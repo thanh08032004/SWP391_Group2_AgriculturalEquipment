@@ -10,7 +10,7 @@
                     <p class="text-muted">
                         <strong>Agricultural Device CMS</strong><br>
                         A student project for Device Management Systems.<br>
-                        Hanoi University of Science and Technology.
+                        FPT University.
                     </p>
                 </div>
             </div>
@@ -38,6 +38,6 @@
     </div>
 
     <div class="text-center py-3 copyright bg-dark text-white">
-        <span>Copyright © 2024. Developed by [Tên nhóm/Tên bạn] - Student Project</span>
+        <span>Copyright © 2026. Developed by Group 2 - Agricultural Device Management Systems Project</span>
     </div>
 </footer>
