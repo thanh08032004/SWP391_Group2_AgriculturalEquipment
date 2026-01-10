@@ -5,18 +5,18 @@
 package model;
 
 import lombok.*;
-
 import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class CustomerVoucher {
     private int id;
-    private String username;
-    private String password;
-    private String role; // ADMIN_SYSTEM, ADMIN_BUSINESS, TECHNICIAN, CUSTOMER
-    private boolean active;
-    private Timestamp createdAt;
+    private int customerId;
+    private int voucherId;
+    private boolean used;
+    private Timestamp assignedAt;
+    private Timestamp usedAt;
 }
+

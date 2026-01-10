@@ -4,19 +4,20 @@
  */
 package model;
 
+/**
+ *
+ * @author Acer
+ */
 import lombok.*;
-
-import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class MaintenanceItem {
     private int id;
-    private String username;
-    private String password;
-    private String role; // ADMIN_SYSTEM, ADMIN_BUSINESS, TECHNICIAN, CUSTOMER
-    private boolean active;
-    private Timestamp createdAt;
+    private int maintenanceId;
+    private int sparePartId;
+    private int quantity;
+    private double price;
 }

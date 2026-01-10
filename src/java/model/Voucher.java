@@ -5,18 +5,21 @@
 package model;
 
 import lombok.*;
-
-import java.sql.Timestamp;
+import java.sql.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Voucher {
     private int id;
-    private String username;
-    private String password;
-    private String role; // ADMIN_SYSTEM, ADMIN_BUSINESS, TECHNICIAN, CUSTOMER
+    private String code;
+    private String description;
+    private String discountType; // PERCENT, AMOUNT
+    private double discountValue;
+    private double minServicePrice;
+    private Date startDate;
+    private Date endDate;
     private boolean active;
-    private Timestamp createdAt;
 }
+

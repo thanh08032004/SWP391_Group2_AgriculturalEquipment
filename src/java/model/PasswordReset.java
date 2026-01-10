@@ -5,18 +5,18 @@
 package model;
 
 import lombok.*;
-
 import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class PasswordReset {
     private int id;
-    private String username;
-    private String password;
-    private String role; // ADMIN_SYSTEM, ADMIN_BUSINESS, TECHNICIAN, CUSTOMER
-    private boolean active;
+    private int userId;
+    private String otpCode;
+    private Timestamp expiredAt;
+    private boolean used;
     private Timestamp createdAt;
 }
+

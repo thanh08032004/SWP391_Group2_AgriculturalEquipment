@@ -5,18 +5,17 @@
 package model;
 
 import lombok.*;
-
-import java.sql.Timestamp;
+import java.sql.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Warranty {
     private int id;
-    private String username;
-    private String password;
-    private String role; // ADMIN_SYSTEM, ADMIN_BUSINESS, TECHNICIAN, CUSTOMER
-    private boolean active;
-    private Timestamp createdAt;
+    private int deviceId;
+    private Date startDate;
+    private Date endDate;
+    private String description;
 }
+

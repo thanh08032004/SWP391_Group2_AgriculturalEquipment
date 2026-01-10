@@ -6,17 +6,14 @@ package model;
 
 import lombok.*;
 
-import java.sql.Timestamp;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class OrderHistory {
     private int id;
-    private String username;
-    private String password;
-    private String role; // ADMIN_SYSTEM, ADMIN_BUSINESS, TECHNICIAN, CUSTOMER
-    private boolean active;
-    private Timestamp createdAt;
+    private int customerId;
+    private double totalAmount;
+    private String note;
 }
+

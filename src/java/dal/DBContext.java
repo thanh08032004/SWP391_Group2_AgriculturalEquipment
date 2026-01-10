@@ -14,11 +14,14 @@ import java.sql.SQLException;
  */
 public class DBContext {
 
-    private static final String URL =
-            "jdbc:mysql://localhost:3306/agri_cms"
-          + "?useSSL=false"
-          + "&allowPublicKeyRetrieval=true"
-          + "&serverTimezone=UTC";
+    private static final String URL
+            = "jdbc:mysql://localhost:3306/agri_cms"
+            + "?useSSL=false"
+            + "&allowPublicKeyRetrieval=true"
+            + "&serverTimezone=UTC"
+            + "&useUnicode=true"
+            + "&characterEncoding=UTF-8"
+            + "&serverTimezone=Asia/Ho_Chi_Minh";
 
     private static final String USER = "root";
     private static final String PASSWORD = "123456";

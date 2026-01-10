@@ -6,17 +6,17 @@ package model;
 
 import lombok.*;
 
-import java.sql.Timestamp;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class SparePart {
     private int id;
-    private String username;
-    private String password;
-    private String role; // ADMIN_SYSTEM, ADMIN_BUSINESS, TECHNICIAN, CUSTOMER
-    private boolean active;
-    private Timestamp createdAt;
+    private String partCode;
+    private String name;
+    private String description;
+    private String unit;
+    private double price;
+    private Integer brandId;
 }
+
