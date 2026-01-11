@@ -75,43 +75,43 @@ public class OtpPassServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        String inputOtp = request.getParameter("otp");
-//        HttpSession session = request.getSession();
-//
-//        Integer userId = (Integer) session.getAttribute("resetUserId");
-//        String email = (String) session.getAttribute("resetEmail");
-//
-//        if (userId == null && email == null) {
-//            response.sendRedirect("forgot-password");
-//            return;
-//        }
-//
-//        PasswordResetDAO resetDAO = new PasswordResetDAO();
-//        PasswordReset reset = resetDAO.findValidOtp(userId, inputOtp);
-//
-//        // OTP sai, hết hạn, đã dùng
-//        if (reset == null) {
-//            request.setAttribute("error", "Mã xác thực không hợp lệ hoặc đã hết hạn");
-//            request.getRequestDispatcher("views/input-otp.jsp").forward(request, response);
-//            return;
-//        }
-//
-//        // OTP đúng
-//        String newPassword = generateRandomPassword(8);
-//        UserDAO userDAO = new UserDAO();
-//        userDAO.updatePassword(userId, newPassword);
-//
-//        // Gửi email
-//        String subject = "Mật khẩu mới của bạn";
-//        String message = "Mật khẩu mới của bạn là: " + newPassword
-//                + "\n\nVui lòng đăng nhập và đổi mật khẩu ngay sau khi đăng nhập.";
-//        boolean sent = EmailUtils.sendEmail(email, subject, message);
-//        if (sent) {
-//            response.sendRedirect("views/send-success.jsp");
-//        } else {
-//            request.setAttribute("error", "Không thể gửi email. Vui lòng thử lại sau!");
-//            request.getRequestDispatcher("views/input-otp.jsp").forward(request, response);
-//        }
+        String inputOtp = request.getParameter("otp");
+        HttpSession session = request.getSession();
+
+        Integer userId = (Integer) session.getAttribute("resetUserId");
+        String email = (String) session.getAttribute("resetEmail");
+
+        if (userId == null && email == null) {
+            response.sendRedirect("forgot-password");
+            return;
+        }
+
+        PasswordResetDAO resetDAO = new PasswordResetDAO();
+        PasswordReset reset = resetDAO.findValidOtp(userId, inputOtp);
+
+        // OTP sai, hết hạn, đã dùng
+        if (reset == null) {
+            request.setAttribute("error", "Mã xác thực không hợp lệ hoặc đã hết hạn");
+            request.getRequestDispatcher("views/input-otp.jsp").forward(request, response);
+            return;
+        }
+
+        // OTP đúng
+        String newPassword = generateRandomPassword(8);
+        UserDAO userDAO = new UserDAO();
+        userDAO.updatePassword(userId, newPassword);
+
+        // Gửi email
+        String subject = "Mật khẩu mới của bạn";
+        String message = "Mật khẩu mới của bạn là: " + newPassword
+                + "\n\nVui lòng đăng nhập và đổi mật khẩu ngay sau khi đăng nhập.";
+        boolean sent = EmailUtils.sendEmail(email, subject, message);
+        if (sent) {
+            response.sendRedirect("views/send-success.jsp");
+        } else {
+            request.setAttribute("error", "Không thể gửi email. Vui lòng thử lại sau!");
+            request.getRequestDispatcher("views/input-otp.jsp").forward(request, response);
+        }
 
     }
 

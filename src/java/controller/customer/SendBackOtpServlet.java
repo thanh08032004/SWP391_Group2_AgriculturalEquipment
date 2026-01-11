@@ -61,33 +61,33 @@ public class SendBackOtpServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        HttpSession session = request.getSession();
-//        String email = (String) session.getAttribute("resetEmail");
-//
-//        UserDAO userDAO = new UserDAO();
-//        User user = userDAO.findByEmail(email);
-//
-//        String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
-//        Timestamp expiredAt = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000); // 5 phút
-//
-//        // Lưu vào session
-//        session.setAttribute("otp", otp);
-//
-//        PasswordResetDAO resetDAO = new PasswordResetDAO();
-//        resetDAO.saveOrUpdateOTP(user.getId(), otp, expiredAt);
-//
-//        String subject = "Mã xác thực của bạn";
-//        String message = "Xin chào " + user.getUsername() + ",\n\nMã xác thực của bạn là: " + otp
-//                + "\n\nVui lòng nhập mã xác thực để lấy lại mật khẩu của bạn !";
-//        boolean sent = EmailUtils.sendEmail(email, subject, message);
-//
-//        if (sent) {
-//            request.setAttribute("message", "Vui lòng kiểm tra lại email!");
-//        } else {
-//            request.setAttribute("error", "Không thể gửi email. Vui lòng thử lại sau!");
-//        }
-//        
-//        request.getRequestDispatcher("views/input-otp.jsp").forward(request, response);
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("resetEmail");
+
+        UserDAO userDAO = new UserDAO();
+        User user = userDAO.findByEmail(email);
+
+        String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
+        Timestamp expiredAt = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000); // 5 phút
+
+        // Lưu vào session
+        session.setAttribute("otp", otp);
+
+        PasswordResetDAO resetDAO = new PasswordResetDAO();
+        resetDAO.saveOrUpdateOTP(user.getId(), otp, expiredAt);
+
+        String subject = "Mã xác thực của bạn";
+        String message = "Xin chào " + user.getUsername() + ",\n\nMã xác thực của bạn là: " + otp
+                + "\n\nVui lòng nhập mã xác thực để lấy lại mật khẩu của bạn !";
+        boolean sent = EmailUtils.sendEmail(email, subject, message);
+
+        if (sent) {
+            request.setAttribute("message", "Vui lòng kiểm tra lại email!");
+        } else {
+            request.setAttribute("error", "Không thể gửi email. Vui lòng thử lại sau!");
+        }
+        
+        request.getRequestDispatcher("views/input-otp.jsp").forward(request, response);
 
     }
 
