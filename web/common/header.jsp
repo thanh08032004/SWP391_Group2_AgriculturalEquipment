@@ -20,24 +20,24 @@
                         <c:choose>
                             <%-- ADMIN ROLE --%>
                             <c:when test="${sessionScope.userRole == 'ADMIN'}">
-                                <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/admin/users">User Management</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/admin/devices">Global Devices</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/admin/reports">System Reports</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/users">User Management</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/devices">Global Devices</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/reports">System Reports</a></li>
                             </c:when>
 
                             <%-- STAFF ROLE (Technicians) --%>
                             <c:when test="${sessionScope.userRole == 'STAFF'}">
-                                <li class="nav-item"><a class="nav-link" href="/staff/tasks">Maintenance Schedule</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/staff/inventory">Spare Parts</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/staff/service-logs">Service Logs</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/tasks">Maintenance Schedule</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/inventory">Spare Parts</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/service-logs">Service Logs</a></li>
                             </c:when>
 
                             <%-- CUSTOMER ROLE (Default) --%>
                             <c:otherwise>
-                                <li class="nav-item"><a class="nav-link" href="/customer/my-assets">My Devices</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/customer/support">Technical Support</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/shop">Parts Store</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/my-assets">My Devices</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Technical Support</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/shop">Parts Store</a></li>
                             </c:otherwise>
                         </c:choose>
                     </ul>
