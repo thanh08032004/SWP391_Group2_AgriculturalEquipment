@@ -5,8 +5,8 @@
 package model;
 
 import lombok.*;
-
 import java.sql.Timestamp;
+
 
 @Data
 @NoArgsConstructor
@@ -16,7 +16,9 @@ public class User {
     private int id;
     private String username;
     private String password;
-    private String role; // ADMIN_SYSTEM, ADMIN_BUSINESS, TECHNICIAN, CUSTOMER
+
+    private int roleId;     // FK → role.id
     private boolean active;
     private Timestamp createdAt;
 }
+
