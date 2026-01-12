@@ -100,56 +100,102 @@
         </div>
         <!-- end hero banner Section -->
 
-        <!-- Categories Section -->
-        <div class="category-list">
-            <div class="container">
-                <div class="section-title text-center mb-4">
-                    <h2>Information about agricultural equipment</h2>
+      <div class="category-list">
+    <div class="container">
+        <div class="section-title text-center mb-4">
+            <h2>Information about agricultural equipment</h2>
+        </div>
+
+        <form class="equipment-form">
+            <h3 class="mb-3">Thông tin về Máy nông nghiệp</h3>
+            <h4 class="mb-4">Tìm hiểu các loại máy nông nghiệp phổ biến hiện nay</h4>
+
+            <!-- PHẦN HIỂN THỊ MẶC ĐỊNH -->
+            <div class="row align-items-start">
+                <div class="col-md-7">
+                    <p>
+                        Cơ giới hóa trong lĩnh vực nông nghiệp đang khiến cho năng suất lao động của
+                        bà con nông dân ngày càng cao hơn. Nếu như trước đây chỉ có những nông cụ
+                        đơn sơ thì giờ đây, trên khắp các cánh đồng trải dài chiều dọc đất nước
+                        thì các loại máy móc phổ biến hơn.
+                    </p>
+
+                    <h4 class="mt-4">1. Máy cày</h4>
+                    <p>
+                        <a href="#">Máy cày</a> là loại máy nông nghiệp phổ biến nhất trên đồng ruộng hiện nay,
+                        giúp cày lật đất, làm đất tơi xốp, tạo điều kiện cho cây trồng phát triển tốt.
+                    </p>
                 </div>
 
-                <form class="equipment-form">
-                    <h3 class="mb-3">Thông tin về Máy nông nghiệp</h3>
-                    <h4 class="mb-4">Tìm hiểu các loại máy nông nghiệp phổ biến hiện nay</h4>
-
-                    <!-- BOOTSTRAP ROW -->
-                    <div class="row align-items-start">
-                        <!-- TEXT -->
-                        <div class="col-md-7">
-                            <p class="mb-3">
-                                Cơ giới hóa trong lĩnh vực nông nghiệp đang khiến cho năng suất lao động của
-                                bà con nông dân ngày càng cao hơn. Nếu như trước đây chỉ có những nông cụ
-                                đơn sơ thì giờ đây, trên khắp các cánh đồng trải dài chiều dọc đất nước
-                                thì các loại máy móc phổ biến hơn.
-                            </p>
-
-                            <p class="mb-3">
-                                Nếu như bà con nông dân đang tìm hiểu về các loại máy móc nông nghiệp
-                                thì đây là các loại máy nông nghiệp phổ biến mà bà con có thể
-                                tham khảo chọn mua nếu có nhu cầu.
-                            </p>
-
-                            <h4 class="mt-4">1. Máy cày</h4>
-                            <p>
-                                <a href="#">Máy cày</a> có lẽ là loại máy nông nghiệp phổ biến nhất trên đồng ruộng hiện nay.
-                                Với kết cấu của mình, máy cày thay thế những con trâu trong việc cày lật đất,
-                                đồng thời giúp làm đất tơi xốp, tạo điều kiện để cây trồng phát triển tốt nhất.
-                                Bên cạnh các dòng máy cày làm đất để trồng lúa, thì hiện các nhà sản xuất đưa tới thị trường đa dạng các dòng máy cày đặc thù như máy cày lên luống đẻ giúp làm các luống trông rau, củ; máy cày mini để làm đất trên các mảnh đất nhỏ...
-
-                                Các thương hiệu máy cày được ưa chuộng nhất trên thị trường hiện nay có thể kể tới như máy cày Kubota, Yanmar, Iseki...
-                            </p>
-                        </div>
-
-                        <!-- IMAGE -->
-                        <div class="col-md-5 text-center">
-                            <img src="assets/images/banner/bn.png"
-                                 class="img-fluid rounded"
-                                 alt="Máy cày"
-                                 style="max-height: 400px;">
-                        </div>
-                    </div>
-                </form>
+                <div class="col-md-5 text-center">
+                    <img src="assets/images/banner/bn.png"
+                         class="img-fluid rounded"
+                         style="max-height: 400px;"
+                         alt="Máy cày">
+                </div>
             </div>
-        </div>
+
+            <!-- PHẦN XEM THÊM -->
+            <div id="moreContent" class="d-none mt-4">
+
+                <!-- PHẦN 2 -->
+                <h4>2. Máy gặt đập liên hợp</h4>
+                <p>
+                    Máy gặt đập liên hợp là loại máy nông nghiệp hiện đại có thể thực hiện
+                    các công đoạn như gặt lúa, tuốt lúa và tách rơm cùng lúc, giúp tiết kiệm
+                    thời gian và công sức lao động cho bà con nông dân.
+                </p>
+
+                <img src="assets/images/banner/bn.png"
+                     class="img-fluid rounded mb-4"
+                     alt="Máy gặt đập liên hợp">
+
+                <!-- PHẦN 3 -->
+                <h4>3. Máy cấy lúa</h4>
+                <p>
+                    Máy cấy lúa giúp bà con nông dân giảm công lao động thủ công,
+                    tăng năng suất và đảm bảo mật độ cây trồng đồng đều.
+                    Hiện nay có các loại máy cấy lúa nhỏ, máy cấy lúa dạng khay
+                    phù hợp với nhiều quy mô sản xuất.
+                </p>
+
+                <img src="assets/images/banner/bn.png"
+                     class="img-fluid rounded mb-4"
+                     alt="Máy cấy lúa">
+
+                <ul>
+                    <li>Máy xới đất</li>
+                    <li>Máy đào đất trồng cây</li>
+                    <li>Máy cắt cỏ</li>
+                    <li>Máy phun thuốc trừ sâu</li>
+                    <li>Máy thu hoạch ngô, khoai, lạc…</li>
+                </ul>
+            </div>
+
+            <!-- NÚT XEM THÊM / THU GỌN -->
+            <div class="text-center mt-4">
+                <button type="button" id="toggleBtn" class="btn btn-primary">
+                    Xem thêm
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    const btn = document.getElementById("toggleBtn");
+    const more = document.getElementById("moreContent");
+
+    btn.addEventListener("click", function () {
+        if (more.classList.contains("d-none")) {
+            more.classList.remove("d-none");
+            btn.innerText = "Thu gọn";
+        } else {
+            more.classList.add("d-none");
+            btn.innerText = "Xem thêm";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+</script>
 
         <!-- End Categories Section -->
         <!-- Feature Section -->

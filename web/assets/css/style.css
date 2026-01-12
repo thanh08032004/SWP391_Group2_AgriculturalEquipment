@@ -1647,3 +1647,22 @@ box-shadow: none;
 }
 
 }
+.equipment-form p {
+    line-height: 1.6;
+    color: #444;
+}
+
+.equipment-form h4 {
+    margin-top: 25px;
+    font-weight: 600;
+}
+
+.equipment-form img {
+    max-height: 400px;
+    object-fit: cover;
+}
+
+#toggleBtn {
+    border-radius: 25px;
+    padding: 8px 30px;
+}
