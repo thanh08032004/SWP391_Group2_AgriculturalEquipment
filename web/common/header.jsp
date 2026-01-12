@@ -55,7 +55,7 @@
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="/profile">Profile Settings</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                                    <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout">Logout</a></li>
                                 </ul>
                             </div>
                         </c:when>
