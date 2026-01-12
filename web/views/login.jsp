@@ -300,7 +300,7 @@
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <div>
-                                                Forgot Password? <a href="forgot-password.html" class="text-primary">Reset It</a>
+                                                Forgot Password? <a href="forgot-password" class="text-primary">Reset It</a>
                                             </div>
                                         </div>
                                         <!-- btn -->
