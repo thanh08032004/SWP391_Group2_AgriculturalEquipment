@@ -50,12 +50,12 @@
                         <c:when test="${not empty sessionScope.user}">
                             <div class="dropdown">
                                 <a class="dropdown-toggle text-dark text-decoration-none" href="#" data-bs-toggle="dropdown">
-                                    <i class="bi bi-person-circle"></i> Hi, ${sessionScope.user.name}
+                                    <i class="bi bi-person-circle"></i> Hi, ${sessionScope.user.username}
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="/profile">Profile Settings</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                                    <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout">Logout</a></li>
                                 </ul>
                             </div>
                         </c:when>
