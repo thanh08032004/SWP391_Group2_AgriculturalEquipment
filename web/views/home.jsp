@@ -130,7 +130,7 @@
                         </div>
 
                         <div class="col-md-5 text-center">
-                            <img src="assets/images/banner/bn.png"
+                            <img style="height: 300px;" src="assets/images/banner/st.png"
                                  class="img-fluid rounded"
                                  style="max-height: 400px;"
                                  alt="Máy cày">
@@ -150,7 +150,7 @@
                             Tùy nhu cầu mà bà con cân nhắc để chọn được loại máy gặt đập phù hợp. Các thương hiệu máy gặt được nhiều người ưa chuộng gồm máy gặt Yanmar, máy gặt KUBOTA, ...
                         </p>
 
-                        <img src="assets/images/banner/bn.png"
+                        <img src="assets/images/banner/st1.png"
                              class="img-fluid rounded mb-4"
                              alt="Máy gặt đập liên hợp">
 
@@ -163,7 +163,7 @@
                             phù hợp với nhiều quy mô sản xuất.
                         </p>
 
-                        <img src="assets/images/banner/bn.png"
+                        <img src="assets/images/banner/st2.png"
                              class="img-fluid rounded mb-4"
                              alt="Máy cấy lúa">
 
