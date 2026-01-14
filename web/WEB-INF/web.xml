@@ -24,6 +24,18 @@
         <servlet-name>LogoutServlet</servlet-name>
         <servlet-class>controller.LogoutServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminBusinessDashboardServlet</servlet-name>
+        <servlet-class>controller.adminBusiness.AdminBusinessDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminSystemDashboardServlet</servlet-name>
+        <servlet-class>controller.adminSystem.AdminSystemDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TechnicanHomeServlet</servlet-name>
+        <servlet-class>controller.technican.TechnicanHomeServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>homeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -47,6 +59,18 @@
     <servlet-mapping>
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminSystemDashboardServlet</servlet-name>
+        <url-pattern>/adminsystemdashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminBusinessDashboardServlet</servlet-name>
+        <url-pattern>/adminbusinessdashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TechnicanHomeServlet</servlet-name>
+        <url-pattern>/technicanhome</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>

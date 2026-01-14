@@ -73,51 +73,51 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        
-    String username = request.getParameter("username");
-    String password = request.getParameter("password");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
 
-    UserDAO userDAO = new UserDAO();
-    User user = userDAO.login(username, password);
+        UserDAO userDAO = new UserDAO();
+        User user = userDAO.login(username, password);
 
-    // Login fail
-    if (user == null) {
-        request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
-        request.setAttribute("username", username);
-        request.getRequestDispatcher("/views/login.jsp").forward(request, response);
-        return;
-    }
+        // Login fail
+        if (user == null) {
+            request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+            return;
+        }
 
-    // Lưu session
-    HttpSession session = request.getSession();
-    session.setAttribute("user", user);
+        // Lưu session
+        HttpSession session = request.getSession();
+        session.setAttribute("user", user);
 
-    String contextPath = request.getContextPath();
+        String contextPath = request.getContextPath();
 
-    switch (user.getRoleId()) {
+        switch (user.getRoleId()) {
 
-        case 1: // ADMIN_SYSTEM
-            response.sendRedirect(contextPath + "/adminadvanced.jsp");
-            break;
+            case 1: // ADMIN_SYSTEM
+                response.sendRedirect(contextPath + "/adminsystemdashboard");
+                break;
 
-        case 2: // ADMIN_BUSINESS
-            response.sendRedirect(contextPath + "/adminuser.jsp");
-            break;
+            case 2: // ADMIN_BUSINESS
+                response.sendRedirect(contextPath + "/adminbusinessdashboard");
 
-        case 3: // TECHNICIAN
-            response.sendRedirect(contextPath + "/staff.jsp");
-            break;
+                break;
 
-        case 4: // CUSTOMER
-             
-            session.setAttribute("userRole", "CUSTOMER");
-            response.sendRedirect(contextPath  + "/home");
-            break;
+            case 3: // TECHNICIAN
+                response.sendRedirect(contextPath + "/technicanhome");
+                break;
 
-        default:
-            session.invalidate();
-            response.sendRedirect(contextPath + "/views/login.jsp");
-    }
+            case 4: // CUSTOMER
+
+//            session.setAttribute("userRole", "CUSTOMER");
+                response.sendRedirect(contextPath + "/home");
+                break;
+
+            default:
+                session.invalidate();
+                response.sendRedirect(contextPath + "/views/login.jsp");
+        }
     }
 
     /**

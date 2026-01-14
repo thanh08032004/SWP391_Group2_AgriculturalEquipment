@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Panelry Dashboard</title>
+    <link rel="shortcut icon" href="../assetAdminSystem/images/favicon.ico" type="image/x-icon">
+    <link href="../assetAdminSystem/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assetAdminSystem/icons/fontawesome/css/fontawesome.min.css" rel="stylesheet">
+    <link href="../assetAdminSystem/icons/fontawesome/css/brands.min.css" rel="stylesheet">
+    <link href="../assetAdminSystem/icons/fontawesome/css/solid.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="../assetAdminSystem/plugin/select2/css/select2.min.css" rel="stylesheet">
+    <link href="../assetAdminSystem/css/board.css" rel="stylesheet">
+    <link href="../assetAdminSystem/css/chat.css" rel="stylesheet">
+    <link href="../assetAdminSystem/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- ========== NAVBAR ========== -->
+     <header>
+         <nav class="navbar navbar-expand-lg" role="navigation" aria-label="Main navigation">
+             <div class="d-flex align-items-center gap-3">
+                 <button class="navbar-toggler icon-btn d-lg-none" id="hambBtn" aria-label="Open menu" title="Open menu">
+                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                         <path stroke="currentColor" stroke-linecap="round" stroke-width="1.6" d="M4 7h16M4 12h16M4 17h16"/>
+                     </svg>
+                 </button>
+                 <a href="index.html" class="navbar-brand">
+                     <div class="logo" aria-hidden="true"><img src="assets/images/icon-logo.png" alt="logo"></div>
+                     <div class="brand-text">
+                        <img src="assets/images/panelry-logo.png" alt="logo">
+                     </div>
+                 </a>
+             </div>
+     
+             <!-- Top nav links -->
+             <div class="collapse navbar-collapse me-3" id="navbarNav">
+                 <ul class="navbar-nav ms-auto" id="menuList">
+                     <li class="nav-item">
+                         <a class="nav-link active" href="index.html" aria-current="page">
+                             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                 <path stroke="currentColor" stroke-width="1.6" d="M3 11.5L12 4l9 7.5M9 21V12h6v9"/>
+                             </svg> Home
+                         </a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link" href="project.html">
+                             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                 <path stroke="currentColor" stroke-width="1.6" d="M3 7h18M7 10h10M5 14h14M9 18h6"/>
+                             </svg> Projects
+                         </a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link" href="task.html">
+                             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                 <path stroke="currentColor" stroke-width="1.6" d="M20 6L9 17l-5-5"/>
+                             </svg> Tasks
+                         </a>
+                     </li>
+                 </ul>
+             </div>
+     
+             <!-- Header actions -->
+             <div class="d-flex gap-2 ms-auto" role="group" aria-label="Header actions">
+                 <!-- Collapse toggle -->
+                 <button class="icon-btn d-none d-lg-grid" id="collapseBtn" aria-pressed="false" title="Collapse sidebar">
+                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                         <path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M9 6l6 6-6 6"/>
+                     </svg>
+                 </button>
+                  <!-- Theme Toggle -->
+                 <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">
+                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" id="themeIcon">
+                         <path stroke="currentColor" stroke-width="1.6" d="M12 17a5 5 0 100-10 5 5 0 000 10zM12 3v2M12 19v2M5 12H3M21 12h-2M6.34 6.34l-1.41 1.41M19.07 19.07l-1.41 1.41"/>
+                     </svg>
+                 </button>
+                 <!-- Search Dropdown -->
+                <div class="dropdown">
+                    <button
+                        class="icon-btn dropdown-toggle"
+                        id="searchBtn"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside"
+                        aria-expanded="false"
+                        aria-label="Search"
+                    >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+                        <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.6" fill="none"/>
+                    </svg>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end search-dropdown" id="searchDropdown">
+                        <input
+                            type="text"
+                            class="search-input"
+                            placeholder="Search..."
+                            id="searchInput"
+                        >
+                    </div>
+                </div>
+                 <!-- Notification Dropdown -->
+                 <div class="dropdown notify-dropdown">
+                      <div
+                         class="dropdown-toggle d-flex align-items-center"
+                         data-bs-toggle="dropdown"
+                         data-bs-auto-close="outside"
+                         aria-expanded="false"
+                         role="button"
+                     >
+                    <button class="icon-btn" id="notifyBtn" aria-label="Notifications" title="Notifications">
+                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                             <path stroke="currentColor" stroke-width="1.6" d="M15 17h5l-1.4-1.7A7 7 0 0012 6a7 7 0 00-6.6 9.3L4 17h5"/>
+                         </svg>
+                     </button>
+                     </div>
+
+                     <div class="dropdown-menu dropdown-menu-end mt-2">
+                        <div id="Notification" class="h-380 scroll-y p-3 custom-scrollbar">
+                            <ul class="timeline p-0">
+                                <li>
+                                    <div class="timeline-panel">
+                                        <div class="media me-2">
+                                            DR
+                                            <!-- <img alt="image" width="50" src="../assetAdminSystem/images/profile.png"> -->
+                                        </div>
+                                        <div class="media-body">
+                                            <h6 class="mb-1">Dr Smith uploaded a new report</h6>
+                                            <small class="d-block">10 Dec 2023 - 08:15 AM</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="timeline-panel">
+                                        <div class="media me-2 media-info">
+                                            AP
+                                        </div>
+                                        <div class="media-body">
+                                            <h6 class="mb-1">New Appointment Scheduled</h6>
+                                            <small class="d-block">10 Dec 2023 - 09:45 AM</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="timeline-panel">
+                                        <div class="media me-2 media-success">
+                                            <i class="fa fa-check-circle"></i>
+                                        </div>
+                                        <div class="media-body">
+                                            <h6 class="mb-1">Patient checked in at reception</h6>
+                                            <small class="d-block">10 Dec 2023 - 10:20 AM</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="timeline-panel">
+                                        <div class="media me-2">
+                                            AS
+                                            <!-- <img alt="image" width="50" src="../assetAdminSystem/images/profile.png"> -->
+                                        </div>
+                                        <div class="media-body">
+                                            <h6 class="mb-1">Dr Alice shared a prescription</h6>
+                                            <small class="d-block">10 Dec 2023 - 11:00 AM</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="timeline-panel">
+                                        <div class="media me-2 media-danger">
+                                            EM
+                                        </div>
+                                        <div class="media-body">
+                                            <h6 class="mb-1">Emergency Alert: Critical Patient</h6>
+                                            <small class="d-block">10 Dec 2023 - 11:30 AM</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="timeline-panel">
+                                        <div class="media me-2 media-primary">
+                                            <i class="fa fa-calendar-alt"></i>
+                                        </div>
+                                        <div class="media-body">
+                                            <h6 class="mb-1">Next Appointment Reminder</h6>
+                                            <small class="d-block">10 Dec 2023 - 12:00 PM</small>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            
+                        </div>
+                        <a class="all-notification" href="#">See all notifications <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                 </div>
+     
+                 <!-- Profile Dropdown -->
+                 <div class="dropdown profile-dropdown">
+                     <div
+                         class="dropdown-toggle d-flex align-items-center"
+                         data-bs-toggle="dropdown"
+                         data-bs-auto-close="outside"
+                         aria-expanded="false"
+                         role="button"
+                     >
+                         <div class="profile" id="profileBtn" tabindex="0" title="Account">
+                             <div class="avatar">M</div>
+                             <div class="name d-none d-md-block">Miller</div>
+                         </div>
+                     </div>
+     
+                     <ul class="dropdown-menu dropdown-menu-end mt-2">
+                         <li><h6 class="dropdown-header">Settings</h6></li>
+                         <li><a class="dropdown-item" href="#"><i class="fa-regular fa-user"></i> Profile Settings</a></li>
+                         <li><a class="dropdown-item" href="#"><i class="fa-regular fa-bell"></i> Notifications</a></li>
+                         <li><a class="dropdown-item" href="#"><i class="fa-solid fa-shield-halved"></i> Privacy &amp; Security</a></li>
+                         <li><a class="dropdown-item" href="#"><i class="fa-regular fa-credit-card"></i> Billing</a></li>
+                         <li>
+                             <div class="sign-out">
+                             <a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket"></i> Sign out</a>
+                             </div>
+                         </li>
+                     </ul>
+
+                 </div>
+     
+     
+             </div>
+         </nav>
+     </header>
+
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="sidebar" id="sidebar" aria-label="Sidebar navigation">
+        <ul class="menu" role="menu">
+            <li class="menu-item" role="none">
+                <a href="index.html" role="menuitem" title="Dashboard">
+                    <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M3 13h8V3H3v10zM13 21h8V11h-8v10zM13 3v6h8V3h-8zM3 21h8v-6H3v6z"
+                            stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">Dashboard</span>
+                </a>
+            </li>
+
+            <li class="menu-item has-submenu" role="none">
+                <a href="#" role="menuitem" title="Projects" class="menu-link">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="4" width="18" height="6" rx="2" stroke="currentColor" stroke-width="1.6"/>
+                        <rect x="3" y="14" width="18" height="6" rx="2" stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">Projects</span>
+                    <span class="arrow">›</span>
+                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="project.html" title="All Projects">
+                            <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M4 6h16M4 12h16M4 18h16"  stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                            <span class="label">All Projects</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="project-create.html" title="Project Created">
+                            <svg viewBox="0 0 24 24" fill="none">
+                             <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                            <span class="label">Create Project</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="menu-item" role="none">
+                <a href="task.html" role="menuitem" title="Tasks">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M2 12h6M2 6h10M2 18h10"  stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">Tasks</span>
+                </a>
+            </li>
+
+            <li class="menu-item" role="none">
+                <a href="reports.html" role="menuitem" title="Reports">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M4 19V5M10 19V9M16 19V3M22 19H2" stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">Reports</span>
+                </a>
+            </li>
+
+            <li class="menu-item" role="none">
+                <a href="board.html" role="menuitem" title="Board">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="4" width="6" height="16" stroke="currentColor" stroke-width="1.6"/>
+                        <rect x="10" y="4" width="5" height="10" stroke="currentColor" stroke-width="1.6"/>
+                        <rect x="16" y="4" width="5" height="13" stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">Board</span>
+                </a>
+            </li>
+
+            <li class="menu-item" role="none">
+                <a href="user.html" role="menuitem" title="User">
+                    <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/>
+                    <path d="M4 20c2-4 6-6 8-6s6 2 8 6" stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">User</span>
+                </a>
+            </li>
+
+            <li class="menu-item" role="none">
+                <a href="team.html" role="menuitem" title="Team">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.6"/>
+                        <circle cx="17" cy="8" r="3" stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M2 20c1.5-3 4-5 7-5M22 20c-1.5-3-4-5-7-5" stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">Team</span>
+                </a>
+            </li>
+
+            <li class="menu-item" role="none">
+                <a href="department.html" role="menuitem" title="Department">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="3" width="6" height="6" stroke="currentColor" stroke-width="1.6"/>
+                        <rect x="15" y="3" width="6" height="6" stroke="currentColor" stroke-width="1.6"/>
+                        <rect x="9" y="15" width="6" height="6" stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M6 9v6h12V9" stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">Department</span>
+                </a>
+            </li>
+            <li class="menu-item" role="none">
+                <a href="chat.html" class="active" role="menuitem" title="Chat">
+                    <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M21 12c0 4-4 7-9 7-1.1 0-2.2-.2-3.2-.5L3 21l1.8-4.3C4.3 15.4 4 13.7 4 12c0-4 4-7 9-7s8 3 8 7z"
+                            stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">Chat</span>
+                </a>
+            </li>
+
+            <li class="menu-item" role="none">
+                <a href="webmail.html" role="menuitem" title="Webmail">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">Webmail</span>
+                </a>
+            </li>
+
+            <li class="menu-item" role="none">
+                <a href="setting.html" role="menuitem" title="Settings">
+                    <svg  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                    <span class="label">Settings</span>
+                </a>
+            </li>
+
+             <li class="menu-item has-submenu" role="none">
+                <a href="#" role="menuitem" title="Pages" class="menu-link">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M6 3h9l5 5v13H6z" stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M15 3v5h5"  stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                    <span class="label">Pages</span>
+                    <span class="arrow">›</span>
+                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="login.html" title="Login">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M10 17l5-5-5-5M15 12H3" stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M17 3h4v18h-4" stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                            <span class="label">Login</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="signup.html" title="Signup">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M6 20c1.5-3 4.5-5 6-5s4.5 2 6 5M12 2v3" stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                            <span class="label">Signup</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="forgot-password.html" title="Forgot Password">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M6 10V8a6 6 0 0112 0v2" stroke="currentColor" stroke-width="1.6"/>
+                                <rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                            <span class="label">Forgot Password</span>
+                        </a>
+                    </li>
+                     <li>
+                        <a href="404.html" title="404">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                            <span class="label">404</span>
+                        </a>
+                    </li>
+                     <li>
+                        <a href="500.html" title="500">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                            <span class="label">500</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main" id="main" role="main">
+            <div class="chat-container">
+        <!-- Sidebar -->
+        <div class="chatsidebar" id="chatsidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="user-avatar">ME</div>
+                <div class="sidebar-actions">
+                    <!-- <i class="fas fa-users" title="Communities"></i>
+                    <i class="fas fa-circle-notch" title="Status"></i>
+                    <i class="fas fa-comment-alt" title="New Chat"></i>
+                    <i class="fas fa-ellipsis-v" title="Menu"></i> -->
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="search-container">
+                <div class="search-box-chat">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input-user" placeholder="Search or start new chat">
+                </div>
+            </div>
+
+            <!-- Chat List -->
+            <div class="chat-list">
+                <div class="chat-item" data-name="John Doe" data-avatar="JD" data-status="Online"
+                    data-gradient="#ff6b6b, #feca57">
+                    <div class="chat-avatar-container">
+                        <div class="chat-avatar">JD</div>
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-header-info">
+                            <div class="chat-name">John Doe</div>
+                            <div class="chat-time">2:30 PM</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="last-message">Hey! How are you doing? 😊</div>
+                            <div class="unread-count">3</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-item" data-name="Sarah Wilson" data-avatar="SW"
+                    data-status="Last seen today at 1:45 PM" data-gradient="#e74c3c, #f39c12">
+                    <div class="chat-avatar" style="background: linear-gradient(45deg, #e74c3c, #f39c12);">SW</div>
+                    <div class="chat-info">
+                        <div class="chat-header-info">
+                            <div class="chat-name">Sarah Wilson</div>
+                            <div class="chat-time">1:45 PM</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="last-message">Thanks for the help earlier!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-item" data-name="Team Group" data-avatar="TG" data-status="5 members"
+                    data-gradient="#9b59b6, #3498db">
+                    <div class="chat-avatar" style="background: linear-gradient(45deg, #9b59b6, #3498db);">TG</div>
+                    <div class="chat-info">
+                        <div class="chat-header-info">
+                            <div class="chat-name">Team Group</div>
+                            <div class="chat-time">12:30 PM</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="last-message">Mike: Let's schedule the meeting</div>
+                            <div class="unread-count">7</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-item" data-name="Alex Johnson" data-avatar="AJ"
+                    data-status="Last seen yesterday at 11:20 PM" data-gradient="#1abc9c, #16a085">
+                    <div class="chat-avatar" style="background: linear-gradient(45deg, #1abc9c, #16a085);">AJ</div>
+                    <div class="chat-info">
+                        <div class="chat-header-info">
+                            <div class="chat-name">Alex Johnson</div>
+                            <div class="chat-time">Yesterday</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="last-message">Perfect! See you tomorrow 👍</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-item" data-name="Emma Davis" data-avatar="ED" data-status="Last seen 2 days ago"
+                    data-gradient="#f1c40f, #f39c12">
+                    <div class="chat-avatar" style="background: linear-gradient(45deg, #f1c40f, #f39c12);">ED</div>
+                    <div class="chat-info">
+                        <div class="chat-header-info">
+                            <div class="chat-name">Emma Davis</div>
+                            <div class="chat-time">2 days ago</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="last-message">Can you send me the documents?</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-item" data-name="Family Group" data-avatar="FG" data-status="8 members"
+                    data-gradient="#e67e22, #d35400">
+                    <div class="chat-avatar" style="background: linear-gradient(45deg, #e67e22, #d35400);">FG</div>
+                    <div class="chat-info">
+                        <div class="chat-header-info">
+                            <div class="chat-name">Family Group</div>
+                            <div class="chat-time">3 days ago</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="last-message">Mom: Don't forget dinner on Sunday!</div>
+                            <div class="unread-count">2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-item" data-name="Mike Chen" data-avatar="MC" data-status="Last seen 5 hours ago"
+                    data-gradient="#2ecc71, #27ae60">
+                    <div class="chat-avatar" style="background: linear-gradient(45deg, #2ecc71, #27ae60);">MC</div>
+                    <div class="chat-info">
+                        <div class="chat-header-info">
+                            <div class="chat-name">Mike Chen</div>
+                            <div class="chat-time">10:15 AM</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="last-message">Great work on the presentation!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-item" data-name="Lisa Park" data-avatar="LP" data-status="Online"
+                    data-gradient="#8e44ad, #9b59b6">
+                    <div class="chat-avatar-container">
+                        <div class="chat-avatar" style="background: linear-gradient(45deg, #8e44ad, #9b59b6);">LP</div>
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-header-info">
+                            <div class="chat-name">Lisa Park</div>
+                            <div class="chat-time">9:45 AM</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="last-message">Let's catch up soon! 🎨</div>
+                            <div class="unread-count">1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-chat" id="mainChat">
+            <!-- Welcome Screen (shown when no chat is selected) -->
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="welcome-logo">
+                    <i class="fa-solid fa-comment"></i>
+                </div>
+                <h1 class="welcome-title">ChatApp Web</h1>
+                <p class="welcome-subtitle">
+                    Send and receive messages without keeping your phone online.<br>
+                    Use ChatApp on up to 4 linked devices and 1 phone at the same time.
+                </p>
+            </div>
+
+            <!-- Chat Interface (hidden by default) -->
+            <div class="chat-interface" id="chatInterface" style="display: none; flex-direction: column; height: 100%;">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <div class="chat-user-info">
+                        <i class="fas fa-arrow-left back-btn" id="backBtn" title="Back"></i>
+                        <div class="chat-user-avatar" id="chatAvatar">JD</div>
+                        <div class="chat-user-details">
+                            <h3 id="chatName">John Doe</h3>
+                            <div class="chat-user-status" id="chatStatus">Online</div>
+                        </div>
+                    </div>
+                    <div class="chat-header-actions">
+                        <i class="fas fa-search" id="searchToggleBtn" title="Search in chat"></i>
+                        <i class="fas fa-ellipsis-v" id="chatMenuBtn" title="Menu"></i>
+
+                        <!-- Chat Menu Dropdown -->
+                        <div class="chat-dropdown-menu" id="chatDropdownMenu">
+                            <div class="chat-dropdown-item" id="clearChatBtn">
+                                <i class="fas fa-broom"></i>
+                                Clear chat
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="chat-dropdown-item danger" id="closeChatBtn">
+                                <i class="fas fa-times-circle"></i>
+                                Close chat
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Search Container -->
+                <div class="chat-search-container" id="chatSearchContainer">
+                    <div class="chat-search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="chat-search-input" id="chatSearchInput" placeholder="Search messages">
+                    </div>
+                    <div class="search-navigation">
+                        <div class="search-count" id="searchCount">0 of 0</div>
+                        <button class="search-nav-btn" id="prevSearchBtn">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                        <button class="search-nav-btn" id="nextSearchBtn">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <button class="close-search-btn" id="closeSearchBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Reply Bar -->
+                <div class="reply-bar" id="replyBar">
+                    <div class="reply-bar-header">
+                        <div class="reply-bar-title">Replying to <span id="replyToName"></span></div>
+                        <button class="reply-bar-close" id="replyBarClose">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="reply-bar-content" id="replyBarContent"></div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message received" data-message-id="1">
+                        <div class="message-bubble">
+                            <div class="message-content">Hey! How are you doing today? 😊</div>
+                            <div class="message-time">2:30 PM</div>
+                            <div class="message-actions">
+                                <div class="message-actions-btn">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="message sent" data-message-id="2">
+                        <div class="message-actions">
+                            <div class="message-actions-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="message-bubble">
+                            <div class="message-content">I'm doing great! Just working on some new projects. How about
+                                you?</div>
+                            <div class="message-time">
+                                2:32 PM
+                                <i class="fas fa-check-double message-status"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="message received" data-message-id="3">
+                        <div class="message-bubble">
+                            <div class="message-content">That sounds awesome! I'd love to hear more about your projects
+                                sometime. 🚀</div>
+                            <div class="message-time">2:33 PM</div>
+                            <div class="message-reactions">
+                                <div class="reaction">
+                                    <span class="reaction-emoji">👍</span>
+                                    <span class="reaction-count">1</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="message-actions">
+                            <div class="message-actions-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="message sent" data-message-id="4">
+                        <div class="message-actions">
+                            <div class="message-actions-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="message-bubble">
+                            <div class="message-content">Let's catch up over coffee this weekend? ☕</div>
+                            <div class="message-time">
+                                2:35 PM
+                                <i class="fas fa-check-double message-status"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="message received" data-message-id="5">
+                        <div class="message-bubble">
+                            <div class="message-content">Perfect! Saturday works for me. Looking forward to it! 🎉</div>
+                            <div class="message-time">2:36 PM</div>
+                        </div>
+                        <div class="message-actions">
+                            <div class="message-actions-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Typing Indicator -->
+                    <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                        <span class="typing-text">typing</span>
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-container">
+                    <div class="input-actions">
+                        <i class="fas fa-smile emoji-btn" title="Emoji"></i>
+                        <label for="fileInput" style="cursor: pointer;">
+                            <i class="fas fa-paperclip" title="Attach File"></i>
+                        </label>
+                        <input type="file" id="fileInput" class="file-input" multiple accept="*/*">
+                    </div>
+                    <div class="message-input-wrapper">
+                        <input type="text" class="message-input" placeholder="Type a message" id="messageInput">
+                    </div>
+                    <button class="send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" id="replyOption">
+            <i class="fas fa-reply"></i>
+            Reply
+        </div>
+        <div class="context-menu-item" id="editOption">
+            <i class="fas fa-edit"></i>
+            Edit
+        </div>
+        <div class="context-menu-item" id="copyOption">
+            <i class="fas fa-copy"></i>
+            Copy
+        </div>
+        <div class="context-menu-item danger" id="deleteOption">
+            <i class="fas fa-trash"></i>
+            Delete
+        </div>
+    </div>
+
+    <!-- Clear Chat Modal -->
+    <div class="modal-overlay" id="clearChatModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon warning">
+                    <i class="fas fa-broom"></i>
+                </div>
+                <div class="modal-title">Clear Chat</div>
+            </div>
+            <div class="modal-content">
+                Are you sure you want to clear all messages in this chat? This action cannot be undone.
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="clearChatCancel">Cancel</button>
+                <button class="modal-btn confirm" id="clearChatConfirm">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Close Chat Modal -->
+    <div class="modal-overlay" id="closeChatModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon danger">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="modal-title">Close Chat</div>
+            </div>
+            <div class="modal-content">
+                Are you sure you want to close this chat? You'll return to the main screen.
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="closeChatCancel">Cancel</button>
+                <button class="modal-btn confirm" id="closeChatConfirm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="profile-modal">
+            <div class="profile-modal-header">
+                <button class="profile-back-btn" id="profileBackBtn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h3>Contact Info</h3>
+                <button class="profile-close-btn" id="profileCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="profile-modal-content" id="profileContent">
+                <!-- Profile content will be loaded here dynamically -->
+            </div>
+        </div>
+    </div>
+    </main>
+
+    <footer class="footer">
+        © 2025 Panelry — All Rights Reserved  <a href="https://www.templaterise.com/" class="text-primary" target="_blank" >Themes By TemplateRise</a>
+    </footer>
+    <script  src="../assetAdminSystem/js/jquery-3.6.0.min.js"></script>
+    <script  src="../assetAdminSystem/js/bootstrap.bundle.min.js"></script>
+    <script  src="../assetAdminSystem/plugin/chart/chart.js"></script>
+    <script  src="../assetAdminSystem/plugin/select2/js/select2.min.js"></script>
+    <script  src="../assetAdminSystem/js/chart.js"></script>
+    <script  src="../assetAdminSystem/js/chat.js"></script>
+    <script  src="../assetAdminSystem/js/board.js"></script>
+    <script  src="../assetAdminSystem/js/script.js"></script>
+</body>
+</html>
