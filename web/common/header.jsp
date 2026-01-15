@@ -49,7 +49,7 @@
                     <c:choose>
                         <c:when test="${not empty sessionScope.user}">
                             <div class="dropdown">
-                                <a class="dropdown-toggle text-dark text-decoration-none" href="#" data-bs-toggle="dropdown">
+                                <a class="dropdown-toggle text-dark text-decoration-none" href="${pageContext.request.contextPath}/profile" data-bs-toggle="dropdown">
                                     <i class="bi bi-person-circle"></i> Hi, ${sessionScope.user.username}
                                 </a>
                                 <ul class="dropdown-menu">
