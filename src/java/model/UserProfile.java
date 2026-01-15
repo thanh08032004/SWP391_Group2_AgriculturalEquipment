@@ -6,7 +6,6 @@ package model;
 
 import lombok.*;
 
-import lombok.*;
 import java.sql.Date;
 
 @Data
@@ -14,6 +13,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @Builder
 public class UserProfile {
+    private User user;
     private int userId;
     private String fullname;
     private String phone;
@@ -22,6 +22,6 @@ public class UserProfile {
     private String avatar;
 
     private String gender;       // MALE / FEMALE / OTHER
-    private Date dateOfBirth;    // DATE
+    private Date birthDate;    // DATE
 }
 
