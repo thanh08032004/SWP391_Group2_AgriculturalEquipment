@@ -91,9 +91,6 @@ public class LoginServlet extends HttpServlet {
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
 
-        //đẩy session vào /profile
-        response.sendRedirect("profile");
-
         String contextPath = request.getContextPath();
 
         switch (user.getRoleId()) {
