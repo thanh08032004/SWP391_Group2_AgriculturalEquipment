@@ -87,7 +87,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // Lưu session
+        // Lưu session,testttttt
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
 
