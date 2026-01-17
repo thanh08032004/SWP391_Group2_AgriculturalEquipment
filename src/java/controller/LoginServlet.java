@@ -100,6 +100,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
+
         //Remember me
         if (user != null) {
             HttpSession session = request.getSession();
@@ -124,6 +125,7 @@ public class LoginServlet extends HttpServlet {
         }
 
         // Lưu session
+
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
 
