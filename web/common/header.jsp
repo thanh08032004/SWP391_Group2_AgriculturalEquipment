@@ -18,8 +18,16 @@
                         </li>
 
                         <c:choose>
-                            <%-- ADMIN ROLE --%>
-                            <c:when test="${sessionScope.userRole == 'ADMIN'}">
+                            <%-- ADMIN_SYSTEM ROLE --%>
+                            <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/users">User Management</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/devices">Global Devices</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/reports">System Reports</a></li>
+                            </c:when>
+                                
+                            <%-- ADMIN_BUSINESS ROLE --%>
+                            <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/users">User Management</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/devices">Global Devices</a></li>
@@ -53,7 +61,7 @@
                                     <i class="bi bi-person-circle"></i> Hi, ${sessionScope.user.username}
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="/profile">Profile Settings</a></li>
+                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/profile">Profile Settings</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout">Logout</a></li>
                                 </ul>

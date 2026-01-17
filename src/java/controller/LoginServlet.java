@@ -8,6 +8,7 @@ import dal.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,7 +59,18 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("views/login.jsp").forward(request, response);
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if ("remember_username".equals(c.getName())) {
+                    request.setAttribute("username", c.getValue());
+                }
+            }
+        }
+
+        request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+
     }
 
     /**
@@ -75,6 +87,7 @@ public class LoginServlet extends HttpServlet {
 
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        String remember = request.getParameter("rememberMe"); // on | null
 
         UserDAO userDAO = new UserDAO();
         User user = userDAO.login(username, password);
@@ -84,6 +97,29 @@ public class LoginServlet extends HttpServlet {
             request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
             request.setAttribute("username", username);
             request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+            return;
+        }
+
+        //Remember me
+        if (user != null) {
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+
+            // ===== SET REMEMBER ME =====
+            if (remember != null) {
+                Cookie c = new Cookie("remember_username", username);
+                c.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
+                c.setPath(request.getContextPath());
+                response.addCookie(c);
+            } else {
+                // user KHÔNG chọn remember → XÓA cookie nếu có
+                Cookie c = new Cookie("remember_username", "");
+                c.setMaxAge(0);
+                c.setPath(request.getContextPath());
+                response.addCookie(c);
+            }
+
+            response.sendRedirect("home");
             return;
         }
 
@@ -109,15 +145,10 @@ public class LoginServlet extends HttpServlet {
                 break;
 
             case 4: // CUSTOMER
-
 //            session.setAttribute("userRole", "CUSTOMER");
                 response.sendRedirect(contextPath + "/home");
                 break;
 
-//            case 5: //test profile bằng role admin
-//                response.sendRedirect(contextPath + "/profile");
-//                break;
-                
             default:
                 session.invalidate();
                 response.sendRedirect(contextPath + "/views/login.jsp");

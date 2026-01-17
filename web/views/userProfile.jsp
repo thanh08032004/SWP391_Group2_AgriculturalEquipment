@@ -6,6 +6,7 @@
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -132,7 +133,7 @@
 
                                 <c:if test="${edit}">
                                     <input type="date" name="birthDate"
-                                           value="${profile.birthDate}">
+                                           value="<fmt:formatDate value='${profile.birthDate}' pattern='yyyy-MM-dd'/>">
                                 </c:if>
                             </div>
                             <div class="info-box full-width">
@@ -165,12 +166,6 @@
                                    class="btn btn-primary">
                                     <i class="fa fa-pen"></i> Edit
                                 </a>
-
-                                <button type="button"
-                                        class="btn btn-outline"
-                                        onclick="toggleChangePassword()">
-                                    <i class="fa fa-key"></i> Change password
-                                </button>
                             </div>
                         </c:if>
 
@@ -226,35 +221,53 @@
                             Reset password
                         </a>
                     </div>
+                    <script>
+                        function updateRemember(checkbox) {
+                            const username = "${user.username}"; // từ session hiện tại
+                            const action = checkbox.checked ? "set" : "unset";
 
-                    <!--                    Remember Account-->
-                    <div class="form-check">
-    <input class="form-check-input" type="checkbox" id="rememberMe"
-           ${cookieUsername != null ? 'checked' : ''}
-           onchange="updateRemember(this)">
-    <label class="form-check-label" for="rememberMe">
-        Remember me (7 days)
-    </label>
-</div>
+                            fetch("${pageContext.request.contextPath}/settings/remember-me", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded"
+                                },
+                                body: "username=" + encodeURIComponent(username) + "&action=" + action
+                            }).then(res => res.json())
+                                    .then(data => console.log("Remember Me status:", data.status))
+                                    .catch(err => console.error(err));
+                        }
+                    </script>
 
-<script>
-function updateRemember(checkbox) {
-    const username = "${user.username}"; // từ session hiện tại
-    const action = checkbox.checked ? "set" : "unset";
+                    <!-- Forget Me -->
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            onclick="forgetMe()">
+                        <i class="fa fa-trash"></i> Forget this device
+                    </button>
 
-    fetch("${pageContext.request.contextPath}/settings/remember-me", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "username=" + encodeURIComponent(username) + "&action=" + action
-    }).then(res => res.json())
-      .then(data => console.log("Remember Me status:", data.status))
-      .catch(err => console.error(err));
-}
-</script>
+                    <input type="checkbox"
+                           disabled
+                           ${cookie.remember_username
+                             != null ? 'checked' : ''}>
+                    <label>Remember me (7 days)</label>
 
+                    <script>
+                        function forgetMe() {
+                            if (!confirm("Bạn có chắc muốn hủy ghi nhớ đăng nhập trên thiết bị này?")) {
+                                return;
+                            }
 
+                            fetch("${pageContext.request.contextPath}/forget-me", {
+                                method: "POST"
+                            })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        alert("Đã hủy remember me cho thiết bị này");
+                                        location.reload(); // reload để checkbox update
+                                    })
+                                    .catch(err => console.error(err));
+                        }
+                    </script>
 
 
 

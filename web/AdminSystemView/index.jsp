@@ -208,7 +208,7 @@
      
                      <ul class="dropdown-menu dropdown-menu-end mt-2">
                          <li><h6 class="dropdown-header">Settings</h6></li>
-                         <li><a class="dropdown-item" href="#"><i class="fa-regular fa-user"></i> Profile Settings</a></li>
+                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/profile"><i class="fa-regular fa-user"></i> Profile Settings</a></li>
                          <li><a class="dropdown-item" href="#"><i class="fa-regular fa-bell"></i> Notifications</a></li>
                          <li><a class="dropdown-item" href="#"><i class="fa-solid fa-shield-halved"></i> Privacy &amp; Security</a></li>
                          <li><a class="dropdown-item" href="#"><i class="fa-regular fa-credit-card"></i> Billing</a></li>

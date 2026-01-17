@@ -19,11 +19,11 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
         <!-- Font -->
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"  rel="stylesheet">
-        
+
     </head>
 
     <body>
-        
+
 
         <main>
             <div class="breadcrumb-main">
@@ -104,6 +104,21 @@
                                         <div class="col-12 d-grid"><button type="submit" class="btn btn-primary">Sign
                                                 In</button></div>
                                         <!-- link -->
+
+                                        <!-- remember me -->
+                                        <div class="col-12 d-flex align-items-center">
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       id="rememberMe"
+                                                       name="rememberMe"
+                                                       ${not empty cookie.remember_username ? "checked" : ""}>
+                                                <label class="form-check-label" for="rememberMe">
+                                                    Remember me (7 days)
+                                                </label>
+                                                
+                                            </div>
+                                        </div>
 
                                     </div>
                                 </form>

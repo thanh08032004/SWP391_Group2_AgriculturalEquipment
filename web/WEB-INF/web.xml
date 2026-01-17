@@ -56,6 +56,10 @@
         <servlet-name>ChangePasswordServlet</servlet-name>
         <servlet-class>controller.ChangePasswordServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ForgetMeServlet</servlet-name>
+        <servlet-class>controller.ForgetMeServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>homeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -103,6 +107,10 @@
     <servlet-mapping>
         <servlet-name>ChangePasswordServlet</servlet-name>
         <url-pattern>/change-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ForgetMeServlet</servlet-name>
+        <url-pattern>/forget-me</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>

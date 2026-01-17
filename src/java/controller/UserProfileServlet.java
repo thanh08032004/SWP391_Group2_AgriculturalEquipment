@@ -2,13 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller;
 
 import dal.UserProfileDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -87,7 +87,6 @@ public class UserProfileServlet extends HttpServlet {
 
         request.setAttribute("tab", tab);
 
-        
         // 6. Đẩy sang JSP
         request.setAttribute("profile", profile);
         request.setAttribute("user", user);
@@ -149,4 +148,3 @@ public class UserProfileServlet extends HttpServlet {
     }// </editor-fold>
 
 }
-
