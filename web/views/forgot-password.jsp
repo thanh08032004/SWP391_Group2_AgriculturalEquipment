@@ -7,7 +7,7 @@
 <html lang="en">
     <head>
         <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-        <jsp:include page="../common/head.jsp"></jsp:include>
+            <jsp:include page="../common/head.jsp"></jsp:include>
             <title>Trang Chủ - CMS Nông Nghiệp</title>
         </head>
         <body>

@@ -12,8 +12,8 @@
         <title>JSP Page</title>
     </head>
     <body>
-      <% 
-    response.sendError(403); 
-%>
+        <% 
+            response.sendError(403); 
+        %>
     </body>
 </html>

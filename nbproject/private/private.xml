@@ -3,7 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Ky5/project_swp/all-group-project/SWP391_Group2_AgriculturalEquipment/src/java/controller/LoginServlet.java</file>
+            <file>file:/C:/Users/FPT/Desktop/swp392/SWP391_Group2_AgriculturalEquipment-main/web/common/header.jsp</file>
+            <file>file:/C:/Users/FPT/Desktop/swp392/SWP391_Group2_AgriculturalEquipment-main/web/errors/403.jsp</file>
+            <file>file:/C:/Users/FPT/Desktop/swp392/SWP391_Group2_AgriculturalEquipment-main/src/java/controller/LoginServlet.java</file>
+            <file>file:/C:/Users/FPT/Desktop/swp392/SWP391_Group2_AgriculturalEquipment-main/src/java/dal/DBContext.java</file>
+            <file>file:/C:/Users/FPT/Desktop/swp392/SWP391_Group2_AgriculturalEquipment-main/web/views/login.jsp</file>
         </group>
     </open-files>
 </project-private>

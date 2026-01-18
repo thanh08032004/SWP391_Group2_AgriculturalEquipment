@@ -13,7 +13,7 @@
     </head>
     <body>
         <% 
-    int trap = 10 / 0; 
-%>
+            int trap = 10 / 0; 
+        %>
     </body>
 </html>
