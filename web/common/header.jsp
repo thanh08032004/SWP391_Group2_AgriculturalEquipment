@@ -1,56 +1,75 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%-- LOGIC XÁC ĐỊNH URL TRANG CHỦ THEO ROLE --%>
+<c:set var="roleHome" value="${pageContext.request.contextPath}/home" />
+<c:choose>
+    <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/adminsystemdashboard" />
+    </c:when>
+    <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/adminbusinessdashboard" />
+    </c:when>
+    <c:when test="${sessionScope.userRole == 'STAFF'}">
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/staff/tasks" />
+    </c:when>
+</c:choose>
+
 <header>
     <div class="container py-lg-2">
         <div class="row align-items-center">
+            <%-- LOGO SECTION: Luôn trỏ về trang chủ của Role --%>
             <div class="col-lg-2">
-                <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
+                <a class="navbar-brand" href="${roleHome}">
                     <img src="${pageContext.request.contextPath}/assets/images/logo.png" class="logo" alt="CMS Logo">
                 </a>
             </div>
-                
+
+            <%-- NAVIGATION SECTION --%>
             <div class="col-lg-7">
                 <nav class="navbar navbar-expand-lg">
                     <ul class="navbar-nav mx-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="${pageContext.request.contextPath}/home">Home</a>
-                        </li>
 
                         <c:choose>
-                            <%-- ADMIN_SYSTEM ROLE --%>
+                            <%-- 1. GUEST OR CUSTOMER --%>
+                            <c:when test="${empty sessionScope.userRole || sessionScope.userRole == 'CUSTOMER'}">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="${pageContext.request.contextPath}/home">Home</a>
+                                </li>
+                                <%--<c:if test="${sessionScope.userRole == 'CUSTOMER'}">--%>
+                                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/my-assets">My Devices</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Support</a></li>
+                                    <%--</c:if>--%>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/shop">Store</a></li>
+                                </c:when>
+
+                            <%-- 2. ADMIN_SYSTEM --%>
                             <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/users">User Management</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/devices">Global Devices</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/reports">System Reports</a></li>
-                            </c:when>
-                                
-                            <%-- ADMIN_BUSINESS ROLE --%>
+                                <li class="nav-item"><a class="nav-link" href="${roleHome}">System Dashboard</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/users">Accounts</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/reports">Security Logs</a></li>
+                                </c:when>
+
+                            <%-- 3. ADMIN_BUSINESS --%>
                             <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/users">User Management</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/devices">Global Devices</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/reports">System Reports</a></li>
-                            </c:when>
+                                <li class="nav-item"><a class="nav-link" href="${roleHome}">Business Dashboard</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/devices">Catalog</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/reports">Finance Reports</a></li>
+                                </c:when>
 
-                            <%-- STAFF ROLE (Technicians) --%>
+                            <%-- 4. STAFF --%>
                             <c:when test="${sessionScope.userRole == 'STAFF'}">
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/tasks">Maintenance Schedule</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${roleHome}">Maintenance Schedule</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/inventory">Spare Parts</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/service-logs">Service Logs</a></li>
-                            </c:when>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/service-logs">Service History</a></li>
+                                </c:when>
+                            </c:choose>
 
-                            <%-- CUSTOMER ROLE (Default) --%>
-                            <c:otherwise>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/my-assets">My Devices</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Technical Support</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/shop">Parts Store</a></li>
-                            </c:otherwise>
-                        </c:choose>
                     </ul>
                 </nav>
             </div>
+
+            <%-- USER ACCOUNT SECTION --%>
 
             <div class="col-lg-3">
                 <div class="list-inline d-flex justify-content-end align-items-center">
@@ -76,3 +95,6 @@
         </div>
     </div>
 </header>
+
+
+
