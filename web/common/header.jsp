@@ -1,7 +1,6 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%-- LOGIC XÁC ĐỊNH URL TRANG CHỦ THEO ROLE --%>
 <c:set var="roleHome" value="${pageContext.request.contextPath}/home" />
 <c:choose>
     <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
@@ -18,14 +17,12 @@
 <header>
     <div class="container py-lg-2">
         <div class="row align-items-center">
-            <%-- LOGO SECTION: Luôn trỏ về trang chủ của Role --%>
             <div class="col-lg-2">
                 <a class="navbar-brand" href="${roleHome}">
                     <img src="${pageContext.request.contextPath}/assets/images/logo.png" class="logo" alt="CMS Logo">
                 </a>
             </div>
 
-            <%-- NAVIGATION SECTION --%>
             <div class="col-lg-7">
                 <nav class="navbar navbar-expand-lg">
                     <ul class="navbar-nav mx-auto">
