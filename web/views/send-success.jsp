@@ -1,8 +1,5 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%-- <c:set var="userRole" value="ADMIN" scope="session" /> --%>
-<%-- <c:set var="userRole" value="STAFF" scope="session" /> --%>
-<c:set var="userRole" value="CUSTOMER" scope="session" />
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -26,17 +23,17 @@
 
 
                     <!-- Message -->
-                    <h4 class="fw-bold text-success">
-                        Mật khẩu đã được gửi 🎉
+                    <h4 class="fw-bold" style="color: #8C593B">
+                        Mật khẩu sẽ sớm gửi đến bạn
                     </h4>
 
                     <p class="text-muted mt-2">
-                        Mật khẩu mới đã được gửi về email của bạn.<br>
-                        Vui lòng kiểm tra hộp thư (kể cả spam).
+                        Admin sẽ cấp mật khẩu cho bạn<br>
+                        Vui lòng kiểm tra hộp thư email trong ngày để nhận mật khẩu mới.
                     </p>
 
                     <!-- Button -->
-                    <a href="login" class="btn btn-success mt-3 w-100">
+                    <a href="login" class="btn btn-primary mt-3 w-100">
                         Quay về đăng nhập
                     </a>
                 </div>

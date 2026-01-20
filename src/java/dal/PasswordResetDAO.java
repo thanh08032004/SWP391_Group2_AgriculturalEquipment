@@ -9,72 +9,87 @@ import model.PasswordReset;
 
 public class PasswordResetDAO extends DBContext {
 
-    public void saveOrUpdateOTP(int userId, String otp, Timestamp expiredAt) {
+    public boolean existsByUserId(int userId) {
+        String sql = "SELECT 1 FROM password_reset_request WHERE user_id = ?";
 
-        String updateSql = """
-        UPDATE password_reset
-        SET otp_code = ?, expired_at = ?, is_used = false, created_at = NOW()
-        WHERE user_id = ?
-    """;
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        String insertSql = """
-        INSERT INTO password_reset (user_id, otp_code, expired_at, is_used)
-        VALUES (?, ?, ?, false)
-    """;
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
 
-        try (Connection conn = getConnection()) {
+        } catch (Exception e) {
+            System.err.println("Error check exists by user id!");
+        }
+        return false;
+    }
 
-            // Try update trước
-            try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
-                psUpdate.setString(1, otp);
-                psUpdate.setTimestamp(2, expiredAt);
-                psUpdate.setInt(3, userId);
+    public void updatePasswordResetRequest(int userId, String email) {
 
-                int affectedRows = psUpdate.executeUpdate();
+        String sql = """
+            UPDATE password_reset_request
+            SET email = ?,
+                status = 'PENDING',
+                created_at = CURRENT_TIMESTAMP
+            WHERE user_id = ?
+        """;
 
-                // Nếu chưa tồn tại -> insert
-                if (affectedRows == 0) {
-                    try (PreparedStatement psInsert = conn.prepareStatement(insertSql)) {
-                        psInsert.setInt(1, userId);
-                        psInsert.setString(2, otp);
-                        psInsert.setTimestamp(3, expiredAt);
-                        psInsert.executeUpdate();
-                    }
-                }
-            }
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        } catch (SQLException e) {
-            System.err.println("Error save or update otp !!!");
+            ps.setString(1, email);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            System.err.println("Error update password reset request!");
         }
     }
 
-    public PasswordReset findValidOtp(int userId, String otp) {
+    public void insertPasswordResetRequest(int userId, String email) {
+
         String sql = """
-        SELECT * FROM password_reset
-        WHERE user_id = ?
-          AND otp_code = ?
-          AND is_used = false
-          AND expired_at > NOW()
-    """;
+            INSERT INTO password_reset_request (user_id, email, status)
+            VALUES (?, ?, 'PENDING')
+        """;
 
-        try (
-            Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, userId);
-            ps.setString(2, otp);
+            ps.setString(2, email);
+            ps.executeUpdate();
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                PasswordReset pr = new PasswordReset();
-                pr.setId(rs.getInt("id"));
-                pr.setUserId(rs.getInt("user_id"));
-                pr.setOtpCode(rs.getString("otp_code"));
-                pr.setExpiredAt(rs.getTimestamp("expired_at"));
-                return pr;
-            }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error insert password reset password!");
         }
-        return null;
+    }
+
+    public void savePasswordResetRequest(int userId, String email) {
+        if (existsByUserId(userId)) {
+            updatePasswordResetRequest(userId, email);
+        } else {
+            insertPasswordResetRequest(userId, email);
+        }
+    }
+
+    public void updateResetRequestStatus(int userId, String status) {
+
+        String sql = """
+            UPDATE password_reset_request
+            SET status = ?
+            WHERE user_id = ?
+              AND status = 'PENDING'
+        """;
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, status); // APPROVED | REJECTED
+            ps.setInt(2, userId);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println("Error update password reset request status !!!");
+        }
     }
 
 }

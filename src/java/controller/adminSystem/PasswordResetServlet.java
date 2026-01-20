@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller.customer;
+package controller.adminSystem;
 
 import dal.PasswordResetDAO;
 import dal.UserDAO;
@@ -12,16 +12,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import java.sql.Timestamp;
 import model.User;
+import org.mindrot.jbcrypt.BCrypt;
 import utils.EmailUtils;
+import utils.PasswordUtil;
 
 /**
  *
  * @author Acer
  */
-public class ForgotPasswordServlet extends HttpServlet {
+public class PasswordResetServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,10 +40,10 @@ public class ForgotPasswordServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ForgotPasswordServlet</title>");
+            out.println("<title>Servlet PasswordResetServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ForgotPasswordServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet PasswordResetServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -61,7 +61,7 @@ public class ForgotPasswordServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("views/forgot-password.jsp").forward(request, response);
+        processRequest(request, response);
     }
 
     /**
@@ -76,29 +76,41 @@ public class ForgotPasswordServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        int userId = Integer.parseInt(request.getParameter("userId"));
         String email = request.getParameter("email");
 
-        if (email == null || email.trim().isEmpty()) {
-            request.setAttribute("error", "Vui lòng nhập email");
-            request.getRequestDispatcher("views/forgot-password.jsp")
-                    .forward(request, response);
-            return;
-        }
+        try {
+            // 1. Random password
+            String newPass = PasswordUtil.randomPassword(6);
 
-        UserDAO userDAO = new UserDAO();
-        User user = userDAO.findByEmail(email);
+            // 2. Hash
+            String hashed = BCrypt.hashpw(newPass, BCrypt.gensalt(10));
 
-        if (user == null) {
-            // email not exist
-            request.setAttribute("error", "Email không tồn tại trong hệ thống");
-            request.getRequestDispatcher("views/forgot-password.jsp")
-                    .forward(request, response);
-        } else {
-            PasswordResetDAO passwordResetDAO = new PasswordResetDAO();
-            passwordResetDAO.savePasswordResetRequest(user.getId(), email);
+            // 3. Update DB
+            UserDAO dao = new UserDAO();
+            dao.updatePassword(userId, hashed);
             
-            response.sendRedirect("send-success");
+            User user = dao.findById(userId);
+
+            // 4. Send mail
+            String subject = "Mật khẩu của bạn";
+            String message = "Xin chào " + user.getUsername() + ",\n\nMật khẩu của bạn là: " + newPass
+                    + "\n\nVui lòng nhập mật khẩu của bạn để đăng nhập!";
+            boolean sent = EmailUtils.sendEmail(email, subject, message);
+
+            // 5. Update request status
+            if(sent) {
+                PasswordResetDAO passwordResetDAO = new PasswordResetDAO();
+                passwordResetDAO.updateResetRequestStatus(userId, "APPROVED");
+                response.sendRedirect("home");
+            } else {
+                request.setAttribute("error", "Lỗi gửi email!");
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error password reset for admin !");
         }
+
     }
 
     /**
