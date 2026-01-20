@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller.customer;
+package controller.adminSystem;
 
 import dal.PasswordResetDAO;
 import dal.UserDAO;
@@ -12,16 +12,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import java.util.Random;
-import model.PasswordReset;
+import model.User;
+import org.mindrot.jbcrypt.BCrypt;
 import utils.EmailUtils;
+import utils.PasswordUtil;
 
 /**
  *
  * @author Acer
  */
-public class OtpPassServlet extends HttpServlet {
+public class PasswordResetServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,10 +40,10 @@ public class OtpPassServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet OtpPassServlet</title>");
+            out.println("<title>Servlet PasswordResetServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet OtpPassServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet PasswordResetServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -61,7 +61,7 @@ public class OtpPassServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("views/input-otp.jsp").forward(request, response);
+        processRequest(request, response);
     }
 
     /**
@@ -75,55 +75,42 @@ public class OtpPassServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String inputOtp = request.getParameter("otp");
-        HttpSession session = request.getSession();
 
-        Integer userId = (Integer) session.getAttribute("resetUserId");
-        String email = (String) session.getAttribute("resetEmail");
+        int userId = Integer.parseInt(request.getParameter("userId"));
+        String email = request.getParameter("email");
 
-        if (userId == null && email == null) {
-            response.sendRedirect("forgot-password");
-            return;
+        try {
+            // 1. Random password
+            String newPass = PasswordUtil.randomPassword(6);
+
+            // 2. Hash
+            String hashed = BCrypt.hashpw(newPass, BCrypt.gensalt(10));
+
+            // 3. Update DB
+            UserDAO dao = new UserDAO();
+            dao.updatePassword(userId, hashed);
+            
+            User user = dao.findById(userId);
+
+            // 4. Send mail
+            String subject = "Mật khẩu của bạn";
+            String message = "Xin chào " + user.getUsername() + ",\n\nMật khẩu của bạn là: " + newPass
+                    + "\n\nVui lòng nhập mật khẩu của bạn để đăng nhập!";
+            boolean sent = EmailUtils.sendEmail(email, subject, message);
+
+            // 5. Update request status
+            if(sent) {
+                PasswordResetDAO passwordResetDAO = new PasswordResetDAO();
+                passwordResetDAO.updateResetRequestStatus(userId, "APPROVED");
+                response.sendRedirect("home");
+            } else {
+                request.setAttribute("error", "Lỗi gửi email!");
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error password reset for admin !");
         }
 
-        PasswordResetDAO resetDAO = new PasswordResetDAO();
-        PasswordReset reset = resetDAO.findValidOtp(userId, inputOtp);
-
-        // OTP sai, hết hạn, đã dùng
-        if (reset == null) {
-            request.setAttribute("error", "Mã xác thực không hợp lệ hoặc đã hết hạn");
-            request.getRequestDispatcher("views/input-otp.jsp").forward(request, response);
-            return;
-        }
-
-        // OTP đúng
-        String newPassword = generateRandomPassword(8);
-        UserDAO userDAO = new UserDAO();
-        userDAO.updatePassword(userId, newPassword);
-
-        // Gửi email
-        String subject = "Mật khẩu mới của bạn";
-        String message = "Mật khẩu mới của bạn là: " + newPassword
-                + "\n\nVui lòng đăng nhập và đổi mật khẩu ngay sau khi đăng nhập.";
-        boolean sent = EmailUtils.sendEmail(email, subject, message);
-        if (sent) {
-            response.sendRedirect("views/send-success.jsp");
-        } else {
-            request.setAttribute("error", "Không thể gửi email. Vui lòng thử lại sau!");
-            request.getRequestDispatcher("views/input-otp.jsp").forward(request, response);
-        }
-
-    }
-
-    private String generateRandomPassword(int length) {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder();
-        Random rand = new Random();
-
-        for (int i = 0; i < length; i++) {
-            sb.append(chars.charAt(rand.nextInt(chars.length())));
-        }
-        return sb.toString();
     }
 
     /**

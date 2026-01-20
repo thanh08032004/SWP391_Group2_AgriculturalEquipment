@@ -26,9 +26,9 @@
 
                 <div class="card shadow p-4" style="max-width: 420px; width: 100%;">
                     <div class="text-center mb-3">
-                        <h3 class="fw-bold">Quên mật khẩu</h3>
-                        <p class="text-muted">
-                            Nhập email của bạn để nhận link đặt lại mật khẩu
+                        <h3 class="fw-bold" style="color: #8C593B">Quên mật khẩu</h3>
+                        <p>
+                            Nhập email của bạn để được admin cấp mật khẩu
                         </p>
                     </div>
 
@@ -57,7 +57,7 @@
                                required />
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100">
+                    <button type="submit" class="btn btn-primary mt-3 w-100">
                         Gửi yêu cầu
                     </button>
                 </form>

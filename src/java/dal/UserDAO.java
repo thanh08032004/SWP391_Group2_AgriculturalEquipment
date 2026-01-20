@@ -9,6 +9,39 @@ import model.User;
 
 public class UserDAO extends DBContext {
 
+    public User findById(int userId) {
+
+        String sql = """
+        SELECT id, username, password, role_id, active, created_at
+        FROM users
+        WHERE id = ?
+        """;
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    user.setRoleId(rs.getInt("role_id"));
+                    user.setActive(rs.getBoolean("active"));
+                    user.setCreatedAt(rs.getTimestamp("created_at"));
+                    return user;
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error find user by id !!!");
+            e.printStackTrace();
+        }
+
+        return null; 
+    }
+
     public User findByEmail(String email) {
         String sql = """
             SELECT u.id, u.username, u.password, u.role_id, u.active, u.created_at
@@ -46,7 +79,7 @@ public class UserDAO extends DBContext {
 
         try (
                 Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, password); 
+            ps.setString(1, password);
             ps.setInt(2, userId);
             ps.executeUpdate();
         } catch (Exception e) {
@@ -54,7 +87,7 @@ public class UserDAO extends DBContext {
         }
 
     }
-    
+
     public User login(String username, String password) {
 
         String sql = """
@@ -66,9 +99,7 @@ public class UserDAO extends DBContext {
         """;
 
         try (
-            Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
             ps.setString(2, password);

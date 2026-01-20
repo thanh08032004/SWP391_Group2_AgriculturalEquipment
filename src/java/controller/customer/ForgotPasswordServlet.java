@@ -89,36 +89,15 @@ public class ForgotPasswordServlet extends HttpServlet {
         User user = userDAO.findByEmail(email);
 
         if (user == null) {
-            // Email không tồn tại
+            // email not exist
             request.setAttribute("error", "Email không tồn tại trong hệ thống");
             request.getRequestDispatcher("views/forgot-password.jsp")
                     .forward(request, response);
         } else {
-            // Sinh OTP 6 số
-            String otp = String.valueOf((int)(Math.random() * 900000) + 100000);
-            Timestamp expiredAt = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000); // 5 phút
+            PasswordResetDAO passwordResetDAO = new PasswordResetDAO();
+            passwordResetDAO.savePasswordResetRequest(user.getId(), email);
             
-            // Lưu vào session
-            HttpSession session = request.getSession();
-            session.setAttribute("otp", otp);
-            session.setAttribute("resetEmail", email);
-            session.setAttribute("resetUserId", user.getId());
-            
-            PasswordResetDAO resetDAO = new PasswordResetDAO();
-            resetDAO.saveOrUpdateOTP(user.getId(), otp, expiredAt);
-            
-            String subject = "Mã xác thực của bạn";
-            String message = "Xin chào " + user.getUsername() + ",\n\nMã xác thực của bạn là: " + otp
-                    + "\n\nVui lòng nhập mã xác thực để lấy lại mật khẩu của bạn !";
-            boolean sent = EmailUtils.sendEmail(email, subject, message);
-
-            if (sent) {
-                response.sendRedirect("otp-pass");
-            } else {
-                request.setAttribute("error", "Không thể gửi email. Vui lòng thử lại sau!");
-                request.getRequestDispatcher("views/forgot-password.jsp").forward(request, response);
-            }
-            
+            response.sendRedirect("send-success");
         }
     }
 
