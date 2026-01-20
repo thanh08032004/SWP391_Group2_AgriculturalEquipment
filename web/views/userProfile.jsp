@@ -7,6 +7,11 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%--<c:if test="${not empty profile.birthDate}">
+    <fmt:formatDate value="${profile.birthDate}" pattern="dd" var="birthDay"/>
+    <fmt:formatDate value="${profile.birthDate}" pattern="MM" var="birthMonth"/>
+    <fmt:formatDate value="${profile.birthDate}" pattern="yyyy" var="birthYear"/>
+</c:if>--%>
 
 <%-- LOGIC XÁC ĐỊNH URL TRANG CHỦ THEO ROLE ĐỂ ĐIỀU HƯỚNG NÚT BACK --%>
 <c:set var="roleHome" value="${pageContext.request.contextPath}/home" />
@@ -41,8 +46,10 @@
                          onerror="this.src='${pageContext.request.contextPath}/assets/images/avatar/default.png'">
                 </div>
 
-                <h2>${profile.fullname}</h2>
-                <div class="role text-uppercase">${sessionScope.userRole}</div>
+                <h2>${profile.fullname}</h2>              
+                <div class="role text-uppercase">
+                    <c:out value="${sessionScope.user.roleName}" default="UNKNOWN ROLE"/>
+                </div>
 
                 <div class="menu">
                     <a href="${pageContext.request.contextPath}/profile?tab=profile"
@@ -71,13 +78,32 @@
                     <form action="${pageContext.request.contextPath}/profile" method="post">
                         <div class="info-grid">
                             <div class="info-box">
-                                <label>Full name</label>
+                                <label>First Name</label>
+
                                 <c:choose>
                                     <c:when test="${edit}">
-                                        <input type="text" name="fullname" value="${profile.fullname}" required>
+                                        <input type="text" name="firstName" value="${firstName}" required>
+                                        <c:if test="${not empty errors.name}">
+                                            <small class="error-text">${errors.name}</small>
+                                        </c:if>
                                     </c:when>
                                     <c:otherwise>
-                                        <span>${profile.fullname}</span>
+                                        <span>${firstName}</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                            <div class="info-box">
+                                <label>Last Name</label>
+
+                                <c:choose>
+                                    <c:when test="${edit}">
+                                        <input type="text" name="lastName" value="${lastName}" required>
+                                        <c:if test="${not empty errors.name}">
+                                            <small class="error-text">${errors.name}</small>
+                                        </c:if>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span>${lastName}</span>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
@@ -86,12 +112,17 @@
                                 <label>Username</label>
                                 <span>${sessionScope.user.username}</span>
                             </div>     
-                            
+
                             <div class="info-box">
                                 <label>Email</label>
+
                                 <c:choose>
                                     <c:when test="${edit}">
                                         <input type="email" name="email" value="${profile.email}" required>
+                                        <c:if test="${not empty errors.email}">
+                                            <small class="error-text">${errors.email}</small>
+                                        </c:if>
+
                                     </c:when>
                                     <c:otherwise>
                                         <span>${profile.email}</span>
@@ -103,7 +134,10 @@
                                 <label>Phone number</label>
                                 <c:choose>
                                     <c:when test="${edit}">
-                                        <input type="text" name="phone" value="${profile.phone}">
+                                        <input type="text" name="phone" value="${profile.phone}" required>
+                                        <c:if test="${not empty errors.phone}">
+                                            <small class="error-text">${errors.phone}</small>
+                                        </c:if>
                                     </c:when>
                                     <c:otherwise>
                                         <span>${profile.phone}</span>
@@ -127,15 +161,28 @@
                                 </c:choose>
                             </div>
 
-                            <div class="info-box">
+                            <div class="info-box full-width">
                                 <label>Birth Date</label>
+
                                 <c:choose>
                                     <c:when test="${edit}">
-                                        <input type="date" name="birthDate" 
-                                               value="<fmt:formatDate value='${profile.birthDate}' pattern='yyyy-MM-dd'/>">
+                                        <div class="birth-row">
+                                            <input type="number" name="day" min="1" max="31"
+                                                   value="${birthDay}" placeholder="DD">
+
+                                            <input type="number" name="month" min="1" max="12"
+                                                   value="${birthMonth}" placeholder="MM">
+
+                                            <input type="number" name="year" min="1900" max="2100"
+                                                   value="${birthYear}" placeholder="YYYY">
+                                            <c:if test="${not empty errors.birthDate}">
+                                                <small class="error-text">${errors.birthDate}</small>
+                                            </c:if>
+                                        </div>
                                     </c:when>
+
                                     <c:otherwise>
-                                        <span>${profile.birthDate}</span>
+                                        <span>${birthDay} / ${birthMonth} / ${birthYear}</span>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
@@ -196,6 +243,30 @@
                         </form>
                     </div>
 
+
+                    <div class="info-box soft mt-4 forgot-password-box">
+                        <h4>
+                            <i class="fa fa-user-shield"></i>
+                            Forgot Password?
+                        </h4>
+
+                        <p class="desc">
+                            If you forget your password, you can submit a reset request.
+                            The system will forward your request to the <strong>System Administrator</strong>
+                            for verification and approval.
+                        </p>
+
+                        <p class="desc text-muted">
+                            Once approved, you will receive further instructions to update your password.
+                        </p>
+
+                        <a href="${pageContext.request.contextPath}/forgot-password"
+                           class="btn btn-outline-primary">
+                            <i class="fa fa-paper-plane"></i> Send Reset Request
+                        </a>
+                    </div>
+
+
                     <div class="info-box danger mt-4">
                         <h4><i class="fa fa-shield"></i> Device Security</h4>
                         <div class="d-flex align-items-center gap-3">
@@ -208,6 +279,9 @@
                             </span>
                         </div>
                     </div>
+
+
+
                 </c:if>
             </div>
         </div>
@@ -227,17 +301,21 @@
         </div>
 
         <script>
-            function openAvatarModal() { document.getElementById("avatarModal").style.display = "flex"; }
-            function closeAvatarModal() { document.getElementById("avatarModal").style.display = "none"; }
-            
+            function openAvatarModal() {
+                document.getElementById("avatarModal").style.display = "flex";
+            }
+            function closeAvatarModal() {
+                document.getElementById("avatarModal").style.display = "none";
+            }
+
             function forgetMe() {
                 if (confirm("Bạn có chắc muốn hủy ghi nhớ đăng nhập trên thiết bị này?")) {
-                    fetch("${pageContext.request.contextPath}/forget-me", { method: "POST" })
-                    .then(res => res.json())
-                    .then(data => {
-                        alert("Đã hủy remember me thành công.");
-                        location.reload();
-                    });
+                    fetch("${pageContext.request.contextPath}/forget-me", {method: "POST"})
+                            .then(res => res.json())
+                            .then(data => {
+                                alert("Đã hủy remember me thành công.");
+                                location.reload();
+                            });
                 }
             }
         </script>

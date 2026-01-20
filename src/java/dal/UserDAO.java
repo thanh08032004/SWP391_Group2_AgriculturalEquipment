@@ -13,7 +13,7 @@ public class UserDAO extends DBContext {
         String sql = """
             SELECT u.id, u.username, u.password, u.role_id, u.active, u.created_at
             FROM users u
-            JOIN user_profile up ON u.id = up.user_id
+            JOIN user_profile up ON u.id = up.user_id           
             WHERE up.email = ?
         """;
 
@@ -58,11 +58,12 @@ public class UserDAO extends DBContext {
     public User login(String username, String password) {
 
         String sql = """
-            SELECT id, username, password, role_id, active, created_at
-            FROM users
+            SELECT u.id, username, password, role_id, r.name as role_name, u.active, created_at
+            FROM users u 
+            JOIN role r ON u.role_id = r.id 
             WHERE username = ?
               AND password = ?
-              AND active = TRUE
+              AND u.active = TRUE
         """;
 
         try (
@@ -80,6 +81,7 @@ public class UserDAO extends DBContext {
                             .username(rs.getString("username"))
                             .password(rs.getString("password"))
                             .roleId(rs.getInt("role_id"))
+                            .roleName(rs.getString("role_name"))
                             .active(rs.getBoolean("active"))
                             .createdAt(rs.getTimestamp("created_at"))
                             .build();

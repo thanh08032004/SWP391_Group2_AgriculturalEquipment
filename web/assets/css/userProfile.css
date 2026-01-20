@@ -297,8 +297,23 @@ body {
 }
 
 
+.birth-row {
+    display: flex;
+    gap: 10px;
+}
+
+.birth-row input {
+    width: 80px;
+    text-align: center;
+}
 
 
+.error-text {
+    color: #d93025;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+}
 
 
 

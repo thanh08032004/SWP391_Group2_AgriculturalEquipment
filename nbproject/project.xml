@@ -52,5 +52,8 @@
             </test-roots>
         </data>
         <libraries xmlns="http://www.netbeans.org/ns/cdnjs-libraries/1"/>
+        <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+            <word>servlet</word>
+        </spellchecker-wordlist>
     </configuration>
 </project>

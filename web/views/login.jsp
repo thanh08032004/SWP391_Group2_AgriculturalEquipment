@@ -32,7 +32,7 @@
                         <h2 class="page-title">Login</h2>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="#">Home</a>
+                                <a href="${pageContext.request.contextPath}/home">Home</a>
                             </li>
                             <li class="breadcrumb-item">
                                 <a href="#">Account</a>
@@ -50,7 +50,7 @@
                             <div class="card-body p-4">
                                 <div class="mb-5">
                                     <h1 class="mb-1 h2 fw-bold">Sign In</h1>
-                                    <p class="mt-3">Registered Customers</p>
+                                    <p class="mt-3">(Registered Customers)</p>
                                 </div>
                                 <c:if test="${not empty error}">
                                     <div class="alert alert-danger mb-3">
@@ -113,6 +113,11 @@
                                                        id="rememberMe"
                                                        name="rememberMe"
                                                        ${not empty cookie.remember_username ? "checked" : ""}>
+<!--                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       id="rememberMe"
+                                                       name="rememberMe"
+                                                       ${not empty cookie.remember_password ? "checked" : ""}>-->
                                                 <label class="form-check-label" for="rememberMe">
                                                     Remember me (7 days)
                                                 </label>

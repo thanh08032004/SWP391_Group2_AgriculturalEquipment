@@ -3,6 +3,7 @@ package dal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.*;
 import model.User;
@@ -47,7 +48,11 @@ public class UserProfileDAO {
                 p.setEmail(rs.getString("email"));
                 p.setPhone(rs.getString("phone"));
                 p.setGender(rs.getString("gender"));
-                p.setBirthDate(rs.getDate("date_of_birth"));
+                //p.setBirthDate(rs.getDate("date_of_birth"));
+                java.sql.Date sqlDate = rs.getDate("date_of_birth");
+                if (sqlDate != null) {
+                    p.setBirthDate(sqlDate.toLocalDate());
+                }
                 p.setAvatar(rs.getString("avatar"));
                 p.setAddress(rs.getString("address"));
                 return p;
@@ -76,7 +81,7 @@ public class UserProfileDAO {
             String gender,
             String email,
             String phone,
-            String birthDate,
+            LocalDate birthDate,
             String address) {
 
         String sql = """
@@ -86,15 +91,13 @@ public class UserProfileDAO {
     """;
 
         try (Connection conn = db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setString(1, fullname);
             ps.setString(2, gender);
             ps.setString(3, email);
             ps.setString(4, phone);
-            ps.setString(5, birthDate);
+            ps.setDate(5, java.sql.Date.valueOf(birthDate));
             ps.setString(6, address);
             ps.setInt(7, userId);
-            
 
             ps.executeUpdate();
 
@@ -119,17 +122,16 @@ public class UserProfileDAO {
     }
 
     public void updatePassword(int userId, String newPassword) {
-    String sql = "UPDATE users SET password = ? WHERE id = ?";
-    try (Connection con = db.getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
+        try (Connection con = db.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setString(1, newPassword); // nếu HASH thì hash ở đây
-        ps.setInt(2, userId);
-        ps.executeUpdate();
+            ps.setString(1, newPassword); // nếu HASH thì hash ở đây
+            ps.setInt(2, userId);
+            ps.executeUpdate();
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
 
 }

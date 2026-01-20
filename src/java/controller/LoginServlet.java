@@ -21,15 +21,6 @@ import model.User;
  */
 public class LoginServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -66,6 +57,9 @@ public class LoginServlet extends HttpServlet {
                 if ("remember_username".equals(c.getName())) {
                     request.setAttribute("username", c.getValue());
                 }
+//                if ("remember_password".equals(c.getName())){
+//                    request.setAttribute("password", c.getValue());
+//                }
             }
         }
 
@@ -95,38 +89,41 @@ public class LoginServlet extends HttpServlet {
         // Login fail
         if (user == null) {
             request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
-            request.setAttribute("username", username);
+            request.setAttribute("username", username);            
             request.getRequestDispatcher("/views/login.jsp").forward(request, response);
             return;
         }
 
-
-        //Remember me
+        //Remember me (7 days)
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
 
-            // ===== SET REMEMBER ME =====
+            // Set remember me
             if (remember != null) {
-                Cookie c = new Cookie("remember_username", username);
-                c.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
-                c.setPath(request.getContextPath());
-                response.addCookie(c);
+                Cookie c1 = new Cookie("remember_username", username);
+                c1.setMaxAge(7 * 24 * 60 * 60); // 7 ngày                
+                c1.setPath(request.getContextPath());
+                response.addCookie(c1);
+                //Cookie c2 = new Cookie("remember_password", password);
+                //c2.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
+                //c2.setPath(request.getContextPath());                
+                //response.addCookie(c2);
             } else {
-                // user KHÔNG chọn remember → XÓA cookie nếu có
-                Cookie c = new Cookie("remember_username", "");
-                c.setMaxAge(0);
-                c.setPath(request.getContextPath());
-                response.addCookie(c);
+                // user không chọn remember → xóa cookie (nếu có)
+                Cookie c1 = new Cookie("remember_username", "");
+                c1.setMaxAge(0);
+                c1.setPath(request.getContextPath());
+                response.addCookie(c1);
+                //Cookie c2 = new Cookie("remember_password", "");
+                //c2.setMaxAge(0);              
+                //c2.setPath(request.getContextPath());                
+                //response.addCookie(c2);
             }
-
-            response.sendRedirect("home");
-            return;
         }
 
         // Lưu session
-
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession();        
         session.setAttribute("user", user);
 
         String contextPath = request.getContextPath();

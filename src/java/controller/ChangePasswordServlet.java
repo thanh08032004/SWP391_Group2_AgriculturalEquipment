@@ -7,7 +7,6 @@ package controller;
 
 import dal.UserProfileDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +16,7 @@ import model.User;
 
 /**
  *
- * @author admin
+ * @author Thong
  */
 public class ChangePasswordServlet extends HttpServlet {
 

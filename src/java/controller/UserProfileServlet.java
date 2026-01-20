@@ -8,13 +8,16 @@ import dal.UserProfileDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import model.User;
 import model.UserProfile;
+import utils.UserProfileUtils;
 
 /**
  *
@@ -48,15 +51,6 @@ public class UserProfileServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -75,32 +69,45 @@ public class UserProfileServlet extends HttpServlet {
         UserProfileDAO dao = new UserProfileDAO();
         UserProfile profile = dao.getUserProfileById(user.getId());
 
-        // 4. Kiểm tra edit mode
+        // 4. Tách fullName
+        String fullName = profile.getFullname();
+        String firstName = "";
+        String lastName = "";
+
+        if (fullName != null && !fullName.trim().isEmpty()) {
+            String[] parts = fullName.trim().split("\\s+");
+            lastName = parts[parts.length - 1];
+            firstName = String.join(" ",
+                    java.util.Arrays.copyOf(parts, parts.length - 1));
+        }
+
+        //4.2
+        if (profile.getBirthDate() != null) {
+            LocalDate dob = profile.getBirthDate();
+            request.setAttribute("birthDay", String.format("%02d", dob.getDayOfMonth()));
+            request.setAttribute("birthMonth", String.format("%02d", dob.getMonthValue()));
+            request.setAttribute("birthYear", String.valueOf(dob.getYear()));
+        }
+
+        // 5. Kiểm tra edit mode
         boolean edit = "true".equals(request.getParameter("edit"));
         request.setAttribute("edit", edit);
 
-        // 5.1. Phân trang (profile với security)
+        // 6. Phân trang (profile với security)
         String tab = request.getParameter("tab");
         if (tab == null) {
             tab = "profile";
         }
-
         request.setAttribute("tab", tab);
 
-        // 6. Đẩy sang JSP
+        // 7. Đẩy sang JSP
         request.setAttribute("profile", profile);
         request.setAttribute("user", user);
+        request.setAttribute("firstName", firstName);
+        request.setAttribute("lastName", lastName);
         request.getRequestDispatcher("/views/userProfile.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -113,28 +120,76 @@ public class UserProfileServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
 
-        // 1. Lấy data từ form
-        String fullname = request.getParameter("fullname");
-        String gender = request.getParameter("gender");
+        Map<String, String> errors = new HashMap<>();
+
+        String firstName = request.getParameter("firstName");
+        String lastName = request.getParameter("lastName");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
-        String birthDate = request.getParameter("birthDate");
+        String gender = request.getParameter("gender");
         String address = request.getParameter("address");
+        String day = request.getParameter("day");
+        String month = request.getParameter("month");
+        String year = request.getParameter("year");
 
-        // 2. Update DB
+// validate name
+        try {
+            UserProfileUtils.validateName(firstName, lastName);
+        } catch (IllegalArgumentException e) {
+            errors.put("name", e.getMessage());
+        }
+
+// validate email
+        try {
+            UserProfileUtils.validateEmail(email);
+        } catch (IllegalArgumentException e) {
+            errors.put("email", e.getMessage());
+        }
+
+// validate phone
+        try {
+            UserProfileUtils.validatePhone(phone);
+        } catch (IllegalArgumentException e) {
+            errors.put("phone", e.getMessage());
+        }
+
+// validate birth date
+        LocalDate birthDate = null;
+        try {
+            birthDate = UserProfileUtils.validateBirthDate(day, month, year);
+        } catch (IllegalArgumentException e) {
+            errors.put("birthDate", e.getMessage());
+        }
+
+//  Có lỗi → quay lại JSP
+        if (!errors.isEmpty()) {
+            request.setAttribute("errors", errors);
+            request.setAttribute("edit", true);
+
+            request.setAttribute("firstName", firstName);
+            request.setAttribute("lastName", lastName);
+            request.setAttribute("birthDay", day);
+            request.setAttribute("birthMonth", month);
+            request.setAttribute("birthYear", year);
+
+            UserProfile profile = new UserProfile();
+            profile.setEmail(email);
+            profile.setPhone(phone);
+            profile.setGender(gender);
+            profile.setAddress(address);
+            request.setAttribute("profile", profile);
+
+            request.getRequestDispatcher("/views/userProfile.jsp")
+                    .forward(request, response);
+            return;
+        }
+
+//  Không lỗi → update DB
+        String fullname = firstName.trim() + " " + lastName.trim();
         UserProfileDAO dao = new UserProfileDAO();
-        dao.updateProfile(
-                user.getId(),
-                fullname,
-                gender,
-                email,
-                phone,
-                birthDate,
-                address
-        );
-
-        // 3. Redirect để tránh submit lại form
+        dao.updateProfile(user.getId(), fullname, gender, email, phone, birthDate, address);
         response.sendRedirect(request.getContextPath() + "/profile");
+
     }
 
     /**
