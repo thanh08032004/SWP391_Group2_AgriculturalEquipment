@@ -5,14 +5,14 @@
 package controller;
 
 import dal.UserDAO;
-import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.PrintWriter;
 import model.User;
 
 /**
@@ -82,81 +82,67 @@ public class LoginServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String remember = request.getParameter("rememberMe"); // on | null
+    String username = request.getParameter("username");
+    String password = request.getParameter("password");
+    String remember = request.getParameter("rememberMe");
 
-        UserDAO userDAO = new UserDAO();
-        User user = userDAO.login(username, password);
+    UserDAO userDAO = new UserDAO();
+    User user = userDAO.login(username, password);
 
-        // Login fail
-        if (user == null) {
-            request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
-            request.setAttribute("username", username);
-            request.getRequestDispatcher("/views/login.jsp").forward(request, response);
-            return;
-        }
-
-
-        //Remember me
-        if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
-
-            // ===== SET REMEMBER ME =====
-            if (remember != null) {
-                Cookie c = new Cookie("remember_username", username);
-                c.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
-                c.setPath(request.getContextPath());
-                response.addCookie(c);
-            } else {
-                // user KHÔNG chọn remember → XÓA cookie nếu có
-                Cookie c = new Cookie("remember_username", "");
-                c.setMaxAge(0);
-                c.setPath(request.getContextPath());
-                response.addCookie(c);
-            }
-
-            response.sendRedirect("home");
-            return;
-        }
-
-        // Lưu session
-
-        HttpSession session = request.getSession();
-        session.setAttribute("user", user);
-
-        String contextPath = request.getContextPath();
-
-        switch (user.getRoleId()) {
-
-            case 1: // ADMIN_SYSTEM
-                response.sendRedirect(contextPath + "/adminsystemdashboard");
-                break;
-
-            case 2: // ADMIN_BUSINESS
-                response.sendRedirect(contextPath + "/adminbusinessdashboard");
-
-                break;
-
-            case 3: // TECHNICIAN
-                response.sendRedirect(contextPath + "/technicanhome");
-                break;
-
-            case 4: // CUSTOMER
-//            session.setAttribute("userRole", "CUSTOMER");
-                response.sendRedirect(contextPath + "/home");
-                break;
-
-            default:
-                session.invalidate();
-                response.sendRedirect(contextPath + "/views/login.jsp");
-        }
+    // 1. Kiểm tra đăng nhập thất bại
+    if (user == null) {
+        request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
+        request.setAttribute("username", username);
+        request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+        return;
     }
 
+    // 2. Đăng nhập thành công -> Lưu Session
+    HttpSession session = request.getSession();
+    session.setAttribute("user", user);
+
+    // === Gán userRole vào session để Header.jsp có thể nhận diện ===
+    if (user.getRoleId() == 1) session.setAttribute("userRole", "ADMIN_SYSTEM");
+    else if (user.getRoleId() == 2) session.setAttribute("userRole", "ADMIN_BUSINESS");
+    else if (user.getRoleId() == 3) session.setAttribute("userRole", "STAFF");
+    else if (user.getRoleId() == 4) session.setAttribute("userRole", "CUSTOMER");
+
+    // 3. Xử lý Remember Me (Cookie)
+    if (remember != null) {
+        Cookie c = new Cookie("remember_username", username);
+        c.setMaxAge(7 * 24 * 60 * 60);
+        c.setPath(request.getContextPath());
+        response.addCookie(c);
+    } else {
+        Cookie c = new Cookie("remember_username", "");
+        c.setMaxAge(0);
+        c.setPath(request.getContextPath());
+        response.addCookie(c);
+    }
+
+    // 4. Phân quyền chuyển hướng (Switch Case)
+    String contextPath = request.getContextPath();
+    switch (user.getRoleId()) {
+        case 1: // ADMIN_SYSTEM
+            response.sendRedirect(contextPath + "/adminsystemdashboard");
+            break;
+        case 2: // ADMIN_BUSINESS
+            response.sendRedirect(contextPath + "/adminbusinessdashboard");
+            break;
+        case 3: // TECHNICIAN (STAFF)
+            response.sendRedirect(contextPath + "/staff/tasks");
+            break;
+        case 4: // CUSTOMER
+            response.sendRedirect(contextPath + "/home");
+            break;
+        default:
+            session.invalidate();
+            response.sendRedirect(contextPath + "/login");
+    }
+}
     /**
      * Returns a short description of the servlet.
      *
@@ -167,4 +153,5 @@ public class LoginServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    
 }
