@@ -120,8 +120,8 @@ public class LoginServlet extends HttpServlet {
                 response.addCookie(c);
             }
 
-            response.sendRedirect("home");
-            return;
+            
+           
         }
 
         // Lưu session
