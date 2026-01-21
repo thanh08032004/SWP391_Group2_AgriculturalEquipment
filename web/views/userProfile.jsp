@@ -7,11 +7,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%--<c:if test="${not empty profile.birthDate}">
-    <fmt:formatDate value="${profile.birthDate}" pattern="dd" var="birthDay"/>
-    <fmt:formatDate value="${profile.birthDate}" pattern="MM" var="birthMonth"/>
-    <fmt:formatDate value="${profile.birthDate}" pattern="yyyy" var="birthYear"/>
-</c:if>--%>
+
 
 <%-- LOGIC XÁC ĐỊNH URL TRANG CHỦ THEO ROLE ĐỂ ĐIỀU HƯỚNG NÚT BACK --%>
 <c:set var="roleHome" value="${pageContext.request.contextPath}/home" />

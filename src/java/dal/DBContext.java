@@ -24,7 +24,7 @@ public class DBContext {
             + "&serverTimezone=Asia/Ho_Chi_Minh";
 
     private static final String USER = "root";
-    private static final String PASSWORD = "123456";
+    private static final String PASSWORD = "1234";
 
     static {
         try {

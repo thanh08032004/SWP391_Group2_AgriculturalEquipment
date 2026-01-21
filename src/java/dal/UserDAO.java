@@ -104,7 +104,7 @@ public class UserDAO extends DBContext {
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username.trim());
-            ps.setString(2, password);
+            ps.setString(2, password.trim());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
