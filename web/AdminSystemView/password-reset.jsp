@@ -75,6 +75,8 @@
 
                                                 <input type="hidden" name="action" value="reject"/>
                                                 <input type="hidden" name="userId" value="${r.userId}"/>
+                                                <input type="hidden" name="email" value="${r.email}"/>
+
 
                                                 <button type="submit"
                                                         class="btn btn-sm btn-outline-danger"

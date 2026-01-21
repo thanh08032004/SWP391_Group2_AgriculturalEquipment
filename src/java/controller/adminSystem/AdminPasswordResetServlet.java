@@ -79,11 +79,10 @@ public class AdminPasswordResetServlet extends HttpServlet {
         int userId = Integer.parseInt(request.getParameter("userId"));
 
         PasswordResetDAO resetDAO = new PasswordResetDAO();
+        String email = request.getParameter("email");
 
         try {
             if ("approve".equals(action)) {
-
-                String email = request.getParameter("email");
 
                 // 1. Random password
                 String rawPassword = PasswordUtil.randomPassword(6);
@@ -97,27 +96,46 @@ public class AdminPasswordResetServlet extends HttpServlet {
 
                 User user = userDAO.findById(userId);
 
-                // 4. Send email
+                // 4. Send email APPROVE
                 String subject = "Reset mật khẩu thành công";
                 String message = "Xin chào " + user.getUsername()
                         + ",\n\nMật khẩu mới của bạn là: " + rawPassword
-                        + "\n\nĐăng nhập để xem thông tin của bạn.";
+                        + "\n\nĐăng nhập để xem thông tin của bạn."
+                        + "Hotline: +84 123 456 789\n"
+                        + "Email hỗ trợ: support@agricms.com\n\n"
+                        + "Trân trọng.";
 
-                boolean sent = EmailUtils.sendEmail(email, subject, message);
+                boolean sentSuccess = EmailUtils.sendEmail(email, subject, message);
 
-                if (sent) {
+                if (sentSuccess) {
                     resetDAO.updateResetRequestStatus(userId, "APPROVED");
                 }
 
             } else if ("reject".equals(action)) {
-                resetDAO.updateResetRequestStatus(userId, "REJECTED");
+
+                // Send email reason
+                String subject = "Yêu cầu reset mật khẩu bị từ chối";
+                String message
+                        = "Chào bạn,\n\n"
+                        + "Yêu cầu reset mật khẩu của bạn đã bị từ chối.\n"
+                        + "Vui lòng liên hệ quản trị viên nếu bạn cần hỗ trợ thêm.\n\n"
+                        + "Hotline: +84 123 456 789\n"
+                        + "Email hỗ trợ: support@agricms.com\n\n"
+                        + "Trân trọng.";
+
+                boolean sentError = EmailUtils.sendEmail(email, subject, message);
+
+                if (sentError) {
+                    resetDAO.updateResetRequestStatus(userId, "REJECTED");
+                }
+
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // quay lại danh sách
+        // return to list
         response.sendRedirect(request.getContextPath() + "/admin/password-reset");
     }
 
