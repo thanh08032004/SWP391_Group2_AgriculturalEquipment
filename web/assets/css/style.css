@@ -1667,3 +1667,130 @@ box-shadow: none;
     border-radius: 25px;
     padding: 8px 30px;
 }
+/* ===== OVERRIDE BOOTSTRAP TABLE BG ===== */
+.role-table > :not(caption) > * > * {
+    background-color: transparent;
+}
+
+/* ===== ROLE TABLE ===== */
+.role-table {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* ===== TABLE HEADER (NHẠT) ===== */
+.role-table thead {
+    background-color: #fff; /* nâu sữa nhạt */
+    color: #5a3e2b;
+}
+
+.role-table thead th {
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    border: none;
+}
+
+/* ===== ZEBRA ROWS ===== */
+.role-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.role-table tbody tr:nth-child(even) {
+    background-color: #faf6f2;
+}
+
+/* ===== HOVER EFFECT ===== */
+.role-table tbody tr:hover {
+    background-color: #f1e9e2 !important;
+    transition: background-color 0.25s ease;
+}
+
+/* ===== STATUS BADGE (GIỮ XANH / ĐỎ) ===== */
+.badge {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    border-radius: 30px;
+    font-weight: 600;
+}
+
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+/* ===== VIEW BUTTON ===== */
+.btn-outline-success {
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-weight: 500;
+    color: #5a3e2b;
+    border-color: #c7b7a3;
+    transition: all 0.25s ease;
+}
+
+.btn-outline-success:hover {
+    background-color: #c7b7a3;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(90, 62, 43, 0.25);
+    transform: translateY(-1px);
+}
+
+/* ===== PAGE TITLE ===== */
+h2 {
+    position: relative;
+    padding-left: 14px;
+}
+
+h2::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    height: 70%;
+    width: 5px;
+    background-color: #c7b7a3;
+    border-radius: 10px;
+}
+.role-title {
+    color: #9f9f9f;
+}
+.role-title {
+    color: #5a3e2b;
+}
+
+.permission-box {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #eee;
+}
+
+.permission-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: #faf6f2;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.permission-item:hover {
+    background-color: #f1e9e2;
+}
+
+.permission-item input {
+    accent-color: #198754;
+}
+
+.permission-item span {
+    font-weight: 500;
+    color: #333;
+}

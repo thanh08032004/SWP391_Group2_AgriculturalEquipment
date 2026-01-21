@@ -198,5 +198,52 @@
         <exception-type>java.lang.Throwable</exception-type>
         <location>/errors/500.jsp</location>
     </error-page>
-
+    <servlet>
+        <servlet-name>RoleServlet</servlet-name>
+        <servlet-class>controller.adminSystem.RoleServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RolePermissionServlet</servlet-name>
+        <servlet-class>controller.adminSystem.RolePermissonServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PermissionUpdateServlet</servlet-name>
+        <servlet-class>controller.adminSystem.PermissionUpdateServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoleDetail</servlet-name>
+        <servlet-class>controller.adminSystem.RoleDetail</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoleUpdateServlet</servlet-name>
+        <servlet-class>controller.adminSystem.RoleUpdateServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SystemAdminServlet</servlet-name>
+        <servlet-class>controller.adminSystem.SystemAdminServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RoleServlet</servlet-name>
+        <url-pattern>/rolelist</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RolePermissionServlet</servlet-name>
+        <url-pattern>/rolepermission</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PermissionUpdateServlet</servlet-name>
+        <url-pattern>/permissionupdate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoleDetail</servlet-name>
+        <url-pattern>/roledetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoleUpdateServlet</servlet-name>
+        <url-pattern>/roleupdate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SystemAdminServlet</servlet-name>
+        <url-pattern>/systemhome</url-pattern>
+    </servlet-mapping>
 </web-app>

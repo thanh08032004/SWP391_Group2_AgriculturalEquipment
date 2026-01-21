@@ -14,5 +14,6 @@ public class Role {
     private Integer id;
     private String name;        // ADMIN_SYSTEM, ADMIN_BUSINESS, CUSTOMER, TECHNICIAN,...
     private String description;
+    private boolean active;
 }
 

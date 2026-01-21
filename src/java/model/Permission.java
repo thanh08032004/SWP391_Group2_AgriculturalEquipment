@@ -12,7 +12,6 @@ import lombok.*;
 @Builder
 public class Permission {
     private Integer id;
-    private Integer roleId;     // FK → role.id
     private String code;        // /home, /about,...
     private String name;
     private String description;
