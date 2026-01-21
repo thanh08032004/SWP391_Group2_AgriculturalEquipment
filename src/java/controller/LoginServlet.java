@@ -38,7 +38,7 @@ public class LoginServlet extends HttpServlet {
         UserDAO dao = new UserDAO();
         User user = dao.login(username, password);
 
-        // 1. Login fail
+        // Login fail
         if (user == null) {
             request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
             request.setAttribute("username", username);
@@ -46,27 +46,19 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // 2. Login sucess -> create session
+        // Create session
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
 
-        // 3. Save role for Header.jsp
+        // Save role for Header.jsp
         switch (user.getRoleId()) {
-            case 1:
-                session.setAttribute("userRole", "ADMIN_SYSTEM");
-                break;
-            case 2:
-                session.setAttribute("userRole", "ADMIN_BUSINESS");
-                break;
-            case 3:
-                session.setAttribute("userRole", "STAFF");
-                break;
-            case 4:
-                session.setAttribute("userRole", "CUSTOMER");
-                break;
+            case 1 -> session.setAttribute("userRole", "ADMIN_SYSTEM");
+            case 2 -> session.setAttribute("userRole", "ADMIN_BUSINESS");
+            case 3 -> session.setAttribute("userRole", "STAFF");
+            case 4 -> session.setAttribute("userRole", "CUSTOMER");
         }
 
-        // 4. Remember Me
+        // Remember Me
         if (remember != null) {
             Cookie c = new Cookie("remember_username", username);
             c.setMaxAge(7 * 24 * 60 * 60);
@@ -79,24 +71,17 @@ public class LoginServlet extends HttpServlet {
             response.addCookie(c);
         }
 
-        // 5. Direct by role
+        // Redirect by role
         String ctx = request.getContextPath();
         switch (user.getRoleId()) {
-            case 1:
-                response.sendRedirect(ctx + "/adminsystemdashboard");
-                break;
-            case 2:
-                response.sendRedirect(ctx + "/adminbusinessdashboard");
-                break;
-            case 3:
-                response.sendRedirect(ctx + "/staff/tasks");
-                break;
-            case 4:
-                response.sendRedirect(ctx + "/home");
-                break;
-            default:
+            case 1 -> response.sendRedirect(ctx + "/admin/users?action=list");
+            case 2 -> response.sendRedirect(ctx + "/adminbusinessdashboard");
+            case 3 -> response.sendRedirect(ctx + "/staff/tasks");
+            case 4 -> response.sendRedirect(ctx + "/home");
+            default -> {
                 session.invalidate();
                 response.sendRedirect(ctx + "/login");
+            }
         }
     }
 }

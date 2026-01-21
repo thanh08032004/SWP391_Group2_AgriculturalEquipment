@@ -1,12 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-import lombok.*;
 import java.sql.Timestamp;
-
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -16,9 +11,10 @@ public class User {
     private int id;
     private String username;
     private String password;
-    private int roleId;     // FK → role.id
-    private String roleName;
+    private int roleId;
+    private String roleName; 
+    private String fullname;
+    private String email;    
     private boolean active;
     private Timestamp createdAt;
 }
-
