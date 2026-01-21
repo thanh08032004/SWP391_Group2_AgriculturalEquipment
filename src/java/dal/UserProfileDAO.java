@@ -88,7 +88,7 @@ public class UserProfileDAO {
         UPDATE user_profile
         SET fullname = ?, gender = ?, email = ?, phone = ?, date_of_birth = ?, address = ?
         WHERE user_id = ?
-    """;
+        """;
 
         try (Connection conn = db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fullname);

@@ -12,6 +12,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import model.PasswordResetRequest;
 import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 import utils.EmailUtils;
@@ -21,17 +23,8 @@ import utils.PasswordUtil;
  *
  * @author Acer
  */
-public class PasswordResetServlet extends HttpServlet {
+public class AdminPasswordResetServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -61,7 +54,13 @@ public class PasswordResetServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        PasswordResetDAO dao = new PasswordResetDAO();
+        List<PasswordResetRequest> listRequest = dao.getAllPasswordResetRequests();
+        request.setAttribute("listRequest", listRequest);
+        for (PasswordResetRequest p : listRequest) {
+            System.out.println(p);
+        }
+        request.getRequestDispatcher("/AdminSystemView/password-reset.jsp").forward(request, response);
     }
 
     /**
@@ -76,51 +75,50 @@ public class PasswordResetServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        String action = request.getParameter("action");
         int userId = Integer.parseInt(request.getParameter("userId"));
-        String email = request.getParameter("email");
+
+        PasswordResetDAO resetDAO = new PasswordResetDAO();
 
         try {
-            // 1. Random password
-            String newPass = PasswordUtil.randomPassword(6);
+            if ("approve".equals(action)) {
 
-            // 2. Hash
-            String hashed = BCrypt.hashpw(newPass, BCrypt.gensalt(10));
+                String email = request.getParameter("email");
 
-            // 3. Update DB
-            UserDAO dao = new UserDAO();
-            dao.updatePassword(userId, hashed);
-            
-            User user = dao.findById(userId);
+                // 1. Random password
+                String rawPassword = PasswordUtil.randomPassword(6);
 
-            // 4. Send mail
-            String subject = "Mật khẩu của bạn";
-            String message = "Xin chào " + user.getUsername() + ",\n\nMật khẩu của bạn là: " + newPass
-                    + "\n\nVui lòng nhập mật khẩu của bạn để đăng nhập!";
-            boolean sent = EmailUtils.sendEmail(email, subject, message);
+                // 2. Hash
+                String hashed = BCrypt.hashpw(rawPassword, BCrypt.gensalt(10));
 
-            // 5. Update request status
-            if(sent) {
-                PasswordResetDAO passwordResetDAO = new PasswordResetDAO();
-                passwordResetDAO.updateResetRequestStatus(userId, "APPROVED");
-                response.sendRedirect("home");
-            } else {
-                request.setAttribute("error", "Lỗi gửi email!");
+                // 3. Update user password
+                UserDAO userDAO = new UserDAO();
+                userDAO.updatePassword(userId, hashed);
+
+                User user = userDAO.findById(userId);
+
+                // 4. Send email
+                String subject = "Reset mật khẩu thành công";
+                String message = "Xin chào " + user.getUsername()
+                        + ",\n\nMật khẩu mới của bạn là: " + rawPassword
+                        + "\n\nĐăng nhập để xem thông tin của bạn.";
+
+                boolean sent = EmailUtils.sendEmail(email, subject, message);
+
+                if (sent) {
+                    resetDAO.updateResetRequestStatus(userId, "APPROVED");
+                }
+
+            } else if ("reject".equals(action)) {
+                resetDAO.updateResetRequestStatus(userId, "REJECTED");
             }
 
         } catch (Exception e) {
-            System.err.println("Error password reset for admin !");
+            e.printStackTrace();
         }
 
+        // quay lại danh sách
+        response.sendRedirect(request.getContextPath() + "/admin/password-reset");
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
 
 }

@@ -5,7 +5,10 @@
 package dal;
 
 import java.sql.*;
-import model.PasswordReset;
+import java.util.ArrayList;
+import java.util.List;
+import model.PasswordResetRequest;
+
 
 public class PasswordResetDAO extends DBContext {
 
@@ -90,6 +93,31 @@ public class PasswordResetDAO extends DBContext {
         } catch (SQLException e) {
             System.err.println("Error update password reset request status !!!");
         }
+    }
+
+    public List<PasswordResetRequest> getAllPasswordResetRequests() {
+        List<PasswordResetRequest> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM password_reset_request";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                PasswordResetRequest pr = new PasswordResetRequest();
+                pr.setId(rs.getInt("id"));
+                pr.setUserId(rs.getInt("user_id"));
+                pr.setEmail(rs.getString("email"));
+                pr.setStatus(rs.getString("status"));
+                pr.setCreatedAt(rs.getTimestamp("created_at"));
+
+                list.add(pr);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error get all password reset request!");
+        }
+
+        return list;
     }
 
 }

@@ -5,7 +5,7 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {"/views/*"})
+@WebFilter(urlPatterns = {"/views/*", "/AdminSystemView/*", "/AdminBusinessView/*"})
 public class AuthFilter implements Filter {
 
     @Override

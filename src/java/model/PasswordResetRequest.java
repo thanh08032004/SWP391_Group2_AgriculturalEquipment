@@ -11,12 +11,11 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PasswordReset {
+public class PasswordResetRequest {
     private int id;
     private int userId;
-    private String otpCode;
-    private Timestamp expiredAt;
-    private boolean used;
+    private String email;
+    private String status;
     private Timestamp createdAt;
 }
 

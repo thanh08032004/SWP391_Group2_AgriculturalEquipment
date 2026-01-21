@@ -12,9 +12,9 @@ public class UserDAO extends DBContext {
     public User findById(int userId) {
 
         String sql = """
-        SELECT id, username, password, role_id, active, created_at
-        FROM users
-        WHERE id = ?
+            SELECT id, username, password, role_id, active, created_at
+            FROM users
+            WHERE id = ?
         """;
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
