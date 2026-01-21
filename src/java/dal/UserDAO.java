@@ -95,14 +95,15 @@ public class UserDAO extends DBContext {
             FROM users u 
             JOIN role r ON u.role_id = r.id 
             WHERE username = ?
-              AND password = ?
+              AND password = ? 
               AND u.active = TRUE
         """;
 
         try (
-                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            Connection conn = getConnection(); 
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, username);
+            ps.setString(1, username.trim());
             ps.setString(2, password);
 
             try (ResultSet rs = ps.executeQuery()) {

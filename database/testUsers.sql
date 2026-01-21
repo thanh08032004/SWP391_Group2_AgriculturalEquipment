@@ -1,0 +1,1 @@
+select * from users join user_profile on users.id = user_profile.user_id

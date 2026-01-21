@@ -38,7 +38,7 @@ public class LoginServlet extends HttpServlet {
         UserDAO dao = new UserDAO();
         User user = dao.login(username, password);
 
-        // 1️⃣ Login thất bại
+        // 1. Login fail
         if (user == null) {
             request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
             request.setAttribute("username", username);
@@ -46,11 +46,11 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // 2️⃣ Login thành công → tạo session
+        // 2. Login sucess -> create session
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
 
-        // 3️⃣ Lưu role cho Header.jsp
+        // 3. Save role for Header.jsp
         switch (user.getRoleId()) {
             case 1:
                 session.setAttribute("userRole", "ADMIN_SYSTEM");
@@ -66,7 +66,7 @@ public class LoginServlet extends HttpServlet {
                 break;
         }
 
-        // 4️⃣ Remember Me (7 days)
+        // 4. Remember Me
         if (remember != null) {
             Cookie c = new Cookie("remember_username", username);
             c.setMaxAge(7 * 24 * 60 * 60);
@@ -79,7 +79,7 @@ public class LoginServlet extends HttpServlet {
             response.addCookie(c);
         }
 
-        // 5️⃣ Điều hướng theo role
+        // 5. Direct by role
         String ctx = request.getContextPath();
         switch (user.getRoleId()) {
             case 1:

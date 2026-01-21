@@ -8,7 +8,8 @@ USE agri_cms;
 CREATE TABLE role (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,   -- ADMIN_SYSTEM, ADMIN_BUSINESS...
-  description TEXT
+  description TEXT,
+  active BOOLEAN DEFAULT TRUE
 ) ENGINE=InnoDB;
 
 -- =================================================
@@ -16,19 +17,10 @@ CREATE TABLE role (
 -- =================================================
 CREATE TABLE permission (
   id INT AUTO_INCREMENT PRIMARY KEY,
-
-  role_id INT NOT NULL,               -- ROLE CHA
-  code VARCHAR(100) NOT NULL,
+  code VARCHAR(100) NOT NULL UNIQUE,
   name VARCHAR(150) NOT NULL,
-  description TEXT,
-
-  FOREIGN KEY (role_id)
-    REFERENCES role(id)
-    ON DELETE CASCADE,
-
-  UNIQUE (role_id, code)
-) ENGINE=InnoDB;
-
+  description TEXT
+);
 -- =================================================
 -- 3. USERS – tài khoản
 -- =================================================
@@ -257,59 +249,8 @@ CREATE TABLE device_rating (
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-
 -- =================================================
--- 16. ORDER_HISTORY – lịch sử mua hàng
--- =================================================
-CREATE TABLE order_history (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  customer_id INT NOT NULL,
-  total_amount DECIMAL(12,2) NOT NULL,
-  note VARCHAR(255),
-
-  FOREIGN KEY (customer_id)
-    REFERENCES users(id)
-    ON DELETE RESTRICT
-) ENGINE=InnoDB;
-
--- =================================================
--- 17. ORDER_ITEM_HISTORY – chi tiết mua device
--- =================================================
-CREATE TABLE order_item_history (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  order_history_id INT NOT NULL,
-  device_id INT NOT NULL,
-  price DECIMAL(12,2) NOT NULL,
-  order_date DATE NOT NULL,
-
-  FOREIGN KEY (order_history_id)
-    REFERENCES order_history(id)
-    ON DELETE CASCADE,
-
-  FOREIGN KEY (device_id)
-    REFERENCES device(id)
-    ON DELETE RESTRICT,
-
-  UNIQUE (order_history_id, device_id)
-) ENGINE=InnoDB;
-
--- =================================================
--- 18. PASSWORD_RESET – bảng lưu otp để lấy lại mật khẩu
--- =================================================
-CREATE TABLE password_reset (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  otp_code VARCHAR(6) NOT NULL,
-  expired_at TIMESTAMP NOT NULL,
-  is_used BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-  FOREIGN KEY (user_id) REFERENCES users(id)
-    ON DELETE CASCADE
-);
-
--- =================================================
--- 19. INVOICE – hóa đơn sửa chữa
+-- 16. INVOICE – hóa đơn sửa chữa
 -- =================================================
 CREATE TABLE invoice (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -322,7 +263,7 @@ CREATE TABLE invoice (
   discount_amount DECIMAL(12,2) DEFAULT 0, -- giảm giá
   total_amount DECIMAL(12,2) NOT NULL,    -- tổng tiền phải trả
 
-  payment_status ENUM('UNPAID','PAID') DEFAULT 'UNPAID',
+  payment_status ENUM('UNPAID','PENDING','PAID') DEFAULT 'UNPAID',
   payment_method ENUM('CASH','BANK_TRANSFER','EWALLET'),
 
   issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- thời điểm hóa đơn được tạo ra
@@ -336,6 +277,145 @@ CREATE TABLE invoice (
     REFERENCES users(id)
     ON DELETE RESTRICT
 ) ENGINE=InnoDB;
+
+-- =================================================
+-- 17. CONTRACT – hợp đồng mua bán thiết bị
+-- =================================================
+CREATE TABLE contract (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  contract_code VARCHAR(50) NOT NULL UNIQUE, -- mã hợp đồng
+  customer_id INT NOT NULL,                  -- khách hàng ký hợp đồng
+
+  signed_at DATE NOT NULL,                   -- ngày ký
+  total_value DECIMAL(12,2) NOT NULL,        -- tổng giá trị hợp đồng
+
+  status ENUM('ACTIVE','COMPLETED','CANCELED') DEFAULT 'ACTIVE',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (customer_id)
+    REFERENCES users(id)
+    ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+-- =================================================
+-- 18. CONTRACT_DEVICE – thiết bị thuộc hợp đồng
+-- =================================================
+CREATE TABLE contract_device (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  contract_id INT NOT NULL,
+  device_id INT NOT NULL,
+
+  price DECIMAL(12,2) NOT NULL,   -- giá của từng máy tại thời điểm bán
+  delivery_date DATE,             -- ngày bàn giao
+
+  FOREIGN KEY (contract_id)
+    REFERENCES contract(id)
+    ON DELETE CASCADE,
+
+  FOREIGN KEY (device_id)
+    REFERENCES device(id)
+    ON DELETE RESTRICT,
+
+  UNIQUE (contract_id, device_id)
+) ENGINE=InnoDB;
+
+-- =================================================
+-- 19. PASSWORD_RESET_REQUEST – gửi yêu cầu reset password
+-- =================================================
+CREATE TABLE password_reset_request (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    email VARCHAR(50),
+    status VARCHAR(20) DEFAULT 'PENDING', -- PENDING | APPROVED | REJECTED
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+-- =================================================
+-- 20. Trung gian giữa role và permission
+-- =================================================
+CREATE TABLE role_permission (
+  role_id INT NOT NULL,
+  permission_id INT NOT NULL,
+
+  PRIMARY KEY (role_id, permission_id),
+
+  FOREIGN KEY (role_id)
+    REFERENCES role(id)
+    ON DELETE CASCADE,
+
+  FOREIGN KEY (permission_id)
+    REFERENCES permission(id)
+    ON DELETE CASCADE
+);
+INSERT INTO role (name, description, active) VALUES
+('ADMIN_SYSTEM',   'Quản trị toàn hệ thống', TRUE),
+('ADMIN_BUSINESS', 'Quản lý vận hành, báo cáo, nhân sự', TRUE),
+('TECHNICIAN',     'Nhân viên bảo trì', TRUE),
+('CUSTOMER',       'Khách hàng sử dụng dịch vụ', TRUE);
+INSERT INTO permission (code, name, description) VALUES
+('/admin/users',              'Quản lý user',        'Xem / thêm / sửa / khóa user'),
+('/admin/roles',              'Quản lý role',        'Quản lý role'),
+('/admin/permissions',        'Quản lý permission',  'Quản lý quyền'),
+('/system/config',            'Cấu hình hệ thống',   'Cấu hình toàn hệ thống'),
+
+('/admin/customers',          'Quản lý khách hàng',  'Xem & quản lý khách'),
+('/admin/devices',            'Quản lý thiết bị',    'Quản lý máy móc'),
+('/admin/maintenance',        'Quản lý bảo trì',     'Phân công bảo trì'),
+('/admin/reports',            'Xem báo cáo',         'Xem thống kê'),
+
+('/tech/maintenance',         'Xem bảo trì',         'Xem công việc'),
+('/tech/maintenance/update',  'Cập nhật bảo trì',   'Cập nhật trạng thái'),
+
+('/customer/devices',         'Xem thiết bị',        'Xem thiết bị của tôi'),
+('/customer/vouchers',        'Xem voucher',         'Xem voucher'),
+('/customer/rating',          'Đánh giá',            'Đánh giá thiết bị');
+
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 1, id FROM permission
+WHERE code IN (
+  '/admin/users',
+  '/admin/roles',
+  '/admin/permissions',
+  '/system/config'
+);
+
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 2, id FROM permission
+WHERE code IN (
+  '/admin/customers',
+  '/admin/devices',
+  '/admin/maintenance',
+  '/admin/reports'
+);
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 3, id FROM permission
+WHERE code IN (
+  '/tech/maintenance',
+  '/tech/maintenance/update'
+);
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 4, id FROM permission
+WHERE code IN (
+  '/customer/devices',
+  '/customer/vouchers',
+  '/customer/rating'
+);
+INSERT INTO users (username, password, role_id) VALUES
+('admin',      '123456', 1),
+('business',   '123456', 2),
+('technician', '123456', 3),
+('customer', '123456', 4),
+('ad', '1', 1);
+
+INSERT INTO user_profile (user_id, fullname, email, gender, date_of_birth, address, phone, avatar) VALUES
+(1, 'Admin System',      'admin@gmail.com',        'MALE',   '1985-01-01' , 'Hà Nội', '0981231234', 'null.jpg'),
+(2, 'Business Owner',    'business@gmail.com',     'MALE',   '1988-05-10', 'Hà Nội', '0981231234', 'admin.png'),
+(3, 'Technician Staff',  'technician@gmail.com',   'MALE',   '1992-08-20', 'Hà Nội','0981231234', 'staff.jpg'),
+(4, 'Cương Đức',         'cuongducjerry@gmail.com', 'MALE',   '1990-01-01', 'Hà Nội','0981231234', 'user.jpg'),
+(5, 'Quản Trị Vũ', 'admin1@gmail.com', 'MALE', '2005-01-01', 'Hà Nội', '0900900900', 'user.jpg');
+
+
 
 
 
