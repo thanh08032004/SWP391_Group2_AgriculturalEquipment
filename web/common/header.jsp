@@ -4,7 +4,7 @@
 <c:set var="roleHome" value="${pageContext.request.contextPath}/home" />
 <c:choose>
     <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
-        <c:set var="roleHome" value="${pageContext.request.contextPath}/adminsystemdashboard" />
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/admin/users?action=list" />
     </c:when>
     <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
         <c:set var="roleHome" value="${pageContext.request.contextPath}/adminbusinessdashboard" />
@@ -42,9 +42,9 @@
 
                             <%-- 2. ADMIN_SYSTEM --%>
                             <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
-                                <li class="nav-item"><a class="nav-link" href="${roleHome}">System Dashboard</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/users">Accounts</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/reports">Security Logs</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${roleHome}">User Management</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/role">Role Management</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/reset">Reset Password</a></li>
                                 </c:when>
 
                             <%-- 3. ADMIN_BUSINESS --%>
@@ -56,7 +56,7 @@
 
                             <%-- 4. STAFF --%>
                             <c:when test="${sessionScope.userRole == 'STAFF'}">
-                                <li class="nav-item"><a class="nav-link" href="${roleHome}">Maintenance Schedule</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${roleHome}">User Management</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/inventory">Spare Parts</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/service-logs">Service History</a></li>
                                 </c:when>

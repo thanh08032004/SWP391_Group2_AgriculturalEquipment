@@ -9,11 +9,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 
-<%-- LOGIC XÁC ĐỊNH URL TRANG CHỦ THEO ROLE ĐỂ ĐIỀU HƯỚNG NÚT BACK --%>
 <c:set var="roleHome" value="${pageContext.request.contextPath}/home" />
 <c:choose>
     <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
-        <c:set var="roleHome" value="${pageContext.request.contextPath}/adminsystemdashboard" />
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/admin/users?action=list" />
     </c:when>
     <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
         <c:set var="roleHome" value="${pageContext.request.contextPath}/adminbusinessdashboard" />
