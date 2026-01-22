@@ -88,30 +88,30 @@ public class UserDAO extends DBContext {
 
     }
 
-    public User login(String username, String password) {
+    public User findByUsername(String username) {
 
         String sql = """
-            SELECT u.id, username, password, role_id, r.name as role_name, u.active, created_at
-            FROM users u 
-            JOIN role r ON u.role_id = r.id 
-            WHERE username = ?
-              AND password = ? 
+            SELECT u.id, u.username, u.password, u.role_id,
+                   r.name AS role_name, u.active, u.created_at
+            FROM users u
+            JOIN role r ON u.role_id = r.id
+            WHERE u.username = ?
               AND u.active = TRUE
         """;
 
         try (
-            Connection conn = getConnection(); 
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
 
             ps.setString(1, username.trim());
-            ps.setString(2, password.trim());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return User.builder()
                             .id(rs.getInt("id"))
                             .username(rs.getString("username"))
-                            .password(rs.getString("password"))
+                            .password(rs.getString("password")) // BCrypt hash
                             .roleId(rs.getInt("role_id"))
                             .roleName(rs.getString("role_name"))
                             .active(rs.getBoolean("active"))
@@ -123,7 +123,6 @@ public class UserDAO extends DBContext {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return null;
     }
 }

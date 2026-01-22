@@ -44,7 +44,7 @@
                             <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
                                 <li class="nav-item"><a class="nav-link" href="${roleHome}">User Management</a></li>
 
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/role">Role Management</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/rolelist">Role Management</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/password-reset">Reset Password</a></li>
 
                                 </c:when>

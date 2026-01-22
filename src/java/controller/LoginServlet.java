@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import model.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class LoginServlet extends HttpServlet {
 
@@ -36,21 +37,21 @@ public class LoginServlet extends HttpServlet {
         String remember = request.getParameter("rememberMe");
 
         UserDAO dao = new UserDAO();
-        User user = dao.login(username, password);
+        User user = dao.findByUsername(username);
 
-        // Login fail
-        if (user == null) {
+        // ❌ Sai username hoặc sai password
+        if (user == null || !BCrypt.checkpw(password, user.getPassword())) {
             request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
             request.setAttribute("username", username);
             request.getRequestDispatcher("/views/login.jsp").forward(request, response);
             return;
         }
 
-        // Create session
+        // ✅ Login thành công
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
 
-        // Save role for Header.jsp
+        // Save role
         switch (user.getRoleId()) {
             case 1 -> session.setAttribute("userRole", "ADMIN_SYSTEM");
             case 2 -> session.setAttribute("userRole", "ADMIN_BUSINESS");
@@ -58,7 +59,7 @@ public class LoginServlet extends HttpServlet {
             case 4 -> session.setAttribute("userRole", "CUSTOMER");
         }
 
-        // Remember Me
+        // Remember me
         if (remember != null) {
             Cookie c = new Cookie("remember_username", username);
             c.setMaxAge(7 * 24 * 60 * 60);
@@ -71,7 +72,6 @@ public class LoginServlet extends HttpServlet {
             response.addCookie(c);
         }
 
-        // Redirect by role
         String ctx = request.getContextPath();
         switch (user.getRoleId()) {
             case 1 -> response.sendRedirect(ctx + "/admin/users?action=list");
