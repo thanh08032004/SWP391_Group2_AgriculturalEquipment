@@ -6,6 +6,8 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 import model.User;
+import org.mindrot.jbcrypt.BCrypt;
+
 
 public class AdminUserServlet extends HttpServlet {
 
@@ -16,11 +18,11 @@ public class AdminUserServlet extends HttpServlet {
         if (action == null) action = "list";
 
         AdminDAO adminDAO = new AdminDAO();
+                            List<User> userList = adminDAO.getAllUsers();
 
         try {
             switch (action) {
                 case "list":
-                    List<User> userList = adminDAO.getAllUsers();
                     request.setAttribute("userList", userList);
                     request.getRequestDispatcher("/AdminSystemView/user-list.jsp").forward(request, response);
                     break;
@@ -46,6 +48,10 @@ public class AdminUserServlet extends HttpServlet {
                     adminDAO.toggleUserStatus(toggleId, status);
                     response.sendRedirect("users?action=list");
                     break;
+                default:
+                    request.setAttribute("userList", userList);
+                    request.getRequestDispatcher("/AdminSystemView/user-list.jsp").forward(request, response);
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,8 +66,10 @@ public class AdminUserServlet extends HttpServlet {
         AdminDAO adminDAO = new AdminDAO();
 
         if ("create".equals(action)) {
+        String hashed = BCrypt.hashpw("123", BCrypt.gensalt(10));
+
             boolean success = adminDAO.createNewUser(
-                request.getParameter("username"), "123", 
+                request.getParameter("username"), hashed, 
                 Integer.parseInt(request.getParameter("roleId")), 
                 request.getParameter("fullname"), request.getParameter("email")
             );
@@ -69,7 +77,6 @@ public class AdminUserServlet extends HttpServlet {
             if (success) response.sendRedirect("users?action=list");
             else {
                  request.setAttribute("error", "Username or email already exists!");
-
                 request.setAttribute("username", request.getParameter("username"));
                 request.setAttribute("fullname", request.getParameter("fullname"));
                 request.setAttribute("email", request.getParameter("email"));
@@ -77,7 +84,6 @@ public class AdminUserServlet extends HttpServlet {
 
                 List<String[]> rolesAdd = adminDAO.getAllRoles();
                 request.setAttribute("roles", rolesAdd);
-
                 request.getRequestDispatcher("/AdminSystemView/user-add.jsp")
                         .forward(request, response);
 
