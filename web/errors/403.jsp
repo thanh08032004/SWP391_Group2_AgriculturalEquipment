@@ -1,5 +1,17 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="roleHome" value="${pageContext.request.contextPath}/home" />
+<c:choose>
+    <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/admin/users" />
+    </c:when>
+    <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/adminbusinessdashboard" />
+    </c:when>
+    <c:when test="${sessionScope.userRole == 'STAFF'}">
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/staff/tasks" />
+    </c:when>
+</c:choose>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,7 +27,7 @@
             <h2 class="mb-3">Access Denied</h2>
             <p class="text-muted mb-4">You do not have permission to access this resource.<br>Please contact your administrator if you believe this is an error.</p>
             <div class="d-flex justify-content-center gap-3">
-                <a href="${pageContext.request.contextPath}/home" class="btn btn-danger shadow-sm">Return Home</a>
+                <a href="${roleHome}" class="btn btn-danger shadow-sm">Return Home</a>
             </div>
         </div>
     </div>

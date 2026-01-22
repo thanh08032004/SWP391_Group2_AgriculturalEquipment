@@ -12,7 +12,7 @@
 <c:set var="roleHome" value="${pageContext.request.contextPath}/home" />
 <c:choose>
     <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
-        <c:set var="roleHome" value="${pageContext.request.contextPath}/admin/users?action=list" />
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/admin/users" />
     </c:when>
     <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
         <c:set var="roleHome" value="${pageContext.request.contextPath}/adminbusinessdashboard" />
