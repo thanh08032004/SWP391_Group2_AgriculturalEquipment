@@ -54,14 +54,14 @@
                                 </c:choose>
                             </td>
                             <td>
-                    <a href="roledetail?viewRole=${r.id}"
+                    <a href="${pageContext.request.contextPath}/roledetail?viewRole=${r.id}"
                        class="btn btn-sm btn-outline-success">
                         View
                     </a>
 </td>
 
                     <td>
-                        <a href="rolepermission?roleId=${r.id}"
+                        <a href="${pageContext.request.contextPath}/rolepermission?roleId=${r.id}"
                            class="btn btn-sm btn-outline-primary">
                             View
                         </a>
