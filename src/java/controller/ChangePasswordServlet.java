@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller;
 
 import dal.UserProfileDAO;
@@ -41,25 +40,30 @@ public class ChangePasswordServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
+        UserProfileDAO userDAO = new UserProfileDAO();
 
         String currentPassword = request.getParameter("currentPassword");
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
 
-        // 2. Validate cơ bản
-        if (!newPassword.equals(confirmPassword)) {
-            request.setAttribute("error", "Confirm password does not match");
-            request.setAttribute("error", "Current password is incorrect");
-            request.getRequestDispatcher("/profile").forward(request, response);
-            return;
-        }
+        // 2. Validate tất cả trước
+        boolean confirmWrong = !newPassword.equals(confirmPassword);
+        boolean currentWrong = !userDAO.checkPassword(user.getId(), currentPassword);
 
-        UserProfileDAO userDAO = new UserProfileDAO();
+        // 3. Xử lý lỗi (redirect 1 lần)
+        if (confirmWrong || currentWrong) {
+            String errorPass;
 
-        // 3. Kiểm tra mật khẩu hiện tại      
-        if (!userDAO.checkPassword(user.getId(), currentPassword)) {
-            request.setAttribute("error", "Current password is incorrect");
-            request.getRequestDispatcher("/profile?edit=false").forward(request, response);
+            // Ưu tiên current password (bảo mật)
+            if (currentWrong) {
+                errorPass = "wrongpass";
+            } else {
+                errorPass = "confirm";
+            }
+
+            response.sendRedirect(
+                    request.getContextPath() + "/profile?tab=security&errorPass=" + errorPass
+            );
             return;
         }
 
@@ -67,6 +71,8 @@ public class ChangePasswordServlet extends HttpServlet {
         userDAO.updatePassword(user.getId(), newPassword);
 
         // 5. Thành công, quay về profile
-        response.sendRedirect(request.getContextPath() + "/profile");
+        response.sendRedirect(
+                request.getContextPath() + "/profile?tab=security&success=passUpdated"
+        );
     }
 }

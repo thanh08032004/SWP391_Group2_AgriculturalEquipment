@@ -23,10 +23,10 @@ public class AuthFilter implements Filter {
         if (uri.equals(contextPath + "/login")
                 || uri.equals(contextPath + "/logout")
                 || uri.endsWith("/login.jsp")) {
-            chain.doFilter(request, response);
+            chain.doFilter(req, res);
             return;
         }
 
-        chain.doFilter(request, response);
+        chain.doFilter(req, res);
     }
 }

@@ -57,6 +57,7 @@ public class LoginServlet extends HttpServlet {
             case 4 -> session.setAttribute("userRole", "CUSTOMER");
         }
 
+        //Remember Me
         if (remember != null) {
             Cookie c = new Cookie("remember_username", username);
             c.setMaxAge(7 * 24 * 60 * 60);

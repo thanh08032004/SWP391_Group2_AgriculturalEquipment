@@ -70,6 +70,12 @@
 
                 <c:if test="${tab == 'profile' || tab == null}">
                     <h3>My Profile</h3>
+                    <c:if test="${not empty success}">
+                        <p style="color:green; margin-bottom: 12px;">
+                            <i class="fa fa-check-circle"></i> ${success}
+                        </p>
+                    </c:if>
+
                     <form action="${pageContext.request.contextPath}/profile" method="post">
                         <div class="info-grid">
                             <div class="info-box">
@@ -229,8 +235,13 @@
                                 <label>Confirm New Password</label>
                                 <input type="password" name="confirmPassword" required>
                             </div>
-                            <c:if test="${not empty error}">
-                                <p style="color:red; margin-top: 8px;">${error}</p>
+                            <c:if test="${not empty errorPass}">
+                                <p style="color:red; margin-top: 8px;">${errorPass}</p>
+                            </c:if>
+                            <c:if test="${not empty success}">
+                                <p style="color:green; margin-top: 8px;">
+                                    <i class="fa fa-check-circle"></i> ${success}
+                                </p>
                             </c:if>
                             <div class="actions">
                                 <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Update Password</button>

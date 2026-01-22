@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.*;
 import model.User;
 import model.UserProfile;
+import org.mindrot.jbcrypt.BCrypt;
 
 @Data
 @NoArgsConstructor
@@ -48,7 +49,6 @@ public class UserProfileDAO {
                 p.setEmail(rs.getString("email"));
                 p.setPhone(rs.getString("phone"));
                 p.setGender(rs.getString("gender"));
-                //p.setBirthDate(rs.getDate("date_of_birth"));
                 java.sql.Date sqlDate = rs.getDate("date_of_birth");
                 if (sqlDate != null) {
                     p.setBirthDate(sqlDate.toLocalDate());
@@ -106,14 +106,17 @@ public class UserProfileDAO {
         }
     }
 
-    public boolean checkPassword(int userId, String password) {
-        String sql = "SELECT id FROM users WHERE id = ? AND password = ?";
+    public boolean checkPassword(int userId, String inputPassword) {
+        String sql = "SELECT password FROM users WHERE id = ?";
         try (Connection con = db.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
-            ps.setString(2, password); // nếu HASH thì đổi
             ResultSet rs = ps.executeQuery();
-            return rs.next();
+
+            if (rs.next()) {
+                String hashedPassword = rs.getString("password");
+                return BCrypt.checkpw(inputPassword, hashedPassword);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,7 +128,8 @@ public class UserProfileDAO {
         String sql = "UPDATE users SET password = ? WHERE id = ?";
         try (Connection con = db.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, newPassword); // nếu HASH thì hash ở đây
+            String hashed = BCrypt.hashpw(newPassword, BCrypt.gensalt(10));
+            ps.setString(1, hashed);
             ps.setInt(2, userId);
             ps.executeUpdate();
 

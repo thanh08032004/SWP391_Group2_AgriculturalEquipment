@@ -45,7 +45,7 @@ CREATE TABLE user_profile (
   user_id INT PRIMARY KEY,
   fullname VARCHAR(100) NOT NULL,
   phone VARCHAR(20),
-  email VARCHAR(100),
+  email VARCHAR(100) UNIQUE,
   address VARCHAR(255),
   avatar VARCHAR(255),
 
@@ -402,11 +402,11 @@ WHERE code IN (
   '/customer/rating'
 );
 INSERT INTO users (username, password, role_id) VALUES
-('admin',      '123456', 1),
-('business',   '123456', 2),
-('technician', '123456', 3),
-('customer', '123456', 4),
-('ad', '1', 1);
+('admin',      '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 1),
+('business',   '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 2),
+('technician', '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 3),
+('customer', '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 4),
+('ad', '$2a$10$/5dn75ieDfDUyuV2g8pWY.2Ch.5xpueDNlYTtfynRnLI1U8g3xz8.', 1);
 
 INSERT INTO user_profile (user_id, fullname, email, gender, date_of_birth, address, phone, avatar) VALUES
 (1, 'Admin System',      'admin@gmail.com',        'MALE',   '1985-01-01' , 'Hà Nội', '0981231234', 'null.jpg'),

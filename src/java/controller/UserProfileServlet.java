@@ -81,7 +81,7 @@ public class UserProfileServlet extends HttpServlet {
                     java.util.Arrays.copyOf(parts, parts.length - 1));
         }
 
-        //4.2
+        //4.2 tách date
         if (profile.getBirthDate() != null) {
             LocalDate dob = profile.getBirthDate();
             request.setAttribute("birthDay", String.format("%02d", dob.getDayOfMonth()));
@@ -100,11 +100,37 @@ public class UserProfileServlet extends HttpServlet {
         }
         request.setAttribute("tab", tab);
 
+        // 6.1 báo lỗi Wrong Pass
+        String errorPass = request.getParameter("errorPass");
+        if (errorPass != null) {
+            switch (errorPass) {
+                case "confirm":
+                    request.setAttribute("errorPass", "Confirm password does not match");
+                    break;
+                case "wrongpass":
+                    request.setAttribute("errorPass", "Current password is incorrect");
+                    break;
+            }
+        }
+        // 6.2 báo update thành công
+        String success = request.getParameter("success");
+        if (success != null) {
+            switch (success) {
+                case "profileUpdated":
+                    request.setAttribute("success", "Profile updated successfully");
+                    break;
+                case "passUpdated":
+                    request.setAttribute("success", "Password updated successfully");
+                    break;
+            }
+        }
+
         // 7. Đẩy sang JSP
         request.setAttribute("profile", profile);
         request.setAttribute("user", user);
         request.setAttribute("firstName", firstName);
         request.setAttribute("lastName", lastName);
+        request.setAttribute("tab", tab);
         request.getRequestDispatcher("/views/userProfile.jsp").forward(request, response);
     }
 
@@ -132,28 +158,28 @@ public class UserProfileServlet extends HttpServlet {
         String month = request.getParameter("month");
         String year = request.getParameter("year");
 
-// validate name
+        // validate name
         try {
             UserProfileUtils.validateName(firstName, lastName);
         } catch (IllegalArgumentException e) {
             errors.put("name", e.getMessage());
         }
 
-// validate email
+        // validate email
         try {
             UserProfileUtils.validateEmail(email);
         } catch (IllegalArgumentException e) {
             errors.put("email", e.getMessage());
         }
 
-// validate phone
+        // validate phone
         try {
             UserProfileUtils.validatePhone(phone);
         } catch (IllegalArgumentException e) {
             errors.put("phone", e.getMessage());
         }
 
-// validate birth date
+        // validate birth date
         LocalDate birthDate = null;
         try {
             birthDate = UserProfileUtils.validateBirthDate(day, month, year);
@@ -161,7 +187,7 @@ public class UserProfileServlet extends HttpServlet {
             errors.put("birthDate", e.getMessage());
         }
 
-//  Có lỗi → quay lại JSP
+        //  Có lỗi -> quay lại JSP
         if (!errors.isEmpty()) {
             request.setAttribute("errors", errors);
             request.setAttribute("edit", true);
@@ -184,11 +210,13 @@ public class UserProfileServlet extends HttpServlet {
             return;
         }
 
-//  Không lỗi → update DB
+        //  Không lỗi -> update DB
         String fullname = firstName.trim() + " " + lastName.trim();
         UserProfileDAO dao = new UserProfileDAO();
         dao.updateProfile(user.getId(), fullname, gender, email, phone, birthDate, address);
-        response.sendRedirect(request.getContextPath() + "/profile");
+        response.sendRedirect(
+            request.getContextPath() + "/profile?success=profileUpdated"
+        );
 
     }
 
