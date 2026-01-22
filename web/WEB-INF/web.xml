@@ -184,7 +184,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>RoleServlet</servlet-name>
-        <url-pattern>/rolelist</url-pattern>
+        <url-pattern>/admin/role</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RolePermissionServlet</servlet-name>

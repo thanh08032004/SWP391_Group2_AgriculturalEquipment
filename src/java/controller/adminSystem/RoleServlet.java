@@ -1,16 +1,13 @@
 package controller.adminSystem;
 import dal.RoleDAO;
-import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.Role;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
-import model.Permission;
+import model.Role;
 
 public class RoleServlet extends HttpServlet {
 
@@ -40,7 +37,7 @@ public class RoleServlet extends HttpServlet {
         List<Role> listR = roleDAO.getAllRoles();
 
         request.setAttribute("listR", listR);
-        request.getRequestDispatcher("AdminSystemView/RoleList.jsp")
+        request.getRequestDispatcher("/AdminSystemView/RoleList.jsp")
                .forward(request, response);
     }
     @Override

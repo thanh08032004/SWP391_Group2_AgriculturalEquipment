@@ -39,7 +39,6 @@ public class LoginServlet extends HttpServlet {
         UserDAO dao = new UserDAO();
         User user = dao.findByUsername(username);
 
-        // ❌ Sai username hoặc sai password
         if (user == null || !BCrypt.checkpw(password, user.getPassword())) {
             request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
             request.setAttribute("username", username);
@@ -47,7 +46,6 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // ✅ Login thành công
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
 
@@ -59,7 +57,6 @@ public class LoginServlet extends HttpServlet {
             case 4 -> session.setAttribute("userRole", "CUSTOMER");
         }
 
-        // Remember me
         if (remember != null) {
             Cookie c = new Cookie("remember_username", username);
             c.setMaxAge(7 * 24 * 60 * 60);

@@ -68,8 +68,19 @@ public class AdminUserServlet extends HttpServlet {
             
             if (success) response.sendRedirect("users?action=list");
             else {
-                request.setAttribute("error", "Username already exists!");
-                doGet(request, response);
+                 request.setAttribute("error", "Username or email already exists!");
+
+                request.setAttribute("username", request.getParameter("username"));
+                request.setAttribute("fullname", request.getParameter("fullname"));
+                request.setAttribute("email", request.getParameter("email"));
+                request.setAttribute("roleId", request.getParameter("roleId"));
+
+                List<String[]> rolesAdd = adminDAO.getAllRoles();
+                request.setAttribute("roles", rolesAdd);
+
+                request.getRequestDispatcher("/AdminSystemView/user-add.jsp")
+                        .forward(request, response);
+
             }
         } 
         else if ("update".equals(action)) {
