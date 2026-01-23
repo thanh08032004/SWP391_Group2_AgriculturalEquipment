@@ -26,6 +26,13 @@
 
 
         <main>
+            <c:if test="${popUpSuccessChangePassword}">
+                <script>
+                    window.onload = function () {
+                        alert("Password changed successfully! Please log in...");
+                    };
+                </script>
+            </c:if>
             <div class="breadcrumb-main">
                 <div class="container">
                     <div class="breadcrumb-container">
@@ -113,15 +120,15 @@
                                                        id="rememberMe"
                                                        name="rememberMe"
                                                        ${not empty cookie.remember_username ? "checked" : ""}>
-<!--                                                <input class="form-check-input"
-                                                       type="checkbox"
-                                                       id="rememberMe"
-                                                       name="rememberMe"
-                                                       ${not empty cookie.remember_password ? "checked" : ""}>-->
+                                                <!--                                                <input class="form-check-input"
+                                                                                                       type="checkbox"
+                                                                                                       id="rememberMe"
+                                                                                                       name="rememberMe"
+                                                ${not empty cookie.remember_password ? "checked" : ""}>-->
                                                 <label class="form-check-label" for="rememberMe">
                                                     Remember me (7 days)
                                                 </label>
-                                                
+
                                             </div>
                                         </div>
 

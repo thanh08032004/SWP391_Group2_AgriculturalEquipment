@@ -1,36 +1,38 @@
-
 package dal;
+
 import dto.PermissionDTO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import model.Role;
+
 public class RoleDAO extends DBContext {
-    
+
     public List<Role> getAllRoles() {
-    List<Role> list = new ArrayList<>();
-    String sql = "SELECT id, name, description, active FROM role";
+        List<Role> list = new ArrayList<>();
+        String sql = "SELECT id, name, description, active FROM role";
 
-    try {
-        Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
 
-        while (rs.next()) {
-            Role r = new Role(
-                rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getBoolean("active")
-            );
-            list.add(r);
+            while (rs.next()) {
+                Role r = new Role(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getBoolean("active")
+                );
+                list.add(r);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
-      public List<PermissionDTO> getPermissionsByRole(int roleId) {
+
+    public List<PermissionDTO> getPermissionsByRole(int roleId) {
         List<PermissionDTO> list = new ArrayList<>();
 
         String sql = """
@@ -50,9 +52,7 @@ public class RoleDAO extends DBContext {
         """;
 
         try (
-            Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, roleId);
 
             ResultSet rs = ps.executeQuery();
@@ -74,75 +74,98 @@ public class RoleDAO extends DBContext {
 
         return list;
     }
-      public Role getRoleById(int roleId) {
-    String sql = "SELECT id, name, description, active FROM role WHERE id = ?";
-    try (
-        Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)
-    ) {
-        ps.setInt(1, roleId);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            return new Role(
-                rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getBoolean("active")
-            );
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    return null;
-}
-public void deletePermissionsByRole(int roleId) {
-    String sql = "DELETE FROM role_permission WHERE role_id = ?";
-    try (
-        Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)
-    ) {
-        ps.setInt(1, roleId);
-        ps.executeUpdate();
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-}
 
-public void insertRolePermission(int roleId, int permissionId) {
-    String sql = "INSERT INTO role_permission(role_id, permission_id) VALUES (?, ?)";
-    try (
-        Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)
-    ) {
-        ps.setInt(1, roleId);
-        ps.setInt(2, permissionId);
-        ps.executeUpdate();
-    } catch (Exception e) {
-        e.printStackTrace();
+    public Role getRoleById(int roleId) {
+        String sql = "SELECT id, name, description, active FROM role WHERE id = ?";
+        try (
+                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Role(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getBoolean("active")
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
-}
-public boolean updateRole(Role r) {
-    String sql = """
+
+    public void deletePermissionsByRole(int roleId) {
+        String sql = "DELETE FROM role_permission WHERE role_id = ?";
+        try (
+                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void insertRolePermission(int roleId, int permissionId) {
+        String sql = "INSERT INTO role_permission(role_id, permission_id) VALUES (?, ?)";
+        try (
+                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            ps.setInt(2, permissionId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean updateRole(Role r) {
+        String sql = """
         UPDATE role
         SET name = ?, description = ?, active = ?
         WHERE id = ?
     """;
 
-    try (
-        Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)
-    ) {
-        ps.setString(1, r.getName());
-        ps.setString(2, r.getDescription());
-        ps.setBoolean(3, r.isActive());
-        ps.setInt(4, r.getId());
+        try (
+                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, r.getName());
+            ps.setString(2, r.getDescription());
+            ps.setBoolean(3, r.isActive());
+            ps.setInt(4, r.getId());
 
-        return ps.executeUpdate() > 0;
+            return ps.executeUpdate() > 0;
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    return false;
-}
+
+    public Role getRoleByUserEmail(String email) {
+        String sql = """
+        SELECT r.id, r.name, r.description, r.active
+                FROM users u
+                JOIN user_profile up ON u.id = up.user_id
+                JOIN role r ON u.role_id = r.id
+                WHERE up.email = ?
+    """;
+
+        try (
+                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new Role(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getBoolean("active")
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }
