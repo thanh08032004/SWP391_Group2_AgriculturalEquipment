@@ -26,13 +26,6 @@
 
 
         <main>
-            <c:if test="${popUpSuccessChangePassword}">
-                <script>
-                    window.onload = function () {
-                        alert("Password changed successfully! Please log in...");
-                    };
-                </script>
-            </c:if>
             <div class="breadcrumb-main">
                 <div class="container">
                     <div class="breadcrumb-container">

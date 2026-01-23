@@ -5,7 +5,6 @@
 package controller.customer;
 
 import dal.PasswordResetDAO;
-import dal.PasswordResetTokenDAO;
 import dal.RoleDAO;
 import dal.UserDAO;
 import java.io.IOException;
@@ -19,7 +18,9 @@ import java.sql.Timestamp;
 import java.util.UUID;
 import model.Role;
 import model.User;
+import org.mindrot.jbcrypt.BCrypt;
 import utils.EmailUtils;
+import utils.PasswordUtil;
 
 /**
  *
@@ -100,43 +101,33 @@ public class ForgotPasswordServlet extends HttpServlet {
         } else {
             RoleDAO roleDAO = new RoleDAO();
             Role role = roleDAO.getRoleByUserEmail(email);
-            if(!role.getName().equals("ADMIN_SYSTEM")) {
+            if (!role.getName().equals("ADMIN_SYSTEM")) {
                 PasswordResetDAO passwordResetDAO = new PasswordResetDAO();
                 passwordResetDAO.savePasswordResetRequest(user.getId(), email);
             } else {
+                // 1. Random password
+                String newPass = PasswordUtil.randomPassword(8);
 
-                // 1. Tạo token reset
-                String token = UUID.randomUUID().toString();
-                Timestamp expiredAt = new Timestamp(
-                        System.currentTimeMillis() + 10 * 60 * 1000 // 10 phút
-                );
+                // 2. Hash
+                String hashed = BCrypt.hashpw(newPass, BCrypt.gensalt(10));
 
-                // 2. Save token
-                PasswordResetTokenDAO resetDAO = new PasswordResetTokenDAO();
-                resetDAO.save(user.getId(), token, expiredAt);
+                // 3. Update DB
+                UserDAO dao = new UserDAO();
+                dao.updatePassword(user.getId(), hashed);
 
-                // 3. Link reset
-                String link = request.getScheme() + "://"
-                        + request.getServerName() + ":"
-                        + request.getServerPort()
-                        + request.getContextPath()
-                        + "/reset-password?token=" + token;
+                // 4. Send mail
+                String subject = "Mật khẩu của bạn";
+                String message = "Xin chào " + user.getUsername() + ",\n\nMật khẩu của bạn là: " + newPass
+                        + "\n\nVui lòng nhập mật khẩu của bạn để đăng nhập!";
+                boolean sent = EmailUtils.sendEmail(email, subject, message);
 
-                // 4. Send email
-                String subject = "Xác nhận đặt lại mật khẩu";
-                String message
-                        = "Xin chào " + user.getUsername() + ",\n\n"
-                        + "Yêu cầu reset mật khẩu của bạn đã được phê duyệt.\n"
-                        + "Vui lòng nhấn vào link dưới đây để đặt lại mật khẩu:\n\n"
-                        + link + "\n\n"
-                        + "Link có hiệu lực trong 10 phút.\n\n"
-                        + "Hotline: +84 123 456 789\n"
-                        + "Email hỗ trợ: support@agricms.com\n\n"
-                        + "Trân trọng.";
-
-                boolean sentSuccess = EmailUtils.sendEmail(email, subject, message);
+                // 5. Update request status
+                if (sent) {
+                    PasswordResetDAO passwordResetDAO = new PasswordResetDAO();
+                    passwordResetDAO.updateResetRequestStatus(user.getId(), "APPROVED");
+                }
             }
-            
+
             response.sendRedirect("send-success");
         }
     }

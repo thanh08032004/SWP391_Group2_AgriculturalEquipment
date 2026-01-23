@@ -5,7 +5,6 @@
 package controller.adminSystem;
 
 import dal.PasswordResetDAO;
-import dal.PasswordResetTokenDAO;
 import dal.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -87,50 +86,33 @@ public class AdminPasswordResetServlet extends HttpServlet {
         try {
             if ("approve".equals(action)) {
 
-                UserDAO userDAO = new UserDAO();
-                User user = userDAO.findById(userId);
+                // 1. Random password
+                String newPass = PasswordUtil.randomPassword(8);
 
-                if (user == null) {
-                    response.sendRedirect(request.getContextPath() + "/admin/password-reset");
-                    return;
+                // 2. Hash
+                String hashed = BCrypt.hashpw(newPass, BCrypt.gensalt(10));
+
+                // 3. Update DB
+                UserDAO dao = new UserDAO();
+                dao.updatePassword(userId, hashed);
+
+                User user = dao.findById(userId);
+
+                // 4. Send mail
+                String subject = "Mật khẩu của bạn";
+                String message = "Xin chào " + user.getUsername() + ",\n\nMật khẩu của bạn là: " + newPass
+                        + "\n\nVui lòng nhập mật khẩu của bạn để đăng nhập!";
+                boolean sent = EmailUtils.sendEmail(email, subject, message);
+
+                // 5. Update request status
+                if (sent) {
+                    PasswordResetDAO passwordResetDAO = new PasswordResetDAO();
+                    passwordResetDAO.updateResetRequestStatus(userId, "APPROVED");
+                } else {
+                    request.setAttribute("error", "Lỗi gửi email!");
                 }
-
-                // 1. Tạo token reset
-                String token = UUID.randomUUID().toString();
-                Timestamp expiredAt = new Timestamp(
-                        System.currentTimeMillis() + 10 * 60 * 1000 // 10 phút
-                );
-
-                // 2. Save token
-                PasswordResetTokenDAO resetDAO = new PasswordResetTokenDAO();
-                resetDAO.save(userId, token, expiredAt);
-
-                // 3. Link reset
-                String link = request.getScheme() + "://"
-                        + request.getServerName() + ":"
-                        + request.getServerPort()
-                        + request.getContextPath()
-                        + "/reset-password?token=" + token;
-
-                // 4. Send email
-                String subject = "Xác nhận đặt lại mật khẩu";
-                String message
-                        = "Xin chào " + user.getUsername() + ",\n\n"
-                        + "Yêu cầu reset mật khẩu của bạn đã được phê duyệt.\n"
-                        + "Vui lòng nhấn vào link dưới đây để đặt lại mật khẩu:\n\n"
-                        + link + "\n\n"
-                        + "Link có hiệu lực trong 10 phút.\n\n"
-                        + "Hotline: +84 123 456 789\n"
-                        + "Email hỗ trợ: support@agricms.com\n\n"
-                        + "Trân trọng.";
-
-                boolean sentSuccess = EmailUtils.sendEmail(email, subject, message);
-
-                if (sentSuccess) {
-                    passwordResetDao.updateResetRequestStatus(userId, "APPROVED");
-                }
-
             } else if ("reject".equals(action)) {
+                passwordResetDao.updateResetRequestStatus(userId, "REJECTED");
 
                 // Send email reason
                 String subject = "Yêu cầu reset mật khẩu bị từ chối";
@@ -149,13 +131,11 @@ public class AdminPasswordResetServlet extends HttpServlet {
                 }
 
             }
-
         } catch (Exception e) {
-            System.err.println("Error send response to user!");
+            System.err.println("Error password reset for admin!");
         }
 
         // return to list
         response.sendRedirect(request.getContextPath() + "/admin/password-reset");
     }
-
 }
