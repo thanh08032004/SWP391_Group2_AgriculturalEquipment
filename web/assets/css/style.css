@@ -162,6 +162,7 @@ font-size: 30px !important;
 .top-header {
 padding: 6px 0px;
 background-color: var(--secondary);
+
 }
 
 .lang .nice-select {
@@ -1158,7 +1159,7 @@ font-size: 24px;
   text-align: center;
   padding: 110px 0;
   margin-bottom: 30px;
-  background: url('../../assets/images/banner/5.png') center center;
+  background: url('../../assets/images/banner/bn.png') center center;
   background-size: cover;
 }
 .breadcrumb-main .page-title {
@@ -1793,4 +1794,101 @@ h2::before {
 .permission-item span {
     font-weight: 500;
     color: #333;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width: 240px;
+
+    /* trừ chiều cao header */
+    height: calc(100vh - 72px);
+
+    background-color: #8C593B;
+    color: #ffffff;
+
+    padding-top: 12px;
+    overflow-y: auto;
+}
+
+/* ROLE NAME */
+.sidebar-role {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    padding: 14px 0;
+    margin-bottom: 12px;
+
+    background-color: rgba(0,0,0,0.15);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+/* MENU LIST */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* MENU ITEM */
+.sidebar ul li {
+    margin: 0;
+}
+
+/* LINK */
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+
+    padding: 14px 20px;
+    color: #fdf4ec;
+    text-decoration: none;
+    font-size: 14px;
+
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+}
+
+/* HOVER */
+.sidebar ul li a:hover {
+    background-color: rgba(0,0,0,0.2);
+    color: #ffffff;
+    border-left-color: #fbbf24;
+}
+
+/* ACTIVE */
+.sidebar ul li a.active {
+    background-color: rgba(0,0,0,0.35);
+    color: #ffffff;
+    border-left-color: #f59e0b;
+}
+
+/* SCROLLBAR */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 10px;
+}
+
+
+/* ===== ADMIN LAYOUT ===== */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* CONTENT PHẦN PHẢI */
+.admin-content {
+    flex: 1;
+    padding: 24px;
+    background-color: #f9fafb;
+}
+
+header {
+    border-bottom: 2px solid #8C593B;
 }

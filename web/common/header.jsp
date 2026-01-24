@@ -34,35 +34,41 @@
                                     <a class="nav-link" href="${pageContext.request.contextPath}/home">Home</a>
                                 </li>
                                 <%--<c:if test="${sessionScope.userRole == 'CUSTOMER'}">--%>
-                                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/my-assets">My Devices</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Support</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/my-assets">My Devices</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Support</a></li>
                                     <%--</c:if>--%>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/shop">Store</a></li>
                                 </c:when>
 
                             <%-- 2. ADMIN_SYSTEM --%>
+                            <%-- 2. ADMIN_SYSTEM --%>
                             <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
-                                <li class="nav-item"><a class="nav-link" href="${roleHome}">User Management</a></li>
-
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/role">Role Management</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/password-reset">Reset Password</a></li>
-
-                                </c:when>
+                                <li class="nav-item">
+                                    <span class="nav-link fw-bold text-uppercase text-center w-100">
+                                        System Administrator
+                                    </span>
+                                </li>
+                            </c:when>
 
                             <%-- 3. ADMIN_BUSINESS --%>
                             <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
-                                <li class="nav-item"><a class="nav-link" href="${roleHome}">Business Dashboard</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/devices">Catalog</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/admin/reports">Finance Reports</a></li>
-                                </c:when>
+                                <li class="nav-item">
+                                    <span class="nav-link fw-bold text-uppercase text-center w-100">
+                                        Business Administrator
+                                    </span>
+                                </li>
+                            </c:when>
 
                             <%-- 4. STAFF --%>
                             <c:when test="${sessionScope.userRole == 'STAFF'}">
-                                <li class="nav-item"><a class="nav-link" href="${roleHome}">User Management</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/inventory">Spare Parts</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/staff/service-logs">Service History</a></li>
-                                </c:when>
-                            </c:choose>
+                                <li class="nav-item">
+                                    <span class="nav-link fw-bold text-uppercase text-center w-100">
+                                        Staff Dashboard
+                                    </span>
+                                </li>
+                            </c:when>
+
+                        </c:choose>
 
                     </ul>
                 </nav>

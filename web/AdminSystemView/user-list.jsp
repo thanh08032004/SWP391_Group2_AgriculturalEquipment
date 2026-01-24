@@ -7,8 +7,17 @@
     <title>User Management - AgriCMS</title>
 </head>
 <body class="bg-light">
+    <header>
+        
     <jsp:include page="../common/header.jsp"></jsp:include>
+    </header>
+    
+    <div class="admin-layout">
+    <jsp:include page="../common/side-bar.jsp"></jsp:include>
 
+    
+    <div class="admin-content">
+    
     <div class="container my-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold"><i class="bi bi-people-fill me-2"></i>User Management</h2>
@@ -64,8 +73,8 @@
             </div>
         </div>
     </div>
-
-    <jsp:include page="../common/footer.jsp"></jsp:include>
+    </div>
+    </div>      
         <jsp:include page="../common/scripts.jsp"></jsp:include>
 
 </body>
