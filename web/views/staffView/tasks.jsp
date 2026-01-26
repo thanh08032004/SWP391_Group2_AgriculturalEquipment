@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <jsp:include page="../common/head.jsp"></jsp:include>
+    <jsp:include page="/common/head.jsp"></jsp:include>
     <title>Staff Tasks</title>
 </head>
 <body>
-    <jsp:include page="../common/header.jsp"></jsp:include>
+    <jsp:include page="/common/header.jsp"></jsp:include>
     <div class="container my-5">
         <h2 class="mb-4">My Maintenance Tasks</h2>
         <div class="table-responsive bg-white p-3 shadow-sm rounded">
@@ -35,6 +35,6 @@
             </table>
         </div>
     </div>
-    <jsp:include page="../common/footer.jsp"></jsp:include>
+    <jsp:include page="/common/footer.jsp"></jsp:include>
 </body>
 </html>

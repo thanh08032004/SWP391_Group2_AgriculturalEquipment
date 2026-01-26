@@ -2,14 +2,12 @@ package controller.adminSystem;
 
 import dal.AdminDAO;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
-@WebServlet(name = "AdminUserServlet", urlPatterns = {"/admin/users"})
 public class AdminUserServlet extends HttpServlet {
 
     @Override
@@ -68,18 +66,25 @@ public class AdminUserServlet extends HttpServlet {
         AdminDAO adminDAO = new AdminDAO();
 
         if ("create".equals(action)) {
+            String username = request.getParameter("username");
+            String fullname = request.getParameter("fullname");
+            String email = request.getParameter("email");
+            String roleId = request.getParameter("roleId");
             String hashed = BCrypt.hashpw("123", BCrypt.gensalt(10));
+            
             boolean success = adminDAO.createNewUser(
-                request.getParameter("username"), hashed, 
-                Integer.parseInt(request.getParameter("roleId")), 
-                request.getParameter("fullname"), request.getParameter("email")
+                username, hashed, Integer.parseInt(roleId), fullname, email
             );
             
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
             } else {
                 request.setAttribute("error", "Username or email already exists!");
-                request.setAttribute("roles", adminDAO.getAllRoles());
+                request.setAttribute("username", username);
+                request.setAttribute("fullname", fullname);
+                request.setAttribute("email", email);
+                request.setAttribute("roleId", roleId);
+                  request.setAttribute("roles", adminDAO.getAllRoles());
                 request.getRequestDispatcher("/views/AdminSystemView/user-add.jsp").forward(request, response);
             }
         } 

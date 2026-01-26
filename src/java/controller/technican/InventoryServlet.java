@@ -19,6 +19,6 @@ public class InventoryServlet extends HttpServlet {
         // List<Part> list = partDAO.getAll();
         // request.setAttribute("partsList", list);
 
-        request.getRequestDispatcher("/staff/inventory.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/StaffView/inventory.jsp").forward(request, response);
     }
 }

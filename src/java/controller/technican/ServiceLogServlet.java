@@ -21,6 +21,6 @@ public class ServiceLogServlet extends HttpServlet {
         // List<ServiceLog> logs = logDAO.getLogsByStaff(staffId);
         // request.setAttribute("logs", logs);
 
-        request.getRequestDispatcher("/staff/service-logs.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/StaffView/service-logs.jsp").forward(request, response);
     }
 }

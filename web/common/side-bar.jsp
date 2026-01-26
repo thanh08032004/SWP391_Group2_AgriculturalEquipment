@@ -11,7 +11,6 @@
             <li><a href="${pageContext.request.contextPath}/admin/roles">Role Management</a></li>
             <li><a href="${pageContext.request.contextPath}/admin/password-reset">Reset Password</a></li>
         </c:if>
-
         <c:if test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
             <li><a href="${pageContext.request.contextPath}/adminbusinessdashboard">Dashboard</a></li>
             <li><a href="${pageContext.request.contextPath}/admin/devices">Catalog</a></li>

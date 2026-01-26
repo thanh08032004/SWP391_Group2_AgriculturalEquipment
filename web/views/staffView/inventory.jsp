@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <jsp:include page="../common/head.jsp"></jsp:include>
+    <jsp:include page="/common/head.jsp"></jsp:include>
     <title>Spare Parts Inventory - AgriCMS</title>
 </head>
 <body>
-    <jsp:include page="../common/header.jsp"></jsp:include>
+    <jsp:include page="/common/header.jsp"></jsp:include>
 
     <div class="container my-5">
         <div class="row mb-4 align-items-center">
@@ -80,6 +80,6 @@
         </div>
     </div>
 
-    <jsp:include page="../common/footer.jsp"></jsp:include>
+    <jsp:include page="/common/footer.jsp"></jsp:include>
 </body>
 </html>

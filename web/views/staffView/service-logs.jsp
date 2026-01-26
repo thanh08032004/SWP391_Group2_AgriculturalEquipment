@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <jsp:include page="../common/head.jsp"></jsp:include>
+    <jsp:include page="/common/head.jsp"></jsp:include>
     <title>Service History - AgriCMS</title>
     <style>
         .timeline { position: relative; padding: 20px 0; }
@@ -17,7 +17,7 @@
     </style>
 </head>
 <body>
-    <jsp:include page="../common/header.jsp"></jsp:include>
+    <jsp:include page="/common/header.jsp"></jsp:include>
 
     <div class="container my-5">
         <div class="row mb-4">
@@ -82,6 +82,6 @@
         </div>
     </div>
 
-    <jsp:include page="../common/footer.jsp"></jsp:include>
+    <jsp:include page="/common/footer.jsp"></jsp:include>
 </body>
 </html>

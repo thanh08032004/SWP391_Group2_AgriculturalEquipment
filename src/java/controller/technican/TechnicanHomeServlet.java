@@ -29,6 +29,6 @@ public class TechnicanHomeServlet extends HttpServlet {
         // List<Part> list = partDAO.getAll();
         // request.setAttribute("tasksList", list);
 
-        request.getRequestDispatcher("/staff/tasks.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/StaffView/tasks.jsp").forward(request, response);
     }
 }
