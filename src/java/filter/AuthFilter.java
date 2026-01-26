@@ -4,29 +4,61 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import model.User;
 
-@WebFilter(urlPatterns = {"/views/*", "/AdminSystemView/*", "/AdminBusinessView/*"})
+@WebFilter(urlPatterns = {"/*"})
 public class AuthFilter implements Filter {
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain)
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+        HttpSession session = req.getSession(false);
 
         String uri = req.getRequestURI();
         String contextPath = req.getContextPath();
 
-        //  Cho phép các trang KHÔNG cần login
-        if (uri.equals(contextPath + "/login")
-                || uri.equals(contextPath + "/logout")
-                || uri.endsWith("/login.jsp")) {
-            chain.doFilter(req, res);
+        if (uri.contains("/assets/") || uri.endsWith(".css") || uri.endsWith(".js") 
+            || uri.equals(contextPath + "/login") 
+            || uri.equals(contextPath + "/home")
+            || uri.equals(contextPath + "/logout")) {
+            chain.doFilter(request, response);
             return;
         }
 
-        chain.doFilter(req, res);
+        if (uri.endsWith(".jsp")) {
+            res.sendRedirect(contextPath + "/login");
+            return;
+        }
+
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if (user == null) {
+            if (uri.contains("/Admin") || uri.contains("/Staff") || uri.contains("/Customer")) {
+                res.sendRedirect(contextPath + "/login");
+                return;
+            }
+        } else {
+            int role = user.getRoleId();
+            
+            if ((uri.contains("/admin/") || uri.contains("/AdminSystemView/")) && role != 1) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN); 
+                return;
+            }
+
+            if ((uri.contains("/staff/") || uri.contains("/StaffView/")) && role != 3) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
+            if ((uri.contains("/customer/") || uri.contains("/CustomerView/")) && role != 4) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+        }
+
+        chain.doFilter(request, response);
     }
 }
