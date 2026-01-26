@@ -36,7 +36,7 @@ public class AuthFilter implements Filter {
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
         if (user == null) {
-            if (uri.contains("/Admin") || uri.contains("/Staff") || uri.contains("/Customer")) {
+            if (uri.contains("/admin") || uri.contains("/staff") || uri.contains("/customer")) {
                 res.sendRedirect(contextPath + "/login");
                 return;
             }
