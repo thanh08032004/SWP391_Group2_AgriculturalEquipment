@@ -6,33 +6,6 @@ import java.util.List;
 import model.User;
 
 public class AdminDAO extends DBContext {
-
-//    public List<User> getAllUsers() {
-//       List<User> list = new ArrayList<>();
-//       String sql;
-//        sql = "Select u.id, i.username, u.role_id,  r.name as 'Role', up.fullname, up.email"
-//                + "from Users u"
-//                + "join role r on r.id = u.role_id"
-//                + "join user_profile up on up.user_id = u.id"
-//                + "order by u.id desc ";
-//        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql);ResultSet rs = ps.executeQuery()){
-//            while(rs.next()){
-//               list.add( User.builder().id(rs.getInt("id"))
-//                       .username(rs.getString("username"))
-//                       .roleId(rs.getInt("role_id"))
-//                       .roleName(rs.getString("role_name"))
-//                        .fullname(rs.getString("fullname"))
-//                        .email(rs.getString("email"))
-//                        .active(rs.getBoolean("active"))
-//                       .createdAt(rs.getTimestamp("created_at"))
-//                       .build())
-//                       ;
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//       return list;
-//    }
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
         String sql = """

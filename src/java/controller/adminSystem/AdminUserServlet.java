@@ -18,7 +18,7 @@ public class AdminUserServlet extends HttpServlet {
         if (action == null) action = "list";
 
         AdminDAO adminDAO = new AdminDAO();
-                            List<User> userList = adminDAO.getAllUsers();
+        List<User> userList = adminDAO.getAllUsers();
 
         try {
             switch (action) {
@@ -81,7 +81,6 @@ public class AdminUserServlet extends HttpServlet {
                 request.setAttribute("fullname", request.getParameter("fullname"));
                 request.setAttribute("email", request.getParameter("email"));
                 request.setAttribute("roleId", request.getParameter("roleId"));
-
                 List<String[]> rolesAdd = adminDAO.getAllRoles();
                 request.setAttribute("roles", rolesAdd);
                 request.getRequestDispatcher("/AdminSystemView/user-add.jsp")
