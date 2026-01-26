@@ -40,8 +40,7 @@
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/shop">Store</a></li>
                                 </c:when>
 
-                            <%-- 2. ADMIN_SYSTEM --%>
-                            <%-- 2. ADMIN_SYSTEM --%>
+                            <%-- 2. ADMIN_SYSTEM --%>                            
                             <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
                                 <li class="nav-item">
                                     <span class="nav-link fw-bold text-uppercase text-center w-100">
