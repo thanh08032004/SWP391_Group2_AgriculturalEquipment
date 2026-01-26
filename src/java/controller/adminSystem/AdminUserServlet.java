@@ -2,13 +2,14 @@ package controller.adminSystem;
 
 import dal.AdminDAO;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
-
+@WebServlet(name = "AdminUserServlet", urlPatterns = {"/admin/users"})
 public class AdminUserServlet extends HttpServlet {
 
     @Override
@@ -24,13 +25,13 @@ public class AdminUserServlet extends HttpServlet {
             switch (action) {
                 case "list":
                     request.setAttribute("userList", userList);
-                    request.getRequestDispatcher("/AdminSystemView/user-list.jsp").forward(request, response);
+                    request.getRequestDispatcher("/views/AdminSystemView/user-list.jsp").forward(request, response);
                     break;
 
                 case "add":
                     List<String[]> rolesAdd = adminDAO.getAllRoles();
                     request.setAttribute("roles", rolesAdd);
-                    request.getRequestDispatcher("/AdminSystemView/user-add.jsp").forward(request, response);
+                    request.getRequestDispatcher("/views/AdminSystemView/user-add.jsp").forward(request, response);
                     break;
 
                 case "edit":
@@ -39,18 +40,19 @@ public class AdminUserServlet extends HttpServlet {
                     List<String[]> rolesEdit = adminDAO.getAllRoles();
                     request.setAttribute("userEdit", userEdit);
                     request.setAttribute("roles", rolesEdit);
-                    request.getRequestDispatcher("/AdminSystemView/user-edit.jsp").forward(request, response);
+                    request.getRequestDispatcher("/views/AdminSystemView/user-edit.jsp").forward(request, response);
                     break;
 
                 case "toggle":
                     int toggleId = Integer.parseInt(request.getParameter("id"));
                     boolean status = Boolean.parseBoolean(request.getParameter("status"));
                     adminDAO.toggleUserStatus(toggleId, status);
-                    response.sendRedirect("users?action=list");
+                    response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
                     break;
+                    
                 default:
                     request.setAttribute("userList", userList);
-                    request.getRequestDispatcher("/AdminSystemView/user-list.jsp").forward(request, response);
+                    request.getRequestDispatcher("/views/AdminSystemView/user-list.jsp").forward(request, response);
                     break;
             }
         } catch (Exception e) {
@@ -66,26 +68,19 @@ public class AdminUserServlet extends HttpServlet {
         AdminDAO adminDAO = new AdminDAO();
 
         if ("create".equals(action)) {
-        String hashed = BCrypt.hashpw("123", BCrypt.gensalt(10));
-
+            String hashed = BCrypt.hashpw("123", BCrypt.gensalt(10));
             boolean success = adminDAO.createNewUser(
                 request.getParameter("username"), hashed, 
                 Integer.parseInt(request.getParameter("roleId")), 
                 request.getParameter("fullname"), request.getParameter("email")
             );
             
-            if (success) response.sendRedirect("users?action=list");
-            else {
-                 request.setAttribute("error", "Username or email already exists!");
-                request.setAttribute("username", request.getParameter("username"));
-                request.setAttribute("fullname", request.getParameter("fullname"));
-                request.setAttribute("email", request.getParameter("email"));
-                request.setAttribute("roleId", request.getParameter("roleId"));
-                List<String[]> rolesAdd = adminDAO.getAllRoles();
-                request.setAttribute("roles", rolesAdd);
-                request.getRequestDispatcher("/AdminSystemView/user-add.jsp")
-                        .forward(request, response);
-
+            if (success) {
+                response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
+            } else {
+                request.setAttribute("error", "Username or email already exists!");
+                request.setAttribute("roles", adminDAO.getAllRoles());
+                request.getRequestDispatcher("/views/AdminSystemView/user-add.jsp").forward(request, response);
             }
         } 
         else if ("update".equals(action)) {
@@ -95,8 +90,9 @@ public class AdminUserServlet extends HttpServlet {
                 request.getParameter("fullname"), request.getParameter("email")
             );
             
-            if (success) response.sendRedirect("users?action=list");
-            else {
+            if (success) {
+                response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
+            } else {
                 request.setAttribute("error", "Update failed!");
                 doGet(request, response);
             }

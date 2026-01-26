@@ -3,32 +3,31 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <jsp:include page="../common/head.jsp"></jsp:include>
-            <title>Add New User - AgriCMS</title>
-        </head>
-        <body class="bg-light">
-        <jsp:include page="../common/header.jsp"></jsp:include>
+        <jsp:include page="/common/head.jsp"></jsp:include>
+        <title>Add New User - AgriCMS</title>
+    </head>
+    <body class="bg-light">
+        <header>
+            <jsp:include page="/common/header.jsp"></jsp:include>
+        </header>
 
-            <div class="container my-5">
-                <div class="row justify-content-center">
-                    <div class="col-md-6">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header bg-primary text-white py-3">
-                                <h5 class="mb-0 fw-bold">Create New Account</h5>
-                            </div>
-                            <div class="card-body p-4">
-                                <form action="${pageContext.request.contextPath}/admin/users?action=create" method="post">
-                                <c:if test="${not empty error}">
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0 fw-bold">Create New Account</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form action="${pageContext.request.contextPath}/admin/users?action=create" method="post">
+                                                                <c:if test="${not empty error}">
                                     <p class="text-danger small mb-1">
-                                        <b> ${error}</b>
+                                        <b>${error}</b>
                                     </p>
                                 </c:if>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">USERNAME</label>
-
-
                                     <input type="text" name="username" class="form-control" value="${username}" required>
-
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">FULL NAME</label>
@@ -60,9 +59,7 @@
                 </div>
             </div>
         </div>
-
-        <jsp:include page="../common/footer.jsp"></jsp:include>
-        <jsp:include page="../common/scripts.jsp"></jsp:include>
-
+        <jsp:include page="/common/footer.jsp"></jsp:include>
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
     </body>
 </html>

@@ -3,11 +3,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <jsp:include page="../common/head.jsp"></jsp:include>
+    <jsp:include page="/common/head.jsp"></jsp:include>
     <title>Edit User - AgriCMS</title>
 </head>
 <body class="bg-light">
-    <jsp:include page="../common/header.jsp"></jsp:include>
+    <jsp:include page="/common/header.jsp"></jsp:include>
+    
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -55,7 +56,7 @@
             </div>
         </div>
     </div>
-    <jsp:include page="../common/footer.jsp"></jsp:include>
-    <jsp:include page="../common/scripts.jsp"></jsp:include>
+    <jsp:include page="/common/footer.jsp"></jsp:include>
+    <jsp:include page="/common/scripts.jsp"></jsp:include>
 </body>
 </html>
