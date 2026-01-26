@@ -116,9 +116,10 @@ public class ForgotPasswordServlet extends HttpServlet {
                 dao.updatePassword(user.getId(), hashed);
 
                 // 4. Send mail
-                String subject = "Mật khẩu của bạn";
-                String message = "Xin chào " + user.getUsername() + ",\n\nMật khẩu của bạn là: " + newPass
-                        + "\n\nVui lòng nhập mật khẩu của bạn để đăng nhập!";
+                String subject = "Your Password";
+                String message = "Hello " + user.getUsername() + ",\n\n"
+                        + "Your password is: " + newPass
+                        + "\n\nPlease use this password to log in.";
                 boolean sent = EmailUtils.sendEmail(email, subject, message);
 
                 // 5. Update request status

@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <jsp:include page="../common/head.jsp"/>
+    <jsp:include page="/common/head.jsp"/>
     <title>User Detail</title>
 </head>
 <body class="bg-light">
-<jsp:include page="../common/header.jsp"/>
+<jsp:include page="/common/header.jsp"/>
 
 <div class="container my-5">
     <div class="card shadow-sm rounded-3">
@@ -63,6 +63,6 @@
     </div>
 </div>
 
-<jsp:include page="../common/footer.jsp"/>
+<jsp:include page="/common/footer.jsp"/>
 </body>
 </html>
