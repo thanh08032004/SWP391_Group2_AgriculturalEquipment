@@ -62,7 +62,7 @@ public class AdminPasswordResetServlet extends HttpServlet {
         for (PasswordResetRequest p : listRequest) {
             System.out.println(p);
         }
-        request.getRequestDispatcher("/AdminSystemView/password-reset-list.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/AdminSystemView/password-reset-list.jsp").forward(request, response);
     }
 
     /**

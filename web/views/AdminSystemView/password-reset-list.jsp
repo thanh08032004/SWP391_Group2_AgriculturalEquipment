@@ -3,17 +3,17 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <jsp:include page="../common/head.jsp"></jsp:include>
+        <jsp:include page="/common/head.jsp"></jsp:include>
             <title>User Management - AgriCMS</title>
         </head>
         <body class="bg-light">
             <header>
 
-            <jsp:include page="../common/header.jsp"></jsp:include>
+            <jsp:include page="/common/header.jsp"></jsp:include>
             </header>
             <div class="admin-layout">
 
-            <jsp:include page="../common/side-bar.jsp"></jsp:include>
+            <jsp:include page="/common/side-bar.jsp"></jsp:include>
 
                 <div class="admin-content">
                     <div class="container my-5">
@@ -103,7 +103,7 @@
             </div>
         </div>
 
-        <jsp:include page="../common/scripts.jsp"></jsp:include>
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
 
     </body>
 </html>

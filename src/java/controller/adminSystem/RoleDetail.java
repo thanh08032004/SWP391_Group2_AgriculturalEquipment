@@ -39,7 +39,7 @@ public class RoleDetail extends HttpServlet {
         RoleDAO dao = new RoleDAO();
         Role listD = dao.getRoleById(roleId);
         request.setAttribute("listD", listD);
-        request.getRequestDispatcher("/AdminSystemView/RoleDetail.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/AdminSystemView/RoleDetail.jsp").forward(request, response);
 
 }
     } 

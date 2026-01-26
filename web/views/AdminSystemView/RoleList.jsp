@@ -8,19 +8,19 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <jsp:include page="../common/head.jsp"></jsp:include>
+        <jsp:include page="/common/head.jsp"></jsp:include>
 
             <title>Trang Chủ - CMS Nông Nghiệp</title>
         </head>
         <body>
             <header>
                 <!-- Navbar -->
-            <jsp:include page="../common/header.jsp"></jsp:include>
+            <jsp:include page="/common/header.jsp"></jsp:include>
             
                 <!-- Navbar -->
             </header>
             <div class="admin-layout">
-            <jsp:include page="../common/side-bar.jsp"></jsp:include>
+            <jsp:include page="/common/side-bar.jsp"></jsp:include>
             <div class="admin-content">
             <div class="container mt-5 mb-5">
                 <h2 class="mb-4 fw-bold role-title">

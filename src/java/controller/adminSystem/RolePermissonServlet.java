@@ -46,7 +46,7 @@ public class RolePermissonServlet extends HttpServlet {
         request.setAttribute("role", role);
         request.setAttribute("ListP", ListP);
 
-        request.getRequestDispatcher("/AdminSystemView/RolePermission.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/AdminSystemView/RolePermission.jsp").forward(request, response);
     }
 
     @Override

@@ -8,7 +8,7 @@
 
         <c:if test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
             <li><a href="${pageContext.request.contextPath}/admin/users">User Management</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/role">Role Management</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/roles">Role Management</a></li>
             <li><a href="${pageContext.request.contextPath}/admin/password-reset">Reset Password</a></li>
         </c:if>
 

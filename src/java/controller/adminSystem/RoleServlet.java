@@ -37,7 +37,7 @@ public class RoleServlet extends HttpServlet {
         List<Role> listR = roleDAO.getAllRoles();
 
         request.setAttribute("listR", listR);
-        request.getRequestDispatcher("/AdminSystemView/RoleList.jsp")
+        request.getRequestDispatcher("/views/AdminSystemView/RoleList.jsp")
                .forward(request, response);
     }
     @Override
@@ -52,3 +52,4 @@ public class RoleServlet extends HttpServlet {
     }// </editor-fold>
 
 }
+

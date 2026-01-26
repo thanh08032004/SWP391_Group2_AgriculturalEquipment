@@ -55,7 +55,7 @@ public class RoleUpdateServlet extends HttpServlet {
         Role roleDetail = dao.getRoleById(id);
         request.setAttribute("listD", roleDetail);
 
-        request.getRequestDispatcher("AdminSystemView/RoleDetail.jsp")
+        request.getRequestDispatcher("/views/AdminSystemView/RoleDetail.jsp")
                .forward(request, response);
     }
     @Override

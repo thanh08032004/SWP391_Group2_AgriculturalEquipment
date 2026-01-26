@@ -69,7 +69,7 @@ public class AdminUserDetailServlet extends HttpServlet {
         }
 
         request.setAttribute("profile", profile);
-        request.getRequestDispatcher("/AdminSystemView/user-detail.jsp")
+        request.getRequestDispatcher("/views/AdminSystemView/user-detail.jsp")
                 .forward(request, response);
     }
 

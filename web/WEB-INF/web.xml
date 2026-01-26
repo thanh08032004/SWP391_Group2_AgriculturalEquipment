@@ -86,6 +86,10 @@
         <servlet-name>AdminPrivateResetPassServlet</servlet-name>
         <servlet-class>controller.adminSystem.AdminPrivateResetPassServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>RoleServlet</servlet-name>
+        <servlet-class>controller.adminSystem.RoleServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>homeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -154,6 +158,10 @@
         <servlet-name>AdminPrivateResetPassServlet</servlet-name>
         <url-pattern>/admin-private-reset-password</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoleServlet</servlet-name>
+        <url-pattern>/admin/roles</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>
     </welcome-file-list>
@@ -174,10 +182,6 @@
         <location>/errors/500.jsp</location>
     </error-page>
     <servlet>
-        <servlet-name>RoleServlet</servlet-name>
-        <servlet-class>controller.adminSystem.RoleServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>RolePermissionServlet</servlet-name>
         <servlet-class>controller.adminSystem.RolePermissonServlet</servlet-class>
     </servlet>
@@ -197,10 +201,6 @@
         <servlet-name>SystemAdminServlet</servlet-name>
         <servlet-class>controller.adminSystem.SystemAdminServlet</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>RoleServlet</servlet-name>
-        <url-pattern>/admin/role</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RolePermissionServlet</servlet-name>
         <url-pattern>/rolepermission</url-pattern>
