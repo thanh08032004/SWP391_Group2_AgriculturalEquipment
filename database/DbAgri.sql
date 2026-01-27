@@ -406,14 +406,18 @@ INSERT INTO users (username, password, role_id) VALUES
 ('business',   '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 2),
 ('technician', '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 3),
 ('customer', '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 4),
-('ad', '$2a$10$/5dn75ieDfDUyuV2g8pWY.2Ch.5xpueDNlYTtfynRnLI1U8g3xz8.', 1);
+('ad', '$2a$10$/5dn75ieDfDUyuV2g8pWY.2Ch.5xpueDNlYTtfynRnLI1U8g3xz8.', 1),
+('cus', '$2a$10$4OQy2EQLTkSbjkMWOXnH6eKnYjeisqrzlD/jc98db1W4G57bjW8d6', 4),
+('bu', '$2a$10$4OQy2EQLTkSbjkMWOXnH6eKnYjeisqrzlD/jc98db1W4G57bjW8d6', 2);
 
 INSERT INTO user_profile (user_id, fullname, email, gender, date_of_birth, address, phone, avatar) VALUES
 (1, 'Admin System',      'admin@gmail.com',        'MALE',   '1985-01-01' , 'Hà Nội', '0981231234', 'null.jpg'),
 (2, 'Business Owner',    'business@gmail.com',     'MALE',   '1988-05-10', 'Hà Nội', '0981231234', 'admin.png'),
 (3, 'Technician Staff',  'technician@gmail.com',   'MALE',   '1992-08-20', 'Hà Nội','0981231234', 'staff.jpg'),
 (4, 'Cương Đức',         'cuongducjerry@gmail.com', 'MALE',   '1990-01-01', 'Hà Nội','0981231234', 'user.jpg'),
-(5, 'Quản Trị Vũ', 'admin1@gmail.com', 'MALE', '2005-01-01', 'Hà Nội', '0900900900', 'user.jpg');
+(5, 'Quản Trị Vũ', 'admin1@gmail.com', 'MALE', '2005-01-01', 'Hà Nội', '0900900900', 'user.jpg'),
+(6, 'Minh Thong',         'minhthong1625@gmail.com', 'MALE',   '2000-06-01', 'Hà Nội','0981231234', 'staff.jpg'),
+(7, 'Minh Thong',         'minhthong16205@gmail.com', 'MALE',   '2000-06-01', 'Hà Nội','0981231234', 'admin.png');
 
 
 
