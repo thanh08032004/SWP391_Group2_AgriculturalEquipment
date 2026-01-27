@@ -23,6 +23,11 @@
             <jsp:include page="/common/side-bar.jsp"></jsp:include>
             <div class="admin-content">
             <div class="container mt-5 mb-5">
+                <div class="back-wrapper">
+            <a href="javascript:history.back()" class="back-btn">
+                ← Back
+            </a>
+        </div>
                 <h2 class="mb-4 fw-bold role-title">
                     Role Management
                 </h2>
@@ -58,14 +63,14 @@
                                 </c:choose>
                             </td>
                             <td>
-                    <a href="${pageContext.request.contextPath}/roledetail?viewRole=${r.id}"
+                    <a href="${pageContext.request.contextPath}/admin/roledetail?viewRole=${r.id}"
                        class="btn btn-sm btn-outline-success">
                         View
                     </a>
 </td>
 
                     <td>
-                        <a href="${pageContext.request.contextPath}/rolepermission?roleId=${r.id}"
+                        <a href="${pageContext.request.contextPath}/admin/rolepermission?roleId=${r.id}"
                            class="btn btn-sm btn-outline-primary">
                             View
                         </a>

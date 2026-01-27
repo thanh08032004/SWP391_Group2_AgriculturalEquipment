@@ -211,22 +211,22 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>RolePermissionServlet</servlet-name>
-        <url-pattern>/rolepermission</url-pattern>
+        <url-pattern>/admin/rolepermission</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>PermissionUpdateServlet</servlet-name>
-        <url-pattern>/permissionupdate</url-pattern>
+        <url-pattern>/admin/permissionupdate</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RoleDetail</servlet-name>
-        <url-pattern>/roledetail</url-pattern>
+        <url-pattern>/admin/roledetail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RoleUpdateServlet</servlet-name>
-        <url-pattern>/roleupdate</url-pattern>
+        <url-pattern>/admin/roleupdate</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SystemAdminServlet</servlet-name>
-        <url-pattern>/systemhome</url-pattern>
+        <url-pattern>/admin/systemhome</url-pattern>
     </servlet-mapping>
 </web-app>

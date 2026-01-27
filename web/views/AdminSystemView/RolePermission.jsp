@@ -10,7 +10,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <jsp:include page="../common/head.jsp"/>
+        <jsp:include page="/common/head.jsp"/>
         <title>Role Permission - CMS Nông Nghiệp</title>
 
         <style>
@@ -37,17 +37,21 @@
 
         <!-- ===== HEADER ===== -->
         <header>
-            <jsp:include page="../common/header.jsp"/>
+            <jsp:include page="/common/header.jsp"/>
         </header>
 
         <!-- ===== CONTENT ===== -->
         <div class="container mt-5 mb-5">
-
+               <div class="back-wrapper" style="margin-left: -50px;">
+            <a href="javascript:history.back()" class="back-btn">
+                ← Back
+            </a>
+        </div>
             <h2 class="fw-bold mb-4">
                 Role: <span class="text-primary">${role.name}</span>
             </h2>
 
-            <form action="permissionupdate" method="post" id="roleForm">
+            <form action="${pageContext.request.contextPath}/admin/permissionupdate" method="post" id="roleForm">
 
                 <!-- hidden roleId -->
                 <input type="hidden" name="roleId" value="${role.id}"/>

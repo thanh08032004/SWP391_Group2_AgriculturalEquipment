@@ -4,21 +4,26 @@
 <html>
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
-        <title>Add New User - AgriCMS</title>
-    </head>
-    <body class="bg-light">
-        <header>
+            <title>Add New User - AgriCMS</title>
+        </head>
+        <body class="bg-light">
+            <header>
             <jsp:include page="/common/header.jsp"></jsp:include>
-        </header>
+            </header>
 
-        <div class="container my-5">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-primary text-white py-3">
-                            <h5 class="mb-0 fw-bold">Create New Account</h5>
-                        </div>
-                        <div class="card-body p-4">
+            <div class="container my-5">
+                <div class="back-wrapper" style="margin-left: -30px;">
+                                <a href="javascript:history.back()" class="back-btn">
+                                    ← Back
+                                </a>
+                            </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-primary text-white py-3">
+                                <h5 class="mb-0 fw-bold">Create New Account</h5>
+                            </div>
+                            <div class="card-body p-4">
                             <c:if test="${not empty error}">
                                 <div class="alert alert-danger py-2 shadow-sm">
                                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -47,7 +52,7 @@
                                         <option value="">-- Select Role --</option>
                                         <c:forEach var="role" items="${roles}">
                                             <option value="${role[0]}" 
-                                                <c:if test="${role[0] == roleId}">selected</c:if>>
+                                                    <c:if test="${role[0] == roleId}">selected</c:if>>
                                                 ${role[1]}
                                             </option>
                                         </c:forEach>
