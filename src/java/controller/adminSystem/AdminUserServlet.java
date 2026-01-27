@@ -46,6 +46,11 @@ public class AdminUserServlet extends HttpServlet {
                 case "toggle":
                     int toggleId = Integer.parseInt(request.getParameter("id"));
                     boolean status = Boolean.parseBoolean(request.getParameter("status"));
+                    User currentUser = (User) request.getSession().getAttribute("user");
+                    if (currentUser != null && toggleId == currentUser.getId()) {
+                        response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
+                        return;
+                    }
                     adminDAO.toggleUserStatus(toggleId, status);
                     response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
                     break;
@@ -54,7 +59,7 @@ public class AdminUserServlet extends HttpServlet {
                     List<User> searchResult = adminDAO.searchUsersByName(txtSearch);
 
                     request.setAttribute("userList", searchResult);
-                    request.setAttribute("searchValue", txtSearch); 
+                    request.setAttribute("searchValue", txtSearch);
                     request.getRequestDispatcher("/views/AdminSystemView/user-list.jsp").forward(request, response);
                     break;
                 default:

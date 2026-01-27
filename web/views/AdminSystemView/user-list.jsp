@@ -32,7 +32,6 @@
                                     </button>
                                 </div>
 
-                                <%-- Nút Reset Filter: Chạy lại action list để xóa từ khóa tìm kiếm --%>
                                 <c:if test="${not empty searchValue}">
                                     <a href="${pageContext.request.contextPath}/admin/users?action=list" class="btn btn-outline-secondary d-flex align-items-center">
                                         <i class="bi bi-arrow-clockwise me-1"></i> Reset
@@ -76,15 +75,25 @@
                                             <td>${u.createdAt}</td>
                                             <td class="text-center pe-4">
                                                 <a href="${pageContext.request.contextPath}/admin/users?action=edit&id=${u.id}" 
-                                                   class="btn btn-sm btn-outline-primary mx-1">
+                                                   class="btn btn-sm btn-outline-primary mx-1 shadow-sm">
                                                     <i class="bi bi-pencil"></i> Edit
-                                                </a>                                            
-                                                <a href="${pageContext.request.contextPath}/admin/users?action=toggle&id=${u.id}&status=${u.active}" 
-                                                   class="btn btn-sm ${u.active ? 'btn-outline-danger' : 'btn-outline-success'} mx-1"
-                                                   onclick="return confirm('Xác nhận thay đổi trạng thái tài khoản?')">
-                                                    <i class="bi ${u.active ? 'bi-lock' : 'bi-unlock'}"></i>
-                                                    ${u.active ? 'Disable' : 'Enable'}
                                                 </a>
+                                                <c:choose>
+                                                    <c:when test="${u.id == sessionScope.user.id}">
+                                                        <button class="btn btn-sm btn-outline-secondary mx-1 shadow-sm" disabled 
+                                                                title="Bạn không thể tự vô hiệu hóa tài khoản của chính mình">
+                                                            <i class="bi bi-lock-fill"></i> Self
+                                                        </button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <a href="${pageContext.request.contextPath}/admin/users?action=toggle&id=${u.id}&status=${u.active}" 
+                                                           class="btn btn-sm ${u.active ? 'btn-outline-danger' : 'btn-outline-success'} mx-1 shadow-sm"
+                                                           onclick="return confirm('Xác nhận thay đổi trạng thái tài khoản?')">
+                                                            <i class="bi ${u.active ? 'bi-lock' : 'bi-unlock'}"></i>
+                                                            ${u.active ? 'Disable' : 'Enable'}
+                                                        </a>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </td>
                                         </tr>
                                     </c:forEach>
