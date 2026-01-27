@@ -12,11 +12,6 @@
             </header>
 
             <div class="container my-5">
-                <div class="back-wrapper" style="margin-left: -30px;">
-                                <a href="javascript:history.back()" class="back-btn">
-                                    ← Back
-                                </a>
-                            </div>
                 <div class="row justify-content-center">
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm">
