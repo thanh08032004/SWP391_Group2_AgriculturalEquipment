@@ -63,6 +63,15 @@ public class AdminDeviceServlet extends HttpServlet {
                             .forward(request, response);
                     break;
                 }
+                case "delete": {
+                    int id = Integer.parseInt(request.getParameter("id"));
+
+                    boolean success = deviceDAO.deleteDevice(id);
+
+                    // Dù thành công hay không cũng quay lại list
+                    response.sendRedirect("devices?action=list");
+                    break;
+                }
 
                 default: {
                     response.sendRedirect("devices?action=list");

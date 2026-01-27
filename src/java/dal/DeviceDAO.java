@@ -241,5 +241,21 @@ public class DeviceDAO extends DBContext {
     }
     return false;
 }
+    
+    public boolean deleteDevice(int id) {
+    String sql = "DELETE FROM device WHERE id = ?";
+
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, id);
+        return ps.executeUpdate() > 0;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
 
 }
