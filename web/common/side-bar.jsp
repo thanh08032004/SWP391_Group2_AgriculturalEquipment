@@ -17,6 +17,8 @@
         </c:when>
         <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
             <li><a href="${pageContext.request.contextPath}/admin-business/devices">Device Management</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin-business/categories">Category Management</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin-business/brands">Brand Management</a></li>
             <li><a href="${pageContext.request.contextPath}/admin/devices">Catalog</a></li>
             <li><a href="${pageContext.request.contextPath}/admin/reports">Reports</a></li>
         </c:when>
