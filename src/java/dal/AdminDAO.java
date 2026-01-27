@@ -112,6 +112,36 @@ public class AdminDAO extends DBContext {
             e.printStackTrace();
         }
     }
+public List<User> searchUsersByName(String txtSearch) {
+    List<User> list = new ArrayList<>();
+    String sql = """
+        SELECT u.id, u.username, u.active, u.created_at, u.role_id, 
+               r.name AS role_name, up.fullname, up.email
+        FROM users u
+        JOIN role r ON u.role_id = r.id
+        JOIN user_profile up ON u.id = up.user_id
+        WHERE up.fullname LIKE ? OR u.username LIKE ?
+        ORDER BY u.id DESC
+    """;
+    
+    try (Connection conn = getConnection(); 
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, "%" + txtSearch + "%");
+        ps.setString(2, "%" + txtSearch + "%");
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(User.builder()
+                        .id(rs.getInt("id")).username(rs.getString("username"))
+                        .roleId(rs.getInt("role_id")).roleName(rs.getString("role_name"))
+                        .fullname(rs.getString("fullname")).email(rs.getString("email"))
+                        .active(rs.getBoolean("active")).createdAt(rs.getTimestamp("created_at")).build());
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return list;
+}
 
     public boolean createNewUser(String username, String password, int roleId, String fullname, String email) {
         String sqlU = "INSERT INTO users (username, password, role_id, active) VALUES (?, ?, ?, 1)";

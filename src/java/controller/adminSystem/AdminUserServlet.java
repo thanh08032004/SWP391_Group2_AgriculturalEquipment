@@ -14,7 +14,9 @@ public class AdminUserServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        if (action == null) action = "list";
+        if (action == null) {
+            action = "list";
+        }
 
         AdminDAO adminDAO = new AdminDAO();
         List<User> userList = adminDAO.getAllUsers();
@@ -47,7 +49,14 @@ public class AdminUserServlet extends HttpServlet {
                     adminDAO.toggleUserStatus(toggleId, status);
                     response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
                     break;
-                    
+                case "search":
+                    String txtSearch = request.getParameter("txt");
+                    List<User> searchResult = adminDAO.searchUsersByName(txtSearch);
+
+                    request.setAttribute("userList", searchResult);
+                    request.setAttribute("searchValue", txtSearch); 
+                    request.getRequestDispatcher("/views/AdminSystemView/user-list.jsp").forward(request, response);
+                    break;
                 default:
                     request.setAttribute("userList", userList);
                     request.getRequestDispatcher("/views/AdminSystemView/user-list.jsp").forward(request, response);
@@ -71,11 +80,11 @@ public class AdminUserServlet extends HttpServlet {
             String email = request.getParameter("email");
             String roleId = request.getParameter("roleId");
             String hashed = BCrypt.hashpw("123", BCrypt.gensalt(10));
-            
+
             boolean success = adminDAO.createNewUser(
-                username, hashed, Integer.parseInt(roleId), fullname, email
+                    username, hashed, Integer.parseInt(roleId), fullname, email
             );
-            
+
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
             } else {
@@ -84,17 +93,16 @@ public class AdminUserServlet extends HttpServlet {
                 request.setAttribute("fullname", fullname);
                 request.setAttribute("email", email);
                 request.setAttribute("roleId", roleId);
-                  request.setAttribute("roles", adminDAO.getAllRoles());
+                request.setAttribute("roles", adminDAO.getAllRoles());
                 request.getRequestDispatcher("/views/AdminSystemView/user-add.jsp").forward(request, response);
             }
-        } 
-        else if ("update".equals(action)) {
+        } else if ("update".equals(action)) {
             boolean success = adminDAO.updateUser(
-                Integer.parseInt(request.getParameter("id")), 
-                Integer.parseInt(request.getParameter("roleId")), 
-                request.getParameter("fullname"), request.getParameter("email")
+                    Integer.parseInt(request.getParameter("id")),
+                    Integer.parseInt(request.getParameter("roleId")),
+                    request.getParameter("fullname"), request.getParameter("email")
             );
-            
+
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
             } else {

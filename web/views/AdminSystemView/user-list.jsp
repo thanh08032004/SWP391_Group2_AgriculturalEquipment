@@ -17,11 +17,33 @@
                 <div class="admin-content">
                     <div class="container my-5">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2 class="fw-bold"><i class="bi bi-people-fill me-2"></i>User Management</h2>
+                            <h2 class="fw-bold text-dark">User Management</h2>
 
-                            <a href="${pageContext.request.contextPath}/admin/users?action=add" class="btn btn-primary shadow-sm">
-                            <i class="bi bi-person-plus-fill"></i> Add New User
-                        </a>
+                            <div class="d-flex gap-3">
+                            <%-- Form Search --%>
+                            <form action="${pageContext.request.contextPath}/admin/users" method="get" class="d-flex shadow-sm gap-2">
+                                <input type="hidden" name="action" value="search">
+
+                                <div class="input-group">
+                                    <input type="text" name="txt" class="form-control" placeholder="Search by name..." 
+                                           value="${searchValue}" style="min-width: 250px;">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="bi bi-search"></i> Search
+                                    </button>
+                                </div>
+
+                                <%-- Nút Reset Filter: Chạy lại action list để xóa từ khóa tìm kiếm --%>
+                                <c:if test="${not empty searchValue}">
+                                    <a href="${pageContext.request.contextPath}/admin/users?action=list" class="btn btn-outline-secondary d-flex align-items-center">
+                                        <i class="bi bi-arrow-clockwise me-1"></i> Reset
+                                    </a>
+                                </c:if>
+                            </form>
+
+                            <a href="${pageContext.request.contextPath}/admin/users?action=add" class="btn btn-success px-4 shadow-sm">
+                                <i class="bi bi-person-plus-fill me-1"></i>Add New User
+                            </a>
+                        </div>
                     </div>
 
                     <div class="card border-0 shadow-sm rounded-3">
