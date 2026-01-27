@@ -11,11 +11,6 @@
 
         <div class="container my-5">
             <div class="card shadow-sm rounded-3">
-                <div class="back-wrapper" style="margin-left: -50px;">
-                    <a href="javascript:history.back()" class="back-btn">
-                        ← Back
-                    </a>
-                </div>
                 <div class="card-header bg-primary text-white">
                     <h5><i class="bi bi-person-lines-fill me-2"></i>User Detail</h5>
                 </div>
