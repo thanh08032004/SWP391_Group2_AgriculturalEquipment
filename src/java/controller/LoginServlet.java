@@ -73,7 +73,7 @@ public class LoginServlet extends HttpServlet {
         String ctx = request.getContextPath();
         switch (user.getRoleId()) {
             case 1 -> response.sendRedirect(ctx + "/admin/users");
-            case 2 -> response.sendRedirect(ctx + "/adminbusinessdashboard");
+            case 2 -> response.sendRedirect(ctx + "/admin-business/devices");
             case 3 -> response.sendRedirect(ctx + "/staff/tasks");
             case 4 -> response.sendRedirect(ctx + "/home");
             default -> {

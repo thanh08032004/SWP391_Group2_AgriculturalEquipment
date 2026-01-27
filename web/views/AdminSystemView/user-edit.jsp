@@ -8,7 +8,7 @@
 </head>
 <body class="bg-light">
     <jsp:include page="/common/header.jsp"></jsp:include>
-    
+
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -17,9 +17,15 @@
                         <h5 class="mb-0 fw-bold">Edit User Information</h5>
                     </div>
                     <div class="card-body p-4">
+                        <c:if test="${userEdit.id == sessionScope.user.id}">
+                            <div class="alert alert-info py-2 small">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Bạn đang chỉnh sửa tài khoản của chính mình. Quyền hạn (Role) không thể thay đổi.
+                            </div>
+                        </c:if>
                         <form action="${pageContext.request.contextPath}/admin/users?action=update" method="post">
                             <input type="hidden" name="id" value="${userEdit.id}">
-                            
+
                             <div class="mb-3">
                                 <label class="form-label small fw-bold text-muted">USERNAME</label>
                                 <input type="text" class="form-control bg-light" value="${userEdit.username}" readonly>
@@ -27,13 +33,17 @@
 
                             <div class="mb-3">
                                 <label class="form-label small fw-bold text-muted">ROLE</label>
-                                <select name="roleId" class="form-select">
+                                <select name="roleId" class="form-select ${userEdit.id == sessionScope.user.id ? 'bg-light' : ''}" 
+                                        ${userEdit.id == sessionScope.user.id ? 'disabled' : ''}>
                                     <c:forEach var="role" items="${roles}">
                                         <option value="${role[0]}" ${userEdit.roleId == role[0] ? 'selected' : ''}>
                                             ${role[1]}
                                         </option>
                                     </c:forEach>
                                 </select>
+                                <c:if test="${userEdit.id == sessionScope.user.id}">
+                                    <input type="hidden" name="roleId" value="${userEdit.roleId}">
+                                </c:if>
                             </div>
 
                             <div class="mb-3">

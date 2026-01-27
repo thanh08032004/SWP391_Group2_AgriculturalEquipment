@@ -8,17 +8,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <jsp:include page="../common/head.jsp"></jsp:include>
+        <jsp:include page="/common/head.jsp"></jsp:include>
         
             <title>Trang Chủ - CMS Nông Nghiệp</title>
         </head>
     <body>
         <header>
                 <!-- Navbar -->
-            <jsp:include page="../common/header.jsp"></jsp:include>
+            <jsp:include page="/common/header.jsp"></jsp:include>
             <!-- Navbar -->
         </header>
-            <div class="container mt-5 mb-3 d-flex justify-content-between align-items-center">
+            <div class="container mt-5 mb-3 d-flex align-items-center">
+                <div class="back-wrapper" style="margin-right: 50px;">
+            <a href="javascript:history.back()" class="back-btn">
+                ← Back
+            </a>
+        </div>
     <h2 class="fw-bold role-title mb-0">Role Management</h2>
 </div>
 <c:if test="${not empty listD}">
@@ -31,7 +36,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="roleupdate" method="post">
+                    <form action="${pageContext.request.contextPath}/admin/roleupdate" method="post">
 
                         <input type="hidden" name="roleId" value="${listD.id}" />
 

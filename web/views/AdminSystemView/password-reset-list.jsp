@@ -17,6 +17,11 @@
 
                 <div class="admin-content">
                     <div class="container my-5">
+                                      <div class="back-wrapper">
+            <a href="javascript:history.back()" class="back-btn">
+                ← Back
+            </a>
+        </div>
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h2 class="fw-bold"><i class="bi bi-people-fill me-2"></i>User Reset Password</h2>
                         </div>
