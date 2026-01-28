@@ -9,9 +9,9 @@ import java.util.*;
 public class DeviceDAO extends DBContext {
 
     public List<DeviceDTO> getAllDevices() {
-    List<DeviceDTO> list = new ArrayList<>();
+        List<DeviceDTO> list = new ArrayList<>();
 
-    String sql = """
+        String sql = """
         SELECT 
             d.id,
             d.serial_number,
@@ -32,34 +32,30 @@ public class DeviceDAO extends DBContext {
         
     """;
 
-    try (
-        Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
-    ) {
-        while (rs.next()) {
-            DeviceDTO d = DeviceDTO.builder()
-                    .id(rs.getInt("id"))
-                    .serialNumber(rs.getString("serial_number"))
-                    .machineName(rs.getString("machine_name"))
-                    .model(rs.getString("model"))
-                    .status(rs.getString("status"))
-                    .purchaseDate(rs.getDate("purchase_date"))
-                    .warrantyEndDate(rs.getDate("warranty_end_date"))
-                    .categoryName(rs.getString("category_name"))
-                    .brandName(rs.getString("brand_name"))
-                    .customerName(rs.getString("customer_name"))
-                    .build();
+        try (
+                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery();) {
+            while (rs.next()) {
+                DeviceDTO d = DeviceDTO.builder()
+                        .id(rs.getInt("id"))
+                        .serialNumber(rs.getString("serial_number"))
+                        .machineName(rs.getString("machine_name"))
+                        .model(rs.getString("model"))
+                        .status(rs.getString("status"))
+                        .purchaseDate(rs.getDate("purchase_date"))
+                        .warrantyEndDate(rs.getDate("warranty_end_date"))
+                        .categoryName(rs.getString("category_name"))
+                        .brandName(rs.getString("brand_name"))
+                        .customerName(rs.getString("customer_name"))
+                        .build();
 
-            list.add(d);
+                list.add(d);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+
+        return list;
     }
-
-    return list;
-}
-
 
     public List<CategoryDTO> getAllCategories() {
         List<CategoryDTO> list = new ArrayList<>();
@@ -175,9 +171,8 @@ public class DeviceDAO extends DBContext {
         return list;
     }
 
-    
     public boolean createDevice(DeviceDTO d) {
-    String sql = """
+        String sql = """
         INSERT INTO device
         (customer_id, serial_number, machine_name, model,
          purchase_date, warranty_end_date, status,
@@ -185,30 +180,29 @@ public class DeviceDAO extends DBContext {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ps.setInt(1, d.getCustomerId());
-        ps.setString(2, d.getSerialNumber());
-        ps.setString(3, d.getMachineName());
-        ps.setString(4, d.getModel());
-        ps.setDate(5, d.getPurchaseDate());
-        ps.setDate(6, d.getWarrantyEndDate());
-        ps.setString(7, d.getStatus());
-        ps.setInt(8, d.getCategoryId());
-        ps.setInt(9, d.getBrandId());
+            ps.setInt(1, d.getCustomerId());
+            ps.setString(2, d.getSerialNumber());
+            ps.setString(3, d.getMachineName());
+            ps.setString(4, d.getModel());
+            ps.setDate(5, d.getPurchaseDate());
+            ps.setDate(6, d.getWarrantyEndDate());
+            ps.setString(7, d.getStatus());
+            ps.setInt(8, d.getCategoryId());
+            ps.setInt(9, d.getBrandId());
 
-        int rows = ps.executeUpdate();
-        return rows > 0;   // 👈 CHỐT Ở ĐÂY
+            int rows = ps.executeUpdate();
+            return rows > 0;   // 👈 CHỐT Ở ĐÂY
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    return false;
-}
 
     public boolean updateDevice(DeviceDTO d) {
-    String sql = """
+        String sql = """
         UPDATE device
         SET machine_name = ?,
             model = ?,
@@ -221,41 +215,209 @@ public class DeviceDAO extends DBContext {
         WHERE id = ?
     """;
 
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ps.setString(1, d.getMachineName());
-        ps.setString(2, d.getModel());
-        ps.setInt(3, d.getCustomerId());
-        ps.setInt(4, d.getCategoryId());
-        ps.setInt(5, d.getBrandId());
-        ps.setDate(6, d.getPurchaseDate());
-        ps.setDate(7, d.getWarrantyEndDate());
-        ps.setString(8, d.getStatus());
-        ps.setInt(9, d.getId());
+            ps.setString(1, d.getMachineName());
+            ps.setString(2, d.getModel());
+            ps.setInt(3, d.getCustomerId());
+            ps.setInt(4, d.getCategoryId());
+            ps.setInt(5, d.getBrandId());
+            ps.setDate(6, d.getPurchaseDate());
+            ps.setDate(7, d.getWarrantyEndDate());
+            ps.setString(8, d.getStatus());
+            ps.setInt(9, d.getId());
 
-        return ps.executeUpdate() > 0;
+            return ps.executeUpdate() > 0;
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    return false;
-}
-    
+
     public boolean deleteDevice(int id) {
-    String sql = "DELETE FROM device WHERE id = ?";
+        String sql = "DELETE FROM device WHERE id = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isSerialExists(String serial) {
+        String sql = "SELECT 1 FROM device WHERE serial_number = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, serial);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    
+
+    public List<DeviceDTO> searchAndFilterPaging(
+        String keyword,
+        String customerName,
+        String categoryId,
+        String brandId,
+        String status,
+        int pageIndex,
+        int pageSize
+) {
+    List<DeviceDTO> list = new ArrayList<>();
+
+    StringBuilder sql = new StringBuilder("""
+        SELECT d.id, d.serial_number, d.machine_name, d.model, d.status,
+               d.purchase_date, d.warranty_end_date,
+               c.name AS categoryName,
+               b.name AS brandName,
+               up.fullname AS customerName
+        FROM device d
+        JOIN category c ON d.category_id = c.id
+        JOIN brand b ON d.brand_id = b.id
+        JOIN users u ON d.customer_id = u.id
+        LEFT JOIN user_profile up ON u.id = up.user_id
+        WHERE 1 = 1
+    """);
+
+    List<Object> params = new ArrayList<>();
+
+    // SEARCH keyword
+    if (keyword != null && !keyword.trim().isEmpty()) {
+        sql.append(" AND (d.serial_number LIKE ? OR d.machine_name LIKE ?)");
+        params.add("%" + keyword + "%");
+        params.add("%" + keyword + "%");
+    }
+
+    // SEARCH customer
+    if (customerName != null && !customerName.trim().isEmpty()) {
+        sql.append(" AND up.fullname LIKE ?");
+        params.add("%" + customerName + "%");
+    }
+
+    // FILTER category
+    if (categoryId != null && !categoryId.trim().isEmpty()) {
+        sql.append(" AND d.category_id = ?");
+        params.add(Integer.parseInt(categoryId));
+    }
+
+    // FILTER brand
+    if (brandId != null && !brandId.trim().isEmpty()) {
+        sql.append(" AND d.brand_id = ?");
+        params.add(Integer.parseInt(brandId));
+    }
+
+    // FILTER status
+    if (status != null && !status.trim().isEmpty()) {
+        sql.append(" AND d.status = ?");
+        params.add(status);
+    }
+
+    // 🔥 MYSQL PAGINATION
+    sql.append(" ORDER BY d.id DESC LIMIT ? OFFSET ?");
+    int offset = (pageIndex - 1) * pageSize;
+    params.add(pageSize);
+    params.add(offset);
 
     try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-        ps.setInt(1, id);
-        return ps.executeUpdate() > 0;
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
 
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            DeviceDTO d = new DeviceDTO();
+            d.setId(rs.getInt("id"));
+            d.setSerialNumber(rs.getString("serial_number"));
+            d.setMachineName(rs.getString("machine_name"));
+            d.setModel(rs.getString("model"));
+            d.setStatus(rs.getString("status"));
+            d.setPurchaseDate(rs.getDate("purchase_date"));
+            d.setWarrantyEndDate(rs.getDate("warranty_end_date"));
+            d.setCategoryName(rs.getString("categoryName"));
+            d.setBrandName(rs.getString("brandName"));
+            d.setCustomerName(rs.getString("customerName"));
+            list.add(d);
+        }
     } catch (Exception e) {
         e.printStackTrace();
     }
-    return false;
+
+    return list;
 }
 
+
+    public int countSearchAndFilter(
+        String keyword,
+        String customerName,
+        String categoryId,
+        String brandId,
+        String status
+) {
+    StringBuilder sql = new StringBuilder("""
+        SELECT COUNT(*)
+        FROM device d
+        JOIN category c ON d.category_id = c.id
+        JOIN brand b ON d.brand_id = b.id
+        JOIN users u ON d.customer_id = u.id
+        LEFT JOIN user_profile up ON u.id = up.user_id
+        WHERE 1 = 1
+    """);
+
+    List<Object> params = new ArrayList<>();
+
+    if (keyword != null && !keyword.trim().isEmpty()) {
+        sql.append(" AND (d.serial_number LIKE ? OR d.machine_name LIKE ?)");
+        params.add("%" + keyword + "%");
+        params.add("%" + keyword + "%");
+    }
+
+    if (customerName != null && !customerName.trim().isEmpty()) {
+        sql.append(" AND up.fullname LIKE ?");
+        params.add("%" + customerName + "%");
+    }
+
+    if (categoryId != null && !categoryId.trim().isEmpty()) {
+        sql.append(" AND d.category_id = ?");
+        params.add(Integer.parseInt(categoryId));
+    }
+
+    if (brandId != null && !brandId.trim().isEmpty()) {
+        sql.append(" AND d.brand_id = ?");
+        params.add(Integer.parseInt(brandId));
+    }
+
+    if (status != null && !status.trim().isEmpty()) {
+        sql.append(" AND d.status = ?");
+        params.add(status);
+    }
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return 0;
+}
 
 }
