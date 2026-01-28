@@ -46,6 +46,15 @@ public class ChangePasswordServlet extends HttpServlet {
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
 
+        // Validate độ dài password
+        if (newPassword == null || newPassword.length() < 3 || newPassword.length() > 30) {
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/profile?tab=security&errorPass=length"
+            );
+            return;
+        }
+
         // 2. Validate tất cả trước
         boolean confirmWrong = !newPassword.equals(confirmPassword);
         boolean currentWrong = !userDAO.checkPassword(user.getId(), currentPassword);

@@ -229,11 +229,13 @@
                             </div>
                             <div class="form-group">
                                 <label>New Password</label>
-                                <input type="password" name="newPassword" required>
+                                <input type="password" name="newPassword" minlength="3"
+                                       maxlength="30" required>
                             </div>
                             <div class="form-group">
                                 <label>Confirm New Password</label>
-                                <input type="password" name="confirmPassword" required>
+                                <input type="password" name="confirmPassword" minlength="3"
+                                       maxlength="30" required>
                             </div>
                             <c:if test="${not empty errorPass}">
                                 <p style="color:red; margin-top: 8px;">${errorPass}</p>
@@ -285,9 +287,6 @@
                             </span>
                         </div>
                     </div>
-
-
-
                 </c:if>
             </div>
         </div>
