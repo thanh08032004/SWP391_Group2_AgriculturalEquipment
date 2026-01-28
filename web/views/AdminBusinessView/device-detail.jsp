@@ -63,6 +63,10 @@
                class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Back
             </a>
+               <a href="${pageContext.request.contextPath}/admin-business/devices?action=edit&id=${device.id}"
+       class="btn btn-warning">
+        <i class="bi bi-pencil-square"></i> Edit
+    </a>
         </div>
     </div>
 </div>
