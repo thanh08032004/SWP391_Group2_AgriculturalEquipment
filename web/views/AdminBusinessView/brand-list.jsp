@@ -82,6 +82,10 @@
                                             <td>${b.email}</td>
                                             <td>${b.address}</td>
                                             <td class="text-center">
+                                                <a href="${pageContext.request.contextPath}/admin-business/brands?action=detail&id=${b.id}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
                                                 <a class="btn btn-sm btn-outline-primary"
                                                    href="brands?action=edit&id=${b.id}">
                                                     <i class="bi bi-pencil"></i>
