@@ -43,11 +43,16 @@ public class AuthFilter implements Filter {
         } else {
             int role = user.getRoleId();
             
-            if ((uri.contains("/admin/") || uri.contains("/AdminSystemView/")) && role != 1) {
-                res.sendError(HttpServletResponse.SC_FORBIDDEN); 
+            
+            if ((uri.contains("/admin-business/") || uri.contains("/AdminBusinessView/")) && role != 2) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
 
+            if (uri.contains("/admin/") && !uri.contains("/admin-business/") && role != 1) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN); 
+                return;
+            }
             if ((uri.contains("/staff/") || uri.contains("/StaffView/")) && role != 3) {
                 res.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return;
