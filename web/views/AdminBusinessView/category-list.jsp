@@ -76,10 +76,6 @@
                                             <td>${c.name}</td>
                                             <td>${c.description}</td>
                                             <td class="text-center">
-                                                <a href="categories?action=detail&id=${c.id}"
-                                                   class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-eye-fill"></i>
-                                                </a>
                                                 <a class="btn btn-sm btn-outline-primary"
                                                    href="categories?action=edit&id=${c.id}">
                                                     <i class="bi bi-pencil"></i>

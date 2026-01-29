@@ -37,10 +37,6 @@ public class AdminBrandServlet extends HttpServlet {
         }
 
         switch (action) {
-            case "detail":
-                showDetail(request, response);
-                break;
-
             case "list":
                 listBrand(request, response);
                 break;
@@ -82,21 +78,6 @@ public class AdminBrandServlet extends HttpServlet {
             default:
                 doGet(request, response);
         }
-    }
-
-    // =========================
-// DETAIL
-// =========================
-    private void showDetail(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        int id = Integer.parseInt(request.getParameter("id"));
-        Brand brand = brandDAO.getBrandById(id);
-
-        request.setAttribute("brand", brand);
-        request.getRequestDispatcher(
-                "/views/AdminBusinessView/brand-detail.jsp"
-        ).forward(request, response);
     }
 
     // =========================
