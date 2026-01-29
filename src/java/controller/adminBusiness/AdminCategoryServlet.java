@@ -33,17 +33,6 @@ public class AdminCategoryServlet extends HttpServlet {
 
         switch (action) {
 
-            case "detail": {
-                int id = Integer.parseInt(request.getParameter("id"));
-                Category c = categoryDAO.getById(id);
-
-                request.setAttribute("category", c);
-                request.getRequestDispatcher(
-                        "/views/AdminBusinessView/category-detail.jsp"
-                ).forward(request, response);
-                break;
-            }
-
             case "list": {
                 int pageSize = 10;
 
