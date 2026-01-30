@@ -1,0 +1,69 @@
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html>
+    <head>
+        <jsp:include page="/common/head.jsp"></jsp:include>
+        <title>Add New Component - AgriCMS</title>
+    </head>
+    <body class="bg-light">
+        <header><jsp:include page="/common/header.jsp"></jsp:include></header>
+        <div class="admin-layout d-flex">
+            <jsp:include page="/common/side-bar.jsp"></jsp:include>
+            <div class="admin-content p-4 w-100">
+                <div class="card shadow-sm mx-auto" style="max-width: 750px;">
+                    <div class="card-header bg-dark text-white p-3"><h5 class="mb-0">Add New Component</h5></div>
+                    <div class="card-body p-4">
+                        <form action="spare-parts?action=create" method="post">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-4 col-form-label fw-bold">Code</label>
+                                        <div class="col-sm-8"><input type="text" name="partCode" class="form-control" required></div>
+                                    </div>
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-4 col-form-label fw-bold">Name</label>
+                                        <div class="col-sm-8"><input type="text" name="name" class="form-control" required></div>
+                                    </div>
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-4 col-form-label fw-bold">Brand</label>
+                                        <div class="col-sm-8">
+                                            <select name="brandId" class="form-select" required>
+                                                <option value="">-- Select Brand --</option>
+                                                <c:forEach var="b" items="${brands}"><option value="${b.id}">${b.name}</option></c:forEach>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-4 col-form-label fw-bold">Price</label>
+                                        <div class="col-sm-8"><input type="number" name="price" class="form-control"></div>
+                                    </div>
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-4 col-form-label fw-bold">Unit</label>
+                                        <div class="col-sm-8"><input type="text" name="unit" class="form-control"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <label class="fw-bold mb-2">Image Filename</label>
+                                    <input type="text" name="image" class="form-control mb-2" placeholder="default_part.jpg">
+                                    <div class="border rounded bg-white d-flex align-items-center justify-content-center" style="height: 150px;">
+                                        <span class="text-muted small">Image Preview</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Description</label>
+                                <textarea name="description" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="d-flex gap-2 justify-content-end mt-4">
+                                <button type="submit" class="btn btn-primary px-4">Add Component</button>
+                                <a href="spare-parts?action=list" class="btn btn-secondary px-4">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
+    </body>
+</html>
