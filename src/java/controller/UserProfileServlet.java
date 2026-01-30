@@ -110,8 +110,12 @@ public class UserProfileServlet extends HttpServlet {
                 case "wrongpass":
                     request.setAttribute("errorPass", "Current password is incorrect");
                     break;
+                case "length":
+                    request.setAttribute("errorPass", "Password must be between 3 and 30 characters");
+                    break;
             }
         }
+
         // 6.2 báo update thành công
         String success = request.getParameter("success");
         if (success != null) {
@@ -215,7 +219,7 @@ public class UserProfileServlet extends HttpServlet {
         UserProfileDAO dao = new UserProfileDAO();
         dao.updateProfile(user.getId(), fullname, gender, email, phone, birthDate, address);
         response.sendRedirect(
-            request.getContextPath() + "/profile?success=profileUpdated"
+                request.getContextPath() + "/profile?success=profileUpdated"
         );
 
     }

@@ -102,6 +102,10 @@
         <servlet-name>AdminBrandServlet</servlet-name>
         <servlet-class>controller.adminBusiness.AdminBrandServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminVoucherServlet</servlet-name>
+        <servlet-class>controller.adminBusiness.AdminVoucherServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>homeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -185,6 +189,10 @@
     <servlet-mapping>
         <servlet-name>AdminBrandServlet</servlet-name>
         <url-pattern>/admin-business/brands</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminVoucherServlet</servlet-name>
+        <url-pattern>/admin-business/vouchers</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>
