@@ -38,6 +38,9 @@
                                     <input type="text" name="serialNumber"
                                            class="form-control"
                                            value="${serialNumber}" required>
+                                    <c:if test="${not empty errorSerial}">
+                                        <small class="text-danger">${errorSerial}</small>
+                                    </c:if>
                                 </div>
 
                                 <!-- MACHINE NAME -->
@@ -63,7 +66,7 @@
                                 <!-- CUSTOMER -->
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">
-                                        CUSTOMER
+                                        CUSTOMER ID
                                     </label>
                                     <input type="number"
                                            name="customerId"
@@ -71,6 +74,9 @@
                                            value="${customerId}"
                                            required
                                            min="1"/>
+                                    <c:if test="${not empty errorCustomerId}">
+                                        <small class="text-danger">${errorCustomerId}</small>
+                                    </c:if>
                                 </div>
 
                                 <!-- CATEGORY -->
@@ -111,6 +117,9 @@
                                     <input type="date" name="purchaseDate"
                                            class="form-control"
                                            value="${purchaseDate}">
+                                    <c:if test="${not empty errorDate}">
+                                        <small class="text-danger">${errorDate}</small>
+                                    </c:if>
                                 </div>
 
                                 <!-- WARRANTY END -->
@@ -136,12 +145,3 @@
 
                             </form>
                         </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <jsp:include page="/common/scripts.jsp"></jsp:include>
-    </body>
-</html>

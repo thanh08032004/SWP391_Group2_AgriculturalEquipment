@@ -11,6 +11,8 @@
             <jsp:include page="/common/header.jsp"></jsp:include>
             </header>
 
+
+
             <div class="admin-layout">
             <jsp:include page="/common/side-bar.jsp"></jsp:include>
 
@@ -25,6 +27,84 @@
                             <i class="bi bi-plus-circle-fill"></i> Add New Device
                         </a>
                     </div>
+
+                    <form method="get"
+                          action="${pageContext.request.contextPath}/admin-business/devices"
+                          class="row g-3 mb-4">
+
+                        <input type="hidden" name="action" value="list"/>
+
+                        <!-- SEARCH keyword -->
+                        <div class="col-md-3">
+                            <input type="text"
+                                   name="keyword"
+                                   value="${param.keyword}"
+                                   class="form-control"
+                                   placeholder="Serial or Machine name">
+                        </div>
+
+                        <!-- SEARCH customer -->
+                        <div class="col-md-3">
+                            <input type="text"
+                                   name="customerName"
+                                   value="${param.customerName}"
+                                   class="form-control"
+                                   placeholder="Customer name">
+                        </div>
+
+                        <!-- FILTER category -->
+                        <div class="col-md-2">
+                            <select name="categoryId"
+                                    class="form-select"
+                                    onchange="this.form.submit()">
+                                <option value="">All Category</option>
+                                <c:forEach var="c" items="${categoryList}">
+                                    <option value="${c.id}"
+                                            ${param.categoryId == c.id ? 'selected' : ''}>
+                                        ${c.name}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
+                        <!-- FILTER brand -->
+                        <div class="col-md-2">
+                            <select name="brandId"
+                                    class="form-select"
+                                    onchange="this.form.submit()">
+                                <option value="">All Brand</option>
+                                <c:forEach var="b" items="${brandList}">
+                                    <option value="${b.id}"
+                                            ${param.brandId == b.id ? 'selected' : ''}>
+                                        ${b.name}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
+                        <!-- FILTER status -->
+                        <div class="col-md-2">
+                            <select name="status"
+                                    class="form-select"
+                                    onchange="this.form.submit()">
+                                <option value="">All Status</option>
+                                <option value="ACTIVE" ${param.status=='ACTIVE'?'selected':''}>Active</option>
+                                <option value="MAINTENANCE" ${param.status=='MAINTENANCE'?'selected':''}>Maintenance</option>
+                                <option value="BROKEN" ${param.status=='BROKEN'?'selected':''}>Broken</option>
+                            </select>
+                        </div>
+
+                        <!-- SEARCH button -->
+                        <div class="col-md-12 text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                            <a href="${pageContext.request.contextPath}/admin-business/devices"
+                               class="btn btn-secondary">
+                                Reset
+                            </a>
+                        </div>
+                    </form>
 
                     <div class="card border-0 shadow-sm rounded-3">
                         <div class="table-responsive">
@@ -80,22 +160,57 @@
                                             <td class="text-center pe-4">
                                                 <a href="${pageContext.request.contextPath}/admin-business/devices?action=edit&id=${d.id}"
                                                    class="btn btn-sm btn-outline-primary mx-1">
-                                                    <i class="bi bi-pencil"></i> Edit
+                                                    <i class="bi bi-pencil"></i> 
                                                 </a>
                                                 <a href="${pageContext.request.contextPath}/admin-business/devices?action=view&id=${d.id}"
                                                    class="btn btn-sm btn-outline-secondary mx-1">
-                                                    <i class="bi bi-eye"></i> View
+                                                    <i class="bi bi-eye"></i> 
                                                 </a>
                                                 <a href="${pageContext.request.contextPath}/admin-business/devices?action=delete&id=${d.id}"
                                                    class="btn btn-sm btn-outline-danger mx-1"
                                                    onclick="return confirm('Are you sure you want to delete this device?');">
-                                                    <i class="bi bi-trash"></i> Delete
+                                                    <i class="bi bi-trash"></i> 
                                                 </a>
                                             </td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
                             </table>
+                            <nav>
+                                <ul class="pagination justify-content-center mt-3">
+
+                                    <c:if test="${currentPage > 1}">
+                                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                            <a class="page-link"
+                                               href="devices?action=list&page=${currentPage - 1}&keyword=${param.keyword}&customerName=${param.customerName}&categoryId=${param.categoryId}&brandId=${param.brandId}&status=${param.status}">
+                                                &laquo;
+                                            </a>
+                                        </li>
+                                    </c:if>
+
+                                    <c:forEach var="i" begin="1" end="${totalPage}">
+                                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                            <a class="page-link"
+                                               href="devices?action=list&page=${i}&keyword=${param.keyword}&customerName=${param.customerName}&categoryId=${param.categoryId}&brandId=${param.brandId}&status=${param.status}">
+                                                ${i}
+                                            </a>
+                                        </li>
+                                    </c:forEach>
+
+
+                                    <c:if test="${currentPage < totalPage}">
+                                        <li class="page-item ${currentPage == totalPage ? 'disabled' : ''}">
+                                            <a class="page-link"
+                                               href="devices?action=list&page=${currentPage + 1}&keyword=${param.keyword}&customerName=${param.customerName}&categoryId=${param.categoryId}&brandId=${param.brandId}&status=${param.status}">
+                                                &raquo;
+                                            </a>
+                                        </li>
+
+                                    </c:if>
+
+                                </ul>
+                            </nav>
+
                         </div>
                     </div>
                 </div>
