@@ -100,4 +100,16 @@ public class SparePartDAO extends DBContext {
                 .image(rs.getString("image"))
                 .build();
     }
+    
+    public boolean deleteSparePart(int id) {
+    String sql = "DELETE FROM spare_part WHERE id = ?";
+    try (Connection con = getConnection(); 
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, id);
+        return ps.executeUpdate() > 0;
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 }

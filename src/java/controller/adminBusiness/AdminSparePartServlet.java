@@ -16,9 +16,9 @@ import model.SparePart;
 
 @WebServlet(name = "AdminSparePartServlet", urlPatterns = {"/admin-business/spare-parts"})
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-    maxFileSize = 1024 * 1024 * 10,      // 10MB
-    maxRequestSize = 1024 * 1024 * 50    // 50MB
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10, // 10MB
+        maxRequestSize = 1024 * 1024 * 50 // 50MB
 )
 public class AdminSparePartServlet extends HttpServlet {
 
@@ -26,8 +26,10 @@ public class AdminSparePartServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        if (action == null) action = "list";
-        
+        if (action == null) {
+            action = "list";
+        }
+
         SparePartDAO dao = new SparePartDAO();
         BrandDAO bDao = new BrandDAO();
 
@@ -48,6 +50,19 @@ public class AdminSparePartServlet extends HttpServlet {
                 request.setAttribute("brands", bDao.getByPage(1, 100));
                 request.getRequestDispatcher("/views/AdminBusinessView/spare-part-edit.jsp").forward(request, response);
                 break;
+            case "delete":
+             try {
+                int idDelete = Integer.parseInt(request.getParameter("id"));
+                boolean success = dao.deleteSparePart(idDelete);
+                if (success) {
+                    response.sendRedirect("spare-parts?action=list&status=success");
+                } else {
+                    response.sendRedirect("spare-parts?action=list&status=error");
+                }
+            } catch (Exception e) {
+                response.sendRedirect("spare-parts?action=list");
+            }
+            break;
         }
     }
 
@@ -56,15 +71,17 @@ public class AdminSparePartServlet extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         SparePartDAO dao = new SparePartDAO();
-        
+
         if ("create".equals(action) || "update".equals(action)) {
             Part filePart = request.getPart("imageFile"); // Lấy file từ input name="imageFile"
-            String fileName = "default_part.jpg"; 
-            
+            String fileName = "default_part.jpg";
+
             //store image
             String uploadPath = getServletContext().getRealPath("/assets/images/parts/");
             File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
 
             if (filePart != null && filePart.getSize() > 0) {
                 // create distinct file bame by timemstamp
@@ -83,7 +100,7 @@ public class AdminSparePartServlet extends HttpServlet {
                     .description(request.getParameter("description"))
                     .image(fileName)
                     .build();
-            
+
             if ("update".equals(action)) {
                 sp.setId(Integer.parseInt(request.getParameter("id")));
                 dao.updateSparePartInfo(sp);
