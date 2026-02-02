@@ -11,71 +11,54 @@
         <div class="admin-layout d-flex">
             <jsp:include page="/common/side-bar.jsp"></jsp:include>
             <div class="admin-content p-4 w-100">
-                <div class="row card-group shadow-sm bg-white rounded overflow-hidden">
-                    <div class="col-md-7 p-4 border-end">
-                        <h4 class="mb-4 text-primary fw-bold">Edit Component Information</h4>
+                <div class="card shadow-sm mx-auto" style="max-width: 900px;">
+                    <div class="card-header bg-primary text-white py-3"><h5 class="mb-0">Edit Component: ${part.partCode}</h5></div>
+                    <div class="card-body p-4">
                         <form action="spare-parts?action=update" method="post" enctype="multipart/form-data">
                             <input type="hidden" name="id" value="${part.id}">
-                            <input type="hidden" name="currentImage" value="${part.image}">
-                            
-                            <div class="mb-3 row">
-                                <label class="col-sm-4 fw-bold">Code</label>
-                                <div class="col-sm-8 text-muted">${part.partCode}</div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-4 fw-bold">Name</label>
-                                <div class="col-sm-8"><input type="text" name="name" class="form-control" value="${part.name}" required></div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-4 fw-bold">Brand</label>
-                                <div class="col-sm-8">
-                                    <select name="brandId" class="form-select">
-                                        <c:forEach var="b" items="${brands}">
-                                            <option value="${b.id}" ${b.id == part.brandId ? 'selected' : ''}>${b.name}</option>
-                                        </c:forEach>
-                                    </select>
+                            <input type="hidden" name="currentImage" value="${part.imageUrl}">
+                            <div class="row">
+                                <div class="col-md-7 border-end">
+                                    <div class="mb-3"><label class="fw-bold">Name</label><input type="text" name="name" class="form-control" value="${part.name}" required></div>
+                                    <div class="row">
+                                        <div class="col-6 mb-3"><label class="fw-bold">Price (vnđ)</label><input type="number" name="price" class="form-control" value="${part.price}" required></div>
+                                        <div class="col-6 mb-3"><label class="fw-bold">Unit</label><input type="text" name="unit" class="form-control" value="${part.unit}" required></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="fw-bold text-primary">Compatible Devices</label>
+                                        <select name="compatibleDeviceIds" class="form-select" multiple style="height: 150px;">
+                                            <c:forEach var="d" items="${devices}">
+                                                <c:set var="selected" value="false" />
+                                                <c:forEach var="compId" items="${part.compatibleDeviceIds}">
+                                                    <c:if test="${compId == d.id}"><c:set var="selected" value="true" /></c:if>
+                                                </c:forEach>
+                                                <option value="${d.id}" ${selected ? 'selected' : ''}>${d.machineName} - ${d.model}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3"><label class="fw-bold">Description</label><textarea name="description" class="form-control" rows="2">${part.description}</textarea></div>
+                                </div>
+                                <div class="col-md-5 text-center">
+                                    <label class="fw-bold mb-2">Change Image</label>
+                                    <input type="file" name="imageFile" id="imageInput" class="form-control mb-3" accept="image/*">
+                                    <div class="border rounded bg-white overflow-hidden shadow-sm" style="height: 250px;">
+                                        <img id="preview" src="${pageContext.request.contextPath}/assets/images/parts/${part.imageUrl}" class="w-100 h-100" style="object-fit: cover;">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-4 fw-bold">Price</label>
-                                <div class="col-sm-8">
-                                    <input type="number" name="price" class="form-control" value="<c:out value='${part.price}' default='0'/>">
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-4 fw-bold">Unit</label>
-                                <div class="col-sm-8"><input type="text" name="unit" class="form-control" value="${part.unit}"></div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Description</label>
-                                <textarea name="description" class="form-control" rows="4">${part.description}</textarea>
-                            </div>
-                            <div class="mt-4">
-                                <button type="submit" class="btn btn-primary px-4">Update Changes</button>
+                            <div class="text-end mt-4">
+                                <button type="submit" class="btn btn-primary px-5">Save Changes</button>
                                 <a href="spare-parts?action=list" class="btn btn-secondary px-4">Cancel</a>
                             </div>
-                    </div>
-
-                    <div class="col-md-5 p-4 bg-light text-center">
-                        <h6 class="fw-bold text-muted border-bottom pb-2 mb-3 text-uppercase">Component Image</h6>
-                        <input type="file" name="imageFile" id="imageInput" class="form-control mb-3" accept="image/*">
-                        <div class="bg-white p-2 rounded border shadow-sm mx-auto" style="width: 250px; height: 250px; overflow: hidden;">
-                            <img id="preview" src="${pageContext.request.contextPath}/assets/images/parts/${part.image}" 
-                                 class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <p class="mt-3 small text-muted">Click the button above to change image</p>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-        <jsp:include page="/common/scripts.jsp"></jsp:include>
         <script>
             document.getElementById('imageInput').onchange = evt => {
                 const [file] = document.getElementById('imageInput').files;
-                if (file) {
-                    document.getElementById('preview').src = URL.createObjectURL(file);
-                }
+                if (file) document.getElementById('preview').src = URL.createObjectURL(file);
             }
         </script>
     </body>

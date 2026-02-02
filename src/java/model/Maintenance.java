@@ -4,17 +4,17 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import lombok.*;
 
-@Data
-@NoArgsConstructor
+@Data 
+@NoArgsConstructor 
 @AllArgsConstructor
 @Builder
 public class Maintenance {
     private int id;
     private int deviceId;
     private int technicianId;
-    private Integer voucherId; // Nullable
+    private Integer voucherId;
     private String description;
-    private BigDecimal price; // dung bigdecimal de xac dinh chinh xac tien te
+    private BigDecimal price; 
     private String status;    // PENDING, WAITING_FOR_STAFF, IN_PROGRESS, STAFF_SUBMITTED, WAITING_FOR_CUSTOMER, DONE, CANCELED
     private Date startDate;
     private Date endDate;

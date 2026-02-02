@@ -9,14 +9,9 @@ public class SparePartDAO extends DBContext {
 
     public List<SparePart> findAllSpareParts(String keyword) {
         List<SparePart> list = new ArrayList<>();
-        String sql = """
-            SELECT sp.*, b.name AS brand_name, inv.quantity 
-            FROM spare_part sp 
-            LEFT JOIN brand b ON sp.brand_id = b.id 
-            LEFT JOIN inventory inv ON sp.id = inv.spare_part_id 
-            WHERE sp.name LIKE ? OR sp.part_code LIKE ? 
-            ORDER BY sp.id DESC
-        """;
+        String sql = "SELECT sp.*, inv.quantity FROM spare_part sp "
+                   + "LEFT JOIN inventory inv ON sp.id = inv.spare_part_id "
+                   + "WHERE sp.name LIKE ? OR sp.part_code LIKE ? ORDER BY sp.id DESC";
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setString(2, "%" + keyword + "%");
@@ -30,60 +25,97 @@ public class SparePartDAO extends DBContext {
     }
 
     public boolean insertNewSparePart(SparePart sp) {
-        String sqlPart = "INSERT INTO spare_part(part_code, name, description, unit, price, brand_id, image) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        String sqlInv = "INSERT INTO inventory(spare_part_id, quantity) VALUES (?, 0)";
+        String sql = "INSERT INTO spare_part(part_code, name, description, unit, price, imageUrl) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
-            try (PreparedStatement ps = con.prepareStatement(sqlPart, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, sp.getPartCode());
                 ps.setString(2, sp.getName());
                 ps.setString(3, sp.getDescription());
                 ps.setString(4, sp.getUnit());
                 ps.setBigDecimal(5, sp.getPrice());
-                ps.setInt(6, sp.getBrandId());
-                ps.setString(7, sp.getImage());
+                ps.setString(6, sp.getImageUrl());
                 ps.executeUpdate();
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        try (PreparedStatement psInv = con.prepareStatement(sqlInv)) {
-                            psInv.setInt(1, rs.getInt(1));
-                            psInv.executeUpdate();
-                        }
-                    }
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    int spId = rs.getInt(1);
+                    // 1. Khởi tạo kho
+                    executeSimple(con, "INSERT INTO inventory(spare_part_id, quantity) VALUES (?, 0)", spId);
+                    // 2. Liên kết thiết bị cụ thể
+                    saveDeviceLinks(con, spId, sp.getCompatibleDeviceIds());
                 }
                 con.commit();
                 return true;
-            } catch (SQLException e) { con.rollback(); e.printStackTrace(); }
+            } catch (SQLException e) { con.rollback(); throw e; }
         } catch (Exception e) { e.printStackTrace(); }
         return false;
     }
 
+    public boolean updateSparePartInfo(SparePart sp) {
+        String sql = "UPDATE spare_part SET name=?, description=?, unit=?, price=?, imageUrl=? WHERE id=?";
+        try (Connection con = getConnection()) {
+            con.setAutoCommit(false);
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, sp.getName());
+                ps.setString(2, sp.getDescription());
+                ps.setString(3, sp.getUnit());
+                ps.setBigDecimal(4, sp.getPrice());
+                ps.setString(5, sp.getImageUrl());
+                ps.setInt(6, sp.getId());
+                ps.executeUpdate();
+                // Cập nhật lại liên kết thiết bị
+                executeSimple(con, "DELETE FROM device_spare_part WHERE spare_part_id = ?", sp.getId());
+                saveDeviceLinks(con, sp.getId(), sp.getCompatibleDeviceIds());
+                con.commit();
+                return true;
+            } catch (SQLException e) { con.rollback(); throw e; }
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
+    }
+
+    private void saveDeviceLinks(Connection con, int spId, List<Integer> deviceIds) throws SQLException {
+        if (deviceIds == null || deviceIds.isEmpty()) return;
+        String sql = "INSERT INTO device_spare_part(device_id, spare_part_id) VALUES (?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            for (Integer devId : deviceIds) {
+                ps.setInt(1, devId);
+                ps.setInt(2, spId);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+    private void executeSimple(Connection con, String sql, int id) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        }
+    }
+
     public SparePart findSparePartById(int id) {
-        String sql = "SELECT sp.*, b.name AS brand_name, inv.quantity FROM spare_part sp " +
-                     "LEFT JOIN brand b ON sp.brand_id = b.id " +
-                     "LEFT JOIN inventory inv ON sp.id = inv.spare_part_id WHERE sp.id = ?";
+        String sql = "SELECT sp.*, inv.quantity FROM spare_part sp LEFT JOIN inventory inv ON sp.id = inv.spare_part_id WHERE sp.id = ?";
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapSparePart(rs);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                SparePart sp = mapSparePart(rs);
+                sp.setCompatibleDeviceIds(getLinkedDeviceIds(id));
+                return sp;
             }
         } catch (Exception e) { e.printStackTrace(); }
         return null;
     }
 
-    public boolean updateSparePartInfo(SparePart sp) {
-        String sql = "UPDATE spare_part SET name = ?, description = ?, unit = ?, price = ?, brand_id = ?, image = ? WHERE id = ?";
+    private List<Integer> getLinkedDeviceIds(int spId) throws SQLException {
+        List<Integer> ids = new ArrayList<>();
+        String sql = "SELECT device_id FROM device_spare_part WHERE spare_part_id = ?";
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, sp.getName());
-            ps.setString(2, sp.getDescription());
-            ps.setString(3, sp.getUnit());
-            ps.setBigDecimal(4, sp.getPrice());
-            ps.setInt(5, sp.getBrandId());
-            ps.setString(6, sp.getImage());
-            ps.setInt(7, sp.getId());
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); }
-        return false;
+            ps.setInt(1, spId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) ids.add(rs.getInt(1));
+        }
+        return ids;
     }
 
     private SparePart mapSparePart(ResultSet rs) throws SQLException {
@@ -94,22 +126,17 @@ public class SparePartDAO extends DBContext {
                 .description(rs.getString("description"))
                 .unit(rs.getString("unit"))
                 .price(rs.getBigDecimal("price"))
-                .brandId(rs.getInt("brand_id"))
-                .brandName(rs.getString("brand_name"))
+                .imageUrl(rs.getString("imageUrl"))
                 .quantity(rs.getInt("quantity"))
-                .image(rs.getString("image"))
                 .build();
     }
-    
+
     public boolean deleteSparePart(int id) {
-    String sql = "DELETE FROM spare_part WHERE id = ?";
-    try (Connection con = getConnection(); 
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, id);
-        return ps.executeUpdate() > 0;
-    } catch (Exception e) {
-        e.printStackTrace();
+        String sql = "DELETE FROM spare_part WHERE id = ?";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
     }
-    return false;
-}
 }
