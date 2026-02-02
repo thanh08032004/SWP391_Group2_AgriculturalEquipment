@@ -57,7 +57,7 @@
                                         </td>
                                         <td><strong>${p.name}</strong><br><small class="text-muted">${p.partCode}</small></td>
                                         <td>${p.brandName}</td>
-                                        <td><fmt:formatNumber value="${p.price}" type="currency" currencySymbol="₫"/> / ${p.unit}</td>
+                                        <td>${p.price} vnđ / ${p.unit}</td>
                                         <td>${p.quantity}</td>
                                         <td>
                                             <c:choose>

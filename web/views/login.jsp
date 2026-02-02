@@ -63,7 +63,7 @@
                                         <!-- row -->
                                         <div class="col-12">
                                             <!-- input -->
-                                            <label for="formSigninEmail" class="form-label">Email/ Phone Number/ Username <span
+                                            <label for="formSigninEmail" class="form-label">Username <span
                                                     class="text-danger">*</span></label>
                                             <input type="text"
                                                    name="username"
