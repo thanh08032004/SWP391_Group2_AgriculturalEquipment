@@ -7,6 +7,16 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.Part;
+import java.io.File;
+import java.math.BigDecimal;
+
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 1024 * 1024 * 5,
+        maxRequestSize = 1024 * 1024 * 10
+)
 
 public class AdminDeviceServlet extends HttpServlet {
 
@@ -31,9 +41,8 @@ public class AdminDeviceServlet extends HttpServlet {
                     String categoryId = request.getParameter("categoryId");
                     String brandId = request.getParameter("brandId");
                     String status = request.getParameter("status");
-                    
-                    
-                      int pageSize = 5; // m đổi tùy thích
+
+                    int pageSize = 5;
                     int pageIndex = 1;
 
                     String pageParam = request.getParameter("page");
@@ -41,9 +50,8 @@ public class AdminDeviceServlet extends HttpServlet {
                         pageIndex = Integer.parseInt(pageParam);
                     }
 
-                    // ===== lấy data =====
-                    List<DeviceDTO> deviceList =
-                            deviceDAO.searchAndFilterPaging(
+                    List<DeviceDTO> deviceList
+                            = deviceDAO.searchAndFilterPaging(
                                     keyword,
                                     customerName,
                                     categoryId,
@@ -53,8 +61,8 @@ public class AdminDeviceServlet extends HttpServlet {
                                     pageSize
                             );
 
-                    int totalRecord =
-                            deviceDAO.countSearchAndFilter(
+                    int totalRecord
+                            = deviceDAO.countSearchAndFilter(
                                     keyword,
                                     customerName,
                                     categoryId,
@@ -144,6 +152,17 @@ public class AdminDeviceServlet extends HttpServlet {
             d.setSerialNumber(serial);
             d.setMachineName(request.getParameter("machineName"));
             d.setModel(request.getParameter("model"));
+            String priceStr = request.getParameter("price");
+            BigDecimal price = new BigDecimal("0.00");
+            if (priceStr != null && !priceStr.trim().isEmpty()) {
+                try {
+                    price = new BigDecimal(priceStr);
+                } catch (NumberFormatException e) {
+                    request.setAttribute("errorPrice", "Price must be number");
+
+                }
+            }
+            d.setPrice(price);
             Integer customerId = null;
             try {
                 customerId = Integer.parseInt(request.getParameter("customerId"));
@@ -177,6 +196,21 @@ public class AdminDeviceServlet extends HttpServlet {
             d.setWarrantyEndDate(Date.valueOf(request.getParameter("warrantyEndDate")));
 
             d.setStatus("ACTIVE");
+            Part filePart = request.getPart("image");
+            String fileName = "default_device.jpg";
+
+// store image
+            String uploadPath = getServletContext().getRealPath("/assets/images/devices/");
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
+            if (filePart != null && filePart.getSize() > 0) {
+                fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
+                filePart.write(uploadPath + File.separator + fileName);
+            }
+            d.setImage(fileName);
 
             boolean success = deviceDAO.createDevice(d);
 
@@ -194,6 +228,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.setAttribute("warrantyEndDate", request.getParameter("warrantyEndDate"));
                 request.setAttribute("categories", deviceDAO.getAllCategories());
                 request.setAttribute("brands", deviceDAO.getAllBrands());
+
                 request.getRequestDispatcher("/views/AdminBusinessView/device-add.jsp").forward(request, response);
             }
         } else if ("update".equals(action)) {
@@ -201,14 +236,36 @@ public class AdminDeviceServlet extends HttpServlet {
             DeviceDTO d = new DeviceDTO();
 
             d.setId(Integer.parseInt(request.getParameter("id")));
+            d.setSerialNumber(request.getParameter("serialNumber"));
             d.setMachineName(request.getParameter("machineName"));
-            d.setModel(request.getParameter("model"));
             d.setCustomerId(Integer.parseInt(request.getParameter("customerId")));
             d.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             d.setBrandId(Integer.parseInt(request.getParameter("brandId")));
             d.setPurchaseDate(Date.valueOf(request.getParameter("purchaseDate")));
             d.setWarrantyEndDate(Date.valueOf(request.getParameter("warrantyEndDate")));
             d.setStatus(request.getParameter("status")); // ACTIVE / MAINTENANCE / BROKEN
+            d.setModel(request.getParameter("model"));
+            String priceStr = request.getParameter("price");
+            BigDecimal price = new BigDecimal("0.00");
+            if (priceStr != null && !priceStr.trim().isEmpty()) {
+                price = new BigDecimal(priceStr);
+            }
+            d.setPrice(price);
+            Part filePart = request.getPart("image");
+            String fileName = request.getParameter("oldImage");
+
+            String uploadPath = getServletContext().getRealPath("/assets/images/devices/");
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
+            if (filePart != null && filePart.getSize() > 0) {
+                fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
+                filePart.write(uploadPath + File.separator + fileName);
+            }
+
+            d.setImage(fileName);
 
             boolean success = deviceDAO.updateDevice(d);
 

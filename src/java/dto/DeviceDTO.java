@@ -1,5 +1,6 @@
 package dto;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import lombok.*;
 
@@ -8,6 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class DeviceDTO {
+
+  
     private int id;
     private String serialNumber;
     private String machineName;
@@ -15,7 +18,8 @@ public class DeviceDTO {
     private String status;
     private Date purchaseDate;
     private Date warrantyEndDate;
-
+    private String image;
+    private BigDecimal price;
     private String categoryName;
     private String brandName;
     private String customerName;

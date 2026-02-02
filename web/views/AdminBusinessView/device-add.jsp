@@ -21,7 +21,7 @@
 
                             <div class="card-body p-4">
                                 <form action="${pageContext.request.contextPath}/admin-business/devices?action=create"
-                                  method="post">
+                                  method="post" enctype="multipart/form-data">
 
                                 <!-- ERROR -->
                                 <c:if test="${not empty error}">
@@ -29,6 +29,15 @@
                                         <b>${error}</b>
                                     </p>
                                 </c:if>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">
+                                        DEVICE IMAGE
+                                    </label>
+                                    <input type="file"
+                                           name="image"
+                                           class="form-control"
+                                           accept="image/*">
+                                </div>
 
                                 <!-- SERIAL -->
                                 <div class="mb-3">
@@ -61,6 +70,21 @@
                                     <input type="text" name="model"
                                            class="form-control"
                                            value="${model}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">
+                                        PRICE (VNĐ)
+                                    </label>
+                                    <input type="number" 
+                                           name="price"
+                                           class="form-control"
+                                           value="${price}"
+                                           step="0.01"
+                                           min="0"
+                                           placeholder="0.00">
+                                    <c:if test="${not empty errorPrice}">
+                                        <small class="text-danger">${errorPrice}</small>
+                                    </c:if>
                                 </div>
 
                                 <!-- CUSTOMER -->

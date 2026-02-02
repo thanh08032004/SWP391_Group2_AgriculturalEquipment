@@ -111,9 +111,11 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th class="ps-4">Serial</th>
+                                        <th class="ps-4">Image</th>
+                                        <th>Serial</th>
                                         <th>Machine Name</th>
                                         <th>Model</th>
+                                        <th>Price</th>
                                         <th>Purchase Date</th>
                                         <th>Warranty End</th>
                                         <th>Category</th>
@@ -127,10 +129,26 @@
                                     <c:forEach var="d" items="${deviceList}">
                                         <tr>
                                             <td class="ps-4">
+                                                <img src="${pageContext.request.contextPath}/assets/images/devices/${d.image}"
+                                                     alt="${d.machineName}"
+                                                     class="rounded border shadow-sm"
+                                                     style="width: 55px; height: 55px; object-fit: cover;">
+                                            </td>
+                                            <td>
                                                 <strong>${d.serialNumber}</strong>
                                             </td>
                                             <td>${d.machineName}</td>
                                             <td>${d.model}</td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${d.price != null}">
+                                                        ${d.price} VNĐ
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        N/A
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
                                             <td>${d.purchaseDate}</td>
                                             <td>${d.warrantyEndDate}</td>
                                             <td>
