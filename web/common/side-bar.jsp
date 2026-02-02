@@ -15,6 +15,7 @@
                 </c:when>
                 <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
                 <li><a href="${pageContext.request.contextPath}/admin-business/devices">Device Management</a></li>
+
                 <li><a href="${pageContext.request.contextPath}/admin-business/categories">Category Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/brands">Brand Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/spare-parts?action=list">Spare Part Management</a></li>
@@ -23,6 +24,7 @@
                         Voucher Management
                     </a>
                 </li>
+                <li><a href="${pageContext.request.contextPath}/admin-business/maintenance">Maintenance Requests</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/catalog">Catalog</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/reports">Reports</a></li>
 
