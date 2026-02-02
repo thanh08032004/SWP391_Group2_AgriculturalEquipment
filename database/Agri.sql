@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS agri_cms;
+drop database agri_cms;
 CREATE DATABASE agri_cms CHARACTER SET utf8mb4;
 USE agri_cms;
 
@@ -87,6 +87,7 @@ CREATE TABLE device (
   serial_number VARCHAR(50) NOT NULL UNIQUE,
   machine_name VARCHAR(100),
   model VARCHAR(50),
+  price DECIMAL(12,2) NOT NULL,
   purchase_date DATE,
   warranty_end_date DATE,
   status ENUM('ACTIVE','MAINTENANCE','BROKEN') DEFAULT 'ACTIVE',
@@ -183,12 +184,7 @@ CREATE TABLE spare_part (
   description TEXT,
   unit VARCHAR(50),
   price DECIMAL(12,2) NOT NULL,
-  brand_id INT,
-  imageUrl VARCHAR(255),
-
-  FOREIGN KEY (brand_id)
-    REFERENCES brand(id)
-    ON DELETE SET NULL
+  imageUrl VARCHAR(255)
 ) ENGINE=InnoDB;
 
 -- =================================================
@@ -342,15 +338,23 @@ CREATE TABLE role_permission (
 );
 
 -- =================================================
--- 21. Password Reset gửi link để vào hệ thống đặt lại password
+-- 21. Bảng trung gian device và spare part
 -- =================================================
-CREATE TABLE password_reset_tokens (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    token VARCHAR(255) NOT NULL,
-    expired_at TIMESTAMP NOT NULL,
-    used BOOLEAN DEFAULT FALSE
-);
+CREATE TABLE device_spare_part (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  device_id INT NOT NULL,
+  spare_part_id INT NOT NULL,
+
+  FOREIGN KEY (device_id)
+    REFERENCES device(id)
+    ON DELETE CASCADE,
+
+  FOREIGN KEY (spare_part_id)
+    REFERENCES spare_part(id)
+    ON DELETE CASCADE,
+
+  UNIQUE (device_id, spare_part_id)
+) ENGINE=InnoDB;
 
 
 INSERT INTO role (name, description, active) VALUES
@@ -407,24 +411,18 @@ WHERE code IN (
   '/customer/rating'
 );
 INSERT INTO users (username, password, role_id) VALUES
-('admin',      '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 1),
-('business',   '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 2),
-('technician', '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 3),
-('customer', '$2a$10$whvGQf6KciUBfEo8gGX1cOL/50L7yzXUVHzSoSiJrgrUhOK.i.dQS', 4),
-('ad', '$2a$10$/5dn75ieDfDUyuV2g8pWY.2Ch.5xpueDNlYTtfynRnLI1U8g3xz8.', 1),
-('cus', '$2a$10$4OQy2EQLTkSbjkMWOXnH6eKnYjeisqrzlD/jc98db1W4G57bjW8d6', 4),
-('bu', '$2a$10$hzBGahu.9HqW4sTEqouUV.fRT7HTxH9hN5m8bL3vytm9XA6f4DTB.', 2),
-('cu', '$2a$10$n.ro21QuSAY2JkX0C2iQR.efcHn.wT3ooxVpajS5kLfEXpBotqDaa', 4);
+('admin',      '$2a$10$FVDjXIMwma2lrHkABJpi2O62ydScIgVsJ9oxzdRZAAX/Cl7wM7fa6', 1),
+('business',   '$2a$10$FVDjXIMwma2lrHkABJpi2O62ydScIgVsJ9oxzdRZAAX/Cl7wM7fa6', 2),
+('technician', '$2a$10$FVDjXIMwma2lrHkABJpi2O62ydScIgVsJ9oxzdRZAAX/Cl7wM7fa6', 3),
+('customer', '$2a$10$FVDjXIMwma2lrHkABJpi2O62ydScIgVsJ9oxzdRZAAX/Cl7wM7fa6', 4),
+('ad', '$2a$10$FVDjXIMwma2lrHkABJpi2O62ydScIgVsJ9oxzdRZAAX/Cl7wM7fa6', 1);
 
 INSERT INTO user_profile (user_id, fullname, email, gender, date_of_birth, address, phone, avatar) VALUES
 (1, 'Admin System',      'admin@gmail.com',        'MALE',   '1985-01-01' , 'Hà Nội', '0981231234', 'null.jpg'),
 (2, 'Business Owner',    'business@gmail.com',     'MALE',   '1988-05-10', 'Hà Nội', '0981231234', 'admin.png'),
 (3, 'Technician Staff',  'technician@gmail.com',   'MALE',   '1992-08-20', 'Hà Nội','0981231234', 'staff.jpg'),
 (4, 'Cương Đức',         'cuongducjerry@gmail.com', 'MALE',   '1990-01-01', 'Hà Nội','0981231234', 'user.jpg'),
-(5, 'Quản Trị Vũ', 'admin1@gmail.com', 'MALE', '2005-01-01', 'Hà Nội', '0900900900', 'user.jpg'),
-(6, 'Minh Thong',         'minhthong1625@gmail.com', 'MALE',   '2000-06-01', 'Hà Nội','0981231234', 'staff.jpg'),
-(7, 'Minh Thong',         'minhthong162052@gmail.com', 'MALE',   '2000-06-01', 'Hà Nội','0981231234', 'admin.png'),
-(8, 'Minh Thong',         'minhthong16205@gmail.com', 'MALE',   '2000-06-01', 'Hà Nội','0981231234', 'user.jpg');
+(5, 'Quản Trị Vũ', 'admin1@gmail.com', 'MALE', '2005-01-01', 'Hà Nội', '0900900900', 'user.jpg');
 
 INSERT INTO category (name, description) VALUES
 ('Máy cày (Tractor)', 'Thiết bị cơ giới dùng để cày xới đất và kéo máy nông nghiệp'),
@@ -472,6 +470,7 @@ INSERT INTO device (
   serial_number,
   machine_name,
   model,
+  price,
   purchase_date,
   warranty_end_date,
   status,
@@ -479,17 +478,17 @@ INSERT INTO device (
   brand_id,
   imageUrl
 ) VALUES
-(4, 'SN-JD-001', 'Máy cày John Deere', 'JD-5050', '2023-06-01', '2026-06-01', 'ACTIVE', 1, 1, 'jd_tractor.jpg'),
-(4, 'SN-KB-002', 'Máy cày Kubota', 'KB-L3408', '2022-03-15', '2025-03-15', 'ACTIVE', 1, 2, 'kubota_tractor.jpg'),
-(4, 'SN-YM-003', 'Máy gặt Yanmar', 'YM-AW70', '2021-09-10', '2024-09-10', 'MAINTENANCE', 2, 4, 'yanmar_harvester.jpg'),
-(4, 'SN-HD-004', 'Máy cắt cỏ Honda', 'HONDA-HRX', '2024-01-20', '2027-01-20', 'ACTIVE', 7, 9, 'honda_mower.jpg'),
-(4, 'SN-HQ-005', 'Máy phun thuốc Husqvarna', 'HQ-SPR200', '2023-11-05', '2026-11-05', 'BROKEN', 5, 8, 'husqvarna_sprayer.jpg');
+(4, 'SN-JD-001', 'Máy cày John Deere', 'JD-5050', 850000000, '2023-06-01', '2026-06-01', 'ACTIVE', 1, 1, 'jd_tractor.jpg'),
+(4, 'SN-KB-002', 'Máy cày Kubota', 'KB-L3408', 620000000, '2022-03-15', '2025-03-15', 'ACTIVE', 1, 2, 'kubota_tractor.jpg'),
+(4, 'SN-YM-003', 'Máy gặt Yanmar', 'YM-AW70', 1200000000, '2021-09-10', '2024-09-10', 'MAINTENANCE', 2, 4, 'yanmar_harvester.jpg'),
+(4, 'SN-HD-004', 'Máy cắt cỏ Honda', 'HONDA-HRX', 45000000, '2024-01-20', '2027-01-20', 'ACTIVE', 7, 9, 'honda_mower.jpg'),
+(4, 'SN-HQ-005', 'Máy phun thuốc Husqvarna', 'HQ-SPR200', 38000000, '2023-11-05', '2026-11-05', 'BROKEN', 5, 8, 'husqvarna_sprayer.jpg');
 
-INSERT INTO spare_part (part_code, name, description, unit, price, brand_id, imageUrl) VALUES
-('SP-001', 'Oil Filter', 'Lọc dầu động cơ', 'Cái', 50000, 9, 'oil_filter.jpg'),
-('SP-002', 'Brake Pad', 'Má phanh trước', 'Bộ', 200000, 8, 'brake_pad.jpg'),
-('SP-003', 'Spark Plug', 'Bugi đánh lửa', 'Cái', 80000, 9, 'spark_plug.jpg'),
-('SP-004', 'Air Filter', 'Lọc gió động cơ', 'Cái', 60000, 1, 'air_filter.jpg');
+INSERT INTO spare_part (part_code, name, description, unit, price, imageUrl) VALUES
+('SP-001', 'Oil Filter', 'Lọc dầu động cơ', 'Cái', 50000, 'oil_filter.jpg'),
+('SP-002', 'Brake Pad', 'Má phanh trước', 'Bộ', 200000, 'brake_pad.jpg'),
+('SP-003', 'Spark Plug', 'Bugi đánh lửa', 'Cái', 80000, 'spark_plug.jpg'),
+('SP-004', 'Air Filter', 'Lọc gió động cơ', 'Cái', 60000, 'air_filter.jpg');
 INSERT INTO inventory (spare_part_id, quantity) VALUES
 (1, 100),
 (2, 50),
@@ -502,16 +501,52 @@ INSERT INTO maintenance (
   status,
   start_date,
   end_date
-) VALUES 
-(  1,  3,  'Bảo trì định kỳ, thay linh kiện hao mòn',  'DONE',  '2025-01-15',  '2025-01-16'),
-(  2,  3,  'Kiểm tra động cơ và thay lọc gió',  'DONE',  '2025-02-05',  '2025-02-06'),
--- Maintenance #3
-(  3,  3,  'Sửa chữa hệ thống truyền động',  'IN_PROGRESS',  '2025-02-20',  NULL),
--- Maintenance #4
-(  4,  3,  'Bảo dưỡng định kỳ – kiểm tra dầu và bugi',  'PENDING',  '2025-03-01',  NULL),
--- Maintenance #5
-(  5,  3,  'Khắc phục lỗi phun thuốc không đều',  'DONE',  '2025-01-28',  '2025-01-29');
+) VALUES (
+  1,
+  3,
+  'Bảo trì định kỳ, thay linh kiện hao mòn',
+  'DONE',
+  '2025-01-15',
+  '2025-01-16'
+),
+(
+  2,
+  3,
+  'Kiểm tra động cơ và thay lọc gió',
+  'DONE',
+  '2025-02-05',
+  '2025-02-06'
+),
 
+-- Maintenance #3
+(
+  3,
+  3,
+  'Sửa chữa hệ thống truyền động',
+  'IN_PROGRESS',
+  '2025-02-20',
+  NULL
+),
+
+-- Maintenance #4
+(
+  4,
+  3,
+  'Bảo dưỡng định kỳ – kiểm tra dầu và bugi',
+  'PENDING',
+  '2025-03-01',
+  NULL
+),
+
+-- Maintenance #5
+(
+  5,
+  3,
+  'Khắc phục lỗi phun thuốc không đều',
+  'DONE',
+  '2025-01-28',
+  '2025-01-29'
+);
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES
 (1, 1, 1),  -- Oil Filter x1
 (1, 2, 2),  -- Brake Pad x2
@@ -539,6 +574,21 @@ INSERT INTO invoice (
   NOW(),
   NOW()
 );
+-- Maintenance #2 (id = 2)
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (2, 4, 1);
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (2, 1, 1);
+
+-- Maintenance #3 (id = 3)
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (3, 2, 2);
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (3, 3, 1);
+
+-- Maintenance #4 (id = 4)
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (4, 1, 1);
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (4, 3, 2);
+
+-- Maintenance #5 (id = 5)
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (5, 2, 1);
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (5, 4, 1);
 
 
 

@@ -117,8 +117,8 @@
     <servlet>
         <servlet-name>CustomerMaintenanceServlet</servlet-name>
         <servlet-class>controller.customer.CustomerMaintenanceServlet</servlet-class>
-    </servlet-mapping>
-    <servlet-mapping>
+    </servlet>
+    <servlet>
         <servlet-name>CustomerVoucherServlet</servlet-name>
         <servlet-class>controller.customer.CustomerVoucherServlet</servlet-class>
     </servlet>
