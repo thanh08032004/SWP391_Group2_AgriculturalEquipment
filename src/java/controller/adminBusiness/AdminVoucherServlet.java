@@ -1,6 +1,7 @@
 package controller.adminBusiness;
 
 import dal.VoucherDAO;
+import dto.VoucherDTO;
 import model.Voucher;
 
 import jakarta.servlet.ServletException;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdminVoucherServlet extends HttpServlet {
@@ -64,7 +66,24 @@ public class AdminVoucherServlet extends HttpServlet {
 
         VoucherDAO dao = new VoucherDAO();
 
-        List<Voucher> vouchers = dao.getVouchers(keyword, page, PAGE_SIZE);
+        // 1. Lấy entity
+        List<Voucher> list = dao.getVouchers(keyword, page, PAGE_SIZE);
+
+        // 2. Map sang DTO
+        List<VoucherDTO> vouchers = new ArrayList<>();
+        for (Voucher v : list) {
+            vouchers.add(new VoucherDTO(
+                    v.getId(),
+                    v.getCode(),
+                    v.getDescription(),
+                    v.getDiscountType(),
+                    v.getDiscountValue(),
+                    v.getMinServicePrice(),
+                    v.getStartDate(),
+                    v.getEndDate(),
+                    v.isActive()
+            ));
+        }
         int total = dao.countVouchers(keyword);
         int totalPage = (int) Math.ceil((double) total / PAGE_SIZE);
 
@@ -89,11 +108,28 @@ public class AdminVoucherServlet extends HttpServlet {
     /* ================= DETAIL ================= */
     private void showDetail(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
         req.setAttribute("activeMenu", "voucher");
         int id = Integer.parseInt(req.getParameter("id"));
 
         VoucherDAO dao = new VoucherDAO();
-        Voucher voucher = dao.getVoucherById(id);
+        Voucher v = dao.getVoucherById(id);
+        if (v == null) {
+            resp.sendRedirect(req.getContextPath() + "/admin-business/vouchers");
+            return;
+        }
+
+        VoucherDTO voucher = new VoucherDTO(
+                v.getId(),
+                v.getCode(),
+                v.getDescription(),
+                v.getDiscountType(),
+                v.getDiscountValue(),
+                v.getMinServicePrice(),
+                v.getStartDate(),
+                v.getEndDate(),
+                v.isActive()
+        );
 
         req.setAttribute("voucher", voucher);
 

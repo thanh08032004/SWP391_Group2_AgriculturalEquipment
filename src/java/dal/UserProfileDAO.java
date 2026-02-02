@@ -26,7 +26,7 @@ public class UserProfileDAO {
                 + "r.name  AS role_name "
                 + "FROM users u "
                 + "JOIN user_profile uP ON u.id = uP.user_id  "
-                + "JOIN role r ON u.role_id = r.id"
+                + "JOIN role r ON u.role_id = r.id "
                 + "    WHERE u.id = ?";
         try {
             Connection conn = db.getConnection();
@@ -95,7 +95,11 @@ public class UserProfileDAO {
             ps.setString(2, gender);
             ps.setString(3, email);
             ps.setString(4, phone);
-            ps.setDate(5, java.sql.Date.valueOf(birthDate));
+            if (birthDate != null) {
+                ps.setDate(5, java.sql.Date.valueOf(birthDate));
+            } else {
+                ps.setNull(5, java.sql.Types.DATE);
+            }
             ps.setString(6, address);
             ps.setInt(7, userId);
 

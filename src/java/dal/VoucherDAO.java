@@ -164,4 +164,75 @@ public class VoucherDAO extends DBContext {
         }
     }
 
+    public int countValidVouchersForCustomer(
+            int customerId,
+            double totalServicePrice
+    ) {
+        String sql = """
+        SELECT COUNT(*)
+        FROM voucher v
+        LEFT JOIN customer_voucher cv
+            ON v.id = cv.voucher_id
+            AND cv.customer_id = ?
+        WHERE v.active = 1
+          AND v.start_date <= CURRENT_DATE
+          AND v.end_date >= CURRENT_DATE
+          AND v.min_service_price <= ?
+          AND (cv.used IS NULL OR cv.used = 0)
+    """;
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setDouble(2, totalServicePrice);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Voucher> getValidVouchersForCustomer(
+            int customerId,
+            double totalServicePrice,
+            int page,
+            int pageSize
+    ) {
+        List<Voucher> list = new ArrayList<>();
+
+        String sql = """
+        SELECT v.*
+        FROM voucher v
+        LEFT JOIN customer_voucher cv
+            ON v.id = cv.voucher_id
+            AND cv.customer_id = ?
+        WHERE v.is_active = 1
+          AND v.start_date <= CURRENT_DATE
+          AND v.end_date >= CURRENT_DATE
+          AND v.min_service_price <= ?
+          AND (cv.used IS NULL OR cv.used = 0)
+        ORDER BY v.id DESC
+        LIMIT ? OFFSET ?
+    """;
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+            ps.setDouble(2, totalServicePrice);
+            ps.setInt(3, pageSize);
+            ps.setInt(4, (page - 1) * pageSize);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapVoucher(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 }
