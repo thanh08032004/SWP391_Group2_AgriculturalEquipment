@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-import lombok.*;
+import java.math.BigDecimal;
 import java.sql.Date;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -15,11 +12,13 @@ public class Maintenance {
     private int id;
     private int deviceId;
     private int technicianId;
-    private Integer voucherId; // nullable
+    private Integer voucherId; // Nullable
     private String description;
-    private double price;
-    private String status; // PENDING, IN_PROGRESS, DONE, CANCELED
+    private BigDecimal price; // dung bigdecimal de xac dinh chinh xac tien te
+    private String status;    // PENDING, WAITING_FOR_STAFF, IN_PROGRESS, STAFF_SUBMITTED, WAITING_FOR_CUSTOMER, DONE, CANCELED
     private Date startDate;
     private Date endDate;
-}
 
+    private String customerName;
+    private String machineName;
+}

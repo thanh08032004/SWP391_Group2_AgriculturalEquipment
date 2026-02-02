@@ -1,13 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-/**
- *
- * @author Acer
- */
+import java.math.BigDecimal;
 import lombok.*;
 
 @Data
@@ -19,5 +12,6 @@ public class MaintenanceItem {
     private int maintenanceId;
     private int sparePartId;
     private int quantity;
-    private double price;
+    private BigDecimal price; // dung bigdecimal cho tinh tien chinh xac
+    private String sparePartName;
 }
