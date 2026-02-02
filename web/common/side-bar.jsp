@@ -24,6 +24,8 @@
                         Voucher Management
                     </a>
                 </li>
+                 <li><a href="${pageContext.request.contextPath}/admin-business/invoicelist">Invoice Management</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin-business/feedbacklist">Feedback Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/maintenance">Maintenance Requests</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/catalog">Catalog</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/reports">Reports</a></li>
