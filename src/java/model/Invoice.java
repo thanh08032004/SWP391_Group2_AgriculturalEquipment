@@ -17,15 +17,13 @@ import java.sql.Timestamp;
 public class Invoice {
 
     private int id;
-
     private int maintenanceId;   // FK tới maintenance
-    private int customerId;      // FK tới user
-
+    private String customerName;
+    private int voucherId;
     private double laborCost;       // tiền công
-    private double partsCost;       // tiền linh kiện
     private double discountAmount;  // giảm giá
     private double totalAmount;     // tổng tiền phải trả
-
+    private String description;
     private String paymentStatus;       // UNPAID, PAID
     private String paymentMethod;       // CASH, BANK_TRANSFER, EWALLET
 

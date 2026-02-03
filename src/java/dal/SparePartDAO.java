@@ -25,7 +25,7 @@ public class SparePartDAO extends DBContext {
     }
 
     public boolean insertNewSparePart(SparePart sp) {
-        String sql = "INSERT INTO spare_part(part_code, name, description, unit, price, imageUrl) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO spare_part(part_code, name, description, unit, price, image) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
             try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -52,7 +52,7 @@ public class SparePartDAO extends DBContext {
     }
 
     public boolean updateSparePartInfo(SparePart sp) {
-        String sql = "UPDATE spare_part SET name=?, description=?, unit=?, price=?, imageUrl=? WHERE id=?";
+        String sql = "UPDATE spare_part SET name=?, description=?, unit=?, price=?, image=? WHERE id=?";
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
             try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -126,7 +126,7 @@ public class SparePartDAO extends DBContext {
                 .description(rs.getString("description"))
                 .unit(rs.getString("unit"))
                 .price(rs.getBigDecimal("price"))
-                .imageUrl(rs.getString("imageUrl"))
+                .imageUrl(rs.getString("image"))
                 .quantity(rs.getInt("quantity"))
                 .build();
     }
