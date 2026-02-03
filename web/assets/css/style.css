@@ -1796,18 +1796,19 @@ h2::before {
     color: #333;
 }
 
-/* ===== SIDEBAR ===== */
+
 .sidebar {
-    width: 240px;
-
-    /* trừ chiều cao header */
-    height: calc(100vh - 72px);
-
+    width: 260px; 
+    height: 100vh; 
     background-color: #8C593B;
     color: #ffffff;
-
     padding-top: 12px;
     overflow-y: auto;
+    
+
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
 }
 
 /* ROLE NAME */
@@ -1880,6 +1881,7 @@ h2::before {
 .admin-layout {
     display: flex;
     min-height: 100vh;
+    gap: 0;
 }
 
 /* CONTENT PHẦN PHẢI */
@@ -1887,6 +1889,9 @@ h2::before {
     flex: 1;
     padding: 24px;
     background-color: #f9fafb;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 header {

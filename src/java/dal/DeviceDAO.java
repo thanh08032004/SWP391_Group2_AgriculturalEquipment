@@ -55,12 +55,12 @@ public class DeviceDAO extends DBContext {
                d.machine_name,
                d.model,
                d.status,
-                     d.price,
+               d.price,
                d.purchase_date,
                d.warranty_end_date,
                d.customer_id,
-                     d.category_id,     
-                                    d.brand_id,
+               d.category_id,     
+               d.brand_id,
                d.imageUrl,
                c.name AS category_name,
                b.name AS brand_name,
@@ -87,9 +87,9 @@ public class DeviceDAO extends DBContext {
                         .model(rs.getString("model"))
                         .status(rs.getString("status"))
                         .customerId(rs.getInt("customer_id"))
-                        .categoryId(rs.getInt("category_id")) 
+                        .categoryId(rs.getInt("category_id"))
                         .price(rs.getBigDecimal("price"))
-                    .brandId(rs.getInt("brand_id")) 
+                        .brandId(rs.getInt("brand_id"))
                         .purchaseDate(rs.getDate("purchase_date"))
                         .warrantyEndDate(rs.getDate("warranty_end_date"))
                         .image(rs.getString("imageUrl"))
@@ -300,7 +300,7 @@ public class DeviceDAO extends DBContext {
                 d.setModel(rs.getString("model"));
                 d.setPrice(rs.getBigDecimal("price"));
                 d.setStatus(rs.getString("status"));
-                
+
                 d.setPurchaseDate(rs.getDate("purchase_date"));
                 d.setWarrantyEndDate(rs.getDate("warranty_end_date"));
                 d.setImage(rs.getString("imageUrl"));

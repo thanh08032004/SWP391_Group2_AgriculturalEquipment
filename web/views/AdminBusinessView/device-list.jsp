@@ -116,8 +116,8 @@
                                         <th>Machine Name</th>
                                         <th>Model</th>
                                         <th>Price</th>
-                                        <th>Purchase Date</th>
-                                        <th>Warranty End</th>
+<!--                                        <th>Purchase Date</th>
+                                        <th>Warranty End</th>-->
                                         <th>Category</th>
                                         <th>Brand</th>
                                         <th>Customer</th>
@@ -149,8 +149,8 @@
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
-                                            <td>${d.purchaseDate}</td>
-                                            <td>${d.warrantyEndDate}</td>
+<!--                                            <td>${d.purchaseDate}</td>
+                                            <td>${d.warrantyEndDate}</td>-->
                                             <td>
                                                 <span class="badge bg-secondary">
                                                     ${d.categoryName}
