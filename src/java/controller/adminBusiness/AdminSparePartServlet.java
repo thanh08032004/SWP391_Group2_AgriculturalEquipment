@@ -4,7 +4,6 @@ import dal.DeviceDAO;
 import dal.SparePartDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import model.SparePart;
 
-@WebServlet(name = "AdminSparePartServlet", urlPatterns = {"/admin-business/spare-parts"})
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 10)
 public class AdminSparePartServlet extends HttpServlet {
 

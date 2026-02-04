@@ -43,7 +43,7 @@
                                     <label class="fw-bold mb-2">Component Image</label>
                                     <input type="file" name="imageFile" id="imageInput" class="form-control mb-3" accept="image/*">
                                     <div class="border rounded bg-white overflow-hidden shadow-sm" style="height: 250px;">
-                                        <img id="preview" src="${pageContext.request.contextPath}/assets/images/parts/default_part.jpg" class="w-100 h-100" style="object-fit: cover;">
+                                        <img id="preview" src="${pageContext.request.contextPath}/assets/images/parts/default.jpg" class="w-100 h-100" style="object-fit: cover;">
                                     </div>
                                 </div>
                             </div>

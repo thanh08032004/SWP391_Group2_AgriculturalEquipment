@@ -63,7 +63,7 @@ public class SparePartDAO extends DBContext {
                 ps.setString(5, sp.getImageUrl());
                 ps.setInt(6, sp.getId());
                 ps.executeUpdate();
-                // Cập nhật lại liên kết thiết bị
+                // cap nhat lai lien ket thiet bi
                 executeSimple(con, "DELETE FROM device_spare_part WHERE spare_part_id = ?", sp.getId());
                 saveDeviceLinks(con, sp.getId(), sp.getCompatibleDeviceIds());
                 con.commit();

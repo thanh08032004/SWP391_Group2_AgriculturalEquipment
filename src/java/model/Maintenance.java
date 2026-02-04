@@ -1,6 +1,5 @@
 package model;
 
-import java.math.BigDecimal;
 import java.sql.Date;
 import lombok.*;
 
@@ -9,16 +8,16 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Maintenance {
-    private int id;
+  private int id;
     private int deviceId;
-    private int technicianId;
-    private Integer voucherId;
+    private int technicianId; //null avaiable when init
     private String description;
-    private BigDecimal price; 
-    private String status;    // PENDING, WAITING_FOR_STAFF, IN_PROGRESS, STAFF_SUBMITTED, WAITING_FOR_CUSTOMER, DONE, CANCELED
+    private String status; // PENDING, IN_PROGRESS, DONE, CANCELED
     private Date startDate;
     private Date endDate;
 
-    private String customerName;
+    //join field
     private String machineName;
+    private String modelName;
+    private String customerName;
 }
