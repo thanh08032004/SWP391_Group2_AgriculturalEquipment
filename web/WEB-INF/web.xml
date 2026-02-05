@@ -8,6 +8,10 @@
         <filter-name>AuthFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+<!--        <welcome-file>/home</welcome-file>-->
+    </welcome-file-list>
     <!-- SERVLETS -->
     <servlet>
         <servlet-name>homeServlet</servlet-name>
@@ -150,6 +154,10 @@
         <servlet-name>TechnicianTaskServlet</servlet-name>
         <servlet-class>controller.technican.TechnicianTaskServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>GuestHomeServlet</servlet-name>
+        <servlet-class>controller.GuestHomeServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>homeServlet</servlet-name>
         <url-pattern>/customer/home</url-pattern>
@@ -282,9 +290,11 @@
         <servlet-name>TechnicianTaskServlet</servlet-name>
         <url-pattern>/technician/mytask</url-pattern>
     </servlet-mapping>
-    <welcome-file-list>
-        <welcome-file>/customer/home</welcome-file>
-    </welcome-file-list>
+    <servlet-mapping>
+        <servlet-name>GuestHomeServlet</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+    
     <error-page>
         <error-code>403</error-code>
         <location>/errors/403.jsp</location>

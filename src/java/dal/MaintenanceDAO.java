@@ -17,14 +17,26 @@ public class MaintenanceDAO extends DBContext {
         } catch (SQLException e) { e.printStackTrace(); }
         return false;
     }
-    public List<Maintenance> getAllMaintenanceRequests() {
+
+    public List<Maintenance> searchMaintenanceRequests(String customerName, String status) {
         List<Maintenance> list = new ArrayList<>();
-        String sql = "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name " +
-                     "FROM maintenance m " +
-                     "JOIN device d ON m.device_id = d.id " +
-                     "JOIN user_profile up ON d.customer_id = up.user_id " +
-                     "ORDER BY m.id DESC";
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        StringBuilder sql = new StringBuilder(
+            "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name " +
+            "FROM maintenance m " +
+            "JOIN device d ON m.device_id = d.id " +
+            "JOIN user_profile up ON d.customer_id = up.user_id WHERE 1=1 "
+        );
+
+        if (customerName != null && !customerName.isEmpty()) sql.append(" AND up.fullname LIKE ? ");
+        if (status != null && !status.equals("All Status")) sql.append(" AND m.status = ? ");
+        sql.append(" ORDER BY m.id DESC");
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
+            if (customerName != null && !customerName.isEmpty()) ps.setString(paramIdx++, "%" + customerName + "%");
+            if (status != null && !status.equals("All Status")) ps.setString(paramIdx++, status);
+
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 list.add(Maintenance.builder()
                         .id(rs.getInt("id"))
