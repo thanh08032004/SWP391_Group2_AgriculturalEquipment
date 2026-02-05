@@ -93,7 +93,7 @@ CREATE TABLE device (
   status ENUM('ACTIVE','MAINTENANCE','BROKEN') DEFAULT 'ACTIVE',
   category_id INT NOT NULL,
   brand_id INT NOT NULL,
-  imageUrl VARCHAR(255),
+  image VARCHAR(255),
 
   FOREIGN KEY (customer_id) REFERENCES users(id),
   FOREIGN KEY (category_id) REFERENCES category(id),
@@ -162,6 +162,7 @@ CREATE TABLE maintenance (
   technician_id INT,
   description TEXT,
   status ENUM('PENDING','IN_PROGRESS','DONE','CANCELED') DEFAULT 'PENDING',
+  image VARCHAR(255),
   start_date DATE NOT NULL,
   end_date DATE,
 
@@ -184,7 +185,7 @@ CREATE TABLE spare_part (
   description TEXT,
   unit VARCHAR(50),
   price DECIMAL(12,2) NOT NULL,
-  imageUrl VARCHAR(255)
+  image VARCHAR(255)
 ) ENGINE=InnoDB;
 
 -- =================================================
@@ -476,7 +477,7 @@ INSERT INTO device (
   status,
   category_id,
   brand_id,
-  imageUrl
+  image
 ) VALUES
 (4, 'SN-JD-001', 'Máy cày John Deere', 'JD-5050', 850000000, '2023-06-01', '2026-06-01', 'ACTIVE', 1, 1, 'jd_tractor.jpg'),
 (4, 'SN-KB-002', 'Máy cày Kubota', 'KB-L3408', 620000000, '2022-03-15', '2025-03-15', 'ACTIVE', 1, 2, 'kubota_tractor.jpg'),
@@ -484,7 +485,7 @@ INSERT INTO device (
 (4, 'SN-HD-004', 'Máy cắt cỏ Honda', 'HONDA-HRX', 45000000, '2024-01-20', '2027-01-20', 'ACTIVE', 7, 9, 'honda_mower.jpg'),
 (4, 'SN-HQ-005', 'Máy phun thuốc Husqvarna', 'HQ-SPR200', 38000000, '2023-11-05', '2026-11-05', 'BROKEN', 5, 8, 'husqvarna_sprayer.jpg');
 
-INSERT INTO spare_part (part_code, name, description, unit, price, imageUrl) VALUES
+INSERT INTO spare_part (part_code, name, description, unit, price, image) VALUES
 ('SP-001', 'Oil Filter', 'Lọc dầu động cơ', 'Cái', 50000, 'oil_filter.jpg'),
 ('SP-002', 'Brake Pad', 'Má phanh trước', 'Bộ', 200000, 'brake_pad.jpg'),
 ('SP-003', 'Spark Plug', 'Bugi đánh lửa', 'Cái', 80000, 'spark_plug.jpg'),
@@ -499,6 +500,7 @@ INSERT INTO maintenance (
   technician_id,
   description,
   status,
+  image,
   start_date,
   end_date
 ) VALUES (
@@ -506,6 +508,7 @@ INSERT INTO maintenance (
   3,
   'Bảo trì định kỳ, thay linh kiện hao mòn',
   'DONE',
+  'maintenance.png',
   '2025-01-15',
   '2025-01-16'
 ),
@@ -514,6 +517,7 @@ INSERT INTO maintenance (
   3,
   'Kiểm tra động cơ và thay lọc gió',
   'DONE',
+  'maintenance.png',
   '2025-02-05',
   '2025-02-06'
 ),
@@ -524,6 +528,7 @@ INSERT INTO maintenance (
   3,
   'Sửa chữa hệ thống truyền động',
   'IN_PROGRESS',
+  'maintenance.png',
   '2025-02-20',
   NULL
 ),
@@ -534,6 +539,7 @@ INSERT INTO maintenance (
   3,
   'Bảo dưỡng định kỳ – kiểm tra dầu và bugi',
   'PENDING',
+  'maintenance.png',
   '2025-03-01',
   NULL
 ),
@@ -544,6 +550,7 @@ INSERT INTO maintenance (
   3,
   'Khắc phục lỗi phun thuốc không đều',
   'DONE',
+  'maintenance.png',
   '2025-01-28',
   '2025-01-29'
 );
