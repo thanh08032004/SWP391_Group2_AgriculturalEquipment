@@ -75,7 +75,7 @@ public class LoginServlet extends HttpServlet {
             case 1 -> response.sendRedirect(ctx + "/admin/users");
             case 2 -> response.sendRedirect(ctx + "/admin-business/devices");
             case 3 -> response.sendRedirect(ctx + "/technician/maintenance");
-            case 4 -> response.sendRedirect(ctx + "/home");
+            case 4 -> response.sendRedirect(ctx + "/customer/home");
             default -> {
                 session.invalidate();
                 response.sendRedirect(ctx + "/login");

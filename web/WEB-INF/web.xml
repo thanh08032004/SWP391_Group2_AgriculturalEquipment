@@ -11,7 +11,7 @@
     <!-- SERVLETS -->
     <servlet>
         <servlet-name>homeServlet</servlet-name>
-        <servlet-class>controller.HomeServlet</servlet-class>
+        <servlet-class>controller.customer.HomeServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ForgotPasswordServlet</servlet-name>
@@ -119,6 +119,10 @@
         <servlet-class>controller.adminBusiness.AdminAddInvoiceServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>AdminDetailInvoiceServlet</servlet-name>
+        <servlet-class>controller.adminBusiness.AdminDetailInvoiceServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>AdminDeleteInvoiceServlet</servlet-name>
         <servlet-class>controller.adminBusiness.AdminDeleteInvoiceServlet</servlet-class>
     </servlet>
@@ -148,7 +152,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>homeServlet</servlet-name>
-        <url-pattern>/home</url-pattern>
+        <url-pattern>/customer/home</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ForgotPasswordServlet</servlet-name>
@@ -243,6 +247,10 @@
         <url-pattern>/admin-business/maintenance</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>AdminDetailInvoiceServlet</servlet-name>
+        <url-pattern>/admin-business/invoicedetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>CustomerMaintenanceServlet</servlet-name>
         <url-pattern>/customer/maintenance</url-pattern>
     </servlet-mapping>
@@ -275,7 +283,7 @@
         <url-pattern>/technician/mytask</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
-        <welcome-file>home</welcome-file>
+        <welcome-file>/customer/home</welcome-file>
     </welcome-file-list>
     <error-page>
         <error-code>403</error-code>

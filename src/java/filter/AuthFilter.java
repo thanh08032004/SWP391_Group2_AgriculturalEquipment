@@ -20,18 +20,11 @@ public class AuthFilter implements Filter {
         String uri = req.getRequestURI();
         String contextPath = req.getContextPath();
 
-        if (uri.contains("/assets/") || uri.endsWith(".css") || uri.endsWith(".js") 
-            || uri.equals(contextPath + "/login") 
-            || uri.equals(contextPath + "/home")
-            || uri.equals(contextPath + "/logout")) {
-            chain.doFilter(request, response);
-            return;
-        }
 
-        if (uri.endsWith(".jsp")) {
-            res.sendRedirect(contextPath + "/login");
-            return;
-        }
+       if (uri.endsWith(".jsp") && req.getHeader("referer") == null) {
+    res.sendRedirect(contextPath + "/login");
+    return;
+}
 
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
