@@ -110,7 +110,7 @@
         <servlet-name>AdminSparePartServlet</servlet-name>
         <servlet-class>controller.adminBusiness.AdminSparePartServlet</servlet-class>
     </servlet>
-        <servlet>
+    <servlet>
         <servlet-name>AdminInvoiceServlet</servlet-name>
         <servlet-class>controller.adminBusiness.AdminInvoiceServlet</servlet-class>
     </servlet>
@@ -133,10 +133,18 @@
     <servlet>
         <servlet-name>CustomerVoucherServlet</servlet-name>
         <servlet-class>controller.customer.CustomerVoucherServlet</servlet-class>
-        </servlet>
+    </servlet>
     <servlet>
         <servlet-name>CustomerDeviceServlet</servlet-name>
         <servlet-class>controller.customer.CustomerDeviceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TechnicianMaintenanceServlet</servlet-name>
+        <servlet-class>controller.technican.TechnicianMaintenanceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TechnicianTaskServlet</servlet-name>
+        <servlet-class>controller.technican.TechnicianTaskServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>homeServlet</servlet-name>
@@ -255,9 +263,16 @@
         <url-pattern>/admin-business/deleteinvoice</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-
         <servlet-name>CustomerDeviceServlet</servlet-name>
         <url-pattern>/customer/devices</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TechnicianMaintenanceServlet</servlet-name>
+        <url-pattern>/technician/maintenance</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TechnicianTaskServlet</servlet-name>
+        <url-pattern>/technician/mytask</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>

@@ -240,7 +240,7 @@ public class DeviceDAO extends DBContext {
         StringBuilder sql = new StringBuilder("""
         SELECT d.id, d.serial_number, d.machine_name, d.model, d.status,
                d.purchase_date, d.warranty_end_date,
-               d.imageUrl,d.price,
+               d.image,d.price,
                c.name AS categoryName,
                b.name AS brandName,
                up.fullname AS customerName
@@ -303,7 +303,7 @@ public class DeviceDAO extends DBContext {
 
                 d.setPurchaseDate(rs.getDate("purchase_date"));
                 d.setWarrantyEndDate(rs.getDate("warranty_end_date"));
-                d.setImage(rs.getString("imageUrl"));
+                d.setImage(rs.getString("image"));
                 d.setCategoryName(rs.getString("categoryName"));
                 d.setBrandName(rs.getString("brandName"));
                 d.setCustomerName(rs.getString("customerName"));

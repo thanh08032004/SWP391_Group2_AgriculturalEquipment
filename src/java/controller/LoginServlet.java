@@ -53,7 +53,7 @@ public class LoginServlet extends HttpServlet {
         switch (user.getRoleId()) {
             case 1 -> session.setAttribute("userRole", "ADMIN_SYSTEM");
             case 2 -> session.setAttribute("userRole", "ADMIN_BUSINESS");
-            case 3 -> session.setAttribute("userRole", "STAFF");
+            case 3 -> session.setAttribute("userRole", "TECHNICIAN");
             case 4 -> session.setAttribute("userRole", "CUSTOMER");
         }
 
@@ -74,7 +74,7 @@ public class LoginServlet extends HttpServlet {
         switch (user.getRoleId()) {
             case 1 -> response.sendRedirect(ctx + "/admin/users");
             case 2 -> response.sendRedirect(ctx + "/admin-business/devices");
-            case 3 -> response.sendRedirect(ctx + "/staff/tasks");
+            case 3 -> response.sendRedirect(ctx + "/technician/maintenance");
             case 4 -> response.sendRedirect(ctx + "/home");
             default -> {
                 session.invalidate();

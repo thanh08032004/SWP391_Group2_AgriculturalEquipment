@@ -9,8 +9,8 @@
     <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
         <c:set var="roleHome" value="${pageContext.request.contextPath}/admin-business/devices" />
     </c:when>
-    <c:when test="${sessionScope.userRole == 'STAFF'}">
-        <c:set var="roleHome" value="${pageContext.request.contextPath}/staff/tasks" />
+    <c:when test="${sessionScope.userRole == 'TECHNICIAN'}">
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/technician/maintenance" />
     </c:when>
 </c:choose>
 
@@ -57,10 +57,10 @@
                             </c:when>
 
                             <%-- 4. STAFF --%>
-                            <c:when test="${sessionScope.userRole == 'STAFF'}">
+                            <c:when test="${sessionScope.userRole == 'TECHNICIAN'}">
                                 <li class="nav-item">
                                     <span class="nav-link fw-bold text-uppercase text-center w-100">
-                                        Staff Dashboard
+                                        Technician Dashboard
                                     </span>
                                 </li>
                             </c:when>
