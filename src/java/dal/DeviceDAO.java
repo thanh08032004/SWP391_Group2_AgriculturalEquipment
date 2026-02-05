@@ -61,7 +61,7 @@ public class DeviceDAO extends DBContext {
                d.customer_id,
                d.category_id,     
                d.brand_id,
-               d.imageUrl,
+               d.image,
                c.name AS category_name,
                b.name AS brand_name,
                up.fullname AS customer_name
@@ -92,7 +92,7 @@ public class DeviceDAO extends DBContext {
                         .brandId(rs.getInt("brand_id"))
                         .purchaseDate(rs.getDate("purchase_date"))
                         .warrantyEndDate(rs.getDate("warranty_end_date"))
-                        .image(rs.getString("imageUrl"))
+                        .image(rs.getString("image"))
                         .categoryName(rs.getString("category_name"))
                         .brandName(rs.getString("brand_name"))
                         .customerName(rs.getString("customer_name"))
@@ -135,7 +135,7 @@ public class DeviceDAO extends DBContext {
         INSERT INTO device
         (customer_id, serial_number, machine_name, model,price,
          purchase_date, warranty_end_date, status,
-         category_id, brand_id, imageUrl)
+         category_id, brand_id, image)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
     """;
 
@@ -174,7 +174,7 @@ public class DeviceDAO extends DBContext {
             purchase_date = ?,
             warranty_end_date = ?,
             status = ?,
-            imageUrl = ?
+            image = ?
         WHERE id = ?
     """;
 

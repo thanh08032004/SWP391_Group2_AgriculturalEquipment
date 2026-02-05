@@ -15,32 +15,42 @@ public class AuthFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+
         HttpSession session = req.getSession(false);
         String uri = req.getRequestURI();
         String contextPath = req.getContextPath();
 
-        if (uri.contains("/assets/") || uri.contains("/common/") || 
-            uri.endsWith(".css") || uri.endsWith(".js") || 
-            uri.endsWith("/home") || uri.endsWith("/login")) {
+        // Allow static resources
+        if (uri.contains("/assets/") || uri.contains("/common/")
+                || uri.endsWith(".css") || uri.endsWith(".js")) {
             chain.doFilter(request, response);
             return;
         }
 
-        if (uri.endsWith(".jsp") && req.getHeader("referer") == null) {
+        // Allow public pages
+        if (uri.endsWith("/home") || uri.endsWith("/login")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // Block direct JSP acces
+        if (uri.endsWith(".jsp")) {
             res.sendRedirect(contextPath + "/home");
             return;
         }
 
+        // Check user login
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
         if (user == null) {
-            if (uri.contains("/admin") || uri.contains("/technician") || 
-                uri.contains("/customer") || uri.contains("/admin-business")) {
+            if (uri.contains("/admin") || uri.contains("/technician")
+                    || uri.contains("/customer") || uri.contains("/admin-business")) {
                 res.sendRedirect(contextPath + "/login");
                 return;
             }
         } else {
             int role = user.getRoleId();
+
             if (uri.contains("/admin/") && !uri.contains("/admin-business/") && role != 1) {
                 res.sendError(HttpServletResponse.SC_FORBIDDEN); return;
             }
@@ -54,6 +64,7 @@ public class AuthFilter implements Filter {
                 res.sendError(HttpServletResponse.SC_FORBIDDEN); return;
             }
         }
+
         chain.doFilter(request, response);
     }
 }

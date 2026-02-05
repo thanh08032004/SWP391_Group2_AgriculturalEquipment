@@ -19,7 +19,6 @@
     <title>500 - Internal Server Error</title>
 </head>
 <body>
-    <jsp:include page="../common/header.jsp"></jsp:include>
 
     <div class="container text-center" style="padding: 100px 0;">
         <div class="error-content">
@@ -30,7 +29,6 @@
         </div>
     </div>
 
-    <jsp:include page="../common/footer.jsp"></jsp:include>
     <jsp:include page="../common/scripts.jsp"></jsp:include>
 </body>
 </html>

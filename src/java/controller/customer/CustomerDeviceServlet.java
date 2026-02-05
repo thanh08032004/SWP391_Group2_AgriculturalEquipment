@@ -18,14 +18,20 @@ public class CustomerDeviceServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         
         if (user == null) {
-            user = new User();
-            user.setId(4); 
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
         }
 
+        // FIX: Lấy tên thật của khách hàng đang đăng nhập từ session
+        String currentCustomerName = (String) session.getAttribute("userFullname");
+        if (currentCustomerName == null) currentCustomerName = ""; 
+
         DeviceDAO dao = new DeviceDAO();
-        List<DeviceDTO> myDevices = dao.searchAndFilterPaging("", "Cương Đức", "", "", "", 1, 100);
+        // Lọc thiết bị dựa trên tên khách hàng hiện tại
+        List<DeviceDTO> myDevices = dao.searchAndFilterPaging("", currentCustomerName, "", "", "", 1, 100);
         
         request.setAttribute("deviceList", myDevices);
+        // FIX 404: Đường dẫn tuyệt đối từ gốc Web Pages
         request.getRequestDispatcher("/views/CustomerView/my-devices.jsp").forward(request, response);
     }
 }
