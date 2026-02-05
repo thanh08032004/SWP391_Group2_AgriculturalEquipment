@@ -110,6 +110,18 @@
         <servlet-name>AdminSparePartServlet</servlet-name>
         <servlet-class>controller.adminBusiness.AdminSparePartServlet</servlet-class>
     </servlet>
+        <servlet>
+        <servlet-name>AdminInvoiceServlet</servlet-name>
+        <servlet-class>controller.adminBusiness.AdminInvoiceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminAddInvoiceServlet</servlet-name>
+        <servlet-class>controller.adminBusiness.AdminAddInvoiceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminDeleteInvoiceServlet</servlet-name>
+        <servlet-class>controller.adminBusiness.AdminDeleteInvoiceServlet</servlet-class>
+    </servlet>
     <servlet>
         <servlet-name>AdminMaintenanceServlet</servlet-name>
         <servlet-class>controller.adminBusiness.AdminMaintenanceServlet</servlet-class>
@@ -117,6 +129,14 @@
     <servlet>
         <servlet-name>CustomerMaintenanceServlet</servlet-name>
         <servlet-class>controller.customer.CustomerMaintenanceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CustomerVoucherServlet</servlet-name>
+        <servlet-class>controller.customer.CustomerVoucherServlet</servlet-class>
+        </servlet>
+    <servlet>
+        <servlet-name>CustomerDeviceServlet</servlet-name>
+        <servlet-class>controller.customer.CustomerDeviceServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>homeServlet</servlet-name>
@@ -217,6 +237,27 @@
     <servlet-mapping>
         <servlet-name>CustomerMaintenanceServlet</servlet-name>
         <url-pattern>/customer/maintenance</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CustomerVoucherServlet</servlet-name>
+        <url-pattern>/customer/vouchers</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminInvoiceServlet</servlet-name>
+        <url-pattern>/admin-business/invoicelist</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminAddInvoiceServlet</servlet-name>
+        <url-pattern>/admin-business/addinvoice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminDeleteInvoiceServlet</servlet-name>
+        <url-pattern>/admin-business/deleteinvoice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+
+        <servlet-name>CustomerDeviceServlet</servlet-name>
+        <url-pattern>/customer/devices</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>

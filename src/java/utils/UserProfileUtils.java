@@ -14,23 +14,20 @@ public class UserProfileUtils {
        - Reject future dates
        - Limit year range (>=1900 && <= current year)
        ===================== */
-    public static LocalDate validateBirthDate(String day, String month, String year) {
-        if (day == null || month == null || year == null
-                || day.isBlank() || month.isBlank() || year.isBlank()) {
+    public static LocalDate validateBirthDate(String birthDate) {
+        if (birthDate == null || birthDate.isBlank()) {
             throw new IllegalArgumentException("Ngày sinh không được để trống");
         }
 
         try {
-            int d = Integer.parseInt(day);
-            int m = Integer.parseInt(month);
-            int y = Integer.parseInt(year);
+            LocalDate date = LocalDate.parse(birthDate); // yyyy-MM-dd
 
+            int year = date.getYear();
             int currentYear = LocalDate.now().getYear();
-            if (y < 1900 || y > currentYear) {
+
+            if (year < 1900 || year > currentYear) {
                 throw new IllegalArgumentException("Năm sinh không hợp lệ");
             }
-
-            LocalDate date = LocalDate.of(y, m, d);
 
             if (date.isAfter(LocalDate.now())) {
                 throw new IllegalArgumentException("Ngày sinh không được ở tương lai");
@@ -38,8 +35,6 @@ public class UserProfileUtils {
 
             return date;
 
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Ngày sinh phải là số");
         } catch (DateTimeException e) {
             throw new IllegalArgumentException("Ngày sinh không hợp lệ");
         }
@@ -85,18 +80,13 @@ public class UserProfileUtils {
        ===================== */
     private static final String NAME_REGEX = "^[A-Za-zÀ-Ỹà-ỹ\\s]+$";
 
-    public static void validateName(String firstName, String lastName) {
-        if (firstName == null || firstName.isBlank()
-                || lastName == null || lastName.isBlank()) {
+    public static void validateName(String fullName) {
+        if (fullName == null || fullName.isBlank()) {
             throw new IllegalArgumentException("Họ và tên không được để trống");
         }
 
-        if (!firstName.matches(NAME_REGEX)) {
+        if (!fullName.matches(NAME_REGEX)) {
             throw new IllegalArgumentException("Tên không được chứa số hoặc ký tự đặc biệt");
-        }
-
-        if (!lastName.matches(NAME_REGEX)) {
-            throw new IllegalArgumentException("Họ không được chứa số hoặc ký tự đặc biệt");
         }
     }
 }

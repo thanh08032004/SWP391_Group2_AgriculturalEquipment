@@ -11,5 +11,5 @@ public class PermissionDTO {
     private String code;
     private String name;
     private String description;
-    private boolean checked; // role hiện tại có quyền hay không
+    private boolean checked;
 }

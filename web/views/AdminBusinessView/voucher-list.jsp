@@ -66,14 +66,14 @@
                             <table class="table table-hover align-middle">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Code</th>
-                                        <th>Discount Type</th>
-                                        <th>Discount</th>           
-                                        <th>Start Date</th>
-                                        <th>End Date</th>
-                                        <th>Min Service Price</th>
-                                        <th>Status</th>
+                                        <th class="text-center">ID</th>
+                                        <th class="text-center">Code</th>
+                                        <th class="text-center">Discount Type</th>
+                                        <th class="text-center">Discount</th>           
+                                        <th class="text-center">Start Date</th>
+                                        <th class="text-center">End Date</th>
+                                        <th class="text-center">Min Service Price</th>
+                                        <th class="text-center">Status</th>
                                         <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -81,17 +81,17 @@
                                 <tbody>
                                     <c:forEach var="v" items="${vouchers}">
                                         <tr>
-                                            <td>${v.id}</td>
-                                            <td>${v.code}</td>
+                                            <td class="text-center">${v.id}</td>
+                                            <td class="text-center">${v.code}</td>
 
-                                            <td>
+                                            <td class="text-center">
                                                 <c:choose>
                                                     <c:when test="${v.discountType == 'PERCENT'}">Percent</c:when>
                                                     <c:otherwise>Amount</c:otherwise>
                                                 </c:choose>
                                             </td>
 
-                                            <td>
+                                            <td class="text-center">
                                                 <c:choose>
                                                     <c:when test="${v.discountType == 'PERCENT'}">
                                                         ${v.discountValue}%
@@ -102,39 +102,39 @@
                                                 </c:choose>
                                             </td>
 
-                                            <td>${v.startDate}</td>
-                                            <td>${v.endDate}</td>
-                                            <td>${v.minServicePrice}</td>
+                                            <td class="text-center">${v.startDate}</td>
+                                            <td class="text-center">${v.endDate}</td>
+                                            <td class="text-center">${v.minServicePrice}</td>
 
-                                            <td>
+                                            <td class="text-center">
                                                 <c:choose>
                                                     <c:when test="${v.active}">
                                                         <span class="badge bg-success">Active</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="badge bg-secondary">De-Active</span>
+                                                        <span class="badge bg-secondary"  style="font-size: 11px;">De-Active</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
 
-                                            <td class="text-center">
+                                            <td class="text-center d-flex align-items-center" >
                                                 <!-- Detail -->
-                                                <a class="btn btn-sm btn-outline-info"
+                                                <a class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center"
                                                    title="View detail"
-                                                   href="${pageContext.request.contextPath}/admin-business/vouchers?action=detail&id=${v.id}">
+                                                   href="${pageContext.request.contextPath}/admin-business/vouchers?action=detail&id=${v.id}" style="width: 30px;  height: 30px; line-height: 30px; padding: 0; margin: 3px">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
 
                                                 <!-- Edit -->
-                                                <a class="btn btn-sm btn-outline-primary"
+                                                <a class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center"
                                                    title="Edit"
-                                                   href="${pageContext.request.contextPath}/admin-business/vouchers?action=edit&id=${v.id}">
+                                                   href="${pageContext.request.contextPath}/admin-business/vouchers?action=edit&id=${v.id} " style="width: 30px;  height: 30px; line-height: 30px; padding: 0; margin: 3px">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
 
                                                 <!-- Delete -->
-                                                <a href="${pageContext.request.contextPath}/admin-business/vouchers?action=delete&id=${v.id}&page=${currentPage}&keyword=${keyword}"
-                                                   class="btn btn-outline-danger"
+                                                <a href="${pageContext.request.contextPath}/admin-business/vouchers?action=delete&id=${v.id}&page=${currentPage}&keyword=${keyword} " style="width: 32px;  height: 30px; line-height: 30px; padding: 0; margin: 3px"
+                                                   class="btn btn-outline-danger d-flex align-items-center justify-content-center"
                                                    onclick="return confirm('Delete this voucher?')">
                                                     <i class="bi bi-trash"></i>
                                                 </a>

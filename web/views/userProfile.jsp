@@ -1,12 +1,7 @@
-<%-- 
-    Document   : userProfile
-    Created on : Jan 16, 2026, 3:42:04 AM
-    Author     : admin
---%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 
 
 <c:set var="roleHome" value="${pageContext.request.contextPath}/home" />
@@ -79,35 +74,21 @@
                     <form action="${pageContext.request.contextPath}/profile" method="post">
                         <div class="info-grid">
                             <div class="info-box">
-                                <label>First Name</label>
+                                <label>Full Name</label>
 
                                 <c:choose>
                                     <c:when test="${edit}">
-                                        <input type="text" name="firstName" value="${firstName}" required>
-                                        <c:if test="${not empty errors.name}">
-                                            <small class="error-text">${errors.name}</small>
+                                        <input type="text" name="fullname" value="${profile.fullname}" required>
+                                        <c:if test="${not empty errors.fullname}">
+                                            <small class="error-text">${errors.fullname}</small>
                                         </c:if>
                                     </c:when>
                                     <c:otherwise>
-                                        <span>${firstName}</span>
+                                        <span>${profile.fullname}</span>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
-                            <div class="info-box">
-                                <label>Last Name</label>
 
-                                <c:choose>
-                                    <c:when test="${edit}">
-                                        <input type="text" name="lastName" value="${lastName}" required>
-                                        <c:if test="${not empty errors.name}">
-                                            <small class="error-text">${errors.name}</small>
-                                        </c:if>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span>${lastName}</span>
-                                    </c:otherwise>
-                                </c:choose>
-                            </div>
 
                             <div class="info-box">
                                 <label>Username</label>
@@ -162,37 +143,30 @@
                                 </c:choose>
                             </div>
 
-                            <div class="info-box full-width">
+                            <div class="info-box">
                                 <label>Birth Date</label>
-
                                 <c:choose>
                                     <c:when test="${edit}">
-                                        <div class="birth-row">
-                                            <input type="number" name="day" min="1" max="31"
-                                                   value="${birthDay}" placeholder="DD">
-
-                                            <input type="number" name="month" min="1" max="12"
-                                                   value="${birthMonth}" placeholder="MM">
-
-                                            <input type="number" name="year" min="1900" max="2100"
-                                                   value="${birthYear}" placeholder="YYYY">
-                                            <c:if test="${not empty errors.birthDate}">
-                                                <small class="error-text">${errors.birthDate}</small>
-                                            </c:if>
-                                        </div>
+                                        <input type="date" name="birthDate"
+                                               value="${profile.birthDate}">
+                                        <c:if test="${not empty errors.birthDate}">
+                                            <small class="error-text">${errors.birthDate}</small>
+                                        </c:if>
                                     </c:when>
-
                                     <c:otherwise>
-                                        <span>${birthDay} / ${birthMonth} / ${birthYear}</span>
+                                        <span>${profile.birthDate}</span>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
-
                             <div class="info-box full-width">
                                 <label>Address</label>
                                 <c:choose>
                                     <c:when test="${edit}">
-                                        <input type="text" name="address" value="${profile.address}">
+                                        <input type="text" name="address"
+                                               value="${profile.address}">
+                                        <c:if test="${not empty errors.address}">
+                                            <small class="error-text">${errors.address}</small>
+                                        </c:if>
                                     </c:when>
                                     <c:otherwise>
                                         <span>${profile.address}</span>

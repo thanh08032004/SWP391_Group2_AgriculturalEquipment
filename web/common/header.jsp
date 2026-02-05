@@ -33,10 +33,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="${pageContext.request.contextPath}/home">Home</a>
                                 </li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/my-assets">My Devices</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Support</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/voucher">My Voucher</a></li>
+                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/devices">My Devices</a></li>                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Support</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/maintenance">Maintenance History</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/vouchers">My Voucher</a></li>
                                 </c:when>
 
                             <%-- 2. ADMIN_SYSTEM --%>                            
