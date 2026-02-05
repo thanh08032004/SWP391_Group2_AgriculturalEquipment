@@ -1,7 +1,6 @@
 package controller.adminBusiness;
 
 import dal.VoucherDAO;
-import dto.VoucherDTO;
 import model.Voucher;
 
 import jakarta.servlet.ServletException;
@@ -11,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AdminVoucherServlet extends HttpServlet {
@@ -52,6 +50,7 @@ public class AdminVoucherServlet extends HttpServlet {
     /* ================= LIST ================= */
     private void listVouchers(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
         req.setAttribute("activeMenu", "voucher");
 
         String keyword = req.getParameter("keyword");
@@ -66,27 +65,10 @@ public class AdminVoucherServlet extends HttpServlet {
 
         VoucherDAO dao = new VoucherDAO();
 
-        // 1. Lấy entity
-        List<Voucher> list = dao.getVouchers(keyword, page, PAGE_SIZE);
-
-        // 2. Map sang DTO
-        List<VoucherDTO> vouchers = new ArrayList<>();
-        for (Voucher v : list) {
-            vouchers.add(new VoucherDTO(
-                    v.getId(),
-                    v.getCode(),
-                    v.getDescription(),
-                    v.getDiscountType(),
-                    v.getDiscountValue(),
-                    v.getMinServicePrice(),
-                    v.getStartDate(),
-                    v.getEndDate(),
-                    v.isActive()
-            ));
-        }
         int total = dao.countVouchers(keyword);
         int totalPage = (int) Math.ceil((double) total / PAGE_SIZE);
 
+        List<Voucher> vouchers = dao.getVouchers(keyword, page, PAGE_SIZE);
         req.setAttribute("vouchers", vouchers);
         req.setAttribute("currentPage", page);
         req.setAttribute("totalPage", totalPage);
@@ -113,23 +95,12 @@ public class AdminVoucherServlet extends HttpServlet {
         int id = Integer.parseInt(req.getParameter("id"));
 
         VoucherDAO dao = new VoucherDAO();
-        Voucher v = dao.getVoucherById(id);
-        if (v == null) {
+
+        Voucher voucher = dao.getVoucherById(id);
+        if (voucher == null) {
             resp.sendRedirect(req.getContextPath() + "/admin-business/vouchers");
             return;
         }
-
-        VoucherDTO voucher = new VoucherDTO(
-                v.getId(),
-                v.getCode(),
-                v.getDescription(),
-                v.getDiscountType(),
-                v.getDiscountValue(),
-                v.getMinServicePrice(),
-                v.getStartDate(),
-                v.getEndDate(),
-                v.isActive()
-        );
 
         req.setAttribute("voucher", voucher);
 
@@ -146,9 +117,17 @@ public class AdminVoucherServlet extends HttpServlet {
 
         VoucherDAO dao = new VoucherDAO();
         Voucher voucher = dao.getVoucherById(id);
-
+        String page = req.getParameter("page");
+        if (page == null || page.isEmpty()) {
+            page = "1";
+        }
+        String keyword = req.getParameter("keyword");
+        if (keyword == null) {
+            keyword = "";
+        }
         req.setAttribute("voucher", voucher);
-
+        req.setAttribute("page", page);
+        req.setAttribute("keyword", keyword);
         req.getRequestDispatcher(
                 "/views/AdminBusinessView/voucher-edit.jsp"
         ).forward(req, resp);
@@ -271,6 +250,15 @@ public class AdminVoucherServlet extends HttpServlet {
                 (minStr == null || minStr.isEmpty()) ? 0 : Double.parseDouble(minStr)
         );
 
+        String page = req.getParameter("page");
+        if (page == null || page.isEmpty()) {
+            page = "1";
+        }
+        String keyword = req.getParameter("keyword");
+        if (keyword == null) {
+            keyword = "";
+        }
+
         try {
             double discountValue = Double.parseDouble(req.getParameter("discountValue"));
             v.setDiscountValue(discountValue);
@@ -295,7 +283,12 @@ public class AdminVoucherServlet extends HttpServlet {
             v.setEndDate(end);
 
             new VoucherDAO().updateVoucher(v);
-            resp.sendRedirect(req.getContextPath() + "/admin-business/vouchers");
+
+            resp.sendRedirect(
+                    req.getContextPath()
+                    + "/admin-business/vouchers?page=" + page
+                    + "&keyword=" + keyword
+            );
 
         } catch (Exception e) {
             req.setAttribute("error", e.getMessage());

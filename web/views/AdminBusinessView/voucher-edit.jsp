@@ -39,7 +39,9 @@
                                           method="post">
 
                                         <input type="hidden" name="id" value="${voucher.id}">
-
+                                        <!-- Giữ phân trang-->
+                                        <input type="hidden" name="page" value="${page}">
+                                        <input type="hidden" name="keyword" value="${keyword}">
                                         <!-- BASIC INFO -->
                                         <h6 class="fw-bold text-primary mb-3">Basic Information</h6>
                                         <div class="row">
