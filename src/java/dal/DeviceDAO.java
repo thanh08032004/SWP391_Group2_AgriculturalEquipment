@@ -377,5 +377,21 @@ public class DeviceDAO extends DBContext {
 
         return 0;
     }
+    public boolean isCustomerExists(int customerId) {
+    String sql = "SELECT 1 FROM users WHERE id = ? AND role_id = 4"; 
+    // role_id = 4 = CUSTOMER
+
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, customerId);
+        ResultSet rs = ps.executeQuery();
+        return rs.next();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 
 }
