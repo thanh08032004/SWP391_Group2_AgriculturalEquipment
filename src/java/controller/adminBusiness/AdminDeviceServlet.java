@@ -140,9 +140,8 @@ public class AdminDeviceServlet extends HttpServlet {
 
         String action = request.getParameter("action");
         DeviceDAO deviceDAO = new DeviceDAO();
-
+        boolean hasError = false;
         if ("create".equals(action)) {
-            boolean hasError = false;
             DeviceDTO d = new DeviceDTO();
 
             String serial = request.getParameter("serialNumber");
@@ -167,7 +166,7 @@ public class AdminDeviceServlet extends HttpServlet {
                     }
                 }else if (price.compareTo(BigDecimal.ZERO) == 0) {
                     request.setAttribute("errorPrice", "Price không được để trống");
-                        hasError = true;
+                    hasError = true;
                 }
             } catch (NumberFormatException e) {
                 request.setAttribute("errorPrice", "Price phải là số");
@@ -229,31 +228,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 filePart.write(uploadPath + File.separator + fileName);
             }
             d.setImage(fileName);
-
-//            if (hasError) {
-//
-//                request.setAttribute("serialNumber", request.getParameter("serialNumber"));
-//                request.setAttribute("machineName", request.getParameter("machineName"));
-//                request.setAttribute("model", request.getParameter("model"));
-//                request.setAttribute("price", request.getParameter("price"));
-//                request.setAttribute("customerId", request.getParameter("customerId"));
-//                request.setAttribute("categoryId", request.getParameter("categoryId"));
-//                request.setAttribute("brandId", request.getParameter("brandId"));
-//                request.setAttribute("purchaseDate", request.getParameter("purchaseDate"));
-//                request.setAttribute("warrantyEndDate", request.getParameter("warrantyEndDate"));
-//
-//                request.setAttribute("categories", deviceDAO.getAllCategories());
-//                request.setAttribute("brands", deviceDAO.getAllBrands());
-//
-//                request.getRequestDispatcher("/views/AdminBusinessView/device-add.jsp")
-//                        .forward(request, response);
-//                return;   
-//            }
-            boolean success = deviceDAO.createDevice(d);
-
-            if (success) {
-                response.sendRedirect("devices?action=list");
-            } else {
+            if (hasError) {
                 request.setAttribute("serialNumber", request.getParameter("serialNumber"));
                 request.setAttribute("machineName", request.getParameter("machineName"));
                 request.setAttribute("model", request.getParameter("model"));
@@ -267,7 +242,14 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.setAttribute("brands", deviceDAO.getAllBrands());
 
                 request.getRequestDispatcher("/views/AdminBusinessView/device-add.jsp").forward(request, response);
+                return;
             }
+
+            boolean success = deviceDAO.createDevice(d);
+
+            if (success) 
+                response.sendRedirect("devices?action=list");
+         
         } else if ("update".equals(action)) {
 
             DeviceDTO d = new DeviceDTO();

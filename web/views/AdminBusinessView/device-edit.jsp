@@ -26,7 +26,7 @@
                                 <!-- ID -->
                                 <input type="hidden" name="id" value="${deviceEdit.id}">
                                 <input type="hidden" name="oldImage" value="${deviceEdit.image}">
-                                <!-- SERIAL (readonly) -->
+                                
                                 <div class="mb-3 text-center">
                                     <img src="${pageContext.request.contextPath}/assets/images/devices/${empty deviceEdit.image ? 'default.png' : deviceEdit.image}"
                                          class="rounded border shadow-sm"
