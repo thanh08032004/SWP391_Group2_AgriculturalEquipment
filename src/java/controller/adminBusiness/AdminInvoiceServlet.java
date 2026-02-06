@@ -33,12 +33,30 @@ public class AdminInvoiceServlet extends HttpServlet {
  protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+          String keyword = request.getParameter("keyword");
+        String filter = request.getParameter("filter");
+
+        int page = 1;
+        int pageSize = 5;
+
+        if (request.getParameter("page") != null) {
+            page = Integer.parseInt(request.getParameter("page"));
+        }
+
         InvoiceDAO dao = new InvoiceDAO();
-        List<Invoice> ListI = dao.getAllInvoices();
+
+        List<Invoice> ListI = dao.searchFilterInvoice(
+                keyword, filter, page, pageSize);
+
+        int totalRecords = dao.countInvoice(keyword, filter);
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
         request.setAttribute("ListI", ListI);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
         request.getRequestDispatcher("/views/AdminBusinessView/invoice-list.jsp")
-               .forward(request, response);
+                .forward(request, response);
     }
 
     @Override
