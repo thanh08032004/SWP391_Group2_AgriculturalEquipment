@@ -1,17 +1,26 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isErrorPage="true"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <c:set var="roleHome" value="${pageContext.request.contextPath}/home" />
-<c:choose>
-    <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
-        <c:set var="roleHome" value="${pageContext.request.contextPath}/admin/users" />
-    </c:when>
-     <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
-        <c:set var="roleHome" value="${pageContext.request.contextPath}/admin-business/devices" />
-    </c:when>
-    <c:when test="${sessionScope.userRole == 'STAFF'}">
-        <c:set var="roleHome" value="${pageContext.request.contextPath}/staff/tasks" />
-    </c:when>
-</c:choose>
+<c:set var="navHome" value="${pageContext.request.contextPath}/home" />
+
+<c:if test="${not empty sessionScope.userRole}">
+    <c:choose>
+        <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
+            <c:set var="roleHome" value="${pageContext.request.contextPath}/admin/users" />
+        </c:when>
+        <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
+            <c:set var="roleHome" value="${pageContext.request.contextPath}/admin-business/devices" />
+        </c:when>
+        <c:when test="${sessionScope.userRole == 'TECHNICIAN'}">
+            <c:set var="roleHome" value="${pageContext.request.contextPath}/technician/maintenance" />
+        </c:when>
+        <c:when test="${sessionScope.userRole == 'CUSTOMER'}">
+            <c:set var="roleHome" value="${pageContext.request.contextPath}/customer/home" />
+            <c:set var="navHome" value="${pageContext.request.contextPath}/customer/home" />
+        </c:when>
+    </c:choose>
+</c:if>
 <!DOCTYPE html>
 <html>
 <head>

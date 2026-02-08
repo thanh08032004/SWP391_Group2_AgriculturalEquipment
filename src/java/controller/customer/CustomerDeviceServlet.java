@@ -1,4 +1,4 @@
-package controller;
+package controller.customer;
 
 import dal.DeviceDAO;
 import dto.DeviceDTO;

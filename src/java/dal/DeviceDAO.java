@@ -226,95 +226,6 @@ public class DeviceDAO extends DBContext {
         return false;
     }
 
-    public List<DeviceDTO> searchAndFilterPaging(
-            String keyword,
-            String customerName,
-            String categoryId,
-            String brandId,
-            String status,
-            int pageIndex,
-            int pageSize
-    ) {
-        List<DeviceDTO> list = new ArrayList<>();
-
-        StringBuilder sql = new StringBuilder("""
-        SELECT d.id, d.serial_number, d.machine_name, d.model, d.status,
-               d.purchase_date, d.warranty_end_date,
-               d.image,d.price,
-               c.name AS categoryName,
-               b.name AS brandName,
-               up.fullname AS customerName
-        FROM device d
-         JOIN category c ON d.category_id = c.id
-         JOIN brand b ON d.brand_id = b.id
-        LEFT JOIN users u ON d.customer_id = u.id
-        LEFT JOIN user_profile up ON u.id = up.user_id
-        WHERE 1 = 1
-    """);
-
-        List<Object> params = new ArrayList<>();
-
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (d.serial_number LIKE ? OR d.machine_name LIKE ?)");
-            params.add("%" + keyword + "%");
-            params.add("%" + keyword + "%");
-        }
-
-        if (customerName != null && !customerName.trim().isEmpty()) {
-            sql.append(" AND up.fullname LIKE ?");
-            params.add("%" + customerName + "%");
-        }
-
-        if (categoryId != null && !categoryId.trim().isEmpty()) {
-            sql.append(" AND d.category_id = ?");
-            params.add(Integer.parseInt(categoryId));
-        }
-
-        if (brandId != null && !brandId.trim().isEmpty()) {
-            sql.append(" AND d.brand_id = ?");
-            params.add(Integer.parseInt(brandId));
-        }
-
-        if (status != null && !status.trim().isEmpty()) {
-            sql.append(" AND d.status = ?");
-            params.add(status);
-        }
-
-        sql.append(" ORDER BY d.id DESC LIMIT ? OFFSET ?");
-        int offset = (pageIndex - 1) * pageSize;
-        params.add(pageSize);
-        params.add(offset);
-
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                DeviceDTO d = new DeviceDTO();
-                d.setId(rs.getInt("id"));
-                d.setSerialNumber(rs.getString("serial_number"));
-                d.setMachineName(rs.getString("machine_name"));
-                d.setModel(rs.getString("model"));
-                d.setPrice(rs.getBigDecimal("price"));
-                d.setStatus(rs.getString("status"));
-
-                d.setPurchaseDate(rs.getDate("purchase_date"));
-                d.setWarrantyEndDate(rs.getDate("warranty_end_date"));
-                d.setImage(rs.getString("image"));
-                d.setCategoryName(rs.getString("categoryName"));
-                d.setBrandName(rs.getString("brandName"));
-                d.setCustomerName(rs.getString("customerName"));
-                list.add(d);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
 
     public int countSearchAndFilter(
             String keyword,
@@ -376,6 +287,75 @@ public class DeviceDAO extends DBContext {
         }
 
         return 0;
+    }
+    
+    
+    public List<DeviceDTO> searchAndFilterPaging(
+            String keyword, String customerName, String categoryId, 
+            String brandId, String status, int pageIndex, int pageSize) {
+        List<DeviceDTO> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+            SELECT d.id, d.serial_number, d.machine_name, d.model, d.status,
+                   d.purchase_date, d.warranty_end_date, d.image, d.price, 
+                   c.name AS categoryName, b.name AS brandName, up.fullname AS customerName
+            FROM device d
+            JOIN category c ON d.category_id = c.id
+            JOIN brand b ON d.brand_id = b.id
+            -- FK trong device là customer_id trỏ tới users.id
+            LEFT JOIN users u ON d.customer_id = u.id 
+            LEFT JOIN user_profile up ON u.id = up.user_id
+            WHERE 1 = 1
+        """);
+
+        List<Object> params = new ArrayList<>();
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (d.serial_number LIKE ? OR d.machine_name LIKE ?)");
+            params.add("%" + keyword + "%"); params.add("%" + keyword + "%");
+        }
+        if (customerName != null && !customerName.trim().isEmpty()) {
+            sql.append(" AND up.fullname LIKE ?");
+            params.add("%" + customerName + "%");
+        }
+         if (categoryId != null && !categoryId.trim().isEmpty()) {
+            sql.append(" AND d.category_id = ?");
+            params.add(Integer.parseInt(categoryId));
+        }
+
+        if (brandId != null && !brandId.trim().isEmpty()) {
+            sql.append(" AND d.brand_id = ?");
+            params.add(Integer.parseInt(brandId));
+        }
+
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND d.status = ?");
+            params.add(status);
+        }
+
+        sql.append(" ORDER BY d.id DESC LIMIT ? OFFSET ?");
+        int offset = (pageIndex - 1) * pageSize;
+        params.add(pageSize); params.add(offset);
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) { ps.setObject(i + 1, params.get(i)); }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                DeviceDTO d = new DeviceDTO();
+                d.setId(rs.getInt("id"));
+                d.setSerialNumber(rs.getString("serial_number"));
+                d.setMachineName(rs.getString("machine_name"));
+                d.setModel(rs.getString("model"));
+                d.setPrice(rs.getBigDecimal("price"));
+                d.setStatus(rs.getString("status"));
+                d.setPurchaseDate(rs.getDate("purchase_date"));
+                d.setWarrantyEndDate(rs.getDate("warranty_end_date"));
+                d.setImage(rs.getString("image")); // Khớp cột 'image'
+                d.setCategoryName(rs.getString("categoryName"));
+                d.setBrandName(rs.getString("brandName"));
+                d.setCustomerName(rs.getString("customerName"));
+                list.add(d);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
     }
     public boolean isCustomerExists(int customerId) {
     String sql = "SELECT 1 FROM users WHERE id = ? AND role_id = 4"; 

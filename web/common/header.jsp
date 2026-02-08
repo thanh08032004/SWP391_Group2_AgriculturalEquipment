@@ -14,7 +14,6 @@
             <c:set var="roleHome" value="${pageContext.request.contextPath}/admin-business/devices" />
         </c:when>
         <c:when test="${sessionScope.userRole == 'TECHNICIAN'}">
-            <%-- Logo dẫn về trang quản lý bảo trì của kỹ thuật viên --%>
             <c:set var="roleHome" value="${pageContext.request.contextPath}/technician/maintenance" />
         </c:when>
         <c:when test="${sessionScope.userRole == 'CUSTOMER'}">
@@ -42,7 +41,7 @@
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/devices">My Devices</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/maintenance">History</a></li>
                             </c:if>
-                            <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/support">Support</a></li>
+                            <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Support</a></li>
                         </c:if>
 
                         <c:if test="${sessionScope.userRole == 'TECHNICIAN'}">
