@@ -8,14 +8,22 @@
         <filter-name>AuthFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <servlet-mapping>
+        <servlet-name>CustomerInvoiceDetail</servlet-name>
+        <url-pattern>/customer/invoicedetail</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
-<!--        <welcome-file>/home</welcome-file>-->
+        <!--        <welcome-file>/home</welcome-file>-->
     </welcome-file-list>
     <!-- SERVLETS -->
     <servlet>
         <servlet-name>homeServlet</servlet-name>
         <servlet-class>controller.customer.HomeServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CustomerInvoiceServlet</servlet-name>
+        <servlet-class>controller.customer.CustomerInvoiceServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ForgotPasswordServlet</servlet-name>
@@ -158,6 +166,14 @@
         <servlet-name>GuestHomeServlet</servlet-name>
         <servlet-class>controller.GuestHomeServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CustomerInvoiceDetail</servlet-name>
+        <servlet-class>controller.customer.CustomerInvoiceDetail</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CustomerInvoiceServlet</servlet-name>
+        <url-pattern>/customer/invoice-list</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>homeServlet</servlet-name>
         <url-pattern>/customer/home</url-pattern>
@@ -294,7 +310,6 @@
         <servlet-name>GuestHomeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
     </servlet-mapping>
-    
     <error-page>
         <error-code>403</error-code>
         <location>/errors/403.jsp</location>
