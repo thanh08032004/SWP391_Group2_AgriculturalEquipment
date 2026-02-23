@@ -14,7 +14,6 @@
         </header>
 
         <div class="admin-layout">
-            <jsp:include page="/common/side-bar.jsp"/>
 
             <div class="admin-content">
                 <div class="container mt-5 mb-5">
@@ -25,7 +24,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
 
                         <form method="get"
-                              action="${pageContext.request.contextPath}/admin-business/invoicelist"
+                              action="${pageContext.request.contextPath}/customer/invoice-list"
                               class="d-flex justify-content-between align-items-center mb-4">
 
                             <div class="d-flex gap-3">
@@ -54,11 +53,6 @@
                                 Search
                             </button>
                         </form>
-
-                        <a href="${pageContext.request.contextPath}/admin-business/addinvoice"
-                           class="btn btn-outline-primary fw-bold">
-                            + Add new Invoice
-                        </a>
                     </div>
 
                     <!-- Table -->
@@ -97,23 +91,10 @@
                                     </td>
 
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/admin-business/invoicedetail?id=${i.id}"
+                                        <a href="${pageContext.request.contextPath}/customer/invoicedetail?id=${i.id}"
                                            class="btn btn-sm btn-primary">
                                             Detail
                                         </a>
-                                        <form action="${pageContext.request.contextPath}/admin-business/deleteinvoice"
-                                              method="post"
-                                              style="display:inline"
-                                              onsubmit="return confirm('Are you sure you want to delete this invoice?')">
-
-                                            <input type="hidden" name="id" value="${i.id}"/>
-
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-outline-danger">
-                                                Delete
-                                            </button>
-                                        </form>
-
                                     </td>
                                 </tr>
                             </c:forEach>

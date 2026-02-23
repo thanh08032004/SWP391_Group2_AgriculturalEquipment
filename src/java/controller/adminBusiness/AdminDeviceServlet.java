@@ -140,60 +140,77 @@ public class AdminDeviceServlet extends HttpServlet {
 
         String action = request.getParameter("action");
         DeviceDAO deviceDAO = new DeviceDAO();
-
+        boolean hasError = false;
         if ("create".equals(action)) {
-
             DeviceDTO d = new DeviceDTO();
 
             String serial = request.getParameter("serialNumber");
-            if (deviceDAO.isSerialExists(serial)) {
+            if (serial == null || serial.trim().isEmpty()) {
+                request.setAttribute("errorSerial", "Serial không được để trống");
+                hasError = true;
+            } else if (deviceDAO.isSerialExists(serial)) {
                 request.setAttribute("errorSerial", "Serial number không được trùng nhau");
+                hasError = true;
             }
             d.setSerialNumber(serial);
             d.setMachineName(request.getParameter("machineName"));
             d.setModel(request.getParameter("model"));
             String priceStr = request.getParameter("price");
-            BigDecimal price = new BigDecimal("0.00");
-            if (priceStr != null && !priceStr.trim().isEmpty()) {
-                try {
+            BigDecimal price = new BigDecimal("0");
+            try {
+                if (priceStr != null && !priceStr.trim().isEmpty()) {
                     price = new BigDecimal(priceStr);
-                } catch (NumberFormatException e) {
-                    request.setAttribute("errorPrice", "Price must be number");
-
+                    if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                        request.setAttribute("errorPrice", "Price phải > 0");
+                        hasError = true;
+                    }
+                }else if (price.compareTo(BigDecimal.ZERO) == 0) {
+                    request.setAttribute("errorPrice", "Price không được để trống");
+                    hasError = true;
                 }
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorPrice", "Price phải là số");
+                hasError = true;
             }
             d.setPrice(price);
             Integer customerId = null;
+            String customerIdRaw = request.getParameter("customerId");
+
             try {
-                customerId = Integer.parseInt(request.getParameter("customerId"));
+                customerId = Integer.parseInt(customerIdRaw);
+
+                // check exist in DB
+                if (!deviceDAO.isCustomerExists(customerId)) {
+                    request.setAttribute("errorCustomerId", "Customer ID không tồn tại");
+                    hasError = true;
+                }
 
             } catch (NumberFormatException e) {
-                request.setAttribute("errorCustomerId", "ID của khách hàng không được nhập chữ");
+                request.setAttribute("errorCustomerId", "Customer ID phải là số");
+                hasError = true;
             }
 
             d.setCustomerId(customerId);
             d.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             d.setBrandId(Integer.parseInt(request.getParameter("brandId")));
 
-            String purchaseStr = request.getParameter("purchaseDate");
-            String warrantyStr = request.getParameter("warrantyEndDate");
-
-            if (purchaseStr != null && warrantyStr != null
-                    && !purchaseStr.isEmpty() && !warrantyStr.isEmpty()) {
-
-                Date purchaseDate = Date.valueOf(purchaseStr);
-                Date warrantyDate = Date.valueOf(warrantyStr);
+            try {
+                Date purchaseDate = Date.valueOf(request.getParameter("purchaseDate"));
+                Date warrantyDate = Date.valueOf(request.getParameter("warrantyEndDate"));
 
                 if (purchaseDate.after(warrantyDate)) {
-                    request.setAttribute(
-                            "errorDate",
-                            "Purchase date phải sớm hơn Warranty end date"
-                    );
+                    request.setAttribute("errorDate",
+                            "Purchase date phải trước Warranty end date");
+                    hasError = true;
                 }
-            }
 
-            d.setPurchaseDate(Date.valueOf(request.getParameter("purchaseDate")));
-            d.setWarrantyEndDate(Date.valueOf(request.getParameter("warrantyEndDate")));
+                d.setPurchaseDate(purchaseDate);
+                d.setWarrantyEndDate(warrantyDate);
+
+            } catch (Exception e) {
+                request.setAttribute("errorDate", "Ngày không hợp lệ");
+                hasError = true;
+            }
 
             d.setStatus("ACTIVE");
             Part filePart = request.getPart("image");
@@ -211,17 +228,12 @@ public class AdminDeviceServlet extends HttpServlet {
                 filePart.write(uploadPath + File.separator + fileName);
             }
             d.setImage(fileName);
-
-            boolean success = deviceDAO.createDevice(d);
-
-            if (success) {
-                response.sendRedirect("devices?action=list");
-            } else {
-                request.setAttribute("error", "Create device failed!");
+            if (hasError) {
                 request.setAttribute("serialNumber", request.getParameter("serialNumber"));
                 request.setAttribute("machineName", request.getParameter("machineName"));
                 request.setAttribute("model", request.getParameter("model"));
                 request.setAttribute("customerId", request.getParameter("customerId"));
+                request.setAttribute("price", request.getParameter("price"));
                 request.setAttribute("categoryId", request.getParameter("categoryId"));
                 request.setAttribute("brandId", request.getParameter("brandId"));
                 request.setAttribute("purchaseDate", request.getParameter("purchaseDate"));
@@ -230,7 +242,14 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.setAttribute("brands", deviceDAO.getAllBrands());
 
                 request.getRequestDispatcher("/views/AdminBusinessView/device-add.jsp").forward(request, response);
+                return;
             }
+
+            boolean success = deviceDAO.createDevice(d);
+
+            if (success) 
+                response.sendRedirect("devices?action=list");
+         
         } else if ("update".equals(action)) {
 
             DeviceDTO d = new DeviceDTO();

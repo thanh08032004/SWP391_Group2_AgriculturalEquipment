@@ -31,10 +31,10 @@
                 <li><a href="${pageContext.request.contextPath}/admin-business/reports">Reports</a></li>
 
             </c:when>
-            <c:when test="${sessionScope.userRole == 'STAFF'}">
-                <li><a href="${pageContext.request.contextPath}/staff/tasks">Tasks</a></li>
-                <li><a href="${pageContext.request.contextPath}/staff/inventory">Inventory</a></li>
-                <li><a href="${pageContext.request.contextPath}/staff/service-logs">Service Logs</a></li>
+            <c:when test="${sessionScope.userRole == 'TECHNICIAN'}">
+                <li><a href="${pageContext.request.contextPath}/technician/maintenance">Maintenance List</a></li>
+                <li><a href="${pageContext.request.contextPath}/technician/mytask">My Task</a></li>
+                <li><a href="${pageContext.request.contextPath}/technician/maintenance">Service Logs</a></li>
                 </c:when>
 
         </c:choose>

@@ -37,7 +37,7 @@
 
                             <form class="row g-2 mb-3"
                                   method="get"
-                                  action="${pageContext.request.contextPath}/admin-business/vouchers">
+                                  action="${pageContext.request.contextPath}/admin-business/vouchers">   
 
                                 <div class="col-md-4">
                                     <input type="text"
@@ -128,12 +128,14 @@
                                                 <!-- Edit -->
                                                 <a class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center"
                                                    title="Edit"
-                                                   href="${pageContext.request.contextPath}/admin-business/vouchers?action=edit&id=${v.id} " style="width: 30px;  height: 30px; line-height: 30px; padding: 0; margin: 3px">
+                                                   href="${pageContext.request.contextPath}/admin-business/vouchers?action=edit&id=${v.id}&page=${currentPage}&keyword=${keyword}" 
+                                                   style="width: 30px;  height: 30px; line-height: 30px; padding: 0; margin: 3px">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
 
                                                 <!-- Delete -->
-                                                <a href="${pageContext.request.contextPath}/admin-business/vouchers?action=delete&id=${v.id}&page=${currentPage}&keyword=${keyword} " style="width: 32px;  height: 30px; line-height: 30px; padding: 0; margin: 3px"
+                                                <a href="${pageContext.request.contextPath}/admin-business/vouchers?action=delete&id=${v.id}&page=${currentPage}&keyword=${keyword} "
+                                                   style="width: 32px;  height: 30px; line-height: 30px; padding: 0; margin: 3px"
                                                    class="btn btn-outline-danger d-flex align-items-center justify-content-center"
                                                    onclick="return confirm('Delete this voucher?')">
                                                     <i class="bi bi-trash"></i>

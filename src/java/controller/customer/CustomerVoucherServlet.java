@@ -37,7 +37,8 @@ public class CustomerVoucherServlet extends HttpServlet {
 
         HttpSession session = req.getSession();
 
-        CustomerVoucher c = (CustomerVoucher) session.getAttribute("customer");
+        //mới đổi từ customer sang user để check
+        CustomerVoucher c = (CustomerVoucher) session.getAttribute("user");
         int customerId = c.getCustomerId();
 
         double totalServicePrice

@@ -164,7 +164,7 @@
     </div>
 
     <div class="text-end mt-3">
-        <a href="${pageContext.request.contextPath}/admin-business/invoicelist"
+        <a href="${pageContext.request.contextPath}/customer/invoicelist"
            class="btn btn-secondary">
             Back to Invoice List
         </a>

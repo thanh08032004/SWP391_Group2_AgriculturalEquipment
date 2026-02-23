@@ -1,5 +1,7 @@
 package controller.adminBusiness;
 import dal.InvoiceDAO;
+import dto.InvoiceDetailDTO;
+import dto.SparePartDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -9,9 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
-import model.Invoice;
 
-public class AdminInvoiceServlet extends HttpServlet {
+public class AdminDetailInvoiceServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -20,44 +21,34 @@ public class AdminInvoiceServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AdminInvoiceServlet</title>");  
+            out.println("<title>Servlet AdminDetailInvoiceServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AdminInvoiceServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet AdminDetailInvoiceServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
     } 
 
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+
     @Override
- protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-          String keyword = request.getParameter("keyword");
-        String filter = request.getParameter("filter");
-
-        int page = 1;
-        int pageSize = 5;
-
-        if (request.getParameter("page") != null) {
-            page = Integer.parseInt(request.getParameter("page"));
-        }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+           int invoiceId = Integer.parseInt(request.getParameter("id"));
 
         InvoiceDAO dao = new InvoiceDAO();
 
-        List<Invoice> ListI = dao.searchFilterInvoice(
-                keyword, filter, page, pageSize);
+        InvoiceDetailDTO invoice = dao.getInvoiceDetailById(invoiceId);
+        List<SparePartDTO> spareParts = dao.getSparePartsByInvoiceId(invoiceId);
 
-        int totalRecords = dao.countInvoice(keyword, filter);
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+        request.setAttribute("invoice", invoice);
+        request.setAttribute("spareParts", spareParts);
 
-        request.setAttribute("ListI", ListI);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
+        request.getRequestDispatcher("/views/AdminBusinessView/invoice-detail.jsp")
+               .forward(request, response);
+    } 
 
-        request.getRequestDispatcher("/views/AdminBusinessView/invoice-list.jsp")
-                .forward(request, response);
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

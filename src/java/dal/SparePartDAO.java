@@ -2,7 +2,9 @@ package dal;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.SparePart;
 
 public class SparePartDAO extends DBContext {
@@ -139,4 +141,104 @@ public class SparePartDAO extends DBContext {
         } catch (Exception e) { e.printStackTrace(); }
         return false;
     }
+    
+    public List<Map<String, Object>> getAvailableParts() {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = """
+            SELECT sp.id, sp.name, sp.price, i.quantity
+            FROM spare_part sp
+            JOIN inventory i ON sp.id = i.spare_part_id
+            WHERE i.quantity > 0
+        """;
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> m = new HashMap<>();
+                m.put("id", rs.getInt("id"));
+                m.put("name", rs.getString("name"));
+                m.put("price", rs.getBigDecimal("price"));
+                m.put("quantity", rs.getInt("quantity"));
+                list.add(m);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+     public List<SparePart> getSparePartsByDevice(int maintenanceId) {
+    List<SparePart> list = new ArrayList<>();
+
+    String sql = """
+        SELECT 
+            sp.id,
+            sp.part_code,
+            sp.name,
+            sp.description,
+            sp.unit,
+            sp.price,
+            sp.imageUrl
+        FROM spare_part sp
+        JOIN device_spare_part dsp 
+            ON sp.id = dsp.spare_part_id 
+            JOIN maintenance m on m.device_id = dsp.device_id
+            where m.id = ?;
+    """;
+
+    try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, maintenanceId);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            SparePart sp = new SparePart();
+            sp.setId(rs.getInt("id"));
+            sp.setPartCode(rs.getString("part_code"));
+            sp.setName(rs.getString("name"));
+            sp.setDescription(rs.getString("description"));
+            sp.setUnit(rs.getString("unit"));
+            sp.setPrice(rs.getBigDecimal("price"));
+            sp.setImageUrl(rs.getString("imageUrl"));
+
+            list.add(sp);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+     
+     public List<SparePart> getSparePartByDeviceId(int deviceId) {
+    List<SparePart> list = new ArrayList<>();
+
+    String sql = """
+        SELECT sp.*
+        FROM spare_part sp
+        JOIN device_spare_part dsp ON sp.id = dsp.spare_part_id
+        WHERE dsp.device_id = ?
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, deviceId);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            SparePart sp = new SparePart();
+            sp.setId(rs.getInt("id"));
+            sp.setName(rs.getString("name"));
+            sp.setUnit(rs.getString("unit"));
+            sp.setPrice(rs.getBigDecimal("price"));
+            list.add(sp);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
 }

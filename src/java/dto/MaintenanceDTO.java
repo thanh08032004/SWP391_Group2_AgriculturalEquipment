@@ -4,24 +4,26 @@
  */
 package dto;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MaintenanceDTO {
 
-    private int id;
+     private int id;
+    private int deviceId;
+    private Integer technicianId;
+    private String status;
+    private String description;
+    private Date startDate;
+    private Date endDate;
+
+    
     private String customerName;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
+    private String machineName;
+    private String serialNumber;
 }

@@ -23,12 +23,7 @@
                                 <form action="${pageContext.request.contextPath}/admin-business/devices?action=create"
                                   method="post" enctype="multipart/form-data">
 
-                                <!-- ERROR -->
-                                <c:if test="${not empty error}">
-                                    <p class="text-danger small mb-2">
-                                        <b>${error}</b>
-                                    </p>
-                                </c:if>
+                                
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">
                                         DEVICE IMAGE
@@ -169,3 +164,5 @@
 
                             </form>
                         </div>
+                                    <jsp:include page="/common/scripts.jsp"></jsp:include>
+                             

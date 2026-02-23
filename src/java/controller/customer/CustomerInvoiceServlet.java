@@ -1,4 +1,4 @@
-package controller.adminBusiness;
+package controller.customer;
 import dal.InvoiceDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -10,8 +10,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Invoice;
+import model.User;
 
-public class AdminInvoiceServlet extends HttpServlet {
+public class CustomerInvoiceServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -20,44 +21,48 @@ public class AdminInvoiceServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AdminInvoiceServlet</title>");  
+            out.println("<title>Servlet CustomerInvoiceServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AdminInvoiceServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet CustomerInvoiceServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
     } 
 
-    @Override
- protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
 
-          String keyword = request.getParameter("keyword");
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+          HttpSession session = request.getSession(false);
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        String keyword = request.getParameter("keyword");
         String filter = request.getParameter("filter");
 
         int page = 1;
         int pageSize = 5;
-
         if (request.getParameter("page") != null) {
             page = Integer.parseInt(request.getParameter("page"));
         }
 
         InvoiceDAO dao = new InvoiceDAO();
+        List<Invoice> list = dao.getInvoicesByCustomer(
+                user.getId(), keyword, filter, page, pageSize
+        );
 
-        List<Invoice> ListI = dao.searchFilterInvoice(
-                keyword, filter, page, pageSize);
-
-        int totalRecords = dao.countInvoice(keyword, filter);
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-
-        request.setAttribute("ListI", ListI);
+        request.setAttribute("ListI", list);
         request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-
-        request.getRequestDispatcher("/views/AdminBusinessView/invoice-list.jsp")
+        request.getRequestDispatcher("/views/CustomerView/customer-invoicelist.jsp")
                 .forward(request, response);
-    }
+    } 
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

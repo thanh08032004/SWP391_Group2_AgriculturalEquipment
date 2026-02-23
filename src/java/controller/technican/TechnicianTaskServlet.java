@@ -3,20 +3,23 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package controller;
+package controller.technican;
 
+import dal.MaintenanceDAO;
+import dal.SparePartDAO;
+import java.io.IOException;
+import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import model.User;
 
 /**
  *
- * @author FPT
+ * @author LOQ
  */
-public class HomeServlet extends HttpServlet {
+public class TechnicianTaskServlet extends HttpServlet {
    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -33,10 +36,10 @@ public class HomeServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet HomeServlet</title>");  
+            out.println("<title>Servlet TechnicianTaskServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet HomeServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet TechnicianTaskServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -50,23 +53,38 @@ public class HomeServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    private final MaintenanceDAO dao = new MaintenanceDAO();
+    private final SparePartDAO spDao = new SparePartDAO();
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        request.getRequestDispatcher("views/home.jsp").forward(request, response);
-    } 
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+        String action = req.getParameter("action");
+        SparePartDAO spDao = new SparePartDAO();
+        User user = (User) req.getSession().getAttribute("user");
+        int technicianId = user.getId();
+
+        if (action == null || action.isEmpty()) {
+            action = "list";
+        }
+        
+        if ("list".equals(action)) {
+        req.setAttribute("list", dao.getMyTasks(technicianId));
+        req.getRequestDispatcher("/views/technicianView/my-tasks.jsp").forward(req, resp);
+    }
+    }
+
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        String action = req.getParameter("action");
+
+        if ("submit".equals(action)) {
+            int id = Integer.parseInt(req.getParameter("id"));
+            dao.submitToAdmin(id);
+            resp.sendRedirect("maintenance?action=list");
+        }
     }
 
     /** 

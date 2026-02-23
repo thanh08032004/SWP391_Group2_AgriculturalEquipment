@@ -32,7 +32,7 @@
                         <h2 class="page-title">Login</h2>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="${pageContext.request.contextPath}/home">Home</a>
+                                <a href="${pageContext.request.contextPath}/customer/home">Home</a>
                             </li>
                             <li class="breadcrumb-item">
                                 <a href="#">Account</a>
