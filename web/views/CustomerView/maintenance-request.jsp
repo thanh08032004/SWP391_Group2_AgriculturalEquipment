@@ -11,7 +11,9 @@
             <div class="card shadow-sm border-0 mx-auto" style="max-width: 600px;">
                 <div class="card-header bg-secondary text-white fw-bold">Add Maintenance Request</div>
                 <div class="card-body p-4">
-                    <form action="${pageContext.request.contextPath}/customer/maintenance" method="post">
+                    <form action="${pageContext.request.contextPath}/customer/maintenance" 
+                      method="post" 
+                      enctype="multipart/form-data">
                     <input type="hidden" name="deviceId" value="${device.id}">
                     <div class="mb-3 row">
                         <label class="col-sm-4 fw-bold">Machine Name</label>

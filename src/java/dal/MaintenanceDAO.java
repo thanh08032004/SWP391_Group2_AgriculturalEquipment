@@ -7,18 +7,19 @@ import model.Maintenance;
 
 public class MaintenanceDAO extends DBContext {
 
-    public boolean createMaintenanceRequest(int deviceId, String description) {
-        String sql = "INSERT INTO maintenance (device_id, description, status, start_date, technician_id) "
-                + "VALUES (?, ?, 'PENDING', CURDATE(), NULL)";
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, deviceId);
-            ps.setString(2, description);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+   public boolean createMaintenanceRequest(int deviceId, String description, String image) {
+    String sql = "INSERT INTO maintenance (device_id, description, image, status, start_date) "
+               + "VALUES (?, ?, ?, 'PENDING', CURDATE())";
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, deviceId);
+        ps.setString(2, description);
+        ps.setString(3, image); // Lưu tên file vào DB
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return false;
+}
 
     public List<Maintenance> searchMaintenanceRequests(String customerName, String status) {
         List<Maintenance> list = new ArrayList<>();
@@ -358,36 +359,33 @@ public class MaintenanceDAO extends DBContext {
         return null;
     }
     // Task: Admin & Customer view device status/diagnostic info
-    public Maintenance getMaintenanceById(int id) {
-        String sql = """
-            SELECT m.*, d.machine_name, d.model, 
-                   up.fullname AS customer_name
-            FROM maintenance m
-            JOIN device d ON m.device_id = d.id
-            JOIN user_profile up ON d.customer_id = up.user_id
-            WHERE m.id = ?
-        """;
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                // Sử dụng Builder từ lớp Maintenance
-                return Maintenance.builder()
-                        .id(rs.getInt("id"))
-                        .deviceId(rs.getInt("device_id"))
-                        .technicianId(rs.getInt("technician_id"))
-                        .description(rs.getString("description")) // Diagnostic info
-                        .status(rs.getString("status"))           // Device/Task status
-                        .startDate(rs.getDate("start_date"))
-                        .endDate(rs.getDate("end_date"))
-                        .machineName(rs.getString("machine_name"))
-                        .modelName(rs.getString("model"))
-                        .customerName(rs.getString("customer_name"))
-                        .build();
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return null;
-    }
+  public Maintenance getMaintenanceById(int id) {
+    String sql = "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name " +
+                 "FROM maintenance m " +
+                 "JOIN device d ON m.device_id = d.id " +
+                 "JOIN user_profile up ON d.customer_id = up.user_id " +
+                 "WHERE m.id = ?";
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return Maintenance.builder()
+                .id(rs.getInt("id"))
+                .deviceId(rs.getInt("device_id"))
+                .technicianId(rs.getInt("technician_id"))
+                .description(rs.getString("description"))
+                .status(rs.getString("status"))
+                .startDate(rs.getDate("start_date"))
+                .endDate(rs.getDate("end_date"))
+                .image(rs.getString("image")) // Retrieve the image path
+                .machineName(rs.getString("machine_name"))
+                .modelName(rs.getString("model"))
+                .customerName(rs.getString("customer_name"))
+                .build();
+        }
+    } catch (SQLException e) { e.printStackTrace(); }
+    return null;
+}
     
     
 

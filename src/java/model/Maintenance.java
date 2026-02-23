@@ -15,7 +15,7 @@ public class Maintenance {
     private String status; // PENDING, IN_PROGRESS, DONE, CANCELED
     private Date startDate;
     private Date endDate;
-
+    private String image;
     //join field
     private String machineName;
     private String modelName;

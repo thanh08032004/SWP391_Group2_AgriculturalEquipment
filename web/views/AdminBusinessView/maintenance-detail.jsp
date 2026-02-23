@@ -41,16 +41,34 @@
 
                 <div class="col-md-8">
                     <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-white fw-bold text-primary">Stage 1: Initial Request (by Customer)</div>
+                        <div class="card-header bg-white fw-bold text-primary">Initial Request</div>
                         <div class="card-body">
-                            <p class="mb-0 text-dark">${task.description}</p>
-                            <small class="text-muted">Submitted on: ${task.startDate}</small>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <p class="fw-bold mb-1 small text-muted">Problem Description:</p>
+                                    <p class="text-dark">${task.description}</p>
+                                    <small class="text-muted">Submitted on: ${task.startDate}</small>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <p class="fw-bold mb-1 small text-muted">Attached Image:</p>
+                                    <c:choose>
+                                        <c:when test="${not empty task.image}">
+                                            <img src="${pageContext.request.contextPath}/assets/images/maintenance/${task.image}" 
+                                                 alt="Customer Upload" class="img-thumbnail shadow-sm" style="max-width: 150px; cursor: pointer;"
+                                                 onclick="window.open(this.src)">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="py-3 px-2 bg-light border rounded text-muted small italic text-center">No image attached</div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <c:if test="${task.status != 'PENDING'}">
                         <div class="card border-0 shadow-sm mb-4 border-start border-warning border-4">
-                            <div class="card-header bg-white fw-bold text-warning">Stage 2: Diagnosis (by Staff)</div>
+                            <div class="card-header bg-white fw-bold text-warning">Diagnosis</div>
                             <div class="card-body">
                                 <p class="text-dark">
                                     <c:out value="${not empty task.description ? task.description : 'Awaiting technician diagnosis...'}" />
@@ -82,7 +100,7 @@
 
                     <c:if test="${task.status == 'DONE' || task.status == 'TECHNICIAN_SUBMITTED'}">
                         <div class="card border-0 shadow-sm mb-4 border-start border-success border-4">
-                            <div class="card-header bg-white fw-bold text-success">Stage 3: Final Status (by Staff)</div>
+                            <div class="card-header bg-white fw-bold text-success">Final Status</div>
                             <div class="card-body">
                                 <p class="mb-1">Execution Status: <strong>${task.status}</strong></p>
                                 <c:if test="${not empty task.endDate}">
