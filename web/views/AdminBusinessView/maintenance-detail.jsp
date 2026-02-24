@@ -31,9 +31,12 @@
                             <p class="mb-1 text-muted small mt-3">Current Status</p>
                             <c:choose>
                                 <c:when test="${task.status == 'PENDING'}"><span class="badge bg-warning text-dark">New Request</span></c:when>
-                                <c:when test="${task.status == 'IN_PROGRESS'}"><span class="badge bg-info">In Progress</span></c:when>
+                                <c:when test="${task.status == 'WAITING_FOR_TECHNICIAN'}"><span class="badge bg-secondary">Awaiting Technician</span></c:when>
+                                <c:when test="${task.status == 'TECHNICIAN_ACCEPTED'}"><span class="badge bg-info">Technician Accepted</span></c:when>
+                                <c:when test="${task.status == 'DIAGNOSIS READY'}"><span class="badge bg-primary">Diagnosis Ready</span></c:when>
+                                <c:when test="${task.status == 'IN_PROGRESS'}"><span class="badge bg-dark">Repairing</span></c:when>
                                 <c:when test="${task.status == 'DONE'}"><span class="badge bg-success">Completed</span></c:when>
-                                <c:otherwise><span class="badge bg-secondary">${task.status}</span></c:otherwise>
+                                <c:otherwise><span class="badge bg-light text-dark border">${task.status}</span></c:otherwise>
                             </c:choose>
                         </div>
                     </div>
@@ -45,20 +48,20 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-8">
-                                    <p class="fw-bold mb-1 small text-muted">Problem Description:</p>
+                                    <p class="fw-bold mb-1 small text-muted text-uppercase">Problem Description:</p>
                                     <p class="text-dark">${task.description}</p>
                                     <small class="text-muted">Submitted on: ${task.startDate}</small>
                                 </div>
                                 <div class="col-md-4 text-end">
-                                    <p class="fw-bold mb-1 small text-muted">Attached Image:</p>
+                                    <p class="fw-bold mb-1 small text-muted text-uppercase">Attached Image:</p>
                                     <c:choose>
                                         <c:when test="${not empty task.image}">
                                             <img src="${pageContext.request.contextPath}/assets/images/maintenance/${task.image}" 
-                                                 alt="Customer Upload" class="img-thumbnail shadow-sm" style="max-width: 150px; cursor: pointer;"
+                                                 alt="Customer Upload" class="img-thumbnail shadow-sm" style="max-width: 100%; cursor: pointer;"
                                                  onclick="window.open(this.src)">
                                         </c:when>
                                         <c:otherwise>
-                                            <div class="py-3 px-2 bg-light border rounded text-muted small italic text-center">No image attached</div>
+                                            <div class="py-4 bg-light border rounded text-muted small italic text-center">No image attached</div>
                                         </c:otherwise>
                                     </c:choose>
                                 </div>
@@ -66,15 +69,16 @@
                         </div>
                     </div>
 
-                    <c:if test="${task.status != 'PENDING'}">
+                    <c:if test="${task.status != 'PENDING' && task.status != 'READY' && task.status != 'WAITING_FOR_TECHNICIAN'}">
                         <div class="card border-0 shadow-sm mb-4 border-start border-warning border-4">
-                            <div class="card-header bg-white fw-bold text-warning">Diagnosis</div>
+                            <div class="card-header bg-white fw-bold text-warning">Diagnosis Ready</div>
                             <div class="card-body">
+                                <h6 class="fw-bold small text-uppercase mb-2">Technician Notes:</h6>
                                 <p class="text-dark">
-                                    <c:out value="${not empty task.description ? task.description : 'Awaiting technician diagnosis...'}" />
+                                    <c:out value="${not empty task.description ? task.description : 'Awaiting diagnostic report...'}" />
                                 </p>
                                 
-                                <h6 class="mt-4 fw-bold small">Proposed Spare Parts:</h6>
+                                <h6 class="mt-4 fw-bold small text-uppercase">Proposed Spare Parts:</h6>
                                 <table class="table table-sm table-bordered mt-2">
                                     <thead class="table-light">
                                         <tr>
@@ -85,42 +89,32 @@
                                     <tbody>
                                         <c:forEach var="item" items="${items}">
                                             <tr>
+                                                <%-- Khớp với key 'name' trong Map của MaintenanceDAO --%>
                                                 <td>${item.name}</td>
                                                 <td class="text-center">x${item.quantity}</td>
                                             </tr>
                                         </c:forEach>
                                         <c:if test="${empty items}">
-                                            <tr><td colspan="2" class="text-center text-muted italic">No parts added yet.</td></tr>
+                                            <tr><td colspan="2" class="text-center text-muted italic py-3">No spare parts suggested by technician.</td></tr>
                                         </c:if>
                                     </tbody>
                                 </table>
+                                <%-- Đã loại bỏ khung Decision Required (Approve/Reject) tại đây --%>
                             </div>
                         </div>
                     </c:if>
 
-                    <c:if test="${task.status == 'DONE' || task.status == 'TECHNICIAN_SUBMITTED'}">
+                    <c:if test="${task.status == 'IN_PROGRESS' || task.status == 'DONE'}">
                         <div class="card border-0 shadow-sm mb-4 border-start border-success border-4">
-                            <div class="card-header bg-white fw-bold text-success">Final Status</div>
+                            <div class="card-header bg-white fw-bold text-success">Repairing & Completion</div>
                             <div class="card-body">
-                                <p class="mb-1">Execution Status: <strong>${task.status}</strong></p>
+                                <p class="mb-1">Current Execution Status: 
+                                    <strong class="text-uppercase">${task.status == 'IN_PROGRESS' ? 'Under Repair' : 'Work Completed'}</strong>
+                                </p>
                                 <c:if test="${not empty task.endDate}">
                                     <p class="mb-0">Completion Date: <strong>${task.endDate}</strong></p>
                                 </c:if>
                             </div>
-                        </div>
-                    </c:if>
-
-                    <c:if test="${task.status == 'TECHNICIAN_SUBMITTED'}">
-                        <div class="alert alert-primary d-flex justify-content-between align-items-center shadow-sm">
-                            <div>
-                                <h6 class="fw-bold mb-1">Diagnosis Approval Required</h6>
-                                <p class="small mb-0">The technician has submitted the diagnosis. Would you like to notify the customer?</p>
-                            </div>
-                            <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="post">
-                                <input type="hidden" name="action" value="approve-diagnosis">
-                                <input type="hidden" name="id" value="${task.id}">
-                                <button type="submit" class="btn btn-primary fw-bold px-4">Approve & Notify</button>
-                            </form>
                         </div>
                     </c:if>
                 </div>

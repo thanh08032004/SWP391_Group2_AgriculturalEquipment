@@ -1,11 +1,11 @@
 package controller.customer;
 
 import dal.DeviceDAO;
-import dto.DeviceDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import model.User;
 
 public class CustomerDeviceServlet extends HttpServlet {
@@ -22,16 +22,11 @@ public class CustomerDeviceServlet extends HttpServlet {
             return;
         }
 
-        // FIX: Lấy tên thật của khách hàng đang đăng nhập từ session
-        String currentCustomerName = (String) session.getAttribute("userFullname");
-        if (currentCustomerName == null) currentCustomerName = ""; 
-
         DeviceDAO dao = new DeviceDAO();
-        // Lọc thiết bị dựa trên tên khách hàng hiện tại
-        List<DeviceDTO> myDevices = dao.searchAndFilterPaging("", currentCustomerName, "", "", "", 1, 100);
+        List<Map<String, Object>> myDevices = dao.getDevicesByCustomerCustom(user.getId());
         
         request.setAttribute("deviceList", myDevices);
-        // FIX 404: Đường dẫn tuyệt đối từ gốc Web Pages
+        
         request.getRequestDispatcher("/views/CustomerView/my-devices.jsp").forward(request, response);
     }
 }

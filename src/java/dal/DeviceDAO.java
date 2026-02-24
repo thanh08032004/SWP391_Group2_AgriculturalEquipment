@@ -373,5 +373,39 @@ public class DeviceDAO extends DBContext {
     }
     return false;
 }
-
+    
+  public List<Map<String, Object>> getDevicesByCustomerCustom(int customerId) {
+    List<Map<String, Object>> list = new ArrayList<>();
+    String sql = "SELECT d.*, " +
+                 "(SELECT m.id FROM maintenance m " +
+                 " WHERE m.device_id = d.id AND m.status = 'DIAGNOSIS READY' " +
+                 " ORDER BY m.id DESC LIMIT 1) as current_maintenance_id " +
+                 "FROM device d WHERE d.customer_id = ?";
+                 
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, customerId);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", rs.getInt("id"));
+            map.put("serialNumber", rs.getString("serial_number"));
+            map.put("machineName", rs.getString("machine_name"));
+            map.put("model", rs.getString("model"));
+            map.put("status", rs.getString("status"));
+            map.put("image", rs.getString("image"));
+            
+            int mId = rs.getInt("current_maintenance_id");
+            if (rs.wasNull()) {
+                map.put("currentMaintenanceId", 0);
+            } else {
+                map.put("currentMaintenanceId", mId);
+            }
+            
+            list.add(map);
+        }
+    } catch (SQLException e) { 
+        e.printStackTrace(); 
+    }
+    return list;
+}
 }

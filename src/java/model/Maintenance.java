@@ -8,16 +8,17 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Maintenance {
-  private int id;
+    private int id;
     private int deviceId;
-    private int technicianId; //null avaiable when init
+    private int technicianId;
     private String description;
-    private String status; // PENDING, IN_PROGRESS, DONE, CANCELED
+    private String status; // PENDING, WAITING_FOR_TECHNICIAN, TECHNICIAN_ACCEPTED, DIAGNOSIS READY, IN_PROGRESS, DONE, READY
     private Date startDate;
     private Date endDate;
     private String image;
-    //join field
+    // Join fields
     private String machineName;
     private String modelName;
     private String customerName;
+    private int currentMaintenanceId;
 }

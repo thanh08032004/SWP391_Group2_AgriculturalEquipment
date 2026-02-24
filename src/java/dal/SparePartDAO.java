@@ -11,7 +11,8 @@ public class SparePartDAO extends DBContext {
 
     public List<SparePart> findAllSpareParts(String keyword) {
         List<SparePart> list = new ArrayList<>();
-        String sql = "SELECT sp.*, inv.quantity FROM spare_part sp "
+        String sql = "SELECT sp.*, inv.quantity"
+                   + " FROM spare_part sp "
                    + "LEFT JOIN inventory inv ON sp.id = inv.spare_part_id "
                    + "WHERE sp.name LIKE ? OR sp.part_code LIKE ? ORDER BY sp.id DESC";
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -27,7 +28,9 @@ public class SparePartDAO extends DBContext {
     }
 
     public boolean insertNewSparePart(SparePart sp) {
-        String sql = "INSERT INTO spare_part(part_code, name, description, unit, price, image) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO spare_part"
+                + "(part_code, name, description, unit, price, image)"
+                + " VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
             try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -41,9 +44,9 @@ public class SparePartDAO extends DBContext {
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     int spId = rs.getInt(1);
-                    // 1. Khởi tạo kho
+                    //init inventory
                     executeSimple(con, "INSERT INTO inventory(spare_part_id, quantity) VALUES (?, 0)", spId);
-                    // 2. Liên kết thiết bị cụ thể
+                    //link to spec device
                     saveDeviceLinks(con, spId, sp.getCompatibleDeviceIds());
                 }
                 con.commit();
@@ -54,7 +57,9 @@ public class SparePartDAO extends DBContext {
     }
 
     public boolean updateSparePartInfo(SparePart sp) {
-        String sql = "UPDATE spare_part SET name=?, description=?, unit=?, price=?, image=? WHERE id=?";
+        String sql = "UPDATE spare_part "
+                + "SET name=?, description=?, unit=?, price=?, image=? "
+                + "WHERE id=?";
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
             try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -211,7 +216,7 @@ public class SparePartDAO extends DBContext {
     return list;
 }
      
-     public List<SparePart> getSparePartByDeviceId(int deviceId) {
+    public List<SparePart> getSparePartByDeviceId(int deviceId) {
     List<SparePart> list = new ArrayList<>();
 
     String sql = """
