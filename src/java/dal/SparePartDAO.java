@@ -138,15 +138,32 @@ public class SparePartDAO extends DBContext {
                 .build();
     }
 
-    public boolean deleteSparePart(int id) {
-        String sql = "DELETE FROM spare_part WHERE id = ?";
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); }
-        return false;
-    }
+   public boolean deleteSparePart(int id) {
+    String checkSql = "SELECT quantity FROM inventory WHERE spare_part_id = ?";
+    String deleteSql = "DELETE FROM spare_part WHERE id = ?";
     
+    try (Connection con = getConnection()) {
+        try (PreparedStatement psCheck = con.prepareStatement(checkSql)) {
+            psCheck.setInt(1, id);
+            ResultSet rs = psCheck.executeQuery();
+            if (rs.next()) {
+                int quantity = rs.getInt("quantity");
+                if (quantity > 0) {
+                    return false; 
+                }
+            }
+        }
+
+        try (PreparedStatement psDelete = con.prepareStatement(deleteSql)) {
+            psDelete.setInt(1, id);
+            return psDelete.executeUpdate() > 0;
+        }
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
     public List<Map<String, Object>> getAvailableParts() {
         List<Map<String, Object>> list = new ArrayList<>();
         String sql = """

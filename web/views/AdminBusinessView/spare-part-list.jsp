@@ -4,16 +4,32 @@
 <html>
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
-        <title>Spare Management - AgriCMS</title>
-    </head>
-    <body class="bg-light">
-        <header><jsp:include page="/common/header.jsp"></jsp:include></header>
+            <title>Spare Management - AgriCMS</title>
+        </head>
+        <body class="bg-light">
+            <header><jsp:include page="/common/header.jsp"></jsp:include></header>
 
-        <div class="admin-layout d-flex">
+            <div class="admin-layout d-flex">
             <jsp:include page="/common/side-bar.jsp"></jsp:include>
-            <div class="admin-content p-4 w-100">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold">Spare Management</h2>
+                <div class="admin-content p-4 w-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold">Spare Management</h2>
+                        <!--delete message-->
+                    <c:if test="${param.msg == 'delete_fail_inventory'}">
+                        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Cannot delete!</strong> This component still has items in inventory. Please clear stock before deleting.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.msg == 'delete_success'}">
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            Component deleted successfully!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
                     <div class="d-flex gap-3">
                         <form action="spare-parts" method="get" class="d-flex gap-2">
                             <input type="hidden" name="action" value="list">
@@ -62,9 +78,25 @@
                                             </c:choose>
                                         </td>
                                         <td class="text-center">
-                                            <a href="spare-parts?action=edit&id=${p.id}" class="text-primary me-3"><i class="bi bi-pencil-square fs-5"></i></a>
-                                            <a href="spare-parts?action=delete&id=${p.id}" class="text-danger" 
-                                               onclick="return confirm('Delete this component?')"><i class="bi bi-trash3 fs-5"></i></a>
+                                            <a href="spare-parts?action=edit&id=${p.id}" class="text-primary me-3">
+                                                <i class="bi bi-pencil-square fs-5"></i>
+                                            </a>
+
+                                            <c:choose>
+                                                <c:when test="${p.quantity > 0}">
+                                                    <%-- neu con hang khong bam duoc xoa  --%>
+                                                    <span class="text-muted">
+                                                        <i class="bi bi-trash3 fs-5"></i>
+                                                    </span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <%-- neu het hang cho phep xoa --%>
+                                                    <a href="spare-parts?action=delete&id=${p.id}" class="text-danger" 
+                                                       onclick="return confirm('Are you sure you want to permanently delete this component?')">
+                                                        <i class="bi bi-trash3 fs-5"></i>
+                                                    </a>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </td>
                                     </tr>
                                 </c:forEach>

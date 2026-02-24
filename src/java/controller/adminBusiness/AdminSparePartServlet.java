@@ -39,8 +39,14 @@ public class AdminSparePartServlet extends HttpServlet {
                 request.getRequestDispatcher("/views/AdminBusinessView/spare-part-edit.jsp").forward(request, response);
                 break;
             case "delete":
-                dao.deleteSparePart(Integer.parseInt(request.getParameter("id")));
-                response.sendRedirect("spare-parts?action=list");
+                int deleteId = Integer.parseInt(request.getParameter("id"));
+                boolean isDeleted = dao.deleteSparePart(deleteId);
+                
+                if (isDeleted) {
+                    response.sendRedirect("spare-parts?action=list&msg=delete_success");
+                } else {
+                    response.sendRedirect("spare-parts?action=list&msg=delete_fail_inventory");
+                }
                 break;
         }
     }
