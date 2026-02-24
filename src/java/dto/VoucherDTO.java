@@ -5,23 +5,21 @@
 package dto;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MaintenanceDTO {
-
-     private int id;
-    private int deviceId;
-    private Integer technicianId;
-    private String status;
+public class VoucherDTO {
+    private int id;
+    private String code;
     private String description;
+    private String discountType;
+    private BigDecimal discountValue;
+    private BigDecimal minServicePrice;
     private Date startDate;
     private Date endDate;
-    private String customerName;
-    private String machineName;
-    private String serialNumber;
+    private boolean active;
 }
