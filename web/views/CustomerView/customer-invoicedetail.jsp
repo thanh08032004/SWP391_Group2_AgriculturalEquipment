@@ -98,6 +98,35 @@
                         </span>
                     </td>
                 </tr>
+                <c:if test="${invoice.paymentStatus eq 'UNPAID'}">
+<tr>
+    <th>Apply Voucher</th>
+    <td colspan="3">
+        <form method="post"
+              action="${pageContext.request.contextPath}/customer/invoicedetail">
+
+            <input type="hidden" name="invoiceId"
+                   value="${invoice.invoiceId}" />
+
+            <select name="voucherId" class="form-select">
+                <option value="">-- Select Voucher --</option>
+
+                <c:forEach var="v" items="${customerVouchers}">
+                    <option value="${v.id}">
+                        ${v.code}
+                        (-${v.discountValue}
+                        ${v.discountType})
+                    </option>
+                </c:forEach>
+            </select>
+
+            <button class="btn btn-success mt-2">
+                Apply
+            </button>
+        </form>
+    </td>
+</tr>
+</c:if>
 
                 <!-- ===== SPARE PART HEADER ===== -->
                 <tr>
@@ -164,7 +193,7 @@
     </div>
 
     <div class="text-end mt-3">
-        <a href="${pageContext.request.contextPath}/customer/invoicelist"
+        <a href="${pageContext.request.contextPath}/customer/invoice-list"
            class="btn btn-secondary">
             Back to Invoice List
         </a>
