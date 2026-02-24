@@ -3,6 +3,7 @@ package dal;
 import dto.InvoiceDetailDTO;
 import dto.MaintenanceDTO;
 import dto.SparePartDTO;
+import dto.VoucherDTO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -453,13 +454,7 @@ public int countInvoice(String keyword, String filter) {
 
     return total;
 }
-public List<Invoice> getInvoicesByCustomer(
-        int customerId,
-        String keyword,
-        String filter,
-        int page,
-        int pageSize
-) {
+public List<Invoice> getInvoicesByCustomer(int customerId, String keyword, String filter, int page, int pageSize) {
     List<Invoice> list = new ArrayList<>();
 
     StringBuilder sql = new StringBuilder("""
@@ -531,13 +526,133 @@ public List<Invoice> getInvoicesByCustomer(
 
     return list;
 }
+public InvoiceDetailDTO getInvoiceDetailByIdAndCustomer(int invoiceId, int customerId) {
+
+    String sql = """
+        SELECT i.*
+        FROM invoice i
+        JOIN maintenance m ON i.maintenance_id = m.id
+        JOIN device d ON m.device_id = d.id
+        WHERE i.id = ? AND d.customer_id = ?
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, invoiceId);
+        ps.setInt(2, customerId);
+
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return getInvoiceDetailById(invoiceId);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+public List<VoucherDTO> getAvailableVouchersByCustomer(int customerId) {
+
+    List<VoucherDTO> list = new ArrayList<>();
+
+    String sql = """
+        SELECT v.id, v.code, v.discount_value, v.discount_type
+        FROM customer_voucher cv
+        JOIN voucher v ON cv.voucher_id = v.id
+        WHERE cv.customer_id = ?
+        AND cv.is_used = FALSE
+        AND v.is_active = TRUE
+        AND CURDATE() BETWEEN v.start_date AND v.end_date
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, customerId);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            VoucherDTO v = new VoucherDTO();
+            v.setId(rs.getInt("id"));
+            v.setCode(rs.getString("code"));
+            v.setDiscountValue(rs.getBigDecimal("discount_value")); // ✅ sửa ở đây
+            v.setDiscountType(rs.getString("discount_type"));
+            list.add(v);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+public void applyVoucher(int invoiceId, int voucherId, int customerId) {
+
+    String updateInvoice = """
+        UPDATE invoice i
+        JOIN voucher v ON v.id = ?
+        SET i.voucher_id = v.id,
+            i.discount_amount =
+                CASE
+                    WHEN v.discount_type = 'PERCENT'
+                    THEN i.total_amount * v.discount_value / 100
+                    ELSE v.discount_value
+                END,
+            i.total_amount =
+                i.total_amount -
+                CASE
+                    WHEN v.discount_type = 'PERCENT'
+                    THEN i.total_amount * v.discount_value / 100
+                    ELSE v.discount_value
+                END
+        WHERE i.id = ?
+    """;
+
+    String markUsed = """
+        UPDATE customer_voucher
+        SET is_used = TRUE
+        WHERE customer_id = ?
+          AND voucher_id = ?
+    """;
+
+    try (Connection con = getConnection()) {
+
+        con.setAutoCommit(false); // transaction
+
+        try (PreparedStatement ps1 = con.prepareStatement(updateInvoice);
+             PreparedStatement ps2 = con.prepareStatement(markUsed)) {
+
+            // Update invoice
+            ps1.setInt(1, voucherId);
+            ps1.setInt(2, invoiceId);
+            int rows = ps1.executeUpdate();
+
+            if (rows == 0) {
+                con.rollback();
+                return;
+            }
+
+            // Mark voucher used
+            ps2.setInt(1, customerId);
+            ps2.setInt(2, voucherId);
+            ps2.executeUpdate();
+
+            con.commit();
+
+        } catch (Exception e) {
+            con.rollback();
+            throw e;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 
 
     public static void main(String[] args) {
         InvoiceDAO dao = new InvoiceDAO();
-        List<Invoice> list = dao.getAllInvoices();
-        for (Invoice a : list) {
-            System.out.println(a.getCustomerName());
-        }
+        InvoiceDetailDTO list = dao.getInvoiceDetailById(1);
+            System.out.println(list);
     }
 }

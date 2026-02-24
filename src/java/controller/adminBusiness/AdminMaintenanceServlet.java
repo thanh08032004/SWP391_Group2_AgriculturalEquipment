@@ -2,22 +2,43 @@ package controller.adminBusiness;
 
 import dal.MaintenanceDAO;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import model.Maintenance;
 
 public class AdminMaintenanceServlet extends HttpServlet {
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String name = request.getParameter("customerName"); // Field (2)
-        String status = request.getParameter("status"); // Field (3)
+        String action = request.getParameter("action");
+        MaintenanceDAO dao = new MaintenanceDAO();
 
-        List<Maintenance> list = new MaintenanceDAO().searchMaintenanceRequests(name, status);
-        request.setAttribute("reqList", list);
-        request.setAttribute("currentName", name);
-        request.setAttribute("currentStatus", status);
-        request.getRequestDispatcher("/views/AdminBusinessView/maintenance-list.jsp").forward(request, response);
+        if ("detail".equals(action)) {
+            int id = Integer.parseInt(request.getParameter("id"));
+            Maintenance task = dao.getMaintenanceById(id);
+            List<Map<String, Object>> items = dao.getMaintenanceItems(id);
+            request.setAttribute("task", task);
+            request.setAttribute("items", items);
+                        request.getRequestDispatcher("/views/AdminBusinessView/maintenance-detail.jsp").forward(request, response);
+        } else {
+            String name = request.getParameter("customerName");
+            String status = request.getParameter("status");
+            List<Maintenance> list = dao.searchMaintenanceRequests(name, status);
+            request.setAttribute("reqList", list);
+            request.getRequestDispatcher("/views/AdminBusinessView/maintenance-list.jsp").forward(request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        String action = request.getParameter("action");
+//        MaintenanceDAO dao = new MaintenanceDAO();
+//        int id = Integer.parseInt(request.getParameter("id"));
+//
+//        if ("approve-diagnosis".equals(action)) {
+//            dao.updateStatus(id, "WAITING_FOR_CUSTOMER"); 
+//            response.sendRedirect("maintenance?action=detail&id=" + id);
+//        }
     }
 }
