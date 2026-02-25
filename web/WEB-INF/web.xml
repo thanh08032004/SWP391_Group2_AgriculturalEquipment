@@ -8,9 +8,17 @@
         <filter-name>AuthFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <servlet>
+        <servlet-name>TechnicianInvoiceServlet</servlet-name>
+        <servlet-class>controller.technician.TechnicianInvoiceServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CustomerInvoiceDetail</servlet-name>
         <url-pattern>/customer/invoicedetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TechnicianInvoiceServlet</servlet-name>
+        <url-pattern>/technician/invoicelist</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
@@ -55,7 +63,7 @@
     </servlet>
     <servlet>
         <servlet-name>TechnicanHomeServlet</servlet-name>
-        <servlet-class>controller.technican.TechnicanHomeServlet</servlet-class>
+        <servlet-class>controller.technician.TechnicanHomeServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UserProfileServlet</servlet-name>
@@ -156,11 +164,11 @@
     </servlet>
     <servlet>
         <servlet-name>TechnicianMaintenanceServlet</servlet-name>
-        <servlet-class>controller.technican.TechnicianMaintenanceServlet</servlet-class>
+        <servlet-class>controller.technician.TechnicianMaintenanceServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>TechnicianTaskServlet</servlet-name>
-        <servlet-class>controller.technican.TechnicianTaskServlet</servlet-class>
+        <servlet-class>controller.technician.TechnicianTaskServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>GuestHomeServlet</servlet-name>

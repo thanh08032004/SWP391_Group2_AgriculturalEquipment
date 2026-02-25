@@ -1,4 +1,4 @@
-package controller.technican;
+package controller.technician;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;

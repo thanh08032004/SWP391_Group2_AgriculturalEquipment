@@ -576,7 +576,7 @@ public List<VoucherDTO> getAvailableVouchersByCustomer(int customerId) {
             VoucherDTO v = new VoucherDTO();
             v.setId(rs.getInt("id"));
             v.setCode(rs.getString("code"));
-            v.setDiscountValue(rs.getBigDecimal("discount_value")); // ✅ sửa ở đây
+            v.setDiscountValue(rs.getBigDecimal("discount_value"));
             v.setDiscountType(rs.getString("discount_type"));
             list.add(v);
         }
@@ -648,8 +648,136 @@ public void applyVoucher(int invoiceId, int voucherId, int customerId) {
         e.printStackTrace();
     }
 }
+public List<Invoice> searchFilterInvoiceByTechnician(
+        int technicianId,
+        String keyword,
+        String filter,
+        int page,
+        int pageSize) {
 
+    List<Invoice> list = new ArrayList<>();
 
+    StringBuilder sql = new StringBuilder("""
+        SELECT DISTINCT i.*, up.fullname AS customer_name
+        FROM invoice i
+        JOIN maintenance m ON i.maintenance_id = m.id
+        JOIN device d ON m.device_id = d.id
+        JOIN users u ON d.customer_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        WHERE m.technician_id = ?
+    """);
+
+    if (keyword != null && !keyword.trim().isEmpty()) {
+        sql.append(" AND up.fullname LIKE ? ");
+    }
+
+    if (filter != null && !filter.isEmpty()) {
+        switch (filter) {
+            case "PAID":
+            case "PENDING":
+            case "UNPAID":
+                sql.append(" AND i.payment_status = ? ");
+                break;
+            case "PRICE_ASC":
+                sql.append(" ORDER BY i.total_amount ASC ");
+                break;
+            case "PRICE_DESC":
+                sql.append(" ORDER BY i.total_amount DESC ");
+                break;
+        }
+    } else {
+        sql.append(" ORDER BY i.issued_at DESC ");
+    }
+
+    sql.append(" LIMIT ? OFFSET ?");
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+        int i = 1;
+        ps.setInt(i++, technicianId);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            ps.setString(i++, "%" + keyword.trim() + "%");
+        }
+
+        if (filter != null &&
+            (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+            ps.setString(i++, filter);
+        }
+
+        ps.setInt(i++, pageSize);
+        ps.setInt(i++, (page - 1) * pageSize);
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Invoice inv = new Invoice();
+            inv.setId(rs.getInt("id"));
+            inv.setMaintenanceId(rs.getInt("maintenance_id"));
+            inv.setCustomerName(rs.getString("customer_name"));
+            inv.setTotalAmount(rs.getDouble("total_amount"));
+            inv.setPaymentStatus(rs.getString("payment_status"));
+            list.add(inv);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+    public int countInvoiceByTechnician(
+            int technicianId,
+            String keyword,
+            String filter) {
+
+        int total = 0;
+
+        StringBuilder sql = new StringBuilder("""
+        SELECT COUNT(DISTINCT i.id)
+        FROM invoice i
+        JOIN maintenance m ON i.maintenance_id = m.id
+        JOIN device d ON m.device_id = d.id
+        JOIN users u ON d.customer_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        WHERE m.technician_id = ?
+    """);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND up.fullname LIKE ? ");
+        }
+
+        if (filter != null
+                && (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+            sql.append(" AND i.payment_status = ? ");
+        }
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+            int i = 1;
+            ps.setInt(i++, technicianId);
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(i++, "%" + keyword.trim() + "%");
+            }
+
+            if (filter != null
+                    && (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+                ps.setString(i++, filter);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return total;
+    }
     public static void main(String[] args) {
         InvoiceDAO dao = new InvoiceDAO();
         InvoiceDetailDTO list = dao.getInvoiceDetailById(1);
