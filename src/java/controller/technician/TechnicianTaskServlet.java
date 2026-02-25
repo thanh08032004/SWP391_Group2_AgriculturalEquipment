@@ -80,11 +80,11 @@ public class TechnicianTaskServlet extends HttpServlet {
 
         String action = req.getParameter("action");
 
-        if ("submit".equals(action)) {
-            int id = Integer.parseInt(req.getParameter("id"));
-            dao.submitToAdmin(id);
-            resp.sendRedirect("maintenance?action=list");
-        }
+//        if ("submit".equals(action)) {
+//            int id = Integer.parseInt(req.getParameter("id"));
+//            dao.submitToAdmin(id);
+//            resp.sendRedirect("maintenance?action=list");
+//        }
     }
 
     /** 

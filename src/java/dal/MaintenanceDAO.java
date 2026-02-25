@@ -246,22 +246,22 @@ public class MaintenanceDAO extends DBContext {
     }
 
     // 4. Submit to admin
-    public boolean submitToAdmin(int id) {
-        String sql = """
-            UPDATE maintenance
-            SET status = 'STAFF_SUBMITTED'
-            WHERE id = ? AND status = 'IN_PROGRESS'
-        """;
-
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+//    public boolean submitToAdmin(int id) {
+//        String sql = """
+//            UPDATE maintenance
+//            SET status = 'STAFF_SUBMITTED'
+//            WHERE id = ? AND status = 'IN_PROGRESS'
+//        """;
+//
+//        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+//
+//            ps.setInt(1, id);
+//            return ps.executeUpdate() > 0;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
 
 //    private MaintenanceDTO map(ResultSet rs) throws SQLException {
 //        return MaintenanceDTO.builder()
