@@ -237,11 +237,12 @@ public class SparePartDAO extends DBContext {
     List<SparePart> list = new ArrayList<>();
 
     String sql = """
-        SELECT sp.*
-        FROM spare_part sp
-        JOIN device_spare_part dsp ON sp.id = dsp.spare_part_id
-        WHERE dsp.device_id = ?
-    """;
+    SELECT sp.*, i.quantity AS stock
+    FROM spare_part sp
+    JOIN device_spare_part dsp ON sp.id = dsp.spare_part_id
+    JOIN inventory i ON sp.id = i.spare_part_id
+    WHERE dsp.device_id = ?
+""";
 
     try (Connection con = getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
@@ -255,6 +256,7 @@ public class SparePartDAO extends DBContext {
             sp.setName(rs.getString("name"));
             sp.setUnit(rs.getString("unit"));
             sp.setPrice(rs.getBigDecimal("price"));
+            sp.setStock(rs.getInt("stock"));
             list.add(sp);
         }
     } catch (Exception e) {
@@ -262,5 +264,6 @@ public class SparePartDAO extends DBContext {
     }
     return list;
 }
+
 
 }

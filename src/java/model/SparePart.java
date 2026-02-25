@@ -16,4 +16,5 @@ public class SparePart {
     
     private List<Integer> compatibleDeviceIds; 
     private int quantity; 
+    private int stock;
 }

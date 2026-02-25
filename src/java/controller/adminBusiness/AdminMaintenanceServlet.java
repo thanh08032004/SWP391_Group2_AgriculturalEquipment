@@ -9,6 +9,7 @@ import java.util.Map;
 import model.Maintenance;
 
 public class AdminMaintenanceServlet extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
@@ -30,18 +31,21 @@ public class AdminMaintenanceServlet extends HttpServlet {
         }
     }
 
-   @Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    String action = request.getParameter("action");
-    MaintenanceDAO dao = new MaintenanceDAO();
-    int id = Integer.parseInt(request.getParameter("id"));
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        MaintenanceDAO dao = new MaintenanceDAO();
+        int id = Integer.parseInt(request.getParameter("id"));
 
-    if ("send-to-customer".equals(action)) {
-        boolean success = dao.updateStatus(id, "DIAGNOSIS READY");
-        response.sendRedirect("maintenance?msg=" + (success ? "sent_success" : "error"));
-    } else if ("approve-diagnosis".equals(action)) {
-        dao.updateStatus(id, "IN_PROGRESS");
-        response.sendRedirect("maintenance?action=detail&id=" + id);
+        if ("send-to-customer".equals(action)) {
+            boolean success = dao.updateStatus(id, "DIAGNOSIS READY");
+            response.sendRedirect("maintenance?msg=" + (success ? "sent_success" : "error"));
+        } else if ("approve-diagnosis".equals(action)) {
+            dao.updateStatus(id, "IN_PROGRESS");
+            response.sendRedirect("maintenance?action=detail&id=" + id);
+        } else if ("assign".equals(action)) {
+            boolean success = dao.updateStatus(id, "WAITING_FOR_TECHNICIAN");
+            response.sendRedirect("maintenance?msg=" + (success ? "assign_success" : "assign error"));
+        }
     }
-}
 }
