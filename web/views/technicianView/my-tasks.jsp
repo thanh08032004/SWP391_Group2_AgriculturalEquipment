@@ -80,29 +80,34 @@
                                             <td>${m.startDate}</td>
                                             <td>${m.endDate != null ? m.endDate : '-'}</td>
                                             <td class="text-center pe-4">
+                                                <div class="d-flex justify-content-center align-items-center flex-nowrap gap-1">
                                                 <c:if test="${m.status == 'TECHNICIAN_ACCEPTED'}">
                                                     <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${m.id}"
                                                        class="btn btn-sm btn-primary mx-1">
                                                         <i class="bi bi-tools"></i> Work
                                                     </a>
-                                                </c:if>
-                                                <c:if test="${m.status == 'IN_PROGRESS'}">
-
-                                                    <!-- Nút View -->
                                                     <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
                                                        class="btn btn-sm btn-info mx-1">
                                                         <i class="bi bi-eye"></i> View
                                                     </a>
+                                                </c:if>
+                                                <c:if test="${m.status == 'IN_PROGRESS'}">
+
+                                                    <!-- Nút View -->
 
                                                     <!-- Nút Complete -->
                                                     <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${m.id}"
                                                        class="btn btn-sm btn-success mx-1"
                                                        onclick="return confirm('Mark this task as DONE?');">
-                                                        <i class="bi bi-check-circle"></i> Complete
+                                                        <i class="bi bi-check-circle"></i> Done
+                                                    </a>
+                                                    <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
+                                                       class="btn btn-sm btn-info mx-1">
+                                                        <i class="bi bi-eye"></i> View
                                                     </a>
 
                                                 </c:if>
-
+                                                </div>
                                             </td>
 
                                         </tr>
