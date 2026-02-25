@@ -86,8 +86,25 @@
                                                         <i class="bi bi-tools"></i> Work
                                                     </a>
                                                 </c:if>
+                                                <c:if test="${m.status == 'IN_PROGRESS'}">
+
+                                                    <!-- Nút View -->
+                                                    <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
+                                                       class="btn btn-sm btn-info mx-1">
+                                                        <i class="bi bi-eye"></i> View
+                                                    </a>
+
+                                                    <!-- Nút Complete -->
+                                                    <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${m.id}"
+                                                       class="btn btn-sm btn-success mx-1"
+                                                       onclick="return confirm('Mark this task as DONE?');">
+                                                        <i class="bi bi-check-circle"></i> Complete
+                                                    </a>
+
+                                                </c:if>
 
                                             </td>
+
                                         </tr>
                                     </c:forEach>
                                     <c:if test="${empty list}">

@@ -122,6 +122,20 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
 
             req.getRequestDispatcher("/views/technicianView/maintenance-work.jsp").forward(req, resp);
         }
+        if ("complete".equals(action)) {
+
+            int id = Integer.parseInt(req.getParameter("id"));
+
+            boolean success = dao.updateStatus(id, "DONE");
+
+            if (success) {
+                req.getSession().setAttribute("success", "Task marked as DONE!");
+            } else {
+                req.getSession().setAttribute("error", "Failed to complete task!");
+            }
+
+            resp.sendRedirect("maintenance?action=mytasks");
+        }
 
     }
 
