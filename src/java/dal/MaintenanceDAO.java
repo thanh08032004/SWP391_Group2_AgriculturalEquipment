@@ -150,9 +150,9 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
     } catch (Exception e) { e.printStackTrace(); }
     return list;
 }
-    ////////////////////////////////////////////////////////////////////////////
+   
 
-    public List<MaintenanceDTO> getWaitingForStaff() {
+    public List<MaintenanceDTO> getWaitingForTechnician() {
         List<MaintenanceDTO> list = new ArrayList<>();
         String sql = """
             SELECT m.*, u.fullname AS customerName, d.machine_name as machineName
@@ -191,9 +191,9 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
     public boolean acceptJob(int maintenanceId, int technicianId) {
         String sql = """
             UPDATE maintenance
-            SET technician_id = ?, status = 'IN_PROGRESS'
-            WHERE id = ?
-            AND status = 'WAITING_FOR_TECHNICIAN'
+                        SET technician_id = ?, status = 'TECHNICIAN_ACCEPTED' 
+                        WHERE id = ?
+                        AND status = 'WAITING_FOR_TECHNICIAN'
         """;
 
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -300,7 +300,7 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
         JOIN device d ON m.device_id = d.id
         JOIN user_profile u ON d.customer_id = u.user_id
         WHERE m.technician_id = ?
-        AND m.status IN ('IN_PROGRESS', 'DONE')
+        AND m.status IN ('IN_PROGRESS', 'DONE','TECHNICIAN_ACCEPTED')
         ORDER BY 
             CASE WHEN m.status = 'IN_PROGRESS' THEN 1 ELSE 2 END,
             m.id DESC
@@ -389,10 +389,10 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
     public boolean submitTaskToAdmin(int maintenanceId, int technicianId) {
         String sql = """
         UPDATE maintenance
-        SET status = 'TECHNICIAN_SUBMITTED', end_date = CURDATE()
-        WHERE id = ?
-        AND technician_id = ?
-        AND status = 'IN_PROGRESS'
+                SET status = 'DIAGNOSIS READY', end_date = CURDATE()
+                WHERE id = ?
+                AND technician_id = ?
+                AND status = 'TECHNICIAN_ACCEPTED'
     """;
 
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
