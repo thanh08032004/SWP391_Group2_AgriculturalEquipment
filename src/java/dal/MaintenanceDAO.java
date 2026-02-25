@@ -22,50 +22,52 @@ public class MaintenanceDAO extends DBContext {
     }
 
     public List<Maintenance> searchMaintenanceRequests(String customerName, String status) {
-    List<Maintenance> list = new ArrayList<>();
-    StringBuilder sql = new StringBuilder(
-            "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name "
-            + "FROM maintenance m "
-            + "JOIN device d ON m.device_id = d.id "
-            + "JOIN user_profile up ON d.customer_id = up.user_id WHERE 1=1 "
-    );
+        List<Maintenance> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name "
+                + "FROM maintenance m "
+                + "JOIN device d ON m.device_id = d.id "
+                + "JOIN user_profile up ON d.customer_id = up.user_id WHERE 1=1 "
+        );
 
-    if (status == null || status.equals("All Status")) {
-        sql.append(" AND m.status != 'READY' ");
-    } else {
-        sql.append(" AND m.status = ? ");
-    }
-
-    if (customerName != null && !customerName.isEmpty()) {
-        sql.append(" AND up.fullname LIKE ? ");
-    }
-    
-    sql.append(" ORDER BY m.id DESC");
-
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
-        int paramIdx = 1;
-        if (status != null && !status.equals("All Status")) {
-            ps.setString(paramIdx++, status);
+        if (status == null || status.equals("All Status")) {
+            sql.append(" AND m.status != 'READY' ");
+        } else {
+            sql.append(" AND m.status = ? ");
         }
+
         if (customerName != null && !customerName.isEmpty()) {
-            ps.setString(paramIdx++, "%" + customerName + "%");
+            sql.append(" AND up.fullname LIKE ? ");
         }
 
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            list.add(Maintenance.builder()
-                    .id(rs.getInt("id"))
-                    .description(rs.getString("description"))
-                    .status(rs.getString("status"))
-                    .startDate(rs.getDate("start_date"))
-                    .machineName(rs.getString("machine_name"))
-                    .modelName(rs.getString("model"))
-                    .customerName(rs.getString("customer_name"))
-                    .build());
+        sql.append(" ORDER BY m.id DESC");
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
+            if (status != null && !status.equals("All Status")) {
+                ps.setString(paramIdx++, status);
+            }
+            if (customerName != null && !customerName.isEmpty()) {
+                ps.setString(paramIdx++, "%" + customerName + "%");
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(Maintenance.builder()
+                        .id(rs.getInt("id"))
+                        .description(rs.getString("description"))
+                        .status(rs.getString("status"))
+                        .startDate(rs.getDate("start_date"))
+                        .machineName(rs.getString("machine_name"))
+                        .modelName(rs.getString("model"))
+                        .customerName(rs.getString("customer_name"))
+                        .build());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) { e.printStackTrace(); }
-    return list;
-}
+        return list;
+    }
 
     // Task: Admin & Customer view device status/diagnostic info
     public Maintenance getMaintenanceById(int id) {
@@ -98,59 +100,61 @@ public class MaintenanceDAO extends DBContext {
         return null;
     }
 
-    
     // Update overall status (Used for Admin to send notifications and for Customer feedback)
     public boolean updateStatus(int id, String status) {
-    String sql = "UPDATE maintenance SET status = ? WHERE id = ?";
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setString(1, status);
-        ps.setInt(2, id);
-        return ps.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
+        String sql = "UPDATE maintenance SET status = ? WHERE id = ?";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    return false;
-}
 
     // Get a list of components along with their prices to display a quotation for the customer.
-public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId) {
-    List<Map<String, Object>> list = new ArrayList<>();
-    String sql = "SELECT mi.quantity, sp.name, sp.price " +
-                 "FROM maintenance_item mi " +
-                 "JOIN spare_part sp ON mi.spare_part_id = sp.id " +
-                 "WHERE mi.maintenance_id = ?";
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, maintenanceId);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", rs.getString("name"));
-        map.put("quantity", rs.getInt("quantity"));
-        map.put("price", rs.getBigDecimal("price"));
-        list.add(map);
-    }
-    } catch (SQLException e) { e.printStackTrace(); }
-    return list;
-    
-}
-    
-    public List<Map<String, Object>> getMaintenanceItems(int maintenanceId) {
-    List<Map<String, Object>> list = new ArrayList<>();
-    String sql = "SELECT mi.*, sp.name AS spare_part_name FROM maintenance_item mi " +
-                 "JOIN spare_part sp ON mi.spare_part_id = sp.id WHERE mi.maintenance_id = ?";
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, maintenanceId);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("name", rs.getString("spare_part_name")); 
-            map.put("quantity", rs.getInt("quantity"));
-            list.add(map);
+    public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT mi.quantity, sp.name, sp.price "
+                + "FROM maintenance_item mi "
+                + "JOIN spare_part sp ON mi.spare_part_id = sp.id "
+                + "WHERE mi.maintenance_id = ?";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, maintenanceId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("name", rs.getString("name"));
+                map.put("quantity", rs.getInt("quantity"));
+                map.put("price", rs.getBigDecimal("price"));
+                list.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) { e.printStackTrace(); }
-    return list;
-}
-   
+        return list;
+
+    }
+
+    public List<Map<String, Object>> getMaintenanceItems(int maintenanceId) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT mi.*, sp.name AS spare_part_name FROM maintenance_item mi "
+                + "JOIN spare_part sp ON mi.spare_part_id = sp.id WHERE mi.maintenance_id = ?";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, maintenanceId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("name", rs.getString("spare_part_name"));
+                map.put("quantity", rs.getInt("quantity"));
+                list.add(map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
     public List<MaintenanceDTO> getWaitingForTechnician() {
         List<MaintenanceDTO> list = new ArrayList<>();
@@ -259,20 +263,20 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
         return false;
     }
 
-    private Maintenance map(ResultSet rs) throws SQLException {
-        return Maintenance.builder()
-                .id(rs.getInt("id"))
-                .deviceId(rs.getInt("device_id"))
-                .technicianId((Integer) rs.getObject("technician_id"))
-                .description(rs.getString("description"))
-                .status(rs.getString("status"))
-                .startDate(rs.getDate("start_date"))
-                .endDate(rs.getDate("end_date"))
-                .customerName(rs.getString("customer_name"))
-                .machineName(rs.getString("machine_name"))
-                .build();
-    }
-
+//    private MaintenanceDTO map(ResultSet rs) throws SQLException {
+//        return MaintenanceDTO.builder()
+//                .id(rs.getInt("id"))
+//                        .deviceId(rs.getInt("device_id"))
+//                        .technicianId(rs.getInt("technician_id"))
+//                        .description(rs.getString("description"))
+//                        .status(rs.getString("status"))
+//                        .startDate(rs.getDate("start_date"))
+//                        .endDate(rs.getDate("end_date"))
+//                        .image(rs.getString("image"))
+//                        .customerName(rs.getString("customerName"))
+//                        .machineName(rs.getString("machineName"))
+//                        .build();
+//    }
     public void upsert(int maintenanceId, int sparePartId, int qty) {
         String sql = """
             INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity)
@@ -366,7 +370,6 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
                 ps.executeUpdate();
             }
 
-            
             try (PreparedStatement ps = con.prepareStatement(insertSql)) {
                 for (int i = 0; i < sparePartIds.size(); i++) {
                     ps.setInt(1, maintenanceId);
@@ -389,7 +392,7 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
     public boolean submitTaskToAdmin(int maintenanceId, int technicianId) {
         String sql = """
         UPDATE maintenance
-                SET status = 'DIAGNOSIS READY', end_date = CURDATE()
+                SET status = 'TECHNICIAN_SUBMITTED', end_date = CURDATE()
                 WHERE id = ?
                 AND technician_id = ?
                 AND status = 'TECHNICIAN_ACCEPTED'
@@ -404,6 +407,107 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
         }
         return false;
     }
-    
-}
 
+    public List<MaintenanceDTO> searchWaitingForTechnician(String name) {
+        List<MaintenanceDTO> list = new ArrayList<>();
+        String sql = "SELECT m.*, u.fullname AS customerName, d.machine_name as machineName\n" +
+"            FROM maintenance m\n" +
+"            JOIN device d ON m.device_id = d.id\n" +
+"            JOIN user_profile u ON d.customer_id = u.user_id\n" +
+"            WHERE m.status = 'WAITING_FOR_TECHNICIAN'\n" +
+"            AND m.technician_id IS NULL\n"
+;
+
+        if (name != null && !name.trim().isEmpty()) {
+            sql += " AND u.fullname LIKE ?";
+        }
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            if (name != null && !name.trim().isEmpty()) {
+                ps.setString(1, "%" + name + "%");
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                MaintenanceDTO m = new MaintenanceDTO();
+                m.setId(rs.getInt("id"));
+                m.setDeviceId(rs.getInt("device_id"));
+                m.setTechnicianId(rs.getInt("technician_id"));
+                m.setDescription(rs.getString("description"));
+                m.setStatus(rs.getString("status"));
+                m.setStartDate(rs.getDate("start_date"));
+                m.setEndDate(rs.getDate("end_date"));
+                m.setCustomerName(rs.getString("customerName"));
+                m.setMachineName(rs.getString("machineName"));
+                list.add(m);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<MaintenanceDTO> searchMyTasks(int technicianId, String name, String status) {
+
+        List<MaintenanceDTO> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("""
+        SELECT m.*, u.fullname AS customerName, d.machine_name AS machineName
+        FROM maintenance m
+        JOIN device d ON m.device_id = d.id
+        JOIN user_profile u ON d.customer_id = u.user_id
+        WHERE m.technician_id = ?
+    """);
+
+        if (name != null && !name.trim().isEmpty()) {
+            sql.append(" AND u.fullname LIKE ? ");
+        }
+
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND m.status = ? ");
+        }
+
+        sql.append("""
+        AND m.status IN ('IN_PROGRESS', 'DONE','TECHNICIAN_ACCEPTED')
+        ORDER BY 
+        CASE WHEN m.status = 'IN_PROGRESS' THEN 1 ELSE 2 END,
+        m.id DESC
+    """);
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            int index = 1;
+            ps.setInt(index++, technicianId);
+
+            if (name != null && !name.trim().isEmpty()) {
+                ps.setString(index++, "%" + name + "%");
+            }
+
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                MaintenanceDTO m = new MaintenanceDTO();
+                m.setId(rs.getInt("id"));
+                m.setDeviceId(rs.getInt("device_id"));
+                m.setTechnicianId(rs.getInt("technician_id"));
+                m.setDescription(rs.getString("description"));
+                m.setStatus(rs.getString("status"));
+                m.setStartDate(rs.getDate("start_date"));
+                m.setEndDate(rs.getDate("end_date"));
+                m.setCustomerName(rs.getString("customerName"));
+                m.setMachineName(rs.getString("machineName"));
+                list.add(m);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+}

@@ -33,10 +33,55 @@
                         <h2 class="fw-bold">
                             <i class="bi bi-clipboard-check me-2"></i>My Tasks
                         </h2>
-                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=list" 
-                           class="btn btn-outline-primary">
-                            <i class="bi bi-plus-circle"></i> Available Tasks
-                        </a>
+                        <form id="searchForm"
+                              action="${pageContext.request.contextPath}/technician/maintenance"
+                              method="get"
+                              class="d-flex gap-2">
+
+                            <input type="hidden" name="action" value="mytasks"/>
+
+                            <!-- Search by name -->
+                            <input type="text"
+                                   name="customerName"
+                                   class="form-control"
+                                   placeholder="Enter name of Customer"
+                                   value="${param.customerName}">
+
+                            <!-- Filter by status -->
+                            <select name="status"
+                                    class="form-select"
+                                    onchange="document.getElementById('searchForm').submit();">
+
+                                <option value="">All Status</option>
+
+                                <option value="TECHNICIAN_ACCEPTED"
+                                        ${param.status == 'TECHNICIAN_ACCEPTED' ? 'selected' : ''}>
+                                    Technician Accepted
+                                </option>
+
+                                <option value="IN_PROGRESS"
+                                        ${param.status == 'IN_PROGRESS' ? 'selected' : ''}>
+                                    In Progress
+                                </option>
+
+                                <option value="DONE"
+                                        ${param.status == 'DONE' ? 'selected' : ''}>
+                                    Done
+                                </option>
+                            </select>
+
+                            <!-- Search button -->
+                            <button type="submit" class="btn btn-secondary px-4">
+                                Search
+                            </button>
+
+                            <!-- Reset button -->
+                            <a href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks"
+                               class="btn btn-outline-secondary">
+                                Reset
+                            </a>
+                        </form>
+                        
                     </div>
 
                     <div class="card border-0 shadow-sm rounded-3">
@@ -81,32 +126,32 @@
                                             <td>${m.endDate != null ? m.endDate : '-'}</td>
                                             <td class="text-center pe-4">
                                                 <div class="d-flex justify-content-center align-items-center flex-nowrap gap-1">
-                                                <c:if test="${m.status == 'TECHNICIAN_ACCEPTED'}">
-                                                    <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${m.id}"
-                                                       class="btn btn-sm btn-primary mx-1">
-                                                        <i class="bi bi-tools"></i> Work
-                                                    </a>
-                                                    <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
-                                                       class="btn btn-sm btn-info mx-1">
-                                                        <i class="bi bi-eye"></i> View
-                                                    </a>
-                                                </c:if>
-                                                <c:if test="${m.status == 'IN_PROGRESS'}">
+                                                    <c:if test="${m.status == 'TECHNICIAN_ACCEPTED'}">
+                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${m.id}"
+                                                           class="btn btn-sm btn-primary mx-1">
+                                                            <i class="bi bi-tools"></i> Work
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
+                                                           class="btn btn-sm btn-info mx-1">
+                                                            <i class="bi bi-eye"></i> View
+                                                        </a>
+                                                    </c:if>
+                                                    <c:if test="${m.status == 'IN_PROGRESS'}">
 
-                                                    <!-- Nút View -->
+                                                        <!-- Nút View -->
 
-                                                    <!-- Nút Complete -->
-                                                    <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${m.id}"
-                                                       class="btn btn-sm btn-success mx-1"
-                                                       onclick="return confirm('Mark this task as DONE?');">
-                                                        <i class="bi bi-check-circle"></i> Done
-                                                    </a>
-                                                    <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
-                                                       class="btn btn-sm btn-info mx-1">
-                                                        <i class="bi bi-eye"></i> View
-                                                    </a>
+                                                        <!-- Nút Complete -->
+                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${m.id}"
+                                                           class="btn btn-sm btn-success mx-1"
+                                                           onclick="return confirm('Mark this task as DONE?');">
+                                                            <i class="bi bi-check-circle"></i> Done
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
+                                                           class="btn btn-sm btn-info mx-1">
+                                                            <i class="bi bi-eye"></i> View
+                                                        </a>
 
-                                                </c:if>
+                                                    </c:if>
                                                 </div>
                                             </td>
 

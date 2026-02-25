@@ -75,8 +75,12 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             action = "list";
         }
         if ("list".equals(action)) {
-            req.setAttribute("list", dao.getWaitingForTechnician());
-            req.setAttribute("hasInProgressTask", dao.hasInProgressTask(technicianId));
+            String name = req.getParameter("customerName");
+           
+
+            req.setAttribute("list",
+                    dao.searchWaitingForTechnician(name));
+//            req.setAttribute("hasInProgressTask", dao.hasInProgressTask(technicianId));
             req.getRequestDispatcher("/views/technicianView/maintenance-list.jsp").forward(req, resp);
         }
 
@@ -100,11 +104,15 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             List<Map<String, Object>> items = dao.getMaintenanceItems(id);
             req.setAttribute("task", task);
             req.setAttribute("items", items);
-            
+
             req.getRequestDispatcher("/views/technicianView/maintenance-detail.jsp").forward(req, resp);
         }
         if ("mytasks".equals(action)) {
-            req.setAttribute("list", dao.getMyTasks(technicianId));
+            String name = req.getParameter("customerName");
+            String status = req.getParameter("status");
+
+            req.setAttribute("list",
+                    dao.searchMyTasks(technicianId, name, status));
             req.getRequestDispatcher("/views/technicianView/my-tasks.jsp").forward(req, resp);
         }
         if ("work".equals(action)) {

@@ -90,5 +90,6 @@
         </div>
 
         <jsp:include page="/common/footer.jsp"/>
+        <jsp:include page="/common/scripts.jsp"/>
     </body>
 </html>
