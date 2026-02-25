@@ -15,6 +15,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import model.Maintenance;
 import model.User;
 
 /**
@@ -94,7 +96,11 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
 
         if ("detail".equals(action)) {
             int id = Integer.parseInt(req.getParameter("id"));
-            req.setAttribute("m", dao.findById(id));
+            Maintenance task = dao.getMaintenanceById(id);
+            List<Map<String, Object>> items = dao.getMaintenanceItems(id);
+            req.setAttribute("task", task);
+            req.setAttribute("items", items);
+            
             req.getRequestDispatcher("/views/technicianView/maintenance-detail.jsp").forward(req, resp);
         }
         if ("mytasks".equals(action)) {

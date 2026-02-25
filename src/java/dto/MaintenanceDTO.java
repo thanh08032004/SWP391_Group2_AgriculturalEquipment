@@ -21,6 +21,7 @@ public class MaintenanceDTO {
     private String description;
     private Date startDate;
     private Date endDate;
+    private String image;
     private String customerName;
     private String machineName;
     private String serialNumber;

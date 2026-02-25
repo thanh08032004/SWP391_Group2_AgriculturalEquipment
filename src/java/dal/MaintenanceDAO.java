@@ -230,6 +230,7 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
                         .status(rs.getString("status"))
                         .startDate(rs.getDate("start_date"))
                         .endDate(rs.getDate("end_date"))
+                        .image(rs.getString("image"))
                         .customerName(rs.getString("customerName"))
                         .machineName(rs.getString("machineName"))
                         .build();
@@ -291,7 +292,7 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
         }
     }
 
-    // Lấy danh sách task của technician (IN_PROGRESS + DONE)
+    // Get task list of maintenance
     public List<MaintenanceDTO> getMyTasks(int technicianId) {
         List<MaintenanceDTO> list = new ArrayList<>();
         String sql = """
@@ -349,7 +350,7 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
         return false;
     }
 
-// Lưu spare parts được chọn cho maintenance
+// save selected spare part to maintenance
     public boolean saveMaintenanceItems(int maintenanceId, List<Integer> sparePartIds, List<Integer> quantities) {
         String deleteSql = "DELETE FROM maintenance_item WHERE maintenance_id = ?";
         String insertSql = """
@@ -360,13 +361,12 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
 
-            // Xóa items cũ
             try (PreparedStatement ps = con.prepareStatement(deleteSql)) {
                 ps.setInt(1, maintenanceId);
                 ps.executeUpdate();
             }
 
-            // Thêm items mới
+            
             try (PreparedStatement ps = con.prepareStatement(insertSql)) {
                 for (int i = 0; i < sparePartIds.size(); i++) {
                     ps.setInt(1, maintenanceId);
@@ -385,7 +385,7 @@ public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId)
         return false;
     }
 
-// Submit task to admin (chuyển status sang TECHNICIAN_SUBMITTED)
+// Submit task to admin 
     public boolean submitTaskToAdmin(int maintenanceId, int technicianId) {
         String sql = """
         UPDATE maintenance
