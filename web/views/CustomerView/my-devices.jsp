@@ -5,70 +5,124 @@
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
             <title>My Devices - Agri CMS</title>
+            <style>
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+                th, td {
+                    border: 1px solid #000;
+                    padding: 10px;
+                    text-align: left;
+                }
+                th {
+                    background-color: #eeeeee;
+                }
+
+                .btn {
+                    display: inline-block;
+                    padding: 6px 12px;
+                    text-decoration: none;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    color: #fff;
+                    text-align: center;
+                    cursor: pointer;
+                    border: none;
+                }
+                .btn-info {
+                    background-color: #17a2b8;
+                }
+                .btn-primary {
+                    background-color: #007bff;
+                }
+                .btn:hover {
+                    opacity: 0.8;
+                }
+
+                .badge {
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 0.85em;
+                }
+                .bg-warning {
+                    background-color: #ffc107;
+                    color: #000;
+                }
+                .bg-success {
+                    background-color: #28a745;
+                    color: #fff;
+                }
+            </style>
         </head>
-        <body class="bg-light">
-            <header><jsp:include page="/common/header.jsp"></jsp:include></header>
+        <body>
+            <header>
+            <jsp:include page="/common/header.jsp"></jsp:include>
+            </header>
 
-            <div class="container py-5">
-                <h2 class="fw-bold mb-4">My Agricultural Devices</h2>
-                <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-muted small text-uppercase">
-                            <tr>
-                                <th class="ps-4">Image</th>
-                                <th>Serial Number</th>
-                                <th>Machine Name</th>
-                                <th>Model</th>
-                                <th>Status</th>
-                                <th class="text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <c:forEach var="d" items="${deviceList}">
-                            <tr>
-                                <td class="ps-4">
-                                    <img src="${pageContext.request.contextPath}/assets/images/devices/${d.image}" 
-                                         style="width: 65px; height: 65px; object-fit: cover;" class="rounded border shadow-sm">
-                                </td>
-                                <td><code class="fw-bold">#${d.serialNumber}</code></td>
-                                <td class="fw-bold">${d.machineName}</td>
-                                <td><span class="badge bg-light text-dark border font-monospace">${d.model}</span></td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${d.status == 'MAINTENANCE'}">
-                                            <span class="badge rounded-pill bg-warning text-dark px-3">Under Maintenance</span>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="badge rounded-pill bg-success px-3">Ready</span>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td class="text-center">
-                                    <c:choose>
-                                        <c:when test="${d.currentMaintenanceId > 0}">
-                                            <a href="${pageContext.request.contextPath}/customer/maintenance?action=view-detail&id=${d.currentMaintenanceId}" 
-                                               class="btn btn-sm btn-info text-white fw-bold px-3 shadow-sm">View Diagnosis</a>
-                                        </c:when>
+            <main style="padding: 20px;">
+                <h1>My Agricultural Devices</h1>
 
-                                        <c:when test="${d.status == 'MAINTENANCE'}">
-                                            <span class="badge bg-light text-muted border py-2 px-3">
-                                                <i class="bi bi-hourglass-split"></i> Processing...
-                                            </span>
-                                        </c:when>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Serial Number</th>
+                            <th>Machine Name</th>
+                            <th>Model</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <c:forEach var="d" items="${deviceList}">
+                        <tr>
 
-                                        <c:otherwise>
-                                            <a href="${pageContext.request.contextPath}/customer/maintenance?deviceId=${d.id}" 
-                                               class="btn btn-sm btn-primary fw-bold px-3">Request Service</a>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <jsp:include page="/common/footer.jsp"></jsp:include>
-        <jsp:include page="/common/scripts.jsp"></jsp:include>
+                            <td>#${d.serialNumber}</td>
+                            <td>${d.machineName}</td>
+                            <td>${d.model}</td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${d.currentMaintenanceId > 0 || d.status == 'MAINTENANCE'}">
+                                        <span class="badge bg-warning">Under Maintenance</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge bg-success">Ready</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <%-- Action Column Logic --%>
+                            <td>
+                                <c:choose>
+                                    <%-- TRƯỜNG HỢP 1: Admin đã gửi chẩn đoán (Public status) --%>
+                                    <c:when test="${d.currentMaintenanceId > 0 && d.maintenanceStatus == 'DIAGNOSIS READY'}">
+                                        <a href="${pageContext.request.contextPath}/customer/maintenance?action=view-detail&id=${d.currentMaintenanceId}" class="btn btn-info">
+                                            View Diagnosis
+                                        </a>
+                                    </c:when>
+
+                                    <%-- TRƯỜNG HỢP 2: Đang trong quy trình bảo trì nhưng KHÔNG thuộc TH1 (VD: PENDING, TECHNICIAN_SUBMITTED, IN_PROGRESS) --%>
+                                    <%-- Sử dụng d.status == 'MAINTENANCE' để khóa tất cả máy đang sửa --%>
+                                    <c:when test="${d.currentMaintenanceId > 0 || d.status == 'MAINTENANCE'}">
+                                        <span style="color: #6c757d; font-style: italic;">Processing...</span>
+                                    </c:when>
+
+                                    <%-- TRƯỜNG HỢP 3: Máy hoàn toàn rảnh rỗi (Ready) --%>
+                                    <c:otherwise>
+                                        <a href="${pageContext.request.contextPath}/customer/maintenance?deviceId=${d.id}" class="btn btn-primary">
+                                            Request Service
+                                        </a>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </main>
+
+        <footer>
+            <jsp:include page="/common/footer.jsp"></jsp:include>
+        </footer>
     </body>
 </html>

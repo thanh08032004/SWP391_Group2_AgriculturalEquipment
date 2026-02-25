@@ -14,15 +14,14 @@
                 <div class="admin-content p-4 w-100">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="fw-bold">Spare Management</h2>
-                        <!--delete message-->
-                    <c:if test="${param.msg == 'delete_fail_inventory'}">
-                        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>Cannot delete!</strong> This component still has items in inventory. Please clear stock before deleting.
+                    <!--delete message-->
+                    <%--<c:if test="${param.msg == 'delete_fail_inventory'}">
+                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>-->
+                        <strong>Cannot delete!</strong> This component still has items in inventory. Please clear stock before deleting.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                    </c:if>
-
+                    </c:if> --%>
                     <c:if test="${param.msg == 'delete_success'}">
                         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
                             <i class="bi bi-check-circle-fill me-2"></i>

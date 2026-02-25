@@ -20,13 +20,12 @@
                             <option value="PENDING" ${currentStatus == 'PENDING' ? 'selected' : ''}>New Request</option>
                             <option value="WAITING_FOR_TECHNICIAN" ${currentStatus == 'WAITING_FOR_TECHNICIAN' ? 'selected' : ''}>Awaiting Assignment</option>
                             <option value="TECHNICIAN_ACCEPTED" ${currentStatus == 'TECHNICIAN_ACCEPTED' ? 'selected' : ''}>Technician Accepted</option>
+                            <option value="TECHNICIAN_SUBMITTED" ${currentStatus == 'TECHNICIAN_SUBMITTED' ? 'selected' : ''}>Technician Submitted</option>
                             <option value="DIAGNOSIS READY" ${currentStatus == 'DIAGNOSIS READY' ? 'selected' : ''}>Diagnosis Ready</option>
                             <option value="IN_PROGRESS" ${currentStatus == 'IN_PROGRESS' ? 'selected' : ''}>Repair In Progress</option>
                             <option value="DONE" ${currentStatus == 'DONE' ? 'selected' : ''}>Completed</option>
-<!--                            <option value="READY" ${currentStatus == 'READY' ? 'selected' : ''}>Ready (Rejected/Initial)</option>-->
                         </select>
-                        <button type="submit" class="btn btn-secondary px-4">Search</button>
-                        <a href="${pageContext.request.contextPath}/admin-business/maintenance" class="btn btn-outline-secondary">Reset</a>
+                        <button type="submit" class="btn btn-secondary px-5">Search</button>
                     </form>
                 </div>
 
@@ -53,7 +52,8 @@
                                             <c:when test="${r.status == 'PENDING'}"><span class="badge bg-warning text-dark">New Request</span></c:when>
                                             <c:when test="${r.status == 'WAITING_FOR_TECHNICIAN'}"><span class="badge bg-secondary">Awaiting Technician</span></c:when>
                                             <c:when test="${r.status == 'TECHNICIAN_ACCEPTED'}"><span class="badge bg-info">Technician Accepted</span></c:when>
-                                            <c:when test="${r.status == 'DIAGNOSIS READY'}"><span class="badge bg-primary">Diagnosis Ready</span></c:when>
+                                            <c:when test="${r.status == 'TECHNICIAN_SUBMITTED'}"><span class="badge bg-info">Technician Submitted</span></c:when>
+                                            <c:when test="${r.status == 'DIAGNOSIS READY'}"><span class="badge bg-primary">Waiting For Customer</span></c:when>
                                             <c:when test="${r.status == 'IN_PROGRESS'}"><span class="badge bg-dark">Repairing</span></c:when>
                                             <c:when test="${r.status == 'DONE'}"><span class="badge bg-success">Completed</span></c:when>
                                             <c:otherwise><span class="badge bg-light text-dark border">${r.status}</span></c:otherwise>
@@ -74,7 +74,7 @@
                                                     </button>
                                                 </form>
                                             </c:when>
-                                            <c:when test="${r.status == 'DIAGNOSIS READY'}">
+                                            <c:when test="${r.status == 'TECHNICIAN_SUBMITTED'}">
                                                 <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="post" style="display:inline;">
                                                     <input type="hidden" name="action" value="send-to-customer">
                                                     <input type="hidden" name="id" value="${r.id}">

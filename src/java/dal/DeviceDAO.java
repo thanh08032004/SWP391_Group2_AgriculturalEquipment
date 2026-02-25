@@ -374,14 +374,18 @@ public class DeviceDAO extends DBContext {
     return false;
 }
     
-  public List<Map<String, Object>> getDevicesByCustomerCustom(int customerId) {
+ public List<Map<String, Object>> getDevicesByCustomerCustom(int customerId) {
     List<Map<String, Object>> list = new ArrayList<>();
-    String sql = "SELECT d.*, " +
-                 "(SELECT m.id FROM maintenance m " +
-                 " WHERE m.device_id = d.id AND m.status = 'DIAGNOSIS READY' " +
-                 " ORDER BY m.id DESC LIMIT 1) as current_maintenance_id " +
-                 "FROM device d WHERE d.customer_id = ?";
-                 
+    String sql = "SELECT d.*, m.id as current_maintenance_id, m.status as maintenanceStatus " +
+                 "FROM device d " +
+                 "LEFT JOIN maintenance m ON m.id = (" +
+                 "    SELECT m2.id FROM maintenance m2 " +
+                 "    WHERE m2.device_id = d.id " +
+                 "    AND m2.status NOT IN ('DONE', 'READY') " +
+                 "    ORDER BY m2.id DESC LIMIT 1" +
+                 ") " +
+                 "WHERE d.customer_id = ?";
+
     try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
         ps.setInt(1, customerId);
         ResultSet rs = ps.executeQuery();
@@ -392,20 +396,25 @@ public class DeviceDAO extends DBContext {
             map.put("machineName", rs.getString("machine_name"));
             map.put("model", rs.getString("model"));
             map.put("status", rs.getString("status"));
-            map.put("image", rs.getString("image"));
             
-            int mId = rs.getInt("current_maintenance_id");
-            if (rs.wasNull()) {
-                map.put("currentMaintenanceId", 0);
-            } else {
-                map.put("currentMaintenanceId", mId);
-            }
+            map.put("currentMaintenanceId", rs.getInt("current_maintenance_id"));
+            map.put("maintenanceStatus", rs.getString("maintenanceStatus"));
             
             list.add(map);
         }
-    } catch (SQLException e) { 
-        e.printStackTrace(); 
-    }
+    } catch (SQLException e) { e.printStackTrace(); }
     return list;
+}
+  
+  public boolean updateDeviceStatus(int deviceId, String status) {
+    String sql = "UPDATE device SET status = ? WHERE id = ?";
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, status);
+        ps.setInt(2, deviceId);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
 }
 }
