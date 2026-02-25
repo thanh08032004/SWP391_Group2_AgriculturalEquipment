@@ -40,6 +40,7 @@
                             <c:if test="${sessionScope.userRole == 'CUSTOMER'}">
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/devices">My Devices</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/maintenance">History</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/vouchers">My Voucher</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/invoice-list">My Invoice</a></li>
                             </c:if>
                             <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Support</a></li>
