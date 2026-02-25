@@ -140,15 +140,65 @@ public class AdminBrandServlet extends HttpServlet {
     // ADD
     // =========================
     private void addBrand(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+            throws ServletException, IOException {
 
+        String name = request.getParameter("name");
+        String phone = request.getParameter("phone");
+        String email = request.getParameter("email");
+        String address = request.getParameter("address");
+
+        StringBuilder error = new StringBuilder();
+
+        // ===== VALIDATE =====
+        // Name bắt buộc
+        if (name == null || name.trim().isEmpty()) {
+            error.append("Brand name is required.<br>");
+        }
+
+        // Phone bắt buộc + đúng định dạng
+        if (phone == null || phone.trim().isEmpty()) {
+            error.append("Phone is required.<br>");
+        } else if (!phone.matches("^0\\d{9,10}$")) {
+            error.append("Phone format invalid (must start with 0 and 10-11 digits).<br>");
+        }
+
+        // Email bắt buộc + đúng format
+        if (email == null || email.trim().isEmpty()) {
+            error.append("Email is required.<br>");
+        } else if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            error.append("Invalid email format.<br>");
+        }
+
+        // Address bắt buộc
+        if (address == null || address.trim().isEmpty()) {
+            error.append("Address is required.<br>");
+        }
+
+        // ===== Nếu có lỗi =====
+        if (error.length() > 0) {
+
+            request.setAttribute("error", error.toString());
+
+            request.setAttribute("name", name);
+            request.setAttribute("phone", phone);
+            request.setAttribute("email", email);
+            request.setAttribute("address", address);
+
+            request.getRequestDispatcher(
+                    "/views/AdminBusinessView/brand-add.jsp"
+            ).forward(request, response);
+            return;
+        }
+
+        // ===== Insert =====
         Brand b = new Brand();
-        b.setName(request.getParameter("name"));
-        b.setPhone(request.getParameter("phone"));
-        b.setEmail(request.getParameter("email"));
-        b.setAddress(request.getParameter("address"));
+        b.setName(name);
+        b.setPhone(phone);
+        b.setEmail(email);
+        b.setAddress(address);
 
         brandDAO.insert(b);
+
         response.sendRedirect("brands?action=list");
     }
 
@@ -168,16 +218,79 @@ public class AdminBrandServlet extends HttpServlet {
     }
 
     private void updateBrand(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+            throws ServletException, IOException {
 
+        String idRaw = request.getParameter("id");
+        String name = request.getParameter("name");
+        String phone = request.getParameter("phone");
+        String email = request.getParameter("email");
+        String address = request.getParameter("address");
+
+        StringBuilder error = new StringBuilder();
+
+        int id = 0;
+
+        // ===== ID =====
+        try {
+            id = Integer.parseInt(idRaw);
+        } catch (Exception e) {
+            error.append("Invalid brand ID.<br>");
+        }
+
+        // ===== NAME =====
+        if (name == null || name.trim().isEmpty()) {
+            error.append("Brand name is required.<br>");
+        }
+
+        // ===== PHONE =====
+        if (phone == null || phone.trim().isEmpty()) {
+            error.append("Phone is required.<br>");
+        } else if (!phone.matches("^0\\d{9,10}$")) {
+            error.append("Phone format invalid (must start with 0 and 10-11 digits).<br>");
+        }
+
+        // ===== EMAIL =====
+        if (email == null || email.trim().isEmpty()) {
+            error.append("Email is required.<br>");
+        } else if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            error.append("Invalid email format.<br>");
+        }
+
+        // ===== ADDRESS =====
+        if (address == null || address.trim().isEmpty()) {
+            error.append("Address is required.<br>");
+        }
+
+
+        // ===== Nếu có lỗi =====
+        if (error.length() > 0) {
+
+            Brand b = new Brand();
+            b.setId(id);
+            b.setName(name);
+            b.setPhone(phone);
+            b.setEmail(email);
+            b.setAddress(address);
+
+            request.setAttribute("error", error.toString());
+            request.setAttribute("brand", b);
+
+            request.getRequestDispatcher(
+                    "/views/AdminBusinessView/brand-edit.jsp"
+            ).forward(request, response);
+            return;
+        }
+
+        // ===== UPDATE =====
         Brand b = new Brand();
-        b.setId(Integer.parseInt(request.getParameter("id")));
-        b.setName(request.getParameter("name"));
-        b.setPhone(request.getParameter("phone"));
-        b.setEmail(request.getParameter("email"));
-        b.setAddress(request.getParameter("address"));
+        b.setId(id);
+        b.setName(name);
+        b.setPhone(phone);
+        b.setEmail(email);
+        b.setAddress(address);
 
         brandDAO.update(b);
+
         response.sendRedirect("brands?action=list");
     }
 

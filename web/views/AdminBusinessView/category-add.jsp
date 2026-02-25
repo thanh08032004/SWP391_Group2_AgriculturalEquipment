@@ -26,13 +26,6 @@
                                 <form action="${pageContext.request.contextPath}/admin-business/categories?action=create"
                                   method="post">
 
-                                <!-- ERROR -->
-                                <c:if test="${not empty error}">
-                                    <p class="text-danger small mb-3">
-                                        <b>${error}</b>
-                                    </p>
-                                </c:if>
-
                                 <!-- CATEGORY NAME -->
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">
@@ -54,6 +47,13 @@
                                               class="form-control"
                                               rows="4">${description}</textarea>
                                 </div>
+
+                                <!-- ERROR -->
+                                <c:if test="${not empty error}">
+                                    <p class="text-danger small mb-3">
+                                        <b>${error}</b>
+                                    </p>
+                                </c:if>
 
                                 <!-- BUTTON -->
                                 <div class="d-grid gap-2">

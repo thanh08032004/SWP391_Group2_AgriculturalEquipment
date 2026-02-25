@@ -108,20 +108,67 @@ public class AdminCategoryServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
 
+        String name = request.getParameter("name");
+        String description = request.getParameter("description");
+
+        if (name != null) {
+            name = name.trim();
+        }
+        if (description != null) {
+            description = description.trim();
+        }
+
+        // ===== VALIDATE =====
+        if (name == null || name.isEmpty()
+                || description == null || description.isEmpty()) {
+
+            request.setAttribute("error", "All fields are required!");
+            request.setAttribute("name", name);
+            request.setAttribute("description", description);
+
+            if ("create".equals(action)) {
+                request.getRequestDispatcher(
+                        "/views/AdminBusinessView/category-add.jsp"
+                ).forward(request, response);
+
+            } else if ("update".equals(action)) {
+
+                Category c = new Category();
+                c.setId(Integer.parseInt(request.getParameter("id")));
+                c.setName(name);
+                c.setDescription(description);
+
+                request.setAttribute("category", c);
+
+                request.getRequestDispatcher(
+                        "/views/AdminBusinessView/category-edit.jsp"
+                ).forward(request, response);
+            }
+
+            return; 
+        }
+
+        // ===== CREATE =====
         if ("create".equals(action)) {
+
             Category c = new Category();
-            c.setName(request.getParameter("name"));
-            c.setDescription(request.getParameter("description"));
+            c.setName(name);
+            c.setDescription(description);
+
             categoryDAO.insert(c);
             response.sendRedirect("categories?action=list");
 
+            // ===== UPDATE =====
         } else if ("update".equals(action)) {
+
             Category c = new Category();
             c.setId(Integer.parseInt(request.getParameter("id")));
-            c.setName(request.getParameter("name"));
-            c.setDescription(request.getParameter("description"));
+            c.setName(name);
+            c.setDescription(description);
+
             categoryDAO.update(c);
             response.sendRedirect("categories?action=list");
         }

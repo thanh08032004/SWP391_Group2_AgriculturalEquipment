@@ -51,6 +51,13 @@
                                               rows="4">${category.description}</textarea>
                                 </div>
 
+                                <!-- ERROR -->
+                                <c:if test="${not empty error}">
+                                    <p class="text-danger small mb-3">
+                                        <b>${error}</b>
+                                    </p>
+                                </c:if>
+
                                 <!-- BUTTON -->
                                 <div class="d-grid gap-2">
                                     <button type="submit"

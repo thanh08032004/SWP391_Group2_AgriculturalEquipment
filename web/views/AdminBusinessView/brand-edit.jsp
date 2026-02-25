@@ -77,6 +77,13 @@
                                                       rows="3">${brand.address}</textarea>
                                         </div>
 
+                                        <!-- ERROR -->
+                                        <c:if test="${not empty error}">
+                                            <div class="alert alert-danger">
+                                                ${error}
+                                            </div>
+                                        </c:if>
+
                                         <!-- BUTTON -->
                                         <div class="d-grid gap-2">
                                             <button type="submit"
