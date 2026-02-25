@@ -95,6 +95,12 @@
                                            class="btn btn-sm btn-primary">
                                             Detail
                                         </a>
+                                        <c:if test="${i.paymentStatus ne 'PAID'}">
+                                            <a href="${pageContext.request.contextPath}/customer/pay?id=${i.id}"
+                                               class="btn btn-sm btn-success">
+                                                Pay
+                                            </a>
+                                        </c:if>
                                     </td>
                                 </tr>
                             </c:forEach>

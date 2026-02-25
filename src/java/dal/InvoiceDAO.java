@@ -576,7 +576,7 @@ public List<VoucherDTO> getAvailableVouchersByCustomer(int customerId) {
             VoucherDTO v = new VoucherDTO();
             v.setId(rs.getInt("id"));
             v.setCode(rs.getString("code"));
-            v.setDiscountValue(rs.getBigDecimal("discount_value")); // ✅ sửa ở đây
+            v.setDiscountValue(rs.getBigDecimal("discount_value"));
             v.setDiscountType(rs.getString("discount_type"));
             list.add(v);
         }
