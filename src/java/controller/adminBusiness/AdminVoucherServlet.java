@@ -2,15 +2,11 @@ package controller.adminBusiness;
 
 import dal.VoucherDAO;
 import model.Voucher;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.sql.Date;
-import java.util.List;
+import java.util.*;
 
 public class AdminVoucherServlet extends HttpServlet {
 
@@ -29,19 +25,15 @@ public class AdminVoucherServlet extends HttpServlet {
             case "add":
                 showAddForm(req, resp);
                 break;
-
             case "detail":
                 showDetail(req, resp);
                 break;
-
             case "edit":
                 showEditForm(req, resp);
                 break;
-
             case "delete":
                 deleteVoucher(req, resp);
                 break;
-
             default:
                 listVouchers(req, resp);
         }
@@ -51,6 +43,7 @@ public class AdminVoucherServlet extends HttpServlet {
     private void listVouchers(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        //Lưu dấu trang trên side bar khi đang truy cập trang hiện tại
         req.setAttribute("activeMenu", "voucher");
 
         String keyword = req.getParameter("keyword");
@@ -138,7 +131,7 @@ public class AdminVoucherServlet extends HttpServlet {
             throws IOException {
 
         int id = Integer.parseInt(req.getParameter("id"));
-
+        
         String page = req.getParameter("page");
         if (page == null || page.isEmpty()) {
             page = "1";
@@ -297,5 +290,4 @@ public class AdminVoucherServlet extends HttpServlet {
                     .forward(req, resp);
         }
     }
-
 }

@@ -3,33 +3,31 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <jsp:include page="/common/head.jsp"></jsp:include>
-            <title>My Voucher</title>
-        </head>
-        <body class="bg-light">
-            <header>
-            <jsp:include page="/common/header.jsp"></jsp:include>
-            </header>
+        <jsp:include page="/common/head.jsp"/>
+        <title>My Voucher</title>
+    </head>
 
-            <div class="admin-layout d-flex">
+    <body class="bg-light">
+        <header>
+            <jsp:include page="/common/header.jsp"/>
+        </header>
 
-                <!-- CONTENT -->
-                <main class="admin-content flex-grow-1">
-                    <div class="container my-5">
+        <div class="admin-layout d-flex">
+            <main class="admin-content flex-grow-1">
+                <div class="container my-5">
 
-                        <!-- Title -->
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2 class="fw-bold">
-                                <i class="bi bi-ticket-perforated me-2"></i> My Voucher
-                            </h2>
-                        </div>
+                    <!-- Title -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold">
+                            <i class="bi bi-ticket-perforated me-2"></i> My Voucher
+                        </h2>
+                    </div>
 
-                        <div class="card border-0 shadow-sm rounded-3">
-                            <div class="table-responsive p-3">
-
-                                <form class="row g-2 mb-3"
-                                      method="get"
-                                      action="${pageContext.request.contextPath}/customer/voucher">
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="table-responsive p-3">
+                            <form class="row g-2 mb-3"
+                                  method="get"  
+                                  action="${pageContext.request.contextPath}/customer/vouchers">   
 
                                 <div class="col-md-4">
                                     <input type="text"
@@ -52,75 +50,78 @@
                                     </a>
                                 </div>
                             </form>
-
-
+                                        
                             <!-- TABLE -->
                             <table class="table table-hover align-middle">
-                                <thead class="table-dark">
+                                <thead class="table-dark text-center">
                                     <tr>
-                                        <th class="text-center">Code</th>
-                                        <th class="text-center">Description</th>
-                                        <th class="text-center">Discount</th>
-                                        <th class="text-center">Min Service Price</th>
-                                        <th class="text-center">Status</th>
-                                        <th class="text-center">Action</th>
+                                        <th>Code</th>
+                                        <th>Discount</th>
+                                        <th>Min Order</th>
+                                        <th>End Date</th>                                  
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    <c:forEach var="v" items="${vouchers}">
-                                        <tr>
-                                            <td class="text-center">${v.code}</td>
-                                            <td class="text-center">${v.description}</td>
+                                    <c:forEach var="v" items="${voucherList}">
+                                        <tr class="text-center">
 
-                                            <td class="text-center">
+                                            <!-- Code -->
+                                            <td>${v.code}</td>
+
+                                            <!-- Discount -->
+                                            <td>
                                                 <c:choose>
                                                     <c:when test="${v.discountType == 'PERCENT'}">
                                                         ${v.discountValue}%
                                                     </c:when>
                                                     <c:otherwise>
-                                                        ${v.discountValue}
+                                                        ${v.discountValue} VND
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
 
-                                            <td class="text-center">
+                                            <!-- Min Order -->
+                                            <td>
                                                 ${v.minServicePrice} VND
                                             </td>
 
-                                            <td class="text-center">
-                                                <c:choose>
-                                                    <c:when test="${v.used}">
-                                                        <span class="badge bg-secondary">Used</span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="badge bg-success">Available</span>
-                                                    </c:otherwise>
-                                                </c:choose>
+                                            <!-- End Date -->
+                                            <td>
+                                                ${v.endDate}
                                             </td>
 
-                                            <td class="text-center d-flex align-items-center" >
-                                                <!-- Detail -->
-                                                <a class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center"
-                                                   title="View detail"
-                                                   href="${pageContext.request.contextPath}/customer/vouchers?action=detail&id=${v.id}" style="width: 30px;  height: 30px; line-height: 30px; padding: 0; margin: 3px">
+                                            <!-- Action -->
+                                            <td>
+                                                <a class="btn btn-sm btn-outline-info"
+                                                   href="${pageContext.request.contextPath}/customer/vouchers?action=detail&id=${v.id}">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
                                             </td>
+
                                         </tr>
                                     </c:forEach>
+
+                                    <c:if test="${empty voucherList}">
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted">
+                                                No voucher available
+                                            </td>
+                                        </tr>
+                                    </c:if>
+
                                 </tbody>
                             </table>
 
-
-                            <!--Phân trang-->
+                            <!-- Pagination -->
                             <nav>
                                 <ul class="pagination justify-content-center">
 
                                     <c:if test="${currentPage > 1}">
                                         <li class="page-item">
                                             <a class="page-link"
-                                               href="?page=${currentPage - 1}&keyword=${keyword}">
+                                               href="${pageContext.request.contextPath}/customer/vouchers?page=${currentPage - 1}">
                                                 &laquo;
                                             </a>
                                         </li>
@@ -129,7 +130,7 @@
                                     <c:forEach begin="1" end="${totalPage}" var="i">
                                         <li class="page-item ${i == currentPage ? 'active' : ''}">
                                             <a class="page-link"
-                                               href="?page=${i}&keyword=${keyword}">
+                                               href="${pageContext.request.contextPath}/customer/vouchers?page=${i}&keyword=${keyword}">
                                                 ${i}
                                             </a>
                                         </li>
@@ -138,7 +139,7 @@
                                     <c:if test="${currentPage < totalPage}">
                                         <li class="page-item">
                                             <a class="page-link"
-                                               href="?page=${currentPage + 1}&keyword=${keyword}">
+                                               href="${pageContext.request.contextPath}/customer/vouchers?page=${currentPage + 1}">
                                                 &raquo;
                                             </a>
                                         </li>
@@ -147,15 +148,12 @@
                                 </ul>
                             </nav>
 
-
                         </div>
                     </div>
-
                 </div>
             </main>
         </div>
 
-        <!-- SCRIPT -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
-</html>
+</html> 

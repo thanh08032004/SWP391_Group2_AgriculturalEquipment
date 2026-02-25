@@ -161,18 +161,12 @@ CREATE TABLE maintenance (
   device_id INT NOT NULL,
   technician_id INT,
   description TEXT,
-  status ENUM('PENDING','IN_PROGRESS','DONE','CANCELED') DEFAULT 'PENDING',
+  status ENUM('READY', 'PENDING', 'WAITING_FOR_TECHNICIAN', 'TECHNICIAN_ACCEPTED', 'DIAGNOSIS READY', 'IN_PROGRESS', 'DONE') DEFAULT 'READY',
   image VARCHAR(255),
   start_date DATE NOT NULL,
   end_date DATE,
-
-  FOREIGN KEY (device_id)
-    REFERENCES device(id)
-    ON DELETE CASCADE,
-
-  FOREIGN KEY (technician_id)
-    REFERENCES users(id)
-    ON DELETE RESTRICT
+  FOREIGN KEY (device_id) REFERENCES device(id) ON DELETE CASCADE,
+  FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- =================================================
@@ -495,112 +489,40 @@ INSERT INTO inventory (spare_part_id, quantity) VALUES
 (2, 50),
 (3, 80),
 (4, 60);
-INSERT INTO maintenance (
-  device_id,
-  technician_id,
-  description,
-  status,
-  image,
-  start_date,
-  end_date
-) VALUES (
-  1,
-  3,
-  'Bảo trì định kỳ, thay linh kiện hao mòn',
-  'DONE',
-  'maintenance.png',
-  '2025-01-15',
-  '2025-01-16'
-),
-(
-  2,
-  3,
-  'Kiểm tra động cơ và thay lọc gió',
-  'DONE',
-  'maintenance.png',
-  '2025-02-05',
-  '2025-02-06'
-),
 
--- Maintenance #3
-(
-  3,
-  3,
-  'Sửa chữa hệ thống truyền động',
-  'IN_PROGRESS',
-  'maintenance.png',
-  '2025-02-20',
-  NULL
-),
 
--- Maintenance #4
-(
-  4,
-  3,
-  'Bảo dưỡng định kỳ – kiểm tra dầu và bugi',
-  'PENDING',
-  'maintenance.png',
-  '2025-03-01',
-  NULL
-),
+INSERT INTO maintenance (device_id, technician_id, description, status, start_date, end_date) VALUES  
+(1, 3, 'Regular maintenance, replaced worn parts', 'DONE', '2025-01-15', '2025-01-16'),
+(2, 3, 'Checked engine and replaced air filter', 'IN_PROGRESS', '2025-02-05', '2025-02-06'),
+(3, 3, 'Repaired transmission system', 'TECHNICIAN_ACCEPTED', '2025-02-20', NULL),
+(4, 3, 'Scheduled service - check oil and spark plugs', 'PENDING', '2025-03-01', NULL),
+(5, 3, 'Fixing sprayer issues', 'READY', '2025-03-02', NULL); -- Thêm bản ghi ID 5 tại đây
 
--- Maintenance #5
-(
-  5,
-  3,
-  'Khắc phục lỗi phun thuốc không đều',
-  'DONE',
-  'maintenance.png',
-  '2025-01-28',
-  '2025-01-29'
-);
-INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES
-(1, 1, 1),  -- Oil Filter x1
-(1, 2, 2),  -- Brake Pad x2
-(1, 3, 1);  -- Spark Plug x1
-INSERT INTO invoice (
-  maintenance_id,
-    voucher_id,
-  labor_cost,
-  discount_amount,
-  total_amount,
-  description,
-  payment_status,
-  payment_method,
-  issued_at,
-  paid_at
-) VALUES (
-  1,
-  1,
-  100000,
-  50000,
-  580000,
-  'Hóa đơn bảo trì thiết bị – thay linh kiện & tiền công',
-  'PAID',
-  'CASH',
-  NOW(),
-  NOW()
-);
--- Maintenance #2 (id = 2)
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (1, 1, 1);
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (1, 2, 2);
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (1, 3, 1);
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (2, 4, 1);
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (2, 1, 1);
-
--- Maintenance #3 (id = 3)
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (3, 2, 2);
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (3, 3, 1);
-
--- Maintenance #4 (id = 4)
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (4, 1, 1);
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (4, 3, 2);
-
--- Maintenance #5 (id = 5)
-INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (5, 2, 1);
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (5, 2, 1); -- Hết lỗi tại dòng này
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (5, 4, 1);
 
+-- 1. Tạo bản ghi Maintenance ở trạng thái DIAGNOSIS READY
+INSERT INTO maintenance (device_id, technician_id, description, status, image, start_date) 
+VALUES 
+(1, 3, 'Kỹ thuật viên báo: Hỏng vòng bi và cần thay dầu máy.', 'DIAGNOSIS READY', 'jd_tractor.jpg', '2026-02-23'),
+(2, 3, 'Kỹ thuật viên báo: Lọc gió quá bẩn, cần thay thế để tránh hỏng động cơ.', 'DIAGNOSIS READY', 'kubota_tractor.jpg', '2026-02-24');
 
+-- 2. Thêm linh kiện (Maintenance Items) để hiển thị bảng báo giá trên JSP
+-- Giả sử ID của 2 bản ghi trên là 6 và 7
 
+-- Linh kiện cho bản ghi #6
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (6, 1, 1); -- Oil Filter
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (6, 2, 2); -- Brake Pad (vòng bi)
 
-
-
-
+-- Linh kiện cho bản ghi #7
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (7, 4, 1); -- Air Filter
 

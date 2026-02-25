@@ -291,11 +291,11 @@
             }
 
             function forgetMe() {
-                if (confirm("Bạn có chắc muốn hủy ghi nhớ đăng nhập trên thiết bị này?")) {
+                if (confirm("Are you sure you want to cancel login reminders on this device?")) {
                     fetch("${pageContext.request.contextPath}/forget-me", {method: "POST"})
                             .then(res => res.json())
                             .then(data => {
-                                alert("Đã hủy remember me thành công.");
+                                alert("Successfully!");
                                 location.reload();
                             });
                 }

@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <jsp:include page="/common/head.jsp"/>
-    <title>Voucher Detail - AgriCMS</title>
+    <title>Voucher Detail</title>
 </head>
 <body class="bg-light">
 
