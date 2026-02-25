@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package controller.technican;
+package controller.technician;
 
 import dal.MaintenanceDAO;
 import dal.SparePartDAO;

@@ -1,4 +1,9 @@
-package controller.technican;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
+
+package controller.technician;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -6,7 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class InventoryServlet extends HttpServlet {
+/**
+ *
+ * @author LOQ
+ */
+public class TechnicanHomeServlet extends HttpServlet {
+   
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -17,8 +27,8 @@ public class InventoryServlet extends HttpServlet {
         }
 
         // List<Part> list = partDAO.getAll();
-        // request.setAttribute("partsList", list);
+        // request.setAttribute("tasksList", list);
 
-        request.getRequestDispatcher("/views/StaffView/inventory.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/StaffView/tasks.jsp").forward(request, response);
     }
 }
