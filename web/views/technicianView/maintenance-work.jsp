@@ -26,14 +26,29 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4 text-center">
+                                    <c:if test="${not empty m.image}">
+                                        <img src="${pageContext.request.contextPath}/images/${m.image}" 
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-height:200px; object-fit:cover;">
+                                    </c:if>
+
+                                    <c:if test="${empty m.image}">
+                                        <img src="${pageContext.request.contextPath}/images/default.jpg" 
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-height:200px; object-fit:cover;">
+                                    </c:if>
+                                </div>
+
+                                <div class="col-md-8">
                                     <p><strong>ID:</strong> #${m.id}</p>
                                     <p><strong>Customer:</strong> ${m.customerName}</p>
                                     <p><strong>Device:</strong> ${m.machineName}</p>
-                                </div>
-                                <div class="col-md-6">
                                     <p><strong>Description:</strong> ${m.description}</p>
-                                    <p><strong>Status:</strong> <span class="badge bg-primary">${m.status}</span></p>
+                                    <p>
+                                        <strong>Status:</strong> 
+                                        <span class="badge bg-primary">${m.status}</span>
+                                    </p>
                                     <p><strong>Start Date:</strong> ${m.startDate}</p>
                                 </div>
                             </div>
@@ -60,7 +75,7 @@
                                                 <th width="15%">Price</th>
                                                 <th width="15%">Quantity</th>
                                                 <th width="15%">Stock</th>
-                                                
+
                                             </tr>
                                         </thead>
                                         <tbody>

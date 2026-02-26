@@ -76,12 +76,29 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
         }
         if ("list".equals(action)) {
             String name = req.getParameter("customerName");
-           
 
-            req.setAttribute("list",
-                    dao.searchWaitingForTechnician(name));
+            int pageSize = 5;
+            int pageIndex = 1;
+
+            String pageParam = req.getParameter("page");
+            if (pageParam != null) {
+                pageIndex = Integer.parseInt(pageParam);
+            }
+
+            List<MaintenanceDTO> list = dao.searchWaitingForTechnicianPaging(name, pageIndex, pageSize);
+
+            int totalRecord = dao.countWaitingForTechnician(name);
+
+            int totalPage = (int) Math.ceil((double) totalRecord / pageSize);
+
+            req.setAttribute("list", list);
+            req.setAttribute("currentPage", pageIndex);
+            req.setAttribute("totalPage", totalPage);
+
+            req.getRequestDispatcher("/views/technicianView/maintenance-list.jsp")
+                    .forward(req, resp);
 //            req.setAttribute("hasInProgressTask", dao.hasInProgressTask(technicianId));
-            req.getRequestDispatcher("/views/technicianView/maintenance-list.jsp").forward(req, resp);
+
         }
 
         if ("accept".equals(action)) {
@@ -111,8 +128,26 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             String name = req.getParameter("customerName");
             String status = req.getParameter("status");
 
-            req.setAttribute("list",
-                    dao.searchMyTasks(technicianId, name, status));
+            int pageSize = 5;
+            int pageIndex = 1;
+
+            String pageParam = req.getParameter("page");
+            if (pageParam != null) {
+                pageIndex = Integer.parseInt(pageParam);
+            }
+
+            List<MaintenanceDTO> list
+                    = dao.searchMyTasksPaging(technicianId, name, status, pageIndex, pageSize);
+
+            int totalRecord
+                    = dao.countMyTasks(technicianId, name, status);
+
+            int totalPage
+                    = (int) Math.ceil((double) totalRecord / pageSize);
+
+            req.setAttribute("list", list);
+            req.setAttribute("currentPage", pageIndex);
+            req.setAttribute("totalPage", totalPage);
             req.getRequestDispatcher("/views/technicianView/my-tasks.jsp").forward(req, resp);
         }
         if ("work".equals(action)) {

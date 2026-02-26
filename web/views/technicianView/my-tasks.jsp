@@ -81,7 +81,7 @@
                                 Reset
                             </a>
                         </form>
-                        
+
                     </div>
 
                     <div class="card border-0 shadow-sm rounded-3">
@@ -166,6 +166,38 @@
                                     </c:if>
                                 </tbody>
                             </table>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center mt-4">
+
+                                    <c:if test="${currentPage > 1}">
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks&page=${currentPage - 1}&customerName=${param.customerName}&status=${param.status}">
+                                                &laquo;
+                                            </a>
+                                        </li>
+                                    </c:if>
+
+                                    <c:forEach var="i" begin="1" end="${totalPage}">
+                                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                            <a class="page-link"
+                                               href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks&page=${i}&customerName=${param.customerName}&status=${param.status}">
+                                                ${i}
+                                            </a>
+                                        </li>
+                                    </c:forEach>
+
+                                    <c:if test="${currentPage < totalPage}">
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks&page=${currentPage + 1}&customerName=${param.customerName}&status=${param.status}">
+                                                &raquo;
+                                            </a>
+                                        </li>
+                                    </c:if>
+
+                                </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
