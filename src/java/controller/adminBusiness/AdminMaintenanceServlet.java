@@ -14,7 +14,7 @@ public class AdminMaintenanceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         MaintenanceDAO dao = new MaintenanceDAO();
-
+        //hien thi 1 chi tiet bao tri
         if ("detail".equals(action)) {
             int id = Integer.parseInt(request.getParameter("id"));
             Maintenance task = dao.getMaintenanceById(id);
@@ -23,6 +23,7 @@ public class AdminMaintenanceServlet extends HttpServlet {
             request.setAttribute("items", items);
             request.getRequestDispatcher("/views/AdminBusinessView/maintenance-detail.jsp").forward(request, response);
         } else {
+            //list or search
             String name = request.getParameter("customerName");
             String status = request.getParameter("status");
             List<Maintenance> list = dao.searchMaintenanceRequests(name, status);
@@ -36,11 +37,12 @@ public class AdminMaintenanceServlet extends HttpServlet {
         String action = request.getParameter("action");
         MaintenanceDAO dao = new MaintenanceDAO();
         int id = Integer.parseInt(request.getParameter("id"));
-
+        //send-to-customer
         if ("send-to-customer".equals(action)) {
             boolean success = dao.updateStatus(id, "DIAGNOSIS READY");
             response.sendRedirect("maintenance?msg=" + (success ? "sent_success" : "error"));
-        } else if ("approve-diagnosis".equals(action)) {
+        } //approve-diagnosis
+        else if ("approve-diagnosis".equals(action)) {
             dao.updateStatus(id, "IN_PROGRESS");
             response.sendRedirect("maintenance?action=detail&id=" + id);
         } else if ("assign".equals(action)) {

@@ -6,7 +6,7 @@ import java.util.*;
 import model.Maintenance;
 
 public class MaintenanceDAO extends DBContext {
-
+    
     public boolean createMaintenanceRequest(int deviceId, String description, String image) {
         String sql = "INSERT INTO maintenance (device_id, description, image, status, start_date) "
                 + "VALUES (?, ?, ?, 'PENDING', CURDATE())";
@@ -69,7 +69,7 @@ public class MaintenanceDAO extends DBContext {
         return list;
     }
 
-    // Task: Admin & Customer view device status/diagnostic info
+    // Admin & Customer view device status/diagnostic info
     public Maintenance getMaintenanceById(int id) {
         String sql = "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name "
                 + "FROM maintenance m "
@@ -100,7 +100,7 @@ public class MaintenanceDAO extends DBContext {
         return null;
     }
 
-    // Update overall status (Used for Admin to send notifications and for Customer feedback)
+    // Update status
     public boolean updateStatus(int id, String status) {
         String sql = "UPDATE maintenance SET status = ? WHERE id = ?";
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -155,7 +155,7 @@ public class MaintenanceDAO extends DBContext {
         }
         return list;
     }
-
+///////////////////////////////////////////////////////////////////////////////////////
     public List<MaintenanceDTO> getWaitingForTechnician() {
         List<MaintenanceDTO> list = new ArrayList<>();
         String sql = """
@@ -263,20 +263,7 @@ public class MaintenanceDAO extends DBContext {
 //        return false;
 //    }
 
-//    private MaintenanceDTO map(ResultSet rs) throws SQLException {
-//        return MaintenanceDTO.builder()
-//                .id(rs.getInt("id"))
-//                        .deviceId(rs.getInt("device_id"))
-//                        .technicianId(rs.getInt("technician_id"))
-//                        .description(rs.getString("description"))
-//                        .status(rs.getString("status"))
-//                        .startDate(rs.getDate("start_date"))
-//                        .endDate(rs.getDate("end_date"))
-//                        .image(rs.getString("image"))
-//                        .customerName(rs.getString("customerName"))
-//                        .machineName(rs.getString("machineName"))
-//                        .build();
-//    }
+
     public void upsert(int maintenanceId, int sparePartId, int qty) {
         String sql = """
             INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity)

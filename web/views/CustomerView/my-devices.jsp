@@ -91,23 +91,18 @@
                                     </c:otherwise>
                                 </c:choose>
                             </td>
-                            <%-- Action Column Logic --%>
                             <td>
                                 <c:choose>
-                                    <%-- TRƯỜNG HỢP 1: Admin đã gửi chẩn đoán (Public status) --%>
                                     <c:when test="${d.currentMaintenanceId > 0 && d.maintenanceStatus == 'DIAGNOSIS READY'}">
                                         <a href="${pageContext.request.contextPath}/customer/maintenance?action=view-detail&id=${d.currentMaintenanceId}" class="btn btn-info">
                                             View Diagnosis
                                         </a>
                                     </c:when>
 
-                                    <%-- TRƯỜNG HỢP 2: Đang trong quy trình bảo trì nhưng KHÔNG thuộc TH1 (VD: PENDING, TECHNICIAN_SUBMITTED, IN_PROGRESS) --%>
-                                    <%-- Sử dụng d.status == 'MAINTENANCE' để khóa tất cả máy đang sửa --%>
                                     <c:when test="${d.currentMaintenanceId > 0 || d.status == 'MAINTENANCE'}">
                                         <span style="color: #6c757d; font-style: italic;">Processing...</span>
                                     </c:when>
 
-                                    <%-- TRƯỜNG HỢP 3: Máy hoàn toàn rảnh rỗi (Ready) --%>
                                     <c:otherwise>
                                         <a href="${pageContext.request.contextPath}/customer/maintenance?deviceId=${d.id}" class="btn btn-primary">
                                             Request Service
