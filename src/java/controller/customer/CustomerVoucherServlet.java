@@ -10,7 +10,7 @@ import model.User;
 
 public class CustomerVoucherServlet extends HttpServlet {
 
-    private static final int PAGE_SIZE = 3;
+    private static final int PAGE_SIZE = 5;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

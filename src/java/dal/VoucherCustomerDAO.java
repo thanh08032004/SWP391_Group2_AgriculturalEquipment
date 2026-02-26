@@ -9,11 +9,8 @@ public class VoucherCustomerDAO extends DBContext {
     public int countValidVoucher(int customerId, String keyword) {
         String sql = """
              SELECT COUNT(*)
-             FROM voucher v
-             JOIN customer_voucher cv ON v.id = cv.voucher_id 
-             WHERE cv.customer_id = ? 
-             AND cv.is_used = FALSE 
-             AND v.is_active = TRUE 
+             FROM voucher v             
+             WHERE  v.is_active = TRUE 
              AND CURDATE() BETWEEN v.start_date AND v.end_date 
              AND v.code LIKE ?
              """;
@@ -22,8 +19,7 @@ public class VoucherCustomerDAO extends DBContext {
             Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
 
-            ps.setInt(1, customerId);
-            ps.setString(2, "%" + keyword + "%");
+            ps.setString(1, "%" + keyword + "%");
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -45,16 +41,13 @@ public class VoucherCustomerDAO extends DBContext {
 
         List<Voucher> list = new ArrayList<>();
         String sql = """
-             SELECT v.*
-             FROM voucher v
-             JOIN customer_voucher cv ON v.id = cv.voucher_id
-             WHERE cv.customer_id = ?
-             AND cv.is_used = FALSE
-             AND v.is_active = TRUE
-             AND CURDATE() BETWEEN v.start_date AND v.end_date
-             AND v.code LIKE ?
-             ORDER BY v.start_date DESC
-             LIMIT ?, ?
+              SELECT v.*
+                     FROM voucher v
+                     WHERE v.is_active = TRUE
+                     AND CURDATE() BETWEEN v.start_date AND v.end_date
+                     AND v.code LIKE ?
+                     ORDER BY v.start_date DESC
+                     LIMIT ?, ?
              """;
 
         try {
@@ -63,10 +56,9 @@ public class VoucherCustomerDAO extends DBContext {
 
             int offset = (page - 1) * pageSize;
 
-            ps.setInt(1, customerId);
-            ps.setString(2, "%" + keyword + "%");
-            ps.setInt(3, offset);
-            ps.setInt(4, pageSize);
+            ps.setString(1, "%" + keyword + "%");
+            ps.setInt(2, offset);
+            ps.setInt(3, pageSize);
 
             ResultSet rs = ps.executeQuery();
 

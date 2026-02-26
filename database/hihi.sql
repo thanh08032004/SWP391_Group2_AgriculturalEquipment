@@ -350,7 +350,38 @@ CREATE TABLE device_spare_part (
 
   UNIQUE (device_id, spare_part_id)
 ) ENGINE=InnoDB;
+CREATE TABLE maintenance_rating (
+  id INT AUTO_INCREMENT PRIMARY KEY,
 
+  maintenance_id INT NOT NULL,
+  customer_id INT NOT NULL,
+
+  rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  comment TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (maintenance_id)
+    REFERENCES maintenance(id)
+    ON DELETE CASCADE,
+
+  FOREIGN KEY (customer_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+
+  UNIQUE (maintenance_id, customer_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE maintenance_rating_image (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  rating_id INT NOT NULL,
+  image_url VARCHAR(255) NOT NULL,
+  uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (rating_id)
+    REFERENCES maintenance_rating(id)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 INSERT INTO role (name, description, active) VALUES
 ('ADMIN_SYSTEM',   'Quản trị toàn hệ thống', TRUE),
@@ -442,23 +473,6 @@ INSERT INTO brand (name, phone, email, address) VALUES
 ('Husqvarna', '+46-36-146500', 'support@husqvarna.com', 'Huskvarna, Sweden'),
 ('Honda', '+81-3-3423-1111', 'info@honda.co.jp', 'Tokyo, Japan'),
 ('Satake', '+81-82-420-0001', 'info@satake-group.com', 'Hiroshima, Japan');
-INSERT INTO voucher 
-(code, description, discount_type, discount_value, min_service_price, start_date, end_date, is_active)
-VALUES
--- Percent vouchers
-('NEWYEAR10', '10% discount for New Year promotion', 'PERCENT', 10.00, 300000, '2024-01-01', '2024-01-31', TRUE),
-('SPRING15', '15% off for spring season', 'PERCENT', 15.00, 500000, '2024-02-01', '2024-03-31', TRUE),
-('SUMMER20', '20% summer sale voucher', 'PERCENT', 20.00, 700000, '2024-06-01', '2024-06-30', TRUE),
-('WELCOME5', '5% discount for new customers', 'PERCENT', 5.00, 200000, '2024-01-01', '2024-12-31', TRUE),
-
--- Amount vouchers
-('SAVE50K', 'Save 50,000 VND on services', 'AMOUNT', 50000, 300000, '2024-01-10', '2024-04-30', TRUE),
-('SAVE100K', 'Save 100,000 VND on orders', 'AMOUNT', 100000, 600000, '2024-02-01', '2024-05-31', TRUE),
-('BIGSALE200K', 'Big sale 200,000 VND voucher', 'AMOUNT', 200000, 1000000, '2024-03-01', '2024-03-31', FALSE),
-
--- Expired vouchers
-('OLD2023', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, '2023-01-01', '2023-12-31', FALSE),
-('FLASH30', '30% flash sale voucher', 'PERCENT', 30.00, 800000, '2023-11-01', '2023-11-15', FALSE);
 
 INSERT INTO device (
   customer_id,
@@ -483,7 +497,10 @@ INSERT INTO spare_part (part_code, name, description, unit, price, image) VALUES
 ('SP-001', 'Oil Filter', 'Lọc dầu động cơ', 'Cái', 50000, 'oil_filter.jpg'),
 ('SP-002', 'Brake Pad', 'Má phanh trước', 'Bộ', 200000, 'brake_pad.jpg'),
 ('SP-003', 'Spark Plug', 'Bugi đánh lửa', 'Cái', 80000, 'spark_plug.jpg'),
-('SP-004', 'Air Filter', 'Lọc gió động cơ', 'Cái', 60000, 'air_filter.jpg');
+('SP-004', 'Air Filter', 'Lọc gió động cơ', 'Cái', 60000, 'air_filter.jpg'),
+('KB-BG-01','Spark Plug', 'Bugi Đánh Lửa K-20', 'Cái', 150000, 'bugi.jpg'),
+('YN-LC-70','Steel Cutting Blade', 'Lưỡi Cắt Thép SK5', 'Bộ', 2800000, 'blade.jpg'),
+('JD-LD-TH','Hydraulic Oil Filter', 'Lọc Dầu Thủy Lực', 'Cái', 450000, 'oil_filter.jpg');
 INSERT INTO inventory (spare_part_id, quantity) VALUES
 (1, 100),
 (2, 50),
@@ -516,13 +533,242 @@ VALUES
 (1, 3, 'Kỹ thuật viên báo: Hỏng vòng bi và cần thay dầu máy.', 'DIAGNOSIS READY', 'jd_tractor.jpg', '2026-02-23'),
 (2, 3, 'Kỹ thuật viên báo: Lọc gió quá bẩn, cần thay thế để tránh hỏng động cơ.', 'DIAGNOSIS READY', 'kubota_tractor.jpg', '2026-02-24');
 
--- 2. Thêm linh kiện (Maintenance Items) để hiển thị bảng báo giá trên JSP
--- Giả sử ID của 2 bản ghi trên là 6 và 7
+INSERT INTO voucher 
+(code, description, discount_type, discount_value, min_service_price, start_date, end_date, is_active)
+VALUES
+-- Percent vouchers
+('NEWYEAR10', '10% discount for New Year promotion', 'PERCENT', 10.00, 300000, '2026-01-01', '2026-12-31', TRUE),
+('SPRING15', '15% off for spring season', 'PERCENT', 15.00, 500000, '2026-01-01', '2026-12-31', TRUE),
+('SUMMER20', '20% summer sale voucher', 'PERCENT', 20.00, 700000, '2026-01-01', '2026-12-31', TRUE),
+('WELCOME5', '5% discount for new customers', 'PERCENT', 5.00, 200000, '2026-01-01', '2026-12-31', TRUE),
 
--- Linh kiện cho bản ghi #6
-INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (6, 1, 1); -- Oil Filter
-INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (6, 2, 2); -- Brake Pad (vòng bi)
+-- Amount vouchers
+('SAVE50K', 'Save 50,000 VND on services', 'AMOUNT', 50000, 300000, '2026-01-01', '2026-12-31', TRUE),
+('SAVE100K', 'Save 100,000 VND on orders', 'AMOUNT', 100000, 600000, '2026-01-01', '2026-12-31', TRUE),
+('BIGSALE200K', 'Big sale 200,000 VND voucher', 'AMOUNT', 200000, 1000000, '2026-01-01', '2026-12-31', TRUE),
 
--- Linh kiện cho bản ghi #7
-INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (7, 4, 1); -- Air Filter
+-- Previously expired vouchers (giờ cho còn hạn luôn nếu muốn test)
+('OLD2023', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, '2026-01-01', '2026-12-31', TRUE),
+('FLASH30', '30% flash sale voucher', 'PERCENT', 30.00, 800000, '2026-01-01', '2026-12-31', TRUE);
 
+INSERT INTO maintenance (
+  device_id,
+  technician_id,
+  description,
+  status,
+  start_date,
+  end_date
+) VALUES (
+  1,
+  3,
+  'Bảo trì định kỳ, thay linh kiện hao mòn',
+  'DONE',
+  '2025-01-15',
+  '2025-01-16'
+),
+(
+  2,
+  3,
+  'Kiểm tra động cơ và thay lọc gió',
+  'DONE',
+  '2025-02-05',
+  '2025-02-06'
+),
+
+-- Maintenance #3
+(
+  3,
+  3,
+  'Sửa chữa hệ thống truyền động',
+  'IN_PROGRESS',
+  '2025-02-20',
+  NULL
+),
+
+-- Maintenance #4
+(
+  4,
+  3,
+  'Bảo dưỡng định kỳ – kiểm tra dầu và bugi',
+  'PENDING',
+  '2025-03-01',
+  NULL
+),
+
+-- Maintenance #5
+(
+  5,
+  3,
+  'Khắc phục lỗi phun thuốc không đều',
+  'DONE',
+  '2025-01-28',
+  '2025-01-29'
+);
+INSERT INTO invoice (
+  maintenance_id,
+    voucher_id,
+  labor_cost,
+  discount_amount,
+  total_amount,
+  description,
+  payment_status,
+  payment_method,
+  issued_at,
+  paid_at
+) VALUES (
+  1,
+  1,
+  100000,
+  50000,
+  580000,
+  'Hóa đơn bảo trì thiết bị – thay linh kiện & tiền công',
+  'PAID',
+  'CASH',
+  NOW(),
+  NOW()
+);
+
+-- Thêm user mới
+INSERT INTO users (username, password, role_id) VALUES
+('customer2', '$2a$10$FVDjXIMwma2lrHkABJpi2O62ydScIgVsJ9oxzdRZAAX/Cl7wM7fa6', 4),
+('customer3', '$2a$10$FVDjXIMwma2lrHkABJpi2O62ydScIgVsJ9oxzdRZAAX/Cl7wM7fa6', 4),
+('tech2', '$2a$10$FVDjXIMwma2lrHkABJpi2O62ydScIgVsJ9oxzdRZAAX/Cl7wM7fa6', 3);
+
+INSERT INTO user_profile (user_id, fullname, email, gender, date_of_birth, address, phone, avatar) VALUES
+(6, 'Nguyễn Văn B', 'customer2@gmail.com', 'MALE', '1995-04-10', 'Hà Nội', '0901111111', 'user.jpg'),
+(7, 'Trần Thị C', 'customer3@gmail.com', 'FEMALE', '1998-09-20', 'Hà Nội', '0902222222', 'user.jpg'),
+(8, 'Tech Staff 2', 'tech2@gmail.com', 'MALE', '1993-02-02', 'Hà Nội', '0903333333', 'staff.jpg');
+
+INSERT INTO device (
+  customer_id,
+  serial_number,
+  machine_name,
+  model,
+  price,
+  purchase_date,
+  warranty_end_date,
+  status,
+  category_id,
+  brand_id,
+  image
+) VALUES
+(6, 'SN-NEW-006', 'Máy cày Kubota X', 'KB-X500', 700000000, '2024-01-01', '2027-01-01', 'ACTIVE', 1, 2, 'kubota_x.jpg'),
+(7, 'SN-NEW-007', 'Máy gặt New Holland', 'NH-888', 1500000000, '2023-07-01', '2026-07-01', 'ACTIVE', 2, 3, 'newholland.jpg');
+
+INSERT INTO maintenance (
+  device_id,
+  technician_id,
+  description,
+  status,
+  start_date,
+  end_date
+) VALUES
+(6, 8, 'Thay lọc dầu và bugi', 'DONE', '2025-03-10', '2025-03-11'),
+(7, 8, 'Sửa hệ thống thu hoạch', 'IN_PROGRESS', '2025-03-15', NULL);
+
+INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES
+(6, 1, 1),
+(6, 3, 2),
+(7, 2, 1);
+
+INSERT INTO invoice (
+  maintenance_id,
+  voucher_id,
+  labor_cost,
+  discount_amount,
+  total_amount,
+  description,
+  payment_status,
+  payment_method,
+  issued_at,
+  paid_at
+) VALUES (
+  6,
+  4,
+  150000,
+  20000,
+  360000,
+  'Hóa đơn bảo trì – Customer 2',
+  'PAID',
+  'BANK_TRANSFER',
+  NOW(),
+  NOW()
+);
+
+INSERT INTO invoice (
+  maintenance_id,
+  voucher_id,
+  labor_cost,
+  discount_amount,
+  total_amount,
+  description,
+  payment_status,
+  payment_method,
+  issued_at
+) VALUES (
+  7,
+  NULL,
+  300000,
+  0,
+  500000,
+  'Hóa đơn sửa chữa – Customer 3',
+  'UNPAID',
+  'CASH',
+  NOW()
+);
+-- Customer id = 4
+INSERT INTO customer_voucher (customer_id, voucher_id, is_used)
+VALUES
+(4, 2, FALSE),
+(4, 4, FALSE),
+(4, 5, FALSE);
+
+-- Customer id = 6
+INSERT INTO customer_voucher (customer_id, voucher_id, is_used)
+VALUES
+(6, 1, FALSE),
+(6, 6, FALSE);
+
+-- Customer id = 7
+INSERT INTO customer_voucher (customer_id, voucher_id, is_used)
+VALUES
+(7, 2, FALSE),
+(7, 4, FALSE),
+(7, 5, FALSE);
+
+-- Thêm đánh giá
+INSERT INTO maintenance_rating (
+  maintenance_id,
+  customer_id,
+  rating,
+  comment
+) VALUES (
+  3,
+  4,
+  5,
+  'Kỹ thuật viên sửa rất nhanh và chuyên nghiệp'
+);
+
+-- Thêm ảnh cho rating vừa tạo (giả sử id = 1)
+INSERT INTO maintenance_rating_image (rating_id, image_url)
+VALUES 
+(1, 'rating_3_img1.jpg'),
+(1, 'rating_3_img2.jpg');
+
+-- Thêm đánh giá
+INSERT INTO maintenance_rating (
+  maintenance_id,
+  customer_id,
+  rating,
+  comment
+) VALUES (
+  5,
+  4,
+  4,
+  'Sửa tốt nhưng hơi lâu'
+);
+
+-- Thêm ảnh cho rating vừa tạo (giả sử id = 2)
+INSERT INTO maintenance_rating_image (rating_id, image_url)
+VALUES 
+(2, 'rating_5_img1.jpg');
