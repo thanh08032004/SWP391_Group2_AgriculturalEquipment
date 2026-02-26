@@ -12,6 +12,18 @@
         <servlet-name>TechnicianInvoiceServlet</servlet-name>
         <servlet-class>controller.technician.TechnicianInvoiceServlet</servlet-class>
     </servlet>
+        <servlet>
+        <servlet-name>TechnicianInvoiceDetailServlet</servlet-name>
+        <servlet-class>controller.technician.TechnicianInvoiceDetailServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TechnicianDeleteInvoiceServlet</servlet-name>
+        <servlet-class>controller.technician.TechnicianDeleteInvoiceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TechnicianAddInvoiceServlet</servlet-name>
+        <servlet-class>controller.technician.TechnicianAddInvoiceServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CustomerInvoiceDetail</servlet-name>
         <url-pattern>/customer/invoicedetail</url-pattern>
@@ -19,6 +31,18 @@
     <servlet-mapping>
         <servlet-name>TechnicianInvoiceServlet</servlet-name>
         <url-pattern>/technician/invoicelist</url-pattern>
+    </servlet-mapping>
+        <servlet-mapping>
+        <servlet-name>TechnicianInvoiceDetailServlet</servlet-name>
+        <url-pattern>/technician/invoicedetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TechnicianDeleteInvoiceServlet</servlet-name>
+        <url-pattern>/technician/deleteinvoice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TechnicianAddInvoiceServlet</servlet-name>
+        <url-pattern>/technician/addinvoice</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>

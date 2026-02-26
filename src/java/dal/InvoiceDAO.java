@@ -778,6 +778,74 @@ public List<Invoice> searchFilterInvoiceByTechnician(
 
         return total;
     }
+    public List<MaintenanceDTO> getAvailableMaintenancesByTechnician(int technicianId) {
+
+    List<MaintenanceDTO> list = new ArrayList<>();
+
+    String sql = """
+        SELECT
+            m.id,
+            up.fullname AS customer_name
+        FROM maintenance m
+        JOIN device d ON m.device_id = d.id
+        JOIN users u ON d.customer_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        LEFT JOIN invoice i ON m.id = i.maintenance_id
+        WHERE i.id IS NULL
+          AND m.status = 'DONE'
+          AND m.technician_id = ?
+        ORDER BY m.id DESC
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, technicianId);
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            MaintenanceDTO dto = new MaintenanceDTO();
+            dto.setId(rs.getInt("id"));
+            dto.setCustomerName(rs.getString("customer_name"));
+            list.add(dto);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+    public boolean checkMaintenanceBelongsToTechnician(
+        int maintenanceId,
+        int technicianId) {
+
+    String sql = """
+        SELECT 1
+        FROM maintenance m
+        LEFT JOIN invoice i ON m.id = i.maintenance_id
+        WHERE m.id = ?
+          AND m.technician_id = ?
+          AND m.status = 'DONE'
+          AND i.id IS NULL
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, maintenanceId);
+        ps.setInt(2, technicianId);
+
+        ResultSet rs = ps.executeQuery();
+        return rs.next();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return false;
+}
     public static void main(String[] args) {
         InvoiceDAO dao = new InvoiceDAO();
         InvoiceDetailDTO list = dao.getInvoiceDetailById(1);
