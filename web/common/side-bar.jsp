@@ -34,7 +34,7 @@
             <c:when test="${sessionScope.userRole == 'TECHNICIAN'}">
                 <li><a href="${pageContext.request.contextPath}/technician/maintenance">Maintenance List</a></li>
                 <li><a href="${pageContext.request.contextPath}/technician/invoicelist">Customer Invoice</a></li>
-                <li><a href="${pageContext.request.contextPath}/technician/mytask">My Task</a></li>
+                <li><a href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks">My Task</a></li>
                 <li><a href="${pageContext.request.contextPath}/technician/maintenance">Service Logs</a></li>
                 </c:when>
 

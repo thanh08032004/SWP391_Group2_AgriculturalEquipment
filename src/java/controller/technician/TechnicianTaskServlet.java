@@ -59,19 +59,19 @@ public class TechnicianTaskServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String action = req.getParameter("action");
-        SparePartDAO spDao = new SparePartDAO();
-        User user = (User) req.getSession().getAttribute("user");
-        int technicianId = user.getId();
-
-        if (action == null || action.isEmpty()) {
-            action = "list";
-        }
-        
-        if ("list".equals(action)) {
-        req.setAttribute("list", dao.getMyTasks(technicianId));
-        req.getRequestDispatcher("/views/technicianView/my-tasks.jsp").forward(req, resp);
-    }
+//        String action = req.getParameter("action");
+//        SparePartDAO spDao = new SparePartDAO();
+//        User user = (User) req.getSession().getAttribute("user");
+//        int technicianId = user.getId();
+//
+//        if (action == null || action.isEmpty()) {
+//            action = "list";
+//        }
+//        
+//        if ("list".equals(action)) {
+//        req.setAttribute("list", dao.getMyTasks(technicianId));
+//        req.getRequestDispatcher("/views/technicianView/my-tasks.jsp").forward(req, resp);
+//    }
     }
 
     @Override

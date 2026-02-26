@@ -31,7 +31,7 @@
                                    placeholder="Enter name of Customer"
                                    value="${param.customerName}">
 
-                            
+
 
                             <button type="submit" class="btn btn-secondary px-4">
                                 Search
@@ -99,6 +99,38 @@
                                     </c:if>
                                 </tbody>
                             </table>
+                            <nav>
+                                <ul class="pagination justify-content-center mt-3">
+
+                                    <c:if test="${currentPage > 1}">
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="maintenance?action=list&page=${currentPage - 1}&customerName=${param.customerName}">
+                                                &laquo;
+                                            </a>
+                                        </li>
+                                    </c:if>
+
+                                    <c:forEach var="i" begin="1" end="${totalPage}">
+                                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                            <a class="page-link"
+                                               href="maintenance?action=list&page=${i}&customerName=${param.customerName}">
+                                                ${i}
+                                            </a>
+                                        </li>
+                                    </c:forEach>
+
+                                    <c:if test="${currentPage < totalPage}">
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="maintenance?action=list&page=${currentPage + 1}&customerName=${param.customerName}">
+                                                &raquo;
+                                            </a>
+                                        </li>
+                                    </c:if>
+
+                                </ul>
+                            </nav>
                         </div>
                     </div>
 
