@@ -77,7 +77,6 @@
                     <tbody>
                     <c:forEach var="d" items="${deviceList}">
                         <tr>
-
                             <td>#${d.serialNumber}</td>
                             <td>${d.machineName}</td>
                             <td>${d.model}</td>
