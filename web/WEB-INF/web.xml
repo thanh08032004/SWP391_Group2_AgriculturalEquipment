@@ -24,6 +24,10 @@
         <servlet-name>TechnicianAddInvoiceServlet</servlet-name>
         <servlet-class>controller.technician.TechnicianAddInvoiceServlet</servlet-class>
     </servlet>
+        <servlet>
+        <servlet-name>CustomerFeedbackServlet</servlet-name>
+        <servlet-class>controller.customer.CustomerFeedbackServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CustomerInvoiceDetail</servlet-name>
         <url-pattern>/customer/invoicedetail</url-pattern>
@@ -43,6 +47,10 @@
     <servlet-mapping>
         <servlet-name>TechnicianAddInvoiceServlet</servlet-name>
         <url-pattern>/technician/addinvoice</url-pattern>
+    </servlet-mapping>
+        <servlet-mapping>
+        <servlet-name>CustomerFeedbackServlet</servlet-name>
+        <url-pattern>/customer/feedbacklist</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
