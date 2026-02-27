@@ -320,7 +320,7 @@ public class MaintenanceDAO extends DBContext {
     public boolean submitTaskToAdmin(int maintenanceId, int technicianId) {
         String sql = """
         UPDATE maintenance
-                SET status = 'TECHNICIAN_SUBMITTED', end_date = CURDATE()
+                SET status = 'TECHNICIAN_SUBMITTED'
                 WHERE id = ?
                 AND technician_id = ?
                 AND status = 'TECHNICIAN_ACCEPTED'
@@ -450,7 +450,7 @@ public class MaintenanceDAO extends DBContext {
                 + "            AND m.technician_id IS NULL";
 
         if (name != null && !name.trim().isEmpty()) {
-            sql += " AND customer_name LIKE ?";
+            sql += " AND u.fullname LIKE ?";
         }
 
         sql += " ORDER BY id DESC LIMIT ? OFFSET ?";
@@ -490,10 +490,15 @@ public class MaintenanceDAO extends DBContext {
 
     public int countWaitingForTechnician(String name) {
 
-        String sql = "SELECT COUNT(*) FROM maintenance WHERE status = 'WAITING_FOR_TECHNICIAN' AND technician_id IS NULL ";
+        String sql = "SELECT COUNT(*)\n" +
+"        FROM maintenance m\n" +
+"        JOIN device d ON m.device_id = d.id\n" +
+"        JOIN user_profile u ON d.customer_id = u.user_id\n" +
+"        WHERE m.status = 'WAITING_FOR_TECHNICIAN'\n" +
+"        AND m.technician_id IS NULL ";
 
         if (name != null && !name.trim().isEmpty()) {
-            sql += " AND customer_name LIKE ?";
+            sql += " AND u.fullname LIKE ?";
         }
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -628,4 +633,15 @@ public class MaintenanceDAO extends DBContext {
 
     return 0;
 }
+    public boolean completeTask(int id, String status) {
+        String sql = "UPDATE maintenance SET status = ?, end_date = CURDATE() WHERE id = ?";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

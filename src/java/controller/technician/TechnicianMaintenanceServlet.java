@@ -175,7 +175,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
 
             int id = Integer.parseInt(req.getParameter("id"));
 
-            boolean success = dao.updateStatus(id, "DONE");
+            boolean success = dao.completeTask(id, "DONE");
 
             if (success) {
                 req.getSession().setAttribute("success", "Task marked as DONE!");
