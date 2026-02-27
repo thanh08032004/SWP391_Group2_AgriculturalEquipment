@@ -7,9 +7,7 @@ import java.util.List;
 
 public class VoucherDAO extends DBContext {
 
-    /* =========================
-       LIST + SEARCH + PAGINATION
-       ========================= */
+    /* LIST + SEARCH + PAGINATION */
     public List<Voucher> getVouchers(String keyword, int page, int pageSize) {
         List<Voucher> list = new ArrayList<>();
 
@@ -37,9 +35,7 @@ public class VoucherDAO extends DBContext {
         return list;
     }
 
-    /* =========================
-       COUNT (for pagination)
-       ========================= */
+    /* COUNT total voucher (dung cho phan trang) */
     public int countVouchers(String keyword) {
         String sql = """
             SELECT COUNT(*)
@@ -60,9 +56,7 @@ public class VoucherDAO extends DBContext {
         return 0;
     }
 
-    /* =========================
-       GET BY ID (Detail)
-       ========================= */
+    /* Get voucher by ID (Detail) */
     public Voucher getVoucherById(int id) {
         String sql = "SELECT * FROM voucher WHERE id = ?";
 
@@ -79,9 +73,7 @@ public class VoucherDAO extends DBContext {
         return null;
     }
 
-    /* =========================
-       DELETE
-       ========================= */
+    /* Delete Voucher */
     public void deleteVoucher(int id) {
         String sql = "DELETE FROM voucher WHERE id = ?";
 
@@ -93,9 +85,7 @@ public class VoucherDAO extends DBContext {
         }
     }
 
-    /* =========================
-       MAP RESULTSET → VOUCHER
-       ========================= */
+    /* MAP RESULTSET → VOUCHER */
     private Voucher mapVoucher(ResultSet rs) throws SQLException {
         Voucher v = new Voucher();
 
@@ -137,6 +127,7 @@ public class VoucherDAO extends DBContext {
         }
     }
 
+    /* Update Voucher */
     public void updateVoucher(Voucher v) {
         String sql = """
         UPDATE voucher
@@ -164,6 +155,7 @@ public class VoucherDAO extends DBContext {
         }
     }
 
+    /*chua dung toi - dung cho tao voucher theo id customer*/
     public int countValidVouchersForCustomer(
             int customerId,
             double totalServicePrice
@@ -177,7 +169,7 @@ public class VoucherDAO extends DBContext {
         WHERE v.active = 1
           AND v.start_date <= CURRENT_DATE
           AND v.end_date >= CURRENT_DATE
-          AND v.min_service_price <= ?
+          
           AND (cv.used IS NULL OR cv.used = 0)
     """;
 
@@ -194,6 +186,7 @@ public class VoucherDAO extends DBContext {
         return 0;
     }
 
+    /* chua dung toi - dung cho tao voucher theo id customer*/
     public List<Voucher> getValidVouchersForCustomer(
             int customerId,
             double totalServicePrice,

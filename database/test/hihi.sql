@@ -448,7 +448,7 @@ INSERT INTO user_profile (user_id, fullname, email, gender, date_of_birth, addre
 (2, 'Business Owner',    'business@gmail.com',     'MALE',   '1988-05-10', 'Hà Nội', '0981231234', 'admin.png'),
 (3, 'Technician Staff',  'technician@gmail.com',   'MALE',   '1992-08-20', 'Hà Nội','0981231234', 'staff.jpg'),
 (4, 'Cương Đức',         'cuongducjerry@gmail.com', 'MALE',   '1990-01-01', 'Hà Nội','0981231234', 'user.jpg'),
-(5, 'Quản Trị Vũ', 'admin1@gmail.com', 'MALE', '2005-01-01', 'Hà Nội', '0900900900', 'user.jpg');
+(5, 'Quản Trị Vũ', 'minhthong16205@gmail.com', 'MALE', '2005-01-01', 'Hà Nội', '0900900900', 'user.jpg');
 
 INSERT INTO category (name, description) VALUES
 ('Máy cày (Tractor)', 'Thiết bị cơ giới dùng để cày xới đất và kéo máy nông nghiệp'),
@@ -549,7 +549,13 @@ VALUES
 
 -- Previously expired vouchers (giờ cho còn hạn luôn nếu muốn test)
 ('OLD2023', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, '2026-01-01', '2026-12-31', TRUE),
-('FLASH30', '30% flash sale voucher', 'PERCENT', 30.00, 800000, '2026-01-01', '2026-12-31', TRUE);
+('FLASH30', '30% flash sale voucher', 'PERCENT', 30.00, 800000, '2026-01-01', '2026-12-31', TRUE),
+('OKOKUHUH', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, '2026-01-01', '2026-1-31', FALSE),
+('SUPERSALE', '30% flash sale voucher', 'PERCENT', 30.00, 800000, '2026-01-01', '2026-1-31', FALSE),
+
+-- Not activated. 
+('AOLD2023333', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, '2026-01-01', '2026-12-31', FALSE),
+('FLASHSSS30', '30% flash sale voucher', 'PERCENT', 30.00, 800000, '2026-01-01', '2026-12-31', FALSE);
 
 INSERT INTO maintenance (
   device_id,
