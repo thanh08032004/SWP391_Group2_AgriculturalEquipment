@@ -23,7 +23,7 @@ public class CustomerMaintenanceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         MaintenanceDAO maintenanceDAO = new MaintenanceDAO();
-
+        //cus view diagnosis from tech
         if ("view-detail".equals(action)) {
             String idStr = request.getParameter("id");
             if (idStr != null) {
@@ -37,6 +37,7 @@ public class CustomerMaintenanceServlet extends HttpServlet {
             }
         } 
         else {
+            //chuyen den req maintenance
             String deviceIdStr = request.getParameter("deviceId");
             if (deviceIdStr != null) {
                 int deviceId = Integer.parseInt(deviceIdStr);

@@ -45,7 +45,8 @@ public class AdminMaintenanceServlet extends HttpServlet {
         else if ("approve-diagnosis".equals(action)) {
             dao.updateStatus(id, "IN_PROGRESS");
             response.sendRedirect("maintenance?action=detail&id=" + id);
-        } else if ("assign".equals(action)) {
+        } //send task to pool
+        else if ("assign".equals(action)) {
             boolean success = dao.updateStatus(id, "WAITING_FOR_TECHNICIAN");
             response.sendRedirect("maintenance?msg=" + (success ? "assign_success" : "assign error"));
         }

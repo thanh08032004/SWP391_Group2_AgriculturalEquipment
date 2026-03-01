@@ -89,7 +89,6 @@
                                     <tbody>
                                         <c:forEach var="item" items="${items}">
                                             <tr>
-                                                <%-- Khớp với key 'name' trong Map của MaintenanceDAO --%>
                                                 <td>${item.name}</td>
                                                 <td class="text-center">x${item.quantity}</td>
                                             </tr>
@@ -99,7 +98,6 @@
                                         </c:if>
                                     </tbody>
                                 </table>
-                                <%-- Đã loại bỏ khung Decision Required (Approve/Reject) tại đây --%>
                             </div>
                         </div>
                     </c:if>
