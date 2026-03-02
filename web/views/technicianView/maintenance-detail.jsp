@@ -13,7 +13,7 @@
         <div class="admin-content p-4 w-100">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="fw-bold">Maintenance Request #${task.id}</h2>
-                <a href="${pageContext.request.contextPath}/technician/maintenance" class="btn btn-outline-secondary btn-sm">
+                <a href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left"></i> Back to List
                 </a>
             </div>
