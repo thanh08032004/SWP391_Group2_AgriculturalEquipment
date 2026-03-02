@@ -25,7 +25,7 @@
                             <option value="IN_PROGRESS" ${currentStatus == 'IN_PROGRESS' ? 'selected' : ''}>Repair In Progress</option>
                             <option value="DONE" ${currentStatus == 'DONE' ? 'selected' : ''}>Completed</option>
                         </select>
-                        <button type="submit" class="btn btn-secondary px-5">Search</button>
+                        <button type="submit" class="btn btn-secondary px-5 d-flex align-items-center justify-content-center">Search</button>
                     </form>
                 </div>
 

@@ -71,9 +71,8 @@
                             </select>
 
                             <!-- Search button -->
-                            <button type="submit" class="btn btn-secondary px-4">
-                                Search
-                            </button>
+                            <button type="submit" class="btn btn-secondary px-5 d-flex align-items-center justify-content-center">Search</button>
+
 
                             <!-- Reset button -->
                             <a href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks"
