@@ -4,6 +4,7 @@ import dal.MaintenanceDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import model.Maintenance;
@@ -45,6 +46,15 @@ public class AdminMaintenanceServlet extends HttpServlet {
         else if ("approve-diagnosis".equals(action)) {
             dao.updateStatus(id, "IN_PROGRESS");
             response.sendRedirect("maintenance?action=detail&id=" + id);
+        } //reject-diagnosis
+        else if ("reject-diagnosis".equals(action)) {
+            boolean updateStatus = dao.updateStatus(id, "TECHNICIAN_ACCEPTED");
+            boolean clearItems = dao.saveMaintenanceItems(id, new ArrayList<>(), new ArrayList<>());
+            if (updateStatus && clearItems) {
+                response.sendRedirect("maintenance?action=detail&id=" + id + "&msg=rejected_and_cleared");
+            } else {
+                response.sendRedirect("maintenance?action=detail&id=" + id + "&msg=error");
+            }
         } //send task to pool
         else if ("assign".equals(action)) {
             boolean success = dao.updateStatus(id, "WAITING_FOR_TECHNICIAN");
