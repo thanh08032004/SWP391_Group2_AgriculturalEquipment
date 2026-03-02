@@ -14,6 +14,7 @@
                 <li><a href="${pageContext.request.contextPath}/admin/password-reset">Reset Password</a></li>
                 </c:when>
                 <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
+                <li><a href="${pageContext.request.contextPath}/admin-business/reports">Dashboard</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/devices">Device Management</a></li>
 
                 <li><a href="${pageContext.request.contextPath}/admin-business/categories">Category Management</a></li>
@@ -24,7 +25,7 @@
                         Voucher Management
                     </a>
                 </li>
-                 <li><a href="${pageContext.request.contextPath}/admin-business/invoicelist">Invoice Management</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin-business/invoicelist">Invoice Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/feedbacklist">Feedback Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/maintenance">Maintenance Requests</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/contracts">Contract Management</a></li>
