@@ -634,7 +634,13 @@ public class MaintenanceDAO extends DBContext {
     return 0;
 }
     public boolean completeTask(int id, String status) {
-        String sql = "UPDATE maintenance SET status = ?, end_date = CURDATE() WHERE id = ?";
+        String sql = "UPDATE maintenance m\n" +
+"        JOIN device d ON m.device_id = d.id\n" +
+"        SET \n" +
+"            m.status = ?,\n" +
+"            m.end_date = CURDATE(),\n" +
+"            d.status = 'ACTIVE'\n" +
+"        WHERE m.id = ?";
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, id);
