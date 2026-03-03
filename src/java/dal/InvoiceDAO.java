@@ -846,6 +846,25 @@ public List<Invoice> searchFilterInvoiceByTechnician(
 
     return false;
 }
+    public void updatePaymentStatusToPaid(int invoiceId) {
+
+    String sql = """
+    UPDATE invoice
+    SET payment_status = 'PAID'
+    WHERE id = ?
+    AND payment_status <> 'PAID'
+""";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, invoiceId);
+        ps.executeUpdate();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
     public static void main(String[] args) {
         InvoiceDAO dao = new InvoiceDAO();
         InvoiceDetailDTO list = dao.getInvoiceDetailById(1);

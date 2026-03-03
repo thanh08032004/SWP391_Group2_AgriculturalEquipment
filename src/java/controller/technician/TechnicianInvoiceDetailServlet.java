@@ -51,10 +51,26 @@ public class TechnicianInvoiceDetailServlet extends HttpServlet {
 
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+    protected void doPost(HttpServletRequest request,
+                      HttpServletResponse response)
+        throws ServletException, IOException {
+
+    String action = request.getParameter("action");
+
+    if ("markPaid".equals(action)) {
+
+        int invoiceId =
+            Integer.parseInt(request.getParameter("invoiceId"));
+
+        InvoiceDAO dao = new InvoiceDAO();
+        dao.updatePaymentStatusToPaid(invoiceId);
+
+        response.sendRedirect(
+            request.getContextPath()
+            + "/technician/invoicedetail?id=" + invoiceId
+        );
     }
+}
 
     @Override
     public String getServletInfo() {
