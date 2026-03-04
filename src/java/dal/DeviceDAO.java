@@ -1,4 +1,4 @@
-package dal;
+    package dal;
 
 import dto.BrandDTO;
 import dto.CategoryDTO;
@@ -154,7 +154,7 @@ public class DeviceDAO extends DBContext {
             ps.setString(11, d.getImage());
 
             int rows = ps.executeUpdate();
-            return rows > 0;   // 👈 CHỐT Ở ĐÂY
+            return rows > 0;   
 
         } catch (Exception e) {
             e.printStackTrace();

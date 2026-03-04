@@ -28,7 +28,7 @@
                             <div class="row">
                                 <div class="col-md-4 text-center">
                                     <c:if test="${not empty m.image}">
-                                        <img src="${pageContext.request.contextPath}/images/${m.image}" 
+                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${m.image}" 
                                              class="img-fluid rounded shadow-sm"
                                              style="max-height:200px; object-fit:cover;">
                                     </c:if>
