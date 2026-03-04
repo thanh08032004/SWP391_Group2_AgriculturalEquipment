@@ -68,7 +68,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
                 deviceDAO.updateDeviceStatus(m.getDeviceId(), "MAINTENANCE");
             } else {
                 maintenanceDAO.updateStatus(id, "READY");
-                deviceDAO.updateDeviceStatus(m.getDeviceId(), "ACTIVE");
+                deviceDAO.updateDeviceStatus(m.getDeviceId(), "BROKEN");
             }
             response.sendRedirect(request.getContextPath() + "/customer/devices?msg=updated");
         } catch (Exception e) {

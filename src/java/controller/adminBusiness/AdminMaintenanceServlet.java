@@ -19,7 +19,7 @@ public class AdminMaintenanceServlet extends HttpServlet {
         if ("detail".equals(action)) {
             int id = Integer.parseInt(request.getParameter("id"));
             Maintenance task = dao.getMaintenanceById(id);
-            List<Map<String, Object>> items = dao.getMaintenanceItems(id);
+            List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
             request.setAttribute("task", task);
             request.setAttribute("items", items);
             request.getRequestDispatcher("/views/AdminBusinessView/maintenance-detail.jsp").forward(request, response);
@@ -43,10 +43,10 @@ public class AdminMaintenanceServlet extends HttpServlet {
             boolean success = dao.updateStatus(id, "DIAGNOSIS READY");
             response.sendRedirect("maintenance?msg=" + (success ? "sent_success" : "error"));
         } //approve-diagnosis
-        else if ("approve-diagnosis".equals(action)) {
-            dao.updateStatus(id, "IN_PROGRESS");
-            response.sendRedirect("maintenance?action=detail&id=" + id);
-        } //reject-diagnosis
+//        else if ("approve-diagnosis".equals(action)) {
+//            dao.updateStatus(id, "IN_PROGRESS");
+//            response.sendRedirect("maintenance?action=detail&id=" + id);
+//        } //reject-diagnosis
         else if ("reject-diagnosis".equals(action)) {
             boolean updateStatus = dao.updateStatus(id, "TECHNICIAN_ACCEPTED");
             boolean clearItems = dao.saveMaintenanceItems(id, new ArrayList<>(), new ArrayList<>());
