@@ -1,9 +1,5 @@
-
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
-
-
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isErrorPage="true"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="roleHome" value="${pageContext.request.contextPath}/home" />
 <c:choose>
     <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
@@ -14,6 +10,9 @@
     </c:when>
     <c:when test="${sessionScope.userRole == 'STAFF'}">
         <c:set var="roleHome" value="${pageContext.request.contextPath}/staff/tasks" />
+    </c:when>
+    <c:when test="${sessionScope.userRole == 'TECHLEADER'}">
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/leader/maintenance" />
     </c:when>
 </c:choose>
 
