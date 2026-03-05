@@ -11,6 +11,9 @@
     <c:when test="${sessionScope.userRole == 'STAFF'}">
         <c:set var="roleHome" value="${pageContext.request.contextPath}/staff/tasks" />
     </c:when>
+    <c:when test="${sessionScope.userRole == 'TECHLEADER'}">
+        <c:set var="roleHome" value="${pageContext.request.contextPath}/leader/maintenance" />
+    </c:when>
 </c:choose>
 <!DOCTYPE html>
 <html>

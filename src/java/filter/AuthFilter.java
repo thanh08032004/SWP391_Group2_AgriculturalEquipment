@@ -44,7 +44,7 @@ public class AuthFilter implements Filter {
 
         if (user == null) {
             if (uri.contains("/admin") || uri.contains("/technician")
-                    || uri.contains("/customer") || uri.contains("/admin-business")) {
+                    || uri.contains("/customer") || uri.contains("/admin-business") || uri.contains("/leader")) {
                 res.sendRedirect(contextPath + "/login");
                 return;
             }
@@ -61,6 +61,9 @@ public class AuthFilter implements Filter {
                 res.sendError(HttpServletResponse.SC_FORBIDDEN); return;
             }
             if (uri.contains("/customer/") && role != 4) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN); return;
+            }
+             if (uri.contains("/leader/") && role != 5) {
                 res.sendError(HttpServletResponse.SC_FORBIDDEN); return;
             }
         }

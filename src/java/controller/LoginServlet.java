@@ -55,6 +55,7 @@ public class LoginServlet extends HttpServlet {
             case 2 -> session.setAttribute("userRole", "ADMIN_BUSINESS");
             case 3 -> session.setAttribute("userRole", "TECHNICIAN");
             case 4 -> session.setAttribute("userRole", "CUSTOMER");
+            case 5 -> session.setAttribute("userRole", "TECHLEADER");
         }
 
         //Remember Me
@@ -76,6 +77,7 @@ public class LoginServlet extends HttpServlet {
             case 2 -> response.sendRedirect(ctx + "/admin-business/devices");
             case 3 -> response.sendRedirect(ctx + "/technician/maintenance");
             case 4 -> response.sendRedirect(ctx + "/customer/home");
+            case 5 -> response.sendRedirect(ctx + "/leader/maintenance");
             default -> {
                 session.invalidate();
                 response.sendRedirect(ctx + "/login");
