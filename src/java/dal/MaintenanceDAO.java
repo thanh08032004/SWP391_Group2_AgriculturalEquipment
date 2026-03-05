@@ -116,7 +116,7 @@ public class MaintenanceDAO extends DBContext {
     // Get a list of components along with their prices to display a quotation for the customer.
     public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId) {
         List<Map<String, Object>> list = new ArrayList<>();
-        String sql = "SELECT mi.quantity, sp.name, sp.price "
+        String sql = "SELECT mi.quantity, sp.name, sp.price, sp.unit "
                 + "FROM maintenance_item mi "
                 + "JOIN spare_part sp ON mi.spare_part_id = sp.id "
                 + "WHERE mi.maintenance_id = ?";
@@ -128,6 +128,7 @@ public class MaintenanceDAO extends DBContext {
                 map.put("name", rs.getString("name"));
                 map.put("quantity", rs.getInt("quantity"));
                 map.put("price", rs.getBigDecimal("price"));
+                map.put("unit", rs.getString("unit"));
                 list.add(map);
             }
         } catch (SQLException e) {

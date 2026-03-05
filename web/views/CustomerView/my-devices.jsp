@@ -82,9 +82,14 @@
                             <td>${d.model}</td>
                             <td>
                                 <c:choose>
-                                    <c:when test="${d.currentMaintenanceId > 0 || d.status == 'MAINTENANCE'}">
+                                    <c:when test="${d.status == 'MAINTENANCE'}">
                                         <span class="badge bg-warning">Under Maintenance</span>
                                     </c:when>
+
+                                    <c:when test="${d.status == 'BROKEN'}">
+                                        <span class="badge bg-danger">Broken</span>
+                                    </c:when>
+
                                     <c:otherwise>
                                         <span class="badge bg-success">Ready</span>
                                     </c:otherwise>
@@ -98,7 +103,7 @@
                                         </a>
                                     </c:when>
 
-                                    <c:when test="${d.currentMaintenanceId > 0 || d.status == 'MAINTENANCE'}">
+                                    <c:when test="${d.status == 'MAINTENANCE'}">
                                         <span style="color: #6c757d; font-style: italic;">Processing...</span>
                                     </c:when>
 

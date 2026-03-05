@@ -19,7 +19,7 @@
                             <div class="col-md-6">
                                 <div class="card border-0 shadow-sm">
 
-                                    <div class="card-header bg-warning text-dark py-3">
+                                    <div class="card-header py-3 text-white" style="background-color: #8C593B;">
                                         <h5 class="mb-0 fw-bold">
                                             <i class="bi bi-pencil-square me-2"></i>
                                             Edit Brand
@@ -87,7 +87,8 @@
                                         <!-- BUTTON -->
                                         <div class="d-grid gap-2">
                                             <button type="submit"
-                                                    class="btn btn-warning fw-bold">
+                                                    class="btn fw-bold text-white"
+                                                    style="background-color: #8C593B; border-color: #8C593B;">
                                                 <i class="bi bi-save me-1"></i>
                                                 Update Brand
                                             </button>
@@ -108,7 +109,6 @@
             </div>
         </div>
 
-        <jsp:include page="/common/footer.jsp"></jsp:include>
         <jsp:include page="/common/scripts.jsp"></jsp:include>
     </body>
 </html>

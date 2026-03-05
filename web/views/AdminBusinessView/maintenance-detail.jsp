@@ -1,5 +1,6 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -96,19 +97,35 @@
                                                     <tr>
                                                         <th>Part Name</th>
                                                         <th class="text-center">Quantity</th>
+                                                        <th class="text-center">Unit</th>
+                                                        <th class="text-end">Price</th> <%-- Căn phải cho tiền tệ --%>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    <c:set var="total" value="0" />
                                                     <c:forEach var="item" items="${items}">
                                                         <tr>
                                                             <td>${item.name}</td>
-                                                            <td class="text-center">x${item.quantity}</td>
+                                                            <td class="text-center">${item.quantity}</td>
+                                                            <td class="text-center">${item.unit}</td>
+                                                            <td class="text-end">
+                                                                <fmt:formatNumber value="${item.price}" type="currency" currencySymbol=""/>
+                                                            </td>
                                                         </tr>
+                                                        <c:set var="total" value="${total + (item.price * item.quantity)}" />
                                                     </c:forEach>
                                                     <c:if test="${empty items}">
                                                         <tr><td colspan="2" class="text-center text-muted italic py-3">No spare parts suggested.</td></tr>
                                                     </c:if>
                                                 </tbody>
+                                                <tfoot class="table-light fw-bold">
+                                                    <tr>
+                                                        <td colspan="3" class="text-end text-uppercase">Estimated Total:</td>
+                                                        <td class="text-end text-primary">
+                                                            <fmt:formatNumber value="${total}" type="currency" currencySymbol=""/>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
                                             </table>
                                         </c:otherwise>
                                     </c:choose>
@@ -117,6 +134,20 @@
                         </c:if>
                     </div>
 
+                    <!--Assign to staff-->
+                    <c:if test="${task.status == 'PENDING'}">
+                        <div class="mt-4 p-3 bg-light border rounded d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-muted">Send to task pool:</span>
+                            <div class="d-flex gap-2">
+                                <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="post" style="display:inline;">
+                                    <input type="hidden" name="action" value="assign">
+                                    <input type="hidden" name="id" value="${task.id}"> <button type="submit" class="btn btn-sm btn-outline-dark">
+                                        Assign Staff
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </c:if>
                     <!--duyet chuan doan-->
                     <c:if test="${task.status == 'TECHNICIAN_SUBMITTED'}">
                         <div class="mt-4 p-3 bg-light border rounded d-flex justify-content-between align-items-center">
