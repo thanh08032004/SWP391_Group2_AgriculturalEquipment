@@ -70,6 +70,7 @@
                                         <th>Phone</th>
                                         <th>Email</th>
                                         <th>Address</th>
+                                        <th>Status</th>
                                         <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -81,20 +82,53 @@
                                             <td>${b.phone}</td>
                                             <td>${b.email}</td>
                                             <td>${b.address}</td>
+
+                                            <!-- STATUS COLUMN -->
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${b.status == 'ACTIVE'}">
+                                                        <span class="badge bg-success">ACTIVE</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge bg-danger">INACTIVE</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+
                                             <td class="text-center">
+
+                                                <!-- Detail luôn hiển thị -->
                                                 <a href="${pageContext.request.contextPath}/admin-business/brands?action=detail&id=${b.id}"
                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-                                                <a class="btn btn-sm btn-outline-primary"
-                                                   href="brands?action=edit&id=${b.id}">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <a class="btn btn-sm btn-outline-danger"
-                                                   href="brands?action=delete&id=${b.id}"
-                                                   onclick="return confirm('Delete this brand?')">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
+
+                                                <!-- Chỉ hiển thị EDIT khi ACTIVE -->
+                                                <c:if test="${b.status == 'ACTIVE'}">
+                                                    <a class="btn btn-sm btn-outline-primary"
+                                                       href="brands?action=edit&id=${b.id}">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                </c:if>
+
+                                                <!-- Toggle Status Button -->
+                                                <c:choose>
+                                                    <c:when test="${b.status == 'ACTIVE'}">
+                                                        <a class="btn btn-sm btn-outline-danger"
+                                                           href="brands?action=delete&id=${b.id}"
+                                                           onclick="return confirm('Deactivate this brand?')">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </a>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <a class="btn btn-sm btn-outline-success"
+                                                           href="brands?action=delete&id=${b.id}"
+                                                           onclick="return confirm('Activate this brand?')">
+                                                            <i class="bi bi-check-circle"></i>
+                                                        </a>
+                                                    </c:otherwise>
+                                                </c:choose>
+
                                             </td>
                                         </tr>
                                     </c:forEach>

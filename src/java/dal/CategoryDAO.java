@@ -14,7 +14,7 @@ public class CategoryDAO extends DBContext {
     //  get all category
     public List<Category> getAll() {
         List<Category> list = new ArrayList<>();
-        String sql = "SELECT id, name, description FROM category";
+        String sql = "SELECT id, name, description, status FROM category";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -23,6 +23,7 @@ public class CategoryDAO extends DBContext {
                 c.setId(rs.getInt("id"));
                 c.setName(rs.getString("name"));
                 c.setDescription(rs.getString("description"));
+                c.setStatus(rs.getString("status"));
                 list.add(c);
             }
         } catch (Exception e) {
@@ -33,7 +34,7 @@ public class CategoryDAO extends DBContext {
 
     // get category by id
     public Category getById(int id) {
-        String sql = "SELECT id, name, description FROM category WHERE id = ?";
+        String sql = "SELECT id, name, description, status FROM category WHERE id = ?";
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -43,6 +44,7 @@ public class CategoryDAO extends DBContext {
                 c.setId(rs.getInt("id"));
                 c.setName(rs.getString("name"));
                 c.setDescription(rs.getString("description"));
+                c.setStatus(rs.getString("status"));
                 return c;
             }
         } catch (Exception e) {
@@ -66,33 +68,51 @@ public class CategoryDAO extends DBContext {
 
     // update category
     public boolean update(Category c) {
-        String sql = "UPDATE category SET name = ?, description = ? WHERE id = ?";
+        String sql = """
+        UPDATE category 
+        SET name = ?, description = ? 
+        WHERE id = ? AND status = 'ACTIVE'
+    """;
+
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
             ps.setString(1, c.getName());
             ps.setString(2, c.getDescription());
             ps.setInt(3, c.getId());
-            return ps.executeUpdate() > 0;
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+
         } catch (Exception e) {
             System.err.println("Error update category!");
         }
         return false;
     }
 
-    // delete category
-    public boolean delete(int id) {
-        String sql = "DELETE FROM category WHERE id = ?";
+    // toggle status
+    public boolean toggleStatus(int id) {
+        String sql = """
+            UPDATE category
+            SET status =
+                CASE
+                    WHEN status = 'ACTIVE' THEN 'INACTIVE'
+                    ELSE 'ACTIVE'
+                END
+            WHERE id = ?
+        """;
+
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            System.err.println("Error delete update category!");
+            System.err.println("Error toggle category!");
         }
         return false;
     }
 
     public List<Category> searchByName(String keyword) {
         List<Category> list = new ArrayList<>();
-        String sql = "SELECT id, name, description FROM category WHERE name LIKE ?";
+        String sql = "SELECT id, name, description, status FROM category WHERE name LIKE ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
@@ -103,6 +123,7 @@ public class CategoryDAO extends DBContext {
                 c.setId(rs.getInt("id"));
                 c.setName(rs.getString("name"));
                 c.setDescription(rs.getString("description"));
+                c.setStatus(rs.getString("status"));
                 list.add(c);
             }
         } catch (Exception e) {
@@ -128,7 +149,7 @@ public class CategoryDAO extends DBContext {
     public List<Category> getByPage(String keyword, int page, int pageSize) {
         List<Category> list = new ArrayList<>();
         String sql = """
-        SELECT id, name, description
+        SELECT id, name, description, status
         FROM category
         WHERE name LIKE ?
         ORDER BY id
@@ -146,6 +167,7 @@ public class CategoryDAO extends DBContext {
                 c.setId(rs.getInt("id"));
                 c.setName(rs.getString("name"));
                 c.setDescription(rs.getString("description"));
+                c.setStatus(rs.getString("status"));
                 list.add(c);
             }
         } catch (Exception e) {

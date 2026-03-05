@@ -1,4 +1,4 @@
-    package dal;
+package dal;
 
 import dto.BrandDTO;
 import dto.CategoryDTO;
@@ -10,7 +10,11 @@ public class DeviceDAO extends DBContext {
 
     public List<CategoryDTO> getAllCategories() {
         List<CategoryDTO> list = new ArrayList<>();
-        String sql = "SELECT id, name, description FROM category";
+        String sql = """
+            SELECT id, name, description
+            FROM category
+            WHERE status = 'ACTIVE'
+        """;
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -29,7 +33,11 @@ public class DeviceDAO extends DBContext {
 
     public List<BrandDTO> getAllBrands() {
         List<BrandDTO> list = new ArrayList<>();
-        String sql = "SELECT id, name, phone, email, address FROM brand";
+        String sql = """
+            SELECT id, name, phone, email, address
+            FROM brand
+            WHERE status = 'ACTIVE'
+        """;
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -154,7 +162,7 @@ public class DeviceDAO extends DBContext {
             ps.setString(11, d.getImage());
 
             int rows = ps.executeUpdate();
-            return rows > 0;   
+            return rows > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -226,7 +234,6 @@ public class DeviceDAO extends DBContext {
         return false;
     }
 
-
     public int countSearchAndFilter(
             String keyword,
             String customerName,
@@ -288,10 +295,9 @@ public class DeviceDAO extends DBContext {
 
         return 0;
     }
-    
-    
+
     public List<DeviceDTO> searchAndFilterPaging(
-            String keyword, String customerName, String categoryId, 
+            String keyword, String customerName, String categoryId,
             String brandId, String status, int pageIndex, int pageSize) {
         List<DeviceDTO> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
@@ -310,13 +316,14 @@ public class DeviceDAO extends DBContext {
         List<Object> params = new ArrayList<>();
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append(" AND (d.serial_number LIKE ? OR d.machine_name LIKE ?)");
-            params.add("%" + keyword + "%"); params.add("%" + keyword + "%");
+            params.add("%" + keyword + "%");
+            params.add("%" + keyword + "%");
         }
         if (customerName != null && !customerName.trim().isEmpty()) {
             sql.append(" AND up.fullname LIKE ?");
             params.add("%" + customerName + "%");
         }
-         if (categoryId != null && !categoryId.trim().isEmpty()) {
+        if (categoryId != null && !categoryId.trim().isEmpty()) {
             sql.append(" AND d.category_id = ?");
             params.add(Integer.parseInt(categoryId));
         }
@@ -333,10 +340,13 @@ public class DeviceDAO extends DBContext {
 
         sql.append(" ORDER BY d.id DESC LIMIT ? OFFSET ?");
         int offset = (pageIndex - 1) * pageSize;
-        params.add(pageSize); params.add(offset);
+        params.add(pageSize);
+        params.add(offset);
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) { ps.setObject(i + 1, params.get(i)); }
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 DeviceDTO d = new DeviceDTO();
@@ -354,67 +364,71 @@ public class DeviceDAO extends DBContext {
                 d.setCustomerName(rs.getString("customerName"));
                 list.add(d);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
+
     public boolean isCustomerExists(int customerId) {
-    String sql = "SELECT 1 FROM users WHERE id = ? AND role_id = 4"; 
-    // role_id = 4 = CUSTOMER
+        String sql = "SELECT 1 FROM users WHERE id = ? AND role_id = 4";
+        // role_id = 4 = CUSTOMER
 
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ps.setInt(1, customerId);
-        ResultSet rs = ps.executeQuery();
-        return rs.next();
+            ps.setInt(1, customerId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
 
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    return false;
-}
-    
- public List<Map<String, Object>> getDevicesByCustomerCustom(int customerId) {
-    List<Map<String, Object>> list = new ArrayList<>();
-    String sql = "SELECT d.*, m.id as current_maintenance_id, m.status as maintenanceStatus " +
-                 "FROM device d " +
-                 "LEFT JOIN maintenance m ON m.id = (" +
-                 "    SELECT m2.id FROM maintenance m2 " +
-                 "    WHERE m2.device_id = d.id " +
-                 "    AND m2.status NOT IN ('DONE', 'READY') " +
-                 "    ORDER BY m2.id DESC LIMIT 1" +
-                 ") " +
-                 "WHERE d.customer_id = ?";
-
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, customerId);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", rs.getInt("id"));
-            map.put("serialNumber", rs.getString("serial_number"));
-            map.put("machineName", rs.getString("machine_name"));
-            map.put("model", rs.getString("model"));
-            map.put("status", rs.getString("status"));
-            
-            map.put("currentMaintenanceId", rs.getInt("current_maintenance_id"));
-            map.put("maintenanceStatus", rs.getString("maintenanceStatus"));
-            
-            list.add(map);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) { e.printStackTrace(); }
-    return list;
-}
-  
-  public boolean updateDeviceStatus(int deviceId, String status) {
-    String sql = "UPDATE device SET status = ? WHERE id = ?";
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setString(1, status);
-        ps.setInt(2, deviceId);
-        return ps.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return false;
     }
-    return false;
-}
+
+    public List<Map<String, Object>> getDevicesByCustomerCustom(int customerId) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT d.*, m.id as current_maintenance_id, m.status as maintenanceStatus "
+                + "FROM device d "
+                + "LEFT JOIN maintenance m ON m.id = ("
+                + "    SELECT m2.id FROM maintenance m2 "
+                + "    WHERE m2.device_id = d.id "
+                + "    AND m2.status NOT IN ('DONE', 'READY') "
+                + "    ORDER BY m2.id DESC LIMIT 1"
+                + ") "
+                + "WHERE d.customer_id = ?";
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", rs.getInt("id"));
+                map.put("serialNumber", rs.getString("serial_number"));
+                map.put("machineName", rs.getString("machine_name"));
+                map.put("model", rs.getString("model"));
+                map.put("status", rs.getString("status"));
+
+                map.put("currentMaintenanceId", rs.getInt("current_maintenance_id"));
+                map.put("maintenanceStatus", rs.getString("maintenanceStatus"));
+
+                list.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public boolean updateDeviceStatus(int deviceId, String status) {
+        String sql = "UPDATE device SET status = ? WHERE id = ?";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, deviceId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

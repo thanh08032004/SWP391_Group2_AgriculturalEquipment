@@ -1,4 +1,5 @@
 <%@page contentType="text/html; charset=UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -34,6 +35,19 @@
                                 <tr>
                                     <th>Description</th>
                                     <td>${category.description}</td>
+                                </tr>
+                                <tr>
+                                    <th>Status</th>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${category.status == 'ACTIVE'}">
+                                                <span class="badge bg-success fs-6">ACTIVE</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge bg-danger fs-6">INACTIVE</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
                                 </tr>
                             </table>
 

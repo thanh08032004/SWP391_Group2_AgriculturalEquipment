@@ -1,4 +1,5 @@
 <%@page contentType="text/html; charset=UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -35,6 +36,21 @@
                         <tr>
                             <th>Address</th>
                             <td>${brand.address}</td>
+                        </tr>
+
+                        <!-- STATUS -->
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                        <c:choose>
+                            <c:when test="${brand.status == 'ACTIVE'}">
+                                <span class="badge bg-success fs-6">ACTIVE</span>
+                            </c:when>
+                            <c:when test="${brand.status == 'INACTIVE'}">
+                                <span class="badge bg-danger fs-6">INACTIVE</span>
+                            </c:when>
+                        </c:choose>
+                        </td>
                         </tr>
                     </table>
 

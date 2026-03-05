@@ -56,7 +56,7 @@ public class AdminBrandServlet extends HttpServlet {
                 break;
 
             case "delete":
-                deleteBrand(request, response);
+                toggleStatus(request, response);
                 break;
 
             default:
@@ -261,7 +261,6 @@ public class AdminBrandServlet extends HttpServlet {
             error.append("Address is required.<br>");
         }
 
-
         // ===== Nếu có lỗi =====
         if (error.length() > 0) {
 
@@ -295,13 +294,13 @@ public class AdminBrandServlet extends HttpServlet {
     }
 
     // =========================
-    // DELETE
+    // TOGGLE STATUS
     // =========================
-    private void deleteBrand(HttpServletRequest request, HttpServletResponse response)
+    private void toggleStatus(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
         int id = Integer.parseInt(request.getParameter("id"));
-        brandDAO.delete(id);
+        brandDAO.toggleStatus(id);
 
         response.sendRedirect("brands?action=list");
     }

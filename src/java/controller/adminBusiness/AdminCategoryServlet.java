@@ -94,7 +94,7 @@ public class AdminCategoryServlet extends HttpServlet {
 
             case "delete": {
                 int id = Integer.parseInt(request.getParameter("id"));
-                categoryDAO.delete(id);
+                categoryDAO.toggleStatus(id);
                 response.sendRedirect("categories?action=list");
                 break;
             }
@@ -148,7 +148,7 @@ public class AdminCategoryServlet extends HttpServlet {
                 ).forward(request, response);
             }
 
-            return; 
+            return;
         }
 
         // ===== CREATE =====

@@ -66,6 +66,7 @@
                                         <th>ID</th>
                                         <th>Name</th>
                                         <th>Description</th>
+                                        <th>Status</th>
                                         <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -75,20 +76,50 @@
                                             <td>${c.id}</td>
                                             <td>${c.name}</td>
                                             <td>${c.description}</td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${c.status == 'ACTIVE'}">
+                                                        <span class="badge bg-success">ACTIVE</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge bg-danger">INACTIVE</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
                                             <td class="text-center">
+
+                                                <!-- Detail luôn hiển thị -->
                                                 <a href="categories?action=detail&id=${c.id}"
                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-eye-fill"></i>
                                                 </a>
-                                                <a class="btn btn-sm btn-outline-primary"
-                                                   href="categories?action=edit&id=${c.id}">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <a class="btn btn-sm btn-outline-danger"
-                                                   href="categories?action=delete&id=${c.id}"
-                                                   onclick="return confirm('Delete this category?')">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
+
+                                                <!-- Chỉ hiển thị EDIT khi ACTIVE -->
+                                                <c:if test="${c.status == 'ACTIVE'}">
+                                                    <a class="btn btn-sm btn-outline-primary"
+                                                       href="categories?action=edit&id=${c.id}">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                </c:if>
+
+                                                <!-- Toggle trạng thái -->
+                                                <c:choose>
+                                                    <c:when test="${c.status == 'ACTIVE'}">
+                                                        <a class="btn btn-sm btn-outline-danger"
+                                                           href="categories?action=delete&id=${c.id}"
+                                                           onclick="return confirm('Deactivate this category?')">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </a>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <a class="btn btn-sm btn-outline-success"
+                                                           href="categories?action=delete&id=${c.id}"
+                                                           onclick="return confirm('Activate this category?')">
+                                                            <i class="bi bi-check-circle"></i>
+                                                        </a>
+                                                    </c:otherwise>
+                                                </c:choose>
+
                                             </td>
                                         </tr>
                                     </c:forEach>

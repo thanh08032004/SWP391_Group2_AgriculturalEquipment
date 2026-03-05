@@ -151,9 +151,13 @@ public class BrandDAO extends DBContext {
     public void update(Brand b) {
         String sql = """
             UPDATE brand
-            SET name = ?, phone = ?, email = ?, address = ?
-            WHERE id = ?
+            SET name = ?, 
+                phone = ?, 
+                email = ?, 
+                address = ?
+            WHERE id = ? AND status = 'ACTIVE'
         """;
+
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, b.getName());
@@ -161,7 +165,12 @@ public class BrandDAO extends DBContext {
             ps.setString(3, b.getEmail());
             ps.setString(4, b.getAddress());
             ps.setInt(5, b.getId());
-            ps.executeUpdate();
+
+            int rows = ps.executeUpdate();
+
+            if (rows == 0) {
+                System.out.println("Brand is INACTIVE. Cannot update.");
+            }
 
         } catch (Exception e) {
             System.err.println("Error update brand!");
@@ -169,17 +178,26 @@ public class BrandDAO extends DBContext {
     }
 
     // =========================
-    // DELETE
+    // STATUS TOGGLE
     // =========================
-    public void delete(int id) {
-        String sql = "DELETE FROM brand WHERE id = ?";
+    public void toggleStatus(int id) {
+        String sql = """
+            UPDATE brand
+            SET status =
+                CASE
+                    WHEN status = 'ACTIVE' THEN 'INACTIVE'
+                    ELSE 'ACTIVE'
+                END
+            WHERE id = ?
+        """;
+
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ps.executeUpdate();
 
         } catch (Exception e) {
-            System.err.println("Error delete brand!");
+            System.err.println("Error toggle brand status!");
         }
     }
 
@@ -193,6 +211,7 @@ public class BrandDAO extends DBContext {
         b.setPhone(rs.getString("phone"));
         b.setEmail(rs.getString("email"));
         b.setAddress(rs.getString("address"));
+        b.setStatus(rs.getString("status"));
         return b;
     }
 }
