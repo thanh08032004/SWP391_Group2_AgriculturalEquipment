@@ -27,7 +27,7 @@
                 </li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/invoicelist">Invoice Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/feedbacklist">Feedback Management</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin-business/maintenance">Maintenance Requests</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin-business/maintenance">Maintenance History</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/contracts">Contract Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/catalog">Catalog</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/reports">Reports</a></li>
@@ -38,7 +38,10 @@
                 <li><a href="${pageContext.request.contextPath}/technician/invoicelist">Customer Invoice</a></li>
                 <li><a href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks">My Task</a></li>
                 <li><a href="${pageContext.request.contextPath}/technician/maintenance">Service Logs</a></li>
-                </c:when>
+            </c:when>
+            <c:when test="${sessionScope.userRole == 'TECHLEADER'}">
+                <li><a href="${pageContext.request.contextPath}/leader/maintenance">Maintenance List</a></li>
+            </c:when>
 
         </c:choose>
     </ul>

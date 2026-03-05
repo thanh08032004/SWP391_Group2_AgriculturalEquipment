@@ -65,24 +65,6 @@
                                     </td>
                                     <td>
                                         <c:choose>
-                                            <c:when test="${r.status == 'PENDING'}">
-                                                <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="post" style="display:inline;">
-                                                    <input type="hidden" name="action" value="assign">
-                                                    <input type="hidden" name="id" value="${r.id}">
-                                                    <button type="submit" class="btn btn-sm btn-outline-dark">
-                                                        Assign Staff
-                                                    </button>
-                                                </form>
-                                            </c:when>
-                                            <c:when test="${r.status == 'TECHNICIAN_SUBMITTED'}">
-                                                <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="post" style="display:inline;">
-                                                    <input type="hidden" name="action" value="send-to-customer">
-                                                    <input type="hidden" name="id" value="${r.id}">
-                                                    <button type="submit" class="btn btn-sm btn-outline-primary px-3">
-                                                        <i class="bi bi-send"></i> Send to Customer
-                                                    </button>
-                                                </form>
-                                            </c:when>
                                             <c:when test="${r.status == 'DONE'}">
                                                 <button class="btn btn-sm btn-outline-success">Invoice</button>
                                             </c:when>

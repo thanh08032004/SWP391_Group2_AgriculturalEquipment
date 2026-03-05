@@ -134,46 +134,6 @@
                         </c:if>
                     </div>
 
-                    <!--Assign to staff-->
-                    <c:if test="${task.status == 'PENDING'}">
-                        <div class="mt-4 p-3 bg-light border rounded d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-muted">Send to task pool:</span>
-                            <div class="d-flex gap-2">
-                                <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="post" style="display:inline;">
-                                    <input type="hidden" name="action" value="assign">
-                                    <input type="hidden" name="id" value="${task.id}"> <button type="submit" class="btn btn-sm btn-outline-dark">
-                                        Assign Staff
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </c:if>
-                    <!--duyet chuan doan-->
-                    <c:if test="${task.status == 'TECHNICIAN_SUBMITTED'}">
-                        <div class="mt-4 p-3 bg-light border rounded d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-muted">Review this diagnosis:</span>
-                            <div class="d-flex gap-2">
-                                <%-- accept: send diagnosis to customer --%>
-                                <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="post">
-                                    <input type="hidden" name="action" value="send-to-customer">
-                                    <input type="hidden" name="id" value="${task.id}">
-                                    <button type="submit" class="btn btn-success shadow-sm">
-                                        <i class="bi "></i> Accept & Send to Customer
-                                    </button>
-                                </form>
-
-                                <%-- reject: tech re diagnosis --%>
-                                <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="post">
-                                    <input type="hidden" name="action" value="reject-diagnosis">
-                                    <input type="hidden" name="id" value="${task.id}">
-                                    <button type="submit" class="btn btn-danger shadow-sm" onclick="return confirm('Request technician to re-diagnose?')">
-                                        <i class="bi "></i> Reject (Re-diagnose)
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </c:if>
-
                     <%-- khoi hien thi IN_PROGRESS hoac DONE--%>
                     <c:if test="${task.status == 'IN_PROGRESS' || task.status == 'DONE'}">
                         <div class="card border-0 shadow-sm mb-4 border-start border-success border-4 w-100">
