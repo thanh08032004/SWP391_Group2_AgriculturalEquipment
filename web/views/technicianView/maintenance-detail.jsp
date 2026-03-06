@@ -1,5 +1,7 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -56,7 +58,10 @@
                                     <div class="col-md-8">
                                         <p class="fw-bold mb-1 small text-muted text-uppercase">Problem Description:</p>
                                         <p class="text-dark">${task.description}</p>
-                                        <small class="text-muted">Submitted on: ${task.startDate}</small>
+                                        <small class="text-muted">
+                                            Submitted on: 
+                                            <fmt:formatDate value="${task.startDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                        </small>
                                     </div>
                                     <div class="col-md-4 text-end">
                                         <p class="fw-bold mb-1 small text-muted text-uppercase">Attached Image:</p>
@@ -123,8 +128,45 @@
                                 </div>
                             </div>
                         </c:if>
+                        <c:if test="${task.status == 'WAITING_FOR_TECHNICIAN' 
+                                      || task.status == 'TECHNICIAN_ACCEPTED' 
+                                      || task.status == 'IN_PROGRESS'}">
+                              <div class="card border-0 shadow-sm mb-4 border-start border-primary border-4">
+                                  <div class="card-header bg-white fw-bold text-primary">
+                                      Technician Action:
+                                  </div>
+                                  <div class="card-body text-center">
+                                      <c:choose>
+                                          <%-- WAITING FOR TECHNICIAN --%>
+                                          <c:when test="${task.status == 'WAITING_FOR_TECHNICIAN'}">
+                                              <a href="${pageContext.request.contextPath}/technician/maintenance?action=accept&id=${task.id}"
+                                                 class="btn btn-success px-4"
+                                                 onclick="return confirm('Accept this maintenance task?')">
+                                                  <i class="bi bi-check-circle"></i> Accept
+                                              </a>
+                                          </c:when>
+                                          <%-- TECHNICIAN ACCEPTED --%>
+                                          <c:when test="${task.status == 'TECHNICIAN_ACCEPTED'}">
+                                              <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${task.id}"
+                                                 class="btn btn-primary px-4">
+                                                  <i class="bi bi-tools"></i> Work
+                                              </a>
+                                          </c:when>
+                                          <%-- IN PROGRESS --%>
+                                          <c:when test="${task.status == 'IN_PROGRESS'}">
+                                              <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${task.id}"
+                                                 class="btn btn-success px-4"
+                                                 onclick="return confirm('Mark this task as DONE?');">
+                                                  <i class="bi bi-check-circle"></i> Done
+                                              </a>
+                                          </c:when>
+                                      </c:choose>
+                                  </div>
+                              </div>
+                        </c:if>
                     </div>
                 </div>
+
             </div>
         </div>
         <jsp:include page="/common/scripts.jsp"></jsp:include>

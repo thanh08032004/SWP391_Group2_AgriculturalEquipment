@@ -1,5 +1,6 @@
 package model;
 
+import java.sql.Timestamp;
 import java.sql.Date;
 import lombok.*;
 
@@ -13,8 +14,8 @@ public class Maintenance {
     private int technicianId;
     private String description;
     private String status; // PENDING, WAITING_FOR_TECHNICIAN, TECHNICIAN_ACCEPTED, DIAGNOSIS READY, IN_PROGRESS, DONE, READY
-    private Date startDate;
-    private Date endDate;
+    private Timestamp startDate;
+    private Timestamp endDate;
     private String image;
     // Join fields
     private String machineName;

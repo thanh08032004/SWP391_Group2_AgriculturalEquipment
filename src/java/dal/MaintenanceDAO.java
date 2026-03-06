@@ -9,7 +9,7 @@ public class MaintenanceDAO extends DBContext {
 
     public boolean createMaintenanceRequest(int deviceId, String description, String image) {
         String sql = "INSERT INTO maintenance (device_id, description, image, status, start_date) "
-                + "VALUES (?, ?, ?, 'PENDING', CURDATE())";
+                + "VALUES (?, ?, ?, 'PENDING', NOW())";
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, deviceId);
             ps.setString(2, description);
@@ -57,7 +57,7 @@ public class MaintenanceDAO extends DBContext {
                         .id(rs.getInt("id"))
                         .description(rs.getString("description"))
                         .status(rs.getString("status"))
-                        .startDate(rs.getDate("start_date"))
+                        .startDate(rs.getTimestamp("start_date"))
                         .machineName(rs.getString("machine_name"))
                         .modelName(rs.getString("model"))
                         .customerName(rs.getString("customer_name"))
@@ -86,8 +86,8 @@ public class MaintenanceDAO extends DBContext {
                         .technicianId(rs.getInt("technician_id"))
                         .description(rs.getString("description"))
                         .status(rs.getString("status"))
-                        .startDate(rs.getDate("start_date"))
-                        .endDate(rs.getDate("end_date"))
+                        .startDate(rs.getTimestamp("start_date"))
+                        .endDate(rs.getTimestamp("end_date"))
                         .image(rs.getString("image"))
                         .machineName(rs.getString("machine_name"))
                         .modelName(rs.getString("model"))
@@ -179,8 +179,8 @@ public class MaintenanceDAO extends DBContext {
 //                m.setTechnicianId(rs.getInt("technician_id"));
 //                m.setDescription(rs.getString("description"));
 //                m.setStatus(rs.getString("status"));
-//                m.setStartDate(rs.getDate("start_date"));
-//                m.setEndDate(rs.getDate("end_date"));
+//                m.setStartDate(rs.getTimestamp("start_date"));
+//                m.setEndDate(rs.getTimestamp("end_date"));
 //
 //                m.setCustomerName(rs.getString("customerName"));
 //                m.setMachineName(rs.getString("machineName"));
@@ -233,8 +233,8 @@ public class MaintenanceDAO extends DBContext {
                         .technicianId(rs.getInt("technician_id"))
                         .description(rs.getString("description"))
                         .status(rs.getString("status"))
-                        .startDate(rs.getDate("start_date"))
-                        .endDate(rs.getDate("end_date"))
+                        .startDate(rs.getTimestamp("start_date"))
+                        .endDate(rs.getTimestamp("end_date"))
                         .image(rs.getString("image"))
                         .customerName(rs.getString("customerName"))
                         .machineName(rs.getString("machineName"))
@@ -271,8 +271,8 @@ public class MaintenanceDAO extends DBContext {
                 m.setTechnicianId(rs.getInt("technician_id"));
                 m.setDescription(rs.getString("description"));
                 m.setStatus(rs.getString("status"));
-                m.setStartDate(rs.getDate("start_date"));
-                m.setEndDate(rs.getDate("end_date"));
+                m.setStartDate(rs.getTimestamp("start_date"));
+                m.setEndDate(rs.getTimestamp("end_date"));
                 m.setCustomerName(rs.getString("customerName"));
                 m.setMachineName(rs.getString("machineName"));
                 list.add(m);
@@ -365,8 +365,8 @@ public class MaintenanceDAO extends DBContext {
 //                m.setTechnicianId(rs.getInt("technician_id"));
 //                m.setDescription(rs.getString("description"));
 //                m.setStatus(rs.getString("status"));
-//                m.setStartDate(rs.getDate("start_date"));
-//                m.setEndDate(rs.getDate("end_date"));
+//                m.setStartDate(rs.getTimestamp("start_date"));
+//                m.setEndDate(rs.getTimestamp("end_date"));
 //                m.setCustomerName(rs.getString("customerName"));
 //                m.setMachineName(rs.getString("machineName"));
 //                list.add(m);
@@ -425,8 +425,8 @@ public class MaintenanceDAO extends DBContext {
                 m.setTechnicianId(rs.getInt("technician_id"));
                 m.setDescription(rs.getString("description"));
                 m.setStatus(rs.getString("status"));
-                m.setStartDate(rs.getDate("start_date"));
-                m.setEndDate(rs.getDate("end_date"));
+                m.setStartDate(rs.getTimestamp("start_date"));
+                m.setEndDate(rs.getTimestamp("end_date"));
                 m.setCustomerName(rs.getString("customerName"));
                 m.setMachineName(rs.getString("machineName"));
                 list.add(m);
@@ -475,8 +475,8 @@ public class MaintenanceDAO extends DBContext {
                 m.setTechnicianId(rs.getInt("technician_id"));
                 m.setDescription(rs.getString("description"));
                 m.setStatus(rs.getString("status"));
-                m.setStartDate(rs.getDate("start_date"));
-                m.setEndDate(rs.getDate("end_date"));
+                m.setStartDate(rs.getTimestamp("start_date"));
+                m.setEndDate(rs.getTimestamp("end_date"));
                 m.setCustomerName(rs.getString("customerName"));
                 m.setMachineName(rs.getString("machineName"));
                 list.add(m);
@@ -579,8 +579,8 @@ public class MaintenanceDAO extends DBContext {
             m.setTechnicianId(rs.getInt("technician_id"));
             m.setDescription(rs.getString("description"));
             m.setStatus(rs.getString("status"));
-            m.setStartDate(rs.getDate("start_date"));
-            m.setEndDate(rs.getDate("end_date"));
+            m.setStartDate(rs.getTimestamp("start_date"));
+            m.setEndDate(rs.getTimestamp("end_date"));
             m.setCustomerName(rs.getString("customerName"));
             m.setMachineName(rs.getString("machineName"));
             list.add(m);

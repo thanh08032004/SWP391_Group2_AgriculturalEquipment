@@ -1,5 +1,6 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -53,7 +54,7 @@
                                         <th>Device</th>
                                         <th>Description</th>
                                         <th>Status</th>
-                                        <th>Start Date</th>
+                                        <th>Request Date</th>
                                         <th class="text-center pe-4">Action</th>
                                     </tr>
                                 </thead>
@@ -72,7 +73,9 @@
                                                 </span>
                                             </td>
 
-                                            <td>${m.startDate}</td>
+                                            <td>
+                                                <fmt:formatDate value="${m.startDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                            </td>
 
                                             <td class="text-center pe-4">
                                                 <a href="${pageContext.request.contextPath}/technician/maintenance?action=accept&id=${m.id}"

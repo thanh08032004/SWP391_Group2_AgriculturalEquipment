@@ -5,6 +5,7 @@
 package dto;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.sql.Date;
 import lombok.*;
 
@@ -19,8 +20,8 @@ public class MaintenanceDTO {
     private Integer technicianId;
     private String status;
     private String description;
-    private Date startDate;
-    private Date endDate;
+    private Timestamp startDate;
+    private Timestamp endDate;
     private String image;
     private String customerName;
     private String machineName;

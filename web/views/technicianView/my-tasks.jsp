@@ -1,5 +1,7 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -93,8 +95,8 @@
                                         <th>Device</th>
                                         <th>Description</th>
                                         <th>Status</th>
-                                        <th>Start Date</th>
-                                        <th>End Date</th>
+                                        <th>Request Date</th>
+                                        <th>Request Done</th>
                                         <th class="text-center pe-4">Action</th>
                                     </tr>
                                 </thead>
@@ -121,48 +123,52 @@
                                                     </c:when>
                                                 </c:choose>
                                             </td>
-                                            <td>${m.startDate}</td>
-                                            <td>${m.endDate != null ? m.endDate : '-'}</td>
-                                            <td class="text-center pe-4">
-                                                <div class="d-flex justify-content-center align-items-center flex-nowrap gap-1">
-                                                    <c:if test="${m.status == 'TECHNICIAN_ACCEPTED'}">
-                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${m.id}"
-                                                           class="btn btn-sm btn-primary mx-1">
-                                                            <i class="bi bi-tools"></i> Work
-                                                        </a>
-                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
-                                                           class="btn btn-sm btn-info mx-1">
-                                                            <i class="bi bi-eye"></i> View
-                                                        </a>
-                                                    </c:if>
-                                                    <c:if test="${m.status == 'IN_PROGRESS'}">
+                                            <td>
+                                    <fmt:formatDate value="${m.startDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                    </td>
+                                    <td>
+                                    <fmt:formatDate value="${m.endDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                    </td>
+                                    <td class="text-center pe-4">
+                                        <div class="d-flex justify-content-center align-items-center flex-nowrap gap-1">
+                                            <c:if test="${m.status == 'TECHNICIAN_ACCEPTED'}">
+                                                <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${m.id}"
+                                                   class="btn btn-sm btn-primary mx-1">
+                                                    <i class="bi bi-tools"></i> Work
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
+                                                   class="btn btn-sm btn-info mx-1">
+                                                    <i class="bi bi-eye"></i> View
+                                                </a>
+                                            </c:if>
+                                            <c:if test="${m.status == 'IN_PROGRESS'}">
 
-                                                        <!-- Nút View -->
+                                                <!-- Nút View -->
 
-                                                        <!-- Nút Complete -->
-                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${m.id}"
-                                                           class="btn btn-sm btn-success mx-1"
-                                                           onclick="return confirm('Mark this task as DONE?');">
-                                                            <i class="bi bi-check-circle"></i> Done
-                                                        </a>
-                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
-                                                           class="btn btn-sm btn-info mx-1">
-                                                            <i class="bi bi-eye"></i> View
-                                                        </a>
+                                                <!-- Nút Complete -->
+                                                <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${m.id}"
+                                                   class="btn btn-sm btn-success mx-1"
+                                                   onclick="return confirm('Mark this task as DONE?');">
+                                                    <i class="bi bi-check-circle"></i> Done
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
+                                                   class="btn btn-sm btn-info mx-1">
+                                                    <i class="bi bi-eye"></i> View
+                                                </a>
 
-                                                    </c:if>
-                                                </div>
-                                            </td>
+                                            </c:if>
+                                        </div>
+                                    </td>
 
-                                        </tr>
-                                    </c:forEach>
-                                    <c:if test="${empty list}">
-                                        <tr>
-                                            <td colspan="8" class="text-center text-muted py-4">
-                                                No tasks found
-                                            </td>
-                                        </tr>
-                                    </c:if>
+                                    </tr>
+                                </c:forEach>
+                                <c:if test="${empty list}">
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-4">
+                                            No tasks found
+                                        </td>
+                                    </tr>
+                                </c:if>
                                 </tbody>
                             </table>
                             <nav aria-label="Page navigation">

@@ -53,7 +53,10 @@
                                     <div class="col-md-8">
                                         <p class="fw-bold mb-1 small text-muted text-uppercase">Problem Description:</p>
                                         <p class="text-dark">${task.description}</p>
-                                        <small class="text-muted">Submitted on: ${task.startDate}</small>
+                                        <small class="text-muted">
+                                            Submitted on: 
+                                            <fmt:formatDate value="${task.startDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                        </small>
                                     </div>
                                     <div class="col-md-4 text-end">
                                         <p class="fw-bold mb-1 small text-muted text-uppercase">Attached Image:</p>
