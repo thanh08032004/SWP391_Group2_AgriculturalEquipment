@@ -639,7 +639,7 @@ public class MaintenanceDAO extends DBContext {
 "        JOIN device d ON m.device_id = d.id\n" +
 "        SET \n" +
 "            m.status = ?,\n" +
-"            m.end_date = CURDATE(),\n" +
+"            m.end_date = NOW(),\n" +
 "            d.status = 'ACTIVE'\n" +
 "        WHERE m.id = ?";
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
