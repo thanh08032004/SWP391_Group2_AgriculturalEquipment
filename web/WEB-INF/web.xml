@@ -82,7 +82,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminDoneMantenanceServlet</servlet-name>
-        <url-pattern>/admin-business/donemantenance</url-pattern>
+        <url-pattern>/admin-business/donemaintenance</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>

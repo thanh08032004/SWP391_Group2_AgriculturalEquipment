@@ -40,7 +40,7 @@ public class AdminDoneMantenanceServlet extends HttpServlet {
 
         List<Maintenance> list = dao.getMaintenanceDone();
 
-        request.setAttribute("maintenanceList", list);
+        request.setAttribute("reqList", list);
 
         request.getRequestDispatcher("/views/AdminBusinessView/invoice-donemaintenance.jsp")
                 .forward(request, response);

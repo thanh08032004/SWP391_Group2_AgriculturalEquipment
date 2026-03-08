@@ -25,7 +25,7 @@
                 <h2 class="fw-bold">
                     <i class="bi bi-receipt me-2"></i> Invoice Management
                 </h2>
-                <a href="${pageContext.request.contextPath}/admin-business/addinvoice"
+                <a href="${pageContext.request.contextPath}/admin-business/donemaintenance"
                    class="btn btn-primary">
                     <i class="bi bi-plus-circle-fill"></i> Add Invoice
                 </a>

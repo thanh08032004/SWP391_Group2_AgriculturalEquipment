@@ -865,11 +865,16 @@ public List<Invoice> searchFilterInvoiceByTechnician(
         e.printStackTrace();
     }
 }
-    public List<Maintenance> getMaintenanceDone() {
+public List<Maintenance> getMaintenanceDone() {
     List<Maintenance> list = new ArrayList<>();
 
     String sql = """
-        SELECT m.id, d.machine_name, d.model, up.fullname
+        SELECT 
+            m.id,
+            m.status,
+            d.machine_name,
+            d.model,
+            up.fullname
         FROM maintenance m
         JOIN device d ON m.device_id = d.id
         JOIN users u ON d.customer_id = u.id
@@ -879,13 +884,16 @@ public List<Invoice> searchFilterInvoiceByTechnician(
         AND i.id IS NULL
     """;
 
-    try {Connection con = getConnection();
-        PreparedStatement ps = con.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
 
         while (rs.next()) {
+
             Maintenance m = new Maintenance();
+
             m.setId(rs.getInt("id"));
+            m.setStatus(rs.getString("status"));
             m.setMachineName(rs.getString("machine_name"));
             m.setModelName(rs.getString("model"));
             m.setCustomerName(rs.getString("fullname"));
