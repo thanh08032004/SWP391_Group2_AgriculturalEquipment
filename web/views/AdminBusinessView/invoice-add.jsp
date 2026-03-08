@@ -26,7 +26,6 @@
 
 <h2 class="fw-bold mb-4">Create Invoice</h2>
 
-<!-- ================= FORM GET: CHỌN MAINTENANCE ================= -->
 <form method="get"
       action="${pageContext.request.contextPath}/admin-business/addinvoice">
 

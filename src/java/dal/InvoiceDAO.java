@@ -865,9 +865,43 @@ public List<Invoice> searchFilterInvoiceByTechnician(
         e.printStackTrace();
     }
 }
+    public List<Maintenance> getMaintenanceDone() {
+    List<Maintenance> list = new ArrayList<>();
+
+    String sql = """
+        SELECT m.id, d.machine_name, d.model, up.fullname
+        FROM maintenance m
+        JOIN device d ON m.device_id = d.id
+        JOIN users u ON d.customer_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        LEFT JOIN invoice i ON i.maintenance_id = m.id
+        WHERE m.status = 'DONE'
+        AND i.id IS NULL
+    """;
+
+    try {Connection con = getConnection();
+        PreparedStatement ps = con.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Maintenance m = new Maintenance();
+            m.setId(rs.getInt("id"));
+            m.setMachineName(rs.getString("machine_name"));
+            m.setModelName(rs.getString("model"));
+            m.setCustomerName(rs.getString("fullname"));
+
+            list.add(m);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
     public static void main(String[] args) {
         InvoiceDAO dao = new InvoiceDAO();
-        InvoiceDetailDTO list = dao.getInvoiceDetailById(1);
+        List<Maintenance> list = dao.getMaintenanceDone();
             System.out.println(list);
     }
 }

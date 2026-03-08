@@ -183,19 +183,13 @@ body{
 
             </div>
         </div>
-
         <!-- Spare Parts -->
-
         <div class="card mt-4">
-
             <div class="card-header text-center">
                 Spare Parts Used
             </div>
-
             <div class="card-body">
-
                 <table class="table table-bordered text-center part-table">
-
                     <thead>
                         <tr>
                             <th>#</th>
@@ -204,45 +198,29 @@ body{
                             <th>Quantity</th>
                         </tr>
                     </thead>
-
                     <tbody>
-
                     <c:set var="totalSpare" value="0" />
-
                     <c:forEach var="sp" items="${spareParts}" varStatus="loop">
-
                         <tr>
                             <td>${loop.index + 1}</td>
-
                             <td>${sp.spareName}</td>
-
                             <td class="money">
                                 <fmt:formatNumber value="${sp.price}" type="number"/>
                             </td>
-
                             <td>${sp.quantity}</td>
                         </tr>
-
                         <c:set var="totalSpare"
                                value="${totalSpare + (sp.price * sp.quantity)}"/>
-
                     </c:forEach>
-
                     </tbody>
-
                 </table>
-
             </div>
         </div>
-
         <!-- COST SUMMARY -->
-
         <div class="card mt-4">
-
             <div class="card-header text-center">
                 Cost Summary
             </div>
-
             <div class="card-body p-0">
 
                 <div class="info-row">
@@ -251,44 +229,34 @@ body{
                         <fmt:formatNumber value="${totalSpare}" type="number"/> đ
                     </div>
                 </div>
-
                 <div class="info-row">
                     <div class="info-label">Labor Cost</div>
                     <div class="money">
                         <fmt:formatNumber value="${invoice.laborCost}" type="number"/> đ
                     </div>
                 </div>
-
                 <div class="info-row">
                     <div class="info-label">Voucher Discount</div>
                     <div class="text-danger">
                         -<fmt:formatNumber value="${invoice.discountAmount}" type="number"/> đ
                     </div>
                 </div>
-
                 <div class="info-row fs-5 fw-bold">
                     <div class="info-label">Grand Total</div>
                     <div class="money">
                         <fmt:formatNumber value="${invoice.totalAmount}" type="number"/> đ
                     </div>
                 </div>
-
             </div>
-
         </div>
-
         <div class="text-end mt-3">
 
             <a href="${pageContext.request.contextPath}/admin-business/invoicelist"
                class="btn btn-secondary">
                 Back to Invoice List
             </a>
-
         </div>
-
     </div>
-
 </div>
-
 </body>
 </html>
