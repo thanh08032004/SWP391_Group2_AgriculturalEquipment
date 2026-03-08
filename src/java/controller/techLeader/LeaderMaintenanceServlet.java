@@ -28,7 +28,6 @@ public class LeaderMaintenanceServlet extends HttpServlet {
         MaintenanceDAO dao = new MaintenanceDAO();
         //hien thi 1 chi tiet bao tri
         if ("detail".equals(action)) {
-            //labor cost per hour
             double laborRate = 100000.0;
             int id = Integer.parseInt(request.getParameter("id"));
             Maintenance task = dao.getMaintenanceById(id);
