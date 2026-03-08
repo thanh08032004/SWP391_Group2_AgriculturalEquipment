@@ -907,6 +907,44 @@ public List<Maintenance> getMaintenanceDone() {
 
     return list;
 }
+public MaintenanceDTO getMaintenanceById(int id) {
+
+    String sql = """
+        SELECT m.id,
+               d.machine_name,
+               d.model,
+               up.fullname
+        FROM maintenance m
+        JOIN device d ON m.device_id = d.id
+        JOIN users u ON d.customer_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        WHERE m.id = ?
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, id);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            MaintenanceDTO m = new MaintenanceDTO();
+
+            m.setId(rs.getInt("id"));
+            m.setMachineName(rs.getString("machine_name"));
+            m.setModel(rs.getString("model"));
+            m.setCustomerName(rs.getString("fullname"));
+
+            return m;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return null;
+}
     public static void main(String[] args) {
         InvoiceDAO dao = new InvoiceDAO();
         List<Maintenance> list = dao.getMaintenanceDone();

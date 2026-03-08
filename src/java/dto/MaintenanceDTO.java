@@ -21,6 +21,7 @@ public class MaintenanceDTO {
     private String technicainNote;
     private Integer laborHours;
     private String status;
+    private String model;
     private String description;
     private Timestamp startDate;
     private Timestamp endDate;

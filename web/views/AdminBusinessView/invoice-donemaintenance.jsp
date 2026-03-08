@@ -66,7 +66,10 @@
                                     <td>
                                         <c:choose>
                                             <c:when test="${r.status == 'DONE'}">
-                                                <button class="btn btn-sm btn-outline-success">Invoice</button>
+                                                <a href="${pageContext.request.contextPath}/admin-business/addinvoice?maintenanceId=${r.id}"
+                                                   class="btn btn-sm btn-outline-success">
+                                                    Invoice
+                                                </a>
                                             </c:when>
                                             <c:otherwise><span class="text-muted small">Tracking...</span></c:otherwise>
                                         </c:choose>
