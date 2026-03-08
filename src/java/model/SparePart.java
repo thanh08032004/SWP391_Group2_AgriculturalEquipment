@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import lombok.*;
 
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
+@Data 
+@NoArgsConstructor 
+@AllArgsConstructor 
+@Builder
 public class SparePart {
     private int id;
     private String partCode;

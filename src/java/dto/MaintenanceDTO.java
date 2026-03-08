@@ -15,9 +15,11 @@ import lombok.*;
 @Builder
 public class MaintenanceDTO {
 
-     private int id;
+    private int id;
     private int deviceId;
     private Integer technicianId;
+    private String technicainNote;
+    private Integer laborHours;
     private String status;
     private String description;
     private Timestamp startDate;
