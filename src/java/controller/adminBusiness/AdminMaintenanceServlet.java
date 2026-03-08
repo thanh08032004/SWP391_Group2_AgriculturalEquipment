@@ -17,11 +17,14 @@ public class AdminMaintenanceServlet extends HttpServlet {
         MaintenanceDAO dao = new MaintenanceDAO();
         //hien thi 1 chi tiet bao tri
         if ("detail".equals(action)) {
+            //labor cost per hour
+            double laborRate = 100000.0;
             int id = Integer.parseInt(request.getParameter("id"));
             Maintenance task = dao.getMaintenanceById(id);
             List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
             request.setAttribute("task", task);
             request.setAttribute("items", items);
+            request.setAttribute("laborRate", laborRate);
             request.getRequestDispatcher("/views/AdminBusinessView/maintenance-detail.jsp").forward(request, response);
         } else {
             //list or search

@@ -94,18 +94,35 @@
                                         </c:when>
                                         <%-- neu dang co du lieu (SUBMITTED, READY, IN_PROGRESS) --%>
                                         <c:otherwise>
+                                            <%-- tech note --%>
+                                            <div class="mb-4">
+                                                <h6 class="fw-bold small text-uppercase text-secondary mb-2">
+                                                    <i class="bi bi-chat-left-dots"></i> Technician's Note:
+                                                </h6>
+                                                <div class="p-3 bg-light border-start border-primary border-4 rounded">
+                                                    <c:choose>
+                                                        <c:when test="${not empty task.technicianNote}">
+                                                            <p class="text-dark mb-0">${task.technicianNote}</p>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <p class="text-muted mb-0 italic small">No technical notes provided by staff.</p>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                            </div>
                                             <h6 class="mt-4 fw-bold small text-uppercase">Proposed Spare Parts:</h6>
                                             <table class="table table-sm table-bordered mt-2">
-                                                <thead class="table-light">
+                                                <thead class="table-light text-center">
                                                     <tr>
                                                         <th>Part Name</th>
-                                                        <th class="text-center">Quantity</th>
-                                                        <th class="text-center">Unit</th>
-                                                        <th class="text-end">Price</th> <%-- Căn phải cho tiền tệ --%>
+                                                        <th>Quantity</th>
+                                                        <th>Unit</th>
+                                                        <th class="text-end">Price</th>
+
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <c:set var="total" value="0" />
+                                                    <c:set var="totalSpareParts" value="0" />
                                                     <c:forEach var="item" items="${items}">
                                                         <tr>
                                                             <td>${item.name}</td>
@@ -115,17 +132,29 @@
                                                                 <fmt:formatNumber value="${item.price}" type="currency" currencySymbol=""/>
                                                             </td>
                                                         </tr>
-                                                        <c:set var="total" value="${total + (item.price * item.quantity)}" />
+                                                        <c:set var="totalSpareParts" value="${totalSpareParts + (item.price * item.quantity)}" />
                                                     </c:forEach>
-                                                    <c:if test="${empty items}">
-                                                        <tr><td colspan="2" class="text-center text-muted italic py-3">No spare parts suggested.</td></tr>
+
+                                                    <%-- KHỐI HIỆN THỊ TIỀN CÔNG --%>
+                                                    <c:if test="${not empty task.laborHours}">
+                                                        <c:set var="laborCost" value="${task.laborHours * laborRate}" />
+                                                        <tr class="table-info">
+                                                            <td class="fw-bold">Labor Cost</td>
+                                                            <td class="text-center">${task.laborHours}</td>
+                                                            <td class="text-center">Hours</td>
+                                                            <td class="text-end fw-bold">
+                                                                <fmt:formatNumber value="${laborCost}" type="currency" currencySymbol=""/>
+                                                            </td>
+                                                        </tr>
                                                     </c:if>
-                                                </tbody>
+
+                                                    <%-- TỔNG CỘNG CUỐI CÙNG --%>
                                                 <tfoot class="table-light fw-bold">
                                                     <tr>
-                                                        <td colspan="3" class="text-end text-uppercase">Estimated Total:</td>
-                                                        <td class="text-end text-primary">
-                                                            <fmt:formatNumber value="${total}" type="currency" currencySymbol=""/>
+                                                        <td colspan="3" class="text-end text-uppercase">Final Total (Estimated):</td>
+                                                        <td class="text-end text-primary fs-5">
+                                                            <fmt:formatNumber value="${totalSpareParts + (task.laborHours * (not empty laborRate ? laborRate : 0))}" 
+                                                                              type="currency" currencySymbol="₫"/>
                                                         </td>
                                                     </tr>
                                                 </tfoot>
