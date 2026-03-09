@@ -15,24 +15,14 @@ public class AdminAddInvoiceServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         InvoiceDAO dao = new InvoiceDAO();
-
         String midRaw = request.getParameter("maintenanceId");
-
         if (midRaw != null && !midRaw.isEmpty()) {
-
             int maintenanceId = Integer.parseInt(midRaw);
+            MaintenanceDTO maintenance = dao.getMaintenanceById(maintenanceId);
 
-            // lấy thông tin maintenance
-            MaintenanceDTO maintenance =
-                    dao.getMaintenanceById(maintenanceId);
-
-            // lấy spare parts
             List<SparePartDTO> itemList =
                     dao.getSparePartsByMaintenance(maintenanceId);
-
-            // tính tổng spare
             double spareTotal = itemList.stream()
                     .mapToDouble(i -> i.getTotal().doubleValue())
                     .sum();
@@ -54,22 +44,12 @@ public class AdminAddInvoiceServlet extends HttpServlet {
 
         InvoiceDAO dao = new InvoiceDAO();
 
-        int maintenanceId =
-                Integer.parseInt(request.getParameter("maintenanceId"));
+        int maintenanceId = Integer.parseInt(request.getParameter("maintenanceId"));
 
-        double laborCost =
-                Double.parseDouble(request.getParameter("laborCost"));
-
-        String description =
-                request.getParameter("description");
-
-        // tính spare total
-        double spareTotal =
-                dao.getTotalSpareCostByMaintenance(maintenanceId);
-
+        double laborCost = Double.parseDouble(request.getParameter("laborCost"));
+        String description = request.getParameter("description");
+        double spareTotal = dao.getTotalSpareCostByMaintenance(maintenanceId);
         double totalAmount = spareTotal + laborCost;
-
-        // insert invoice
         dao.insertInvoice(
                 maintenanceId,
                 null,

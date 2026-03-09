@@ -75,7 +75,7 @@
                                 <div class="col-md-4">
                                     <label class="form-label">Device</label>
                                     <input class="form-control"
-                                           value="${maintenance.machineName} - ${maintenance.modelName}"
+                                           value="${maintenance.machineName} - ${maintenance.model}"
                                            readonly>
                                 </div>
 
@@ -192,7 +192,7 @@
 
                     <div class="text-end">
 
-                        <a href="${pageContext.request.contextPath}/admin-business/maintenance"
+                        <a href="${pageContext.request.contextPath}/admin-business/invoicelist"
                            class="btn btn-secondary">
                             Cancel
                         </a>

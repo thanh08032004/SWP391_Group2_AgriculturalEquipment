@@ -13,7 +13,7 @@
                 <div class="admin-content p-4 w-100">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="fw-bold">Maintenance Requests</h2>
-                        <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="get" class="d-flex gap-2">
+                        <form action="${pageContext.request.contextPath}/admin-business/donemaintenance" method="get" class="d-flex gap-2">
                         <input type="text" name="customerName" class="form-control" placeholder="Enter name of Customer" value="${currentName}">
                         <select name="status" class="form-select">
                             <option value="All Status">All Status</option>
@@ -78,6 +78,22 @@
                             </c:forEach>
                         </tbody>
                     </table>
+                    <!-- PAGINATION -->
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <c:forEach begin="1"
+                                       end="${totalPages}"
+                                       var="p">
+                                <li class="page-item ${p == currentPage ? 'active' : ''}">
+
+                                    <a class="page-link"
+                                       href="?page=${p}&filter=${param.filter}&keyword=${param.keyword}">
+                                        ${p}
+                                    </a>
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
