@@ -28,13 +28,15 @@ public class LeaderMaintenanceServlet extends HttpServlet {
         MaintenanceDAO dao = new MaintenanceDAO();
         //hien thi 1 chi tiet bao tri
         if ("detail".equals(action)) {
+            double laborRate = 100000.0;
             int id = Integer.parseInt(request.getParameter("id"));
             Maintenance task = dao.getMaintenanceById(id);
             List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
             request.setAttribute("task", task);
             request.setAttribute("items", items);
+            request.setAttribute("laborRate", laborRate);
             request.getRequestDispatcher("/views/TechLeaderView/maintenance-detail.jsp").forward(request, response);
-        } else {
+        }  else {
             //list or search
             String name = request.getParameter("customerName");
             String status = request.getParameter("status");

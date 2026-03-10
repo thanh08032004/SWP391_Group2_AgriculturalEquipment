@@ -55,18 +55,66 @@
                         </div>
                     </div>
 
+
+                    <!-- Button hiển thị -->
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-outline-primary" onclick="toggleSpareParts()">
+                            <i class="bi bi-plus-circle"></i> Add Spare Parts || Tech Note
+                        </button>
+                    </div>
+
                     <!-- Spare Parts Selection -->
-                    <div class="card border-0 shadow-sm rounded-3">
+                    <div id="sparePartsSection" 
+                         class="card border-0 shadow-sm rounded-3 ${not empty keyword || currentPage > 1 ? '' : 'd-none'}">
                         <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Select Spare Parts Needed</h5>
+                            <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Select Spare Parts Needed (Optional)</h5>
                         </div>
                         <div class="card-body">
+                            <form method="get" action="${pageContext.request.contextPath}/technician/maintenance" class="mb-3">
+
+                                <input type="hidden" name="action" value="work"/>
+                                <input type="hidden" name="id" value="${m.id}"/>
+
+                                <div class="input-group">
+                                    <input type="text"
+                                           name="keyword"
+                                           value="${keyword}"
+                                           class="form-control"
+                                           placeholder="Search spare part by name">
+
+                                    <button class="btn btn-primary">
+                                        <i class="bi bi-search"></i> Search
+                                    </button>
+                                </div>
+                            </form>
+
                             <form method="post" action="${pageContext.request.contextPath}/technician/maintenance">
                                 <input type="hidden" name="action" value="submitwork"/>
                                 <input type="hidden" name="maintenanceId" value="${m.id}"/>
 
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
+                                <div class="mb-3">
+                                    <label class="form-label">Technician Note</label>
+                                    <textarea name="technicianNote" 
+                                              class="form-control" 
+                                              rows="4"
+                                              required
+                                              placeholder="Describe maintenance work..."></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Work Hours</label>
+                                    <input type="number"
+                                           name="workHours"
+                                           class="form-control"
+                                           min="0.5"
+                                           step="0.5"
+                                           required
+                                           placeholder="Enter number of hours">
+                                </div>
+
+                                <div class="table-responsive"> 
+
+                                    <table class="table table-bordered mt-3">
                                         <thead class="table-light">
                                             <tr>
                                                 <th width="5%">Select</th>
@@ -115,6 +163,26 @@
                                             </c:if>
                                         </tbody>
                                     </table>
+                                    <c:if test="${totalPage > 1}">
+                                        <nav class="mt-3">
+                                            <ul class="pagination justify-content-center">
+
+                                                <c:forEach begin="1" end="${totalPage}" var="i">
+
+                                                    <li class="page-item ${i == currentPage ? 'active' : ''}">
+
+                                                        <a class="page-link"
+                                                           href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${m.id}&keyword=${keyword}&page=${i}">
+                                                            ${i}
+                                                        </a>
+
+                                                    </li>
+
+                                                </c:forEach>
+
+                                            </ul>
+                                        </nav>
+                                    </c:if>
                                 </div>
 
                                 <div class="mt-3">
@@ -143,19 +211,8 @@
                 });
             });
 
-            document.querySelectorAll('.spare-part-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function () {
-                    const sparePartId = this.value;
-                    const qtyInput = document.getElementById('qty-' + sparePartId);
-                    qtyInput.disabled = !this.checked;
-                    if (!this.checked) {
-                        qtyInput.value = 1;
-                    }
-                });
-            });
-
-// Validate trước khi submit
-            document.querySelector('form').addEventListener('submit', function (e) {
+            // Validate trước khi submit
+            document.querySelector('form[action*="submitwork"]').addEventListener('submit', function (e) {
                 const checkedBoxes = document.querySelectorAll('.spare-part-checkbox:checked');
                 const errors = [];
 
@@ -173,8 +230,24 @@
                     }
                 });
 
-                if (checkedBoxes.length === 0) {
-                    errors.push('⚠️ Vui lòng chọn ít nhất 1 linh kiện');
+                // Chỉ validate nếu có chọn linh kiện
+                if (checkedBoxes.length > 0) {
+
+                    checkedBoxes.forEach(checkbox => {
+                        const sparePartId = checkbox.value;
+                        const name = checkbox.dataset.name;
+                        const stock = parseInt(checkbox.dataset.stock);
+                        const qty = parseInt(document.getElementById('qty-' + sparePartId).value);
+
+                        if (qty > stock) {
+                            errors.push(`❌ <strong>${name}</strong>: yêu cầu ${qty}, chỉ còn ${stock} trong kho`);
+                        }
+
+                        if (qty <= 0) {
+                            errors.push(`❌ <strong>${name}</strong>: số lượng phải lớn hơn 0`);
+                        }
+                    });
+
                 }
 
                 if (errors.length > 0) {
@@ -193,6 +266,19 @@
                     alertBox.scrollIntoView({behavior: 'smooth'});
                 }
             });
+
+            function toggleSpareParts(btn) {
+
+                const section = document.getElementById("sparePartsSection");
+
+                section.classList.toggle("d-none");
+
+                if (section.classList.contains("d-none")) {
+                    btn.innerHTML = '<i class="bi bi-plus-circle"></i> Add Spare Parts';
+                } else {
+                    btn.innerHTML = '<i class="bi bi-x-circle"></i> Hide Spare Parts';
+                }
+            }
         </script>
     </body>
 </html>

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import model.Maintenance;
+import model.SparePart;
 import model.User;
 
 /**
@@ -150,27 +151,81 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             req.setAttribute("totalPage", totalPage);
             req.getRequestDispatcher("/views/technicianView/my-tasks.jsp").forward(req, resp);
         }
+//        if ("work".equals(action)) {
+//            int id = Integer.parseInt(req.getParameter("id"));
+//            MaintenanceDTO m = dao.findById(id);
+//
+//            // Kiểm tra quyền truy cập
+//            if (m.getTechnicianId() != technicianId) {
+//                req.getSession().setAttribute("error", "Access denied!");
+//                resp.sendRedirect("maintenance?action=mytasks");
+//                return;
+//            }
+//
+//            req.setAttribute("m", m);
+//
+//            // Lấy spare parts của device
+//            req.setAttribute("spareParts", spDao.getSparePartByDeviceId(m.getDeviceId()));
+//
+//            // Lấy maintenance items đã chọn (nếu có)
+//            req.setAttribute("selectedItems", dao.getMaintenanceItems(id));
+//
+//            req.getRequestDispatcher("/views/technicianView/maintenance-work.jsp").forward(req, resp);
+//        }
+
         if ("work".equals(action)) {
+
             int id = Integer.parseInt(req.getParameter("id"));
             MaintenanceDTO m = dao.findById(id);
 
-            // Kiểm tra quyền truy cập
+            // kiểm tra quyền technician
             if (m.getTechnicianId() != technicianId) {
                 req.getSession().setAttribute("error", "Access denied!");
                 resp.sendRedirect("maintenance?action=mytasks");
                 return;
             }
 
+            // search
+            String keyword = req.getParameter("keyword");
+            if (keyword == null) {
+                keyword = "";
+            }
+
+            // paging
+            int pageSize = 2;
+            int pageIndex = 1;
+
+            String pageParam = req.getParameter("page");
+            if (pageParam != null) {
+                pageIndex = Integer.parseInt(pageParam);
+            }
+
+            // lấy spare parts theo device
+            List<SparePart> spareParts
+                    = spDao.searchSparePartsByDevice(m.getDeviceId(), keyword, pageIndex, pageSize);
+
+            int totalRecord
+                    = spDao.countSparePartsByDevice(m.getDeviceId(), keyword);
+
+            System.out.println("Total Record: " + totalRecord);
+
+            int totalPage = (int) Math.ceil((double) totalRecord / pageSize);
+
+            // lấy spare parts đã chọn trước đó
+            List<Map<String, Object>> selectedItems = dao.getMaintenanceItems(id);
+
+            // set attribute cho JSP
             req.setAttribute("m", m);
+            req.setAttribute("spareParts", spareParts);
+            req.setAttribute("selectedItems", selectedItems);
+            req.setAttribute("currentPage", pageIndex);
+            req.setAttribute("totalPage", totalPage);
+            req.setAttribute("keyword", keyword);
 
-            // Lấy spare parts của device
-            req.setAttribute("spareParts", spDao.getSparePartByDeviceId(m.getDeviceId()));
-
-            // Lấy maintenance items đã chọn (nếu có)
-            req.setAttribute("selectedItems", dao.getMaintenanceItems(id));
-
-            req.getRequestDispatcher("/views/technicianView/maintenance-work.jsp").forward(req, resp);
+            req.getRequestDispatcher("/views/technicianView/maintenance-work.jsp")
+                    .forward(req, resp);
         }
+
         if ("complete".equals(action)) {
 
             int id = Integer.parseInt(req.getParameter("id"));
@@ -201,7 +256,18 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
         if ("submitwork".equals(action)) {
             int maintenanceId = Integer.parseInt(req.getParameter("maintenanceId"));
 
-            // Lấy danh sách spare parts được chọn
+            String technicianNote = req.getParameter("technicianNote");
+            String hoursStr = req.getParameter("workHours");
+            double laborHours = 0;
+
+            if (hoursStr != null && !hoursStr.trim().isEmpty()) {
+                laborHours = Double.parseDouble(hoursStr);
+            }
+
+            // lưu note + hours
+            dao.updateTechnicianWork(maintenanceId, technicianNote, laborHours);
+
+            // Lấy danh sách spare parts được chọn - spare parts (optional)
             String[] sparePartIds = req.getParameterValues("sparePartIds");
             if (sparePartIds != null) {
                 List<Integer> partIds = new ArrayList<>();
@@ -229,6 +295,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
 
             resp.sendRedirect("maintenance?action=mytasks");
         }
+
     }
 
     /**

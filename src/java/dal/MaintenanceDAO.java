@@ -88,6 +88,8 @@ public class MaintenanceDAO extends DBContext {
                         .status(rs.getString("status"))
                         .startDate(rs.getTimestamp("start_date"))
                         .endDate(rs.getTimestamp("end_date"))
+                        .laborHours(rs.getInt("labor_hours"))
+                        .technicianNote(rs.getString("technician_note"))
                         .image(rs.getString("image"))
                         .machineName(rs.getString("machine_name"))
                         .modelName(rs.getString("model"))
@@ -191,7 +193,6 @@ public class MaintenanceDAO extends DBContext {
 //        }
 //        return list;
 //    }
-
     // 2. Staff accept job
     public boolean acceptJob(int maintenanceId, int technicianId) {
         String sql = """
@@ -235,6 +236,8 @@ public class MaintenanceDAO extends DBContext {
                         .status(rs.getString("status"))
                         .startDate(rs.getTimestamp("start_date"))
                         .endDate(rs.getTimestamp("end_date"))
+                        .laborHours(rs.getInt("labor_hours"))
+                        .technicainNote(rs.getString("technician_note"))
                         .image(rs.getString("image"))
                         .customerName(rs.getString("customerName"))
                         .machineName(rs.getString("machineName"))
@@ -270,6 +273,8 @@ public class MaintenanceDAO extends DBContext {
                 m.setDeviceId(rs.getInt("device_id"));
                 m.setTechnicianId(rs.getInt("technician_id"));
                 m.setDescription(rs.getString("description"));
+                m.setLaborHours(rs.getInt("labor_hours"));
+                m.setTechnicainNote(rs.getString("technician_note"));
                 m.setStatus(rs.getString("status"));
                 m.setStartDate(rs.getTimestamp("start_date"));
                 m.setEndDate(rs.getTimestamp("end_date"));
@@ -287,9 +292,9 @@ public class MaintenanceDAO extends DBContext {
     public boolean saveMaintenanceItems(int maintenanceId, List<Integer> sparePartIds, List<Integer> quantities) {
         String deleteSql = "DELETE FROM maintenance_item WHERE maintenance_id = ?";
         String insertSql = """
-        INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity)
-        VALUES (?, ?, ?)
-    """;
+            INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity)
+            VALUES (?, ?, ?)
+        """;
 
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
@@ -317,15 +322,15 @@ public class MaintenanceDAO extends DBContext {
         return false;
     }
 
-// Submit task to admin 
+    // Submit task to admin 
     public boolean submitTaskToAdmin(int maintenanceId, int technicianId) {
         String sql = """
-        UPDATE maintenance
-                SET status = 'TECHNICIAN_SUBMITTED'
-                WHERE id = ?
-                AND technician_id = ?
-                AND status = 'TECHNICIAN_ACCEPTED'
-    """;
+            UPDATE maintenance
+                    SET status = 'TECHNICIAN_SUBMITTED'
+                    WHERE id = ?
+                    AND technician_id = ?
+                    AND status = 'TECHNICIAN_ACCEPTED'
+        """;
 
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, maintenanceId);
@@ -491,12 +496,12 @@ public class MaintenanceDAO extends DBContext {
 
     public int countWaitingForTechnician(String name) {
 
-        String sql = "SELECT COUNT(*)\n" +
-"        FROM maintenance m\n" +
-"        JOIN device d ON m.device_id = d.id\n" +
-"        JOIN user_profile u ON d.customer_id = u.user_id\n" +
-"        WHERE m.status = 'WAITING_FOR_TECHNICIAN'\n" +
-"        AND m.technician_id IS NULL ";
+        String sql = "SELECT COUNT(*)\n"
+                + "        FROM maintenance m\n"
+                + "        JOIN device d ON m.device_id = d.id\n"
+                + "        JOIN user_profile u ON d.customer_id = u.user_id\n"
+                + "        WHERE m.status = 'WAITING_FOR_TECHNICIAN'\n"
+                + "        AND m.technician_id IS NULL ";
 
         if (name != null && !name.trim().isEmpty()) {
             sql += " AND u.fullname LIKE ?";
@@ -519,17 +524,17 @@ public class MaintenanceDAO extends DBContext {
 
         return 0;
     }
-    
+
     public List<MaintenanceDTO> searchMyTasksPaging(
-        int technicianId,
-        String name,
-        String status,
-        int pageIndex,
-        int pageSize) {
+            int technicianId,
+            String name,
+            String status,
+            int pageIndex,
+            int pageSize) {
 
-    List<MaintenanceDTO> list = new ArrayList<>();
+        List<MaintenanceDTO> list = new ArrayList<>();
 
-    StringBuilder sql = new StringBuilder("""
+        StringBuilder sql = new StringBuilder("""
         SELECT m.*, u.fullname AS customerName, d.machine_name AS machineName
         FROM maintenance m
         JOIN device d ON m.device_id = d.id
@@ -537,15 +542,15 @@ public class MaintenanceDAO extends DBContext {
         WHERE m.technician_id = ?
     """);
 
-    if (name != null && !name.trim().isEmpty()) {
-        sql.append(" AND u.fullname LIKE ? ");
-    }
+        if (name != null && !name.trim().isEmpty()) {
+            sql.append(" AND u.fullname LIKE ? ");
+        }
 
-    if (status != null && !status.trim().isEmpty()) {
-        sql.append(" AND m.status = ? ");
-    }
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND m.status = ? ");
+        }
 
-    sql.append("""
+        sql.append("""
         AND m.status IN ('IN_PROGRESS', 'DONE','TECHNICIAN_ACCEPTED')
         ORDER BY 
         CASE WHEN m.status = 'IN_PROGRESS' THEN 1 ELSE 2 END,
@@ -553,95 +558,95 @@ public class MaintenanceDAO extends DBContext {
         LIMIT ? OFFSET ?
     """);
 
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-        int index = 1;
-        ps.setInt(index++, technicianId);
+            int index = 1;
+            ps.setInt(index++, technicianId);
 
-        if (name != null && !name.trim().isEmpty()) {
-            ps.setString(index++, "%" + name + "%");
+            if (name != null && !name.trim().isEmpty()) {
+                ps.setString(index++, "%" + name + "%");
+            }
+
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+
+            ps.setInt(index++, pageSize);
+            ps.setInt(index++, (pageIndex - 1) * pageSize);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                MaintenanceDTO m = new MaintenanceDTO();
+                m.setId(rs.getInt("id"));
+                m.setDeviceId(rs.getInt("device_id"));
+                m.setTechnicianId(rs.getInt("technician_id"));
+                m.setDescription(rs.getString("description"));
+                m.setStatus(rs.getString("status"));
+                m.setStartDate(rs.getTimestamp("start_date"));
+                m.setEndDate(rs.getTimestamp("end_date"));
+                m.setCustomerName(rs.getString("customerName"));
+                m.setMachineName(rs.getString("machineName"));
+                list.add(m);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        if (status != null && !status.trim().isEmpty()) {
-            ps.setString(index++, status);
-        }
-
-        ps.setInt(index++, pageSize);
-        ps.setInt(index++, (pageIndex - 1) * pageSize);
-
-        ResultSet rs = ps.executeQuery();
-
-        while (rs.next()) {
-            MaintenanceDTO m = new MaintenanceDTO();
-            m.setId(rs.getInt("id"));
-            m.setDeviceId(rs.getInt("device_id"));
-            m.setTechnicianId(rs.getInt("technician_id"));
-            m.setDescription(rs.getString("description"));
-            m.setStatus(rs.getString("status"));
-            m.setStartDate(rs.getTimestamp("start_date"));
-            m.setEndDate(rs.getTimestamp("end_date"));
-            m.setCustomerName(rs.getString("customerName"));
-            m.setMachineName(rs.getString("machineName"));
-            list.add(m);
-        }
-
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
 
-    return list;
-}
     public int countMyTasks(
-        int technicianId,
-        String name,
-        String status) {
+            int technicianId,
+            String name,
+            String status) {
 
-    String sql = "SELECT COUNT(*) FROM maintenance WHERE technician_id = ?";
-
-    if (name != null && !name.trim().isEmpty()) {
-        sql += " AND customer_name LIKE ?";
-    }
-
-    if (status != null && !status.trim().isEmpty()) {
-        sql += " AND status = ?";
-    }
-
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-
-        int index = 1;
-
-        ps.setInt(index++, technicianId);
+        String sql = "SELECT COUNT(*) FROM maintenance WHERE technician_id = ?";
 
         if (name != null && !name.trim().isEmpty()) {
-            ps.setString(index++, "%" + name + "%");
+            sql += " AND customer_name LIKE ?";
         }
 
         if (status != null && !status.trim().isEmpty()) {
-            ps.setString(index++, status);
+            sql += " AND status = ?";
         }
 
-        ResultSet rs = ps.executeQuery();
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        if (rs.next()) {
-            return rs.getInt(1);
+            int index = 1;
+
+            ps.setInt(index++, technicianId);
+
+            if (name != null && !name.trim().isEmpty()) {
+                ps.setString(index++, "%" + name + "%");
+            }
+
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return 0;
     }
 
-    return 0;
-}
     public boolean completeTask(int id, String status) {
-        String sql = "UPDATE maintenance m\n" +
-"        JOIN device d ON m.device_id = d.id\n" +
-"        SET \n" +
-"            m.status = ?,\n" +
-"            m.end_date = NOW(),\n" +
-"            d.status = 'ACTIVE'\n" +
-"        WHERE m.id = ?";
+        String sql = "UPDATE maintenance m\n"
+                + "        JOIN device d ON m.device_id = d.id\n"
+                + "        SET \n"
+                + "            m.status = ?,\n"
+                + "            m.end_date = NOW(),\n"
+                + "            d.status = 'ACTIVE'\n"
+                + "        WHERE m.id = ?";
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, id);
@@ -651,4 +656,28 @@ public class MaintenanceDAO extends DBContext {
         }
         return false;
     }
+
+    public boolean updateTechnicianWork(int maintenanceId, String note, double hours) {
+
+        String sql = """
+            UPDATE maintenance
+            SET technician_note = ?, labor_hours = ?
+            WHERE id = ?
+        """;
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, note);
+            ps.setDouble(2, hours);
+            ps.setInt(3, maintenanceId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
 }

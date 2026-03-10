@@ -13,6 +13,8 @@ public class Maintenance {
     private int deviceId;
     private int technicianId;
     private String description;
+    private String technicianNote;
+    private int laborHours;
     private String status; // PENDING, WAITING_FOR_TECHNICIAN, TECHNICIAN_ACCEPTED, DIAGNOSIS READY, IN_PROGRESS, DONE, READY
     private Timestamp startDate;
     private Timestamp endDate;

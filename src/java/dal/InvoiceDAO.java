@@ -865,9 +865,133 @@ public List<Invoice> searchFilterInvoiceByTechnician(
         e.printStackTrace();
     }
 }
+public List<Maintenance> getMaintenanceDone(String name, String status,
+                                            int page, int pageSize) {
+
+    List<Maintenance> list = new ArrayList<>();
+
+    // Nếu chọn status khác DONE thì không hiển thị gì
+    if (status != null && !status.equals("DONE") && !status.equals("All Status")) {
+        return list;
+    }
+
+    String sql = """
+        SELECT 
+            m.id,
+            m.status,
+            d.machine_name,
+            d.model,
+            up.fullname
+        FROM maintenance m
+        JOIN device d ON m.device_id = d.id
+        JOIN users u ON d.customer_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        LEFT JOIN invoice i ON i.maintenance_id = m.id
+        WHERE m.status = 'DONE'
+        AND i.id IS NULL
+        AND up.fullname LIKE ?
+        ORDER BY m.id DESC
+        LIMIT ? OFFSET ?
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setString(1, "%" + (name == null ? "" : name) + "%");
+        ps.setInt(2, pageSize);
+        ps.setInt(3, (page - 1) * pageSize);
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+
+            Maintenance m = new Maintenance();
+
+            m.setId(rs.getInt("id"));
+            m.setStatus(rs.getString("status"));
+            m.setMachineName(rs.getString("machine_name"));
+            m.setModelName(rs.getString("model"));
+            m.setCustomerName(rs.getString("fullname"));
+
+            list.add(m);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+public int countMaintenanceDone(String name, String status) {
+
+    String sql = """
+        SELECT COUNT(*)
+        FROM maintenance m
+        JOIN device d ON m.device_id = d.id
+        JOIN users u ON d.customer_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        LEFT JOIN invoice i ON i.maintenance_id = m.id
+        WHERE m.status = 'DONE'
+        AND i.id IS NULL
+        AND up.fullname LIKE ?
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setString(1, "%" + (name == null ? "" : name) + "%");
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return 0;
+}
+public MaintenanceDTO getMaintenanceById(int id) {
+
+    String sql = """
+        SELECT m.id,
+               d.machine_name,
+               d.model,
+               up.fullname
+        FROM maintenance m
+        JOIN device d ON m.device_id = d.id
+        JOIN users u ON d.customer_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        WHERE m.id = ?
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, id);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            MaintenanceDTO m = new MaintenanceDTO();
+
+            m.setId(rs.getInt("id"));
+            m.setMachineName(rs.getString("machine_name"));
+            m.setModel(rs.getString("model"));
+            m.setCustomerName(rs.getString("fullname"));
+
+            return m;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return null;
+}
     public static void main(String[] args) {
         InvoiceDAO dao = new InvoiceDAO();
-        InvoiceDetailDTO list = dao.getInvoiceDetailById(1);
-            System.out.println(list);
     }
 }
