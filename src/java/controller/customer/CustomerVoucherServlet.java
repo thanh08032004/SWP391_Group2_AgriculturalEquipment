@@ -20,7 +20,7 @@ public class CustomerVoucherServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
-            resp.sendRedirect("login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login.jsp");
             return;
         }
 
@@ -78,11 +78,24 @@ public class CustomerVoucherServlet extends HttpServlet {
                 break;
 
             // ================= DETAIL =================
-            case "detail":
+            case "detail": 
+                //check id null
+                String idParam = req.getParameter("id");
 
-                int id = Integer.parseInt(req.getParameter("id"));
+                if (idParam == null) {
+                    resp.sendRedirect(req.getContextPath() + "/customer/vouchers");
+                    return;
+                }
 
-                Voucher voucher = dao.getVoucherById(id);
+                int id = Integer.parseInt(idParam);
+                
+                Voucher voucher = dao.getVoucherByIdAndUser(id, user.getId());
+                
+                //check voucher null
+                if (voucher == null) {
+                    resp.sendRedirect(req.getContextPath() + "/customer/vouchers");
+                    return;
+                }
 
                 req.setAttribute("voucher", voucher);
 

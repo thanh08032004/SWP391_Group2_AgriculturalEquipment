@@ -138,34 +138,56 @@
 
                                         <hr class="my-4">
 
-                                        <!-- TIME -->
-                                        <h6 class="fw-bold text-primary mb-3">Valid Time</h6>
+                                        <!-- TARGET SETTINGS -->
+                                        <h6 class="fw-bold text-primary mb-3">Target Settings</h6>
+
                                         <div class="row">
+
+                                            <!-- Voucher Type -->
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label small fw-bold text-muted">
-                                                    Start Date
+                                                    Voucher Type
                                                 </label>
-                                                <input type="date"
-                                                       name="startDate"
-                                                       class="form-control"
-                                                       value="${voucher.startDate}
-                                                       required>
+
+                                                <select name="voucherType" 
+                                                        class="form-select"
+                                                        onchange="onVoucherTypeChange(this)">
+
+                                                    <option value="GLOBAL">Global (All Customers)</option>
+                                                    <option value="CUSTOMER">Specific Customer</option>
+
+                                                </select>
                                             </div>
 
-                                            <div class="col-md-6 mb-3">
+                                            <!-- Customer ID -->
+                                            <div class="col-md-6 mb-3" id="customerIdField" style="display:none;">
                                                 <label class="form-label small fw-bold text-muted">
-                                                    End Date
+                                                    Customer ID
                                                 </label>
-                                                <input type="date"
-                                                       name="endDate"
+
+                                                <input type="number"
+                                                       name="customerId"
                                                        class="form-control"
-                                                       value="${voucher.endDate}"
-                                                       required>
+                                                       placeholder="Enter customer ID">
                                             </div>
+
                                         </div>
+                                        <script>
+                                            function onVoucherTypeChange(select) {
 
+                                                const customerField = document.getElementById("customerIdField");
+
+                                                if (select.value === "CUSTOMER") {
+                                                    customerField.style.display = "block";
+                                                } else {
+                                                    customerField.style.display = "none";
+                                                }
+
+                                            }
+                                        </script>
                                         <hr class="my-4">
-
+                                        
+                                        
                                         <!-- DESCRIPTION -->
                                         <h6 class="fw-bold text-primary mb-3">Description</h6>
                                         <div class="mb-4">

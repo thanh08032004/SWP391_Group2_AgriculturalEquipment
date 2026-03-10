@@ -5,8 +5,6 @@
 package model;
 
 import lombok.*;
-import java.sql.Date;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,8 +16,7 @@ public class Voucher {
     private String discountType; // PERCENT, AMOUNT
     private double discountValue;
     private double minServicePrice;
-    private Date startDate;
-    private Date endDate;
+    private String voucherType; //GLOBAL, CUSTOMER
     private boolean active;
 }
 

@@ -1,11 +1,11 @@
 package controller.adminBusiness;
 
+import dal.VoucherCustomerDAO;
 import dal.VoucherDAO;
 import model.Voucher;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.sql.Date;
 import java.util.*;
 
 public class AdminVoucherServlet extends HttpServlet {
@@ -69,6 +69,7 @@ public class AdminVoucherServlet extends HttpServlet {
 
         req.getRequestDispatcher("/views/AdminBusinessView/voucher-list.jsp")
                 .forward(req, resp);
+
     }
 
     /* ================= ADD ================= */
@@ -131,7 +132,7 @@ public class AdminVoucherServlet extends HttpServlet {
             throws IOException {
 
         int id = Integer.parseInt(req.getParameter("id"));
-        
+
         String page = req.getParameter("page");
         if (page == null || page.isEmpty()) {
             page = "1";
@@ -142,6 +143,10 @@ public class AdminVoucherServlet extends HttpServlet {
             keyword = "";
         }
         keyword = java.net.URLEncoder.encode(keyword, "UTF-8");
+
+        //Xoa customer_voucher
+        VoucherCustomerDAO cvDao = new VoucherCustomerDAO();
+        cvDao.deleteByVoucherId(id);
 
         new VoucherDAO().deleteVoucher(id);
 
@@ -175,10 +180,14 @@ public class AdminVoucherServlet extends HttpServlet {
 
         Voucher v = new Voucher();
 
+        String voucherType = req.getParameter("voucherType");
+        String customerId = req.getParameter("customerId");
+
         // gán data trước để lưu nếu có field sai   
         v.setCode(req.getParameter("code"));
         v.setDescription(req.getParameter("description"));
         v.setDiscountType(req.getParameter("discountType"));
+        v.setVoucherType(req.getParameter("voucherType"));
         v.setActive(Boolean.parseBoolean(req.getParameter("isActive")));
 
         // minServicePrice có thể rỗng
@@ -201,20 +210,26 @@ public class AdminVoucherServlet extends HttpServlet {
                 throw new IllegalArgumentException("Discount amount must be greater than 0");
             }
 
-            //date
-            Date start = Date.valueOf(req.getParameter("startDate"));
-            Date end = Date.valueOf(req.getParameter("endDate"));
-
-            if (end.before(start)) {
-                throw new IllegalArgumentException("End date must be after start date");
+            //Validate customerID
+            if ("CUSTOMER".equals(voucherType)) {
+                if (customerId == null || customerId.isEmpty()) {
+                    throw new IllegalArgumentException("Customer ID is required");
+                }
             }
-
-            v.setStartDate(start);
-            v.setEndDate(end);
 
             //save data đúng
             VoucherDAO dao = new VoucherDAO();
-            dao.addVoucher(v);
+            int voucherId = dao.addVoucher(v);
+
+            if ("CUSTOMER".equals(voucherType)
+                    && customerId != null
+                    && !customerId.isEmpty()) {
+
+                int cId = Integer.parseInt(customerId);
+
+                VoucherCustomerDAO cvDao = new VoucherCustomerDAO();
+                cvDao.addVoucherToCustomer(cId, voucherId);
+            }
 
             resp.sendRedirect(req.getContextPath() + "/admin-business/vouchers");
 
@@ -236,6 +251,7 @@ public class AdminVoucherServlet extends HttpServlet {
         v.setCode(req.getParameter("code"));
         v.setDescription(req.getParameter("description"));
         v.setDiscountType(req.getParameter("discountType"));
+        v.setVoucherType(req.getParameter("voucherType"));
         v.setActive(Boolean.parseBoolean(req.getParameter("isActive")));
 
         String minStr = req.getParameter("minServicePrice");
@@ -265,17 +281,30 @@ public class AdminVoucherServlet extends HttpServlet {
                 throw new IllegalArgumentException("Discount amount must be greater than 0");
             }
 
-            Date start = Date.valueOf(req.getParameter("startDate"));
-            Date end = Date.valueOf(req.getParameter("endDate"));
+            String voucherType = req.getParameter("voucherType");
+            String customerId = req.getParameter("customerId");
 
-            if (end.before(start)) {
-                throw new IllegalArgumentException("End date must be after start date");
+            //Validate customerID
+            if ("CUSTOMER".equals(voucherType)) {
+                if (customerId == null || customerId.isEmpty()) {
+                    throw new IllegalArgumentException("Customer ID is required");
+                }
             }
+            VoucherDAO dao = new VoucherDAO();
+            dao.updateVoucher(v);
 
-            v.setStartDate(start);
-            v.setEndDate(end);
+            VoucherCustomerDAO cvDao = new VoucherCustomerDAO();
 
-            new VoucherDAO().updateVoucher(v);
+            // xóa customer cũ
+            cvDao.deleteByVoucherId(v.getId());
+
+            if ("CUSTOMER".equals(voucherType)
+                    && customerId != null
+                    && !customerId.isEmpty()) {
+
+                int cId = Integer.parseInt(customerId);
+                cvDao.addVoucherToCustomer(cId, v.getId());
+            }
 
             resp.sendRedirect(
                     req.getContextPath()

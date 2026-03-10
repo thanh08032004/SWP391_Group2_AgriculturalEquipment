@@ -50,7 +50,7 @@
                                     </a>
                                 </div>
                             </form>
-                                        
+
                             <!-- TABLE -->
                             <table class="table table-hover align-middle">
                                 <thead class="table-dark text-center">
@@ -58,7 +58,7 @@
                                         <th>Code</th>
                                         <th>Discount</th>
                                         <th>Min Order</th>
-                                        <th>End Date</th>                                  
+                                        <th>Voucher Type</th>                                  
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -87,9 +87,19 @@
                                                 ${v.minServicePrice} VND
                                             </td>
 
-                                            <!-- End Date -->
+                                            <!-- Voucher Type -->
                                             <td>
-                                                ${v.endDate}
+                                                <c:choose>
+                                                    <c:when test="${v.voucherType == 'GLOBAL'}">
+                                                        <span class="badge bg-primary">Public</span>
+                                                    </c:when>
+                                                    <c:when test="${v.voucherType == 'CUSTOMER'}">
+                                                        <span class="badge bg-warning text-dark">Private</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        ${v.voucherType}
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </td>
 
                                             <!-- Action -->

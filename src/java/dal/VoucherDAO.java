@@ -95,36 +95,41 @@ public class VoucherDAO extends DBContext {
         v.setDiscountType(rs.getString("discount_type"));
         v.setDiscountValue(rs.getDouble("discount_value"));
         v.setMinServicePrice(rs.getDouble("min_service_price"));
-        v.setStartDate(rs.getDate("start_date"));
-        v.setEndDate(rs.getDate("end_date"));
+        v.setVoucherType(rs.getString("voucher_type"));
         v.setActive(rs.getBoolean("is_active"));
 
         return v;
     }
 
-    public void addVoucher(Voucher v) {
+    public int addVoucher(Voucher v) {
         String sql = """
         INSERT INTO voucher
         (code, description, discount_type, discount_value,
-         min_service_price, start_date, end_date, is_active)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+         min_service_price, voucher_type, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     """;
 
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, v.getCode());
             ps.setString(2, v.getDescription());
             ps.setString(3, v.getDiscountType());
             ps.setDouble(4, v.getDiscountValue());
             ps.setDouble(5, v.getMinServicePrice());
-            ps.setDate(6, v.getStartDate());
-            ps.setDate(7, v.getEndDate());
-            ps.setBoolean(8, v.isActive());
+            ps.setString(6, v.getVoucherType());
+            ps.setBoolean(7, v.isActive());
 
             ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return -1;
     }
 
     /* Update Voucher */
@@ -133,7 +138,7 @@ public class VoucherDAO extends DBContext {
         UPDATE voucher
         SET code = ?, description = ?, discount_type = ?,
             discount_value = ?, min_service_price = ?,
-            start_date = ?, end_date = ?, is_active = ?
+            voucher_type = ?, is_active = ?
         WHERE id = ?
     """;
 
@@ -144,88 +149,13 @@ public class VoucherDAO extends DBContext {
             ps.setString(3, v.getDiscountType());
             ps.setDouble(4, v.getDiscountValue());
             ps.setDouble(5, v.getMinServicePrice());
-            ps.setDate(6, v.getStartDate());
-            ps.setDate(7, v.getEndDate());
-            ps.setBoolean(8, v.isActive());
-            ps.setInt(9, v.getId());
+            ps.setString(6, v.getVoucherType());
+            ps.setBoolean(7, v.isActive());           
+            ps.setInt(8, v.getId());
 
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
-    /*chua dung toi - dung cho tao voucher theo id customer*/
-    public int countValidVouchersForCustomer(
-            int customerId,
-            double totalServicePrice
-    ) {
-        String sql = """
-        SELECT COUNT(*)
-        FROM voucher v
-        LEFT JOIN customer_voucher cv
-            ON v.id = cv.voucher_id
-            AND cv.customer_id = ?
-        WHERE v.active = 1
-          AND v.start_date <= CURRENT_DATE
-          AND v.end_date >= CURRENT_DATE
-          
-          AND (cv.used IS NULL OR cv.used = 0)
-    """;
-
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, customerId);
-            ps.setDouble(2, totalServicePrice);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    /* chua dung toi - dung cho tao voucher theo id customer*/
-    public List<Voucher> getValidVouchersForCustomer(
-            int customerId,
-            double totalServicePrice,
-            int page,
-            int pageSize
-    ) {
-        List<Voucher> list = new ArrayList<>();
-
-        String sql = """
-        SELECT v.*
-        FROM voucher v
-        LEFT JOIN customer_voucher cv
-            ON v.id = cv.voucher_id
-            AND cv.customer_id = ?
-        WHERE v.is_active = 1
-          AND v.start_date <= CURRENT_DATE
-          AND v.end_date >= CURRENT_DATE
-          AND v.min_service_price <= ?
-          AND (cv.used IS NULL OR cv.used = 0)
-        ORDER BY v.id DESC
-        LIMIT ? OFFSET ?
-    """;
-
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, customerId);
-            ps.setDouble(2, totalServicePrice);
-            ps.setInt(3, pageSize);
-            ps.setInt(4, (page - 1) * pageSize);
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapVoucher(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
 }

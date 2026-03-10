@@ -69,16 +69,23 @@
                                         <th class="text-center">ID</th>
                                         <th class="text-center">Code</th>
                                         <th class="text-center">Discount Type</th>
-                                        <th class="text-center">Discount</th>           
-                                        <th class="text-center">Start Date</th>
-                                        <th class="text-center">End Date</th>
+                                        <th class="text-center">Discount</th>                                                 
                                         <th class="text-center">Min Service Price</th>
+                                        <th class="text-center">Voucher Type</th>
                                         <th class="text-center">Status</th>
                                         <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
+                                    <c:if test="${empty vouchers}">
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted">
+                                                No voucher found
+                                            </td>
+                                        </tr>
+                                    </c:if>
+
                                     <c:forEach var="v" items="${vouchers}">
                                         <tr>
                                             <td class="text-center">${v.id}</td>
@@ -102,9 +109,9 @@
                                                 </c:choose>
                                             </td>
 
-                                            <td class="text-center">${v.startDate}</td>
-                                            <td class="text-center">${v.endDate}</td>
                                             <td class="text-center">${v.minServicePrice}</td>
+
+                                            <td class="text-center">${v.voucherType}</td>
 
                                             <td class="text-center">
                                                 <c:choose>
