@@ -85,7 +85,7 @@ public class VoucherDAO extends DBContext {
         }
     }
 
-    /* MAP RESULTSET → VOUCHER */
+    /* MAP RESULTSET → VOUCHER */ /* chuyển data db thành object voucher - đỡ phải lặp lại code*/
     private Voucher mapVoucher(ResultSet rs) throws SQLException {
         Voucher v = new Voucher();
 

@@ -510,10 +510,10 @@ INSERT INTO inventory (spare_part_id, quantity) VALUES
 
 INSERT INTO maintenance (device_id, technician_id, description, status, start_date, end_date) VALUES  
 (1, 3, 'Regular maintenance, replaced worn parts', 'DONE', '2025-01-15', '2025-01-16'),
-(2, 3, 'Checked engine and replaced air filter', 'IN_PROGRESS', '2025-02-05', '2025-02-06'),
+(2, 3, 'Checked engine and replaced air filter', 'IN_PROGRESS', '2025-02-05', NULL),
 (3, 3, 'Repaired transmission system', 'TECHNICIAN_ACCEPTED', '2025-02-20', NULL),
 (4, 3, 'Scheduled service - check oil and spark plugs', 'PENDING', '2025-03-01', NULL),
-(5, 3, 'Fixing sprayer issues', 'READY', '2025-03-02', NULL); -- Thêm bản ghi ID 5 tại đây
+(5, 3, 'Fixing sprayer issues', 'READY', '2025-03-02', '2025-03-05');
 
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (1, 1, 1);
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (1, 2, 2);
@@ -530,7 +530,7 @@ INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES (5
 -- 1. Tạo bản ghi Maintenance ở trạng thái DIAGNOSIS READY
 INSERT INTO maintenance (device_id, technician_id, description, status, image, start_date) 
 VALUES 
-(1, 3, 'Kỹ thuật viên báo: Hỏng vòng bi và cần thay dầu máy.', 'DIAGNOSIS READY', 'jd_tractor.jpg', '2026-02-23'),
+(1, 3, 'Kỹ thuật viên báo: Hỏng vòng bi và cần thay dầu máy.', 'TECHNICIAN_SUBMITTED', 'jd_tractor.jpg', '2026-02-23'),
 (2, 3, 'Kỹ thuật viên báo: Lọc gió quá bẩn, cần thay thế để tránh hỏng động cơ.', 'DIAGNOSIS READY', 'kubota_tractor.jpg', '2026-02-24');
 
 INSERT INTO voucher 
@@ -795,19 +795,85 @@ WHERE maintenance_id IN (3, 4, 5);
 
 INSERT INTO device_spare_part (device_id, spare_part_id)
 VALUES
-(3 ,1),
-(3, 2),
-(3, 3),
-(3,4);
+(3 ,1),(3, 2),(3, 3),(3,4);
 INSERT INTO device_spare_part (device_id, spare_part_id)
 VALUES
-(4 ,1),
-(4, 2),
-(4, 3),
-(4,4);
+(4 ,1),(4, 2),(4, 3),(4,4);
 INSERT INTO device_spare_part (device_id, spare_part_id)
 VALUES
-(5 ,1),
-(5, 2),
-(5, 3),
-(5,4);
+(5 ,1),(5, 2),(5, 3),(5,4);
+
+-- ========================================================================== --
+-- Contract cho customer id = 4
+INSERT INTO contract (
+  contract_code,
+  customer_id,
+  signed_at,
+  total_value,
+  status
+) VALUES (
+  'HD-2026-001',
+  4,
+  '2026-02-01',
+  1470000000.00,
+  'ACTIVE'
+);
+
+-- Contract cho customer id = 6
+INSERT INTO contract (
+  contract_code,
+  customer_id,
+  signed_at,
+  total_value,
+  status
+) VALUES (
+  'HD-2026-002',
+  6,
+  '2026-02-05',
+  700000000.00,
+  'COMPLETED'
+);
+
+-- Contract cho customer id = 7
+INSERT INTO contract (
+  contract_code,
+  customer_id,
+  signed_at,
+  total_value,
+  status
+) VALUES (
+  'HD-2026-003',
+  7,
+  '2026-02-10',
+  1500000000.00,
+  'ACTIVE'
+);
+
+-- Contract 1 – Customer 4 mua 2 máy --
+INSERT INTO contract_device (
+  contract_id,
+  device_id,
+  price,
+  delivery_date
+) VALUES
+(1, 1, 850000000.00, '2026-02-15'),
+(1, 2, 620000000.00, '2026-02-15');
+
+-- Contract 2 – Customer 6 mua 1 máy --
+INSERT INTO contract_device (
+  contract_id,
+  device_id,
+  price,
+  delivery_date
+) VALUES
+(2, 6, 700000000.00, '2026-02-20');
+
+-- Contract 3 – Customer 7 mua 1 máy --
+INSERT INTO contract_device (
+  contract_id,
+  device_id,
+  price,
+  delivery_date
+) VALUES
+(3, 7, 1500000000.00, '2026-02-25');
+-- ========================================================================== --
