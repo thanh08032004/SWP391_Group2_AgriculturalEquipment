@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller.techLeader;
 
 import dal.MaintenanceDAO;
@@ -21,8 +20,8 @@ import model.Maintenance;
  * @author FPT
  */
 public class LeaderMaintenanceServlet extends HttpServlet {
-   
-@Override
+
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         MaintenanceDAO dao = new MaintenanceDAO();
@@ -32,11 +31,13 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             int id = Integer.parseInt(request.getParameter("id"));
             Maintenance task = dao.getMaintenanceById(id);
             List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
+            List<model.User> technicians = dao.getAllTechnicians();
             request.setAttribute("task", task);
             request.setAttribute("items", items);
             request.setAttribute("laborRate", laborRate);
+            request.setAttribute("technicians", technicians);
             request.getRequestDispatcher("/views/TechLeaderView/maintenance-detail.jsp").forward(request, response);
-        }  else {
+        } else {
             //list or search
             String name = request.getParameter("customerName");
             String status = request.getParameter("status");
@@ -56,10 +57,10 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             boolean success = dao.updateStatus(id, "DIAGNOSIS READY");
             response.sendRedirect("maintenance?msg=" + (success ? "sent_success" : "error"));
         } //approve-diagnosis
-//        else if ("approve-diagnosis".equals(action)) {
-//            dao.updateStatus(id, "IN_PROGRESS");
-//            response.sendRedirect("maintenance?action=detail&id=" + id);
-//        } //reject-diagnosis
+        //        else if ("approve-diagnosis".equals(action)) {
+        //            dao.updateStatus(id, "IN_PROGRESS");
+        //            response.sendRedirect("maintenance?action=detail&id=" + id);
+        //        } //reject-diagnosis
         else if ("reject-diagnosis".equals(action)) {
             boolean updateStatus = dao.updateStatus(id, "TECHNICIAN_ACCEPTED");
             boolean clearItems = dao.saveMaintenanceItems(id, new ArrayList<>(), new ArrayList<>());
@@ -70,10 +71,14 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             }
         } //send task to pool
         else if ("assign".equals(action)) {
-            boolean success = dao.updateStatus(id, "WAITING_FOR_TECHNICIAN");
-            response.sendRedirect("maintenance?msg=" + (success ? "assign_success" : "assign error"));
+            int taskId = Integer.parseInt(request.getParameter("id"));
+            String techIdRaw = request.getParameter("technicianId");
+            int techId = (techIdRaw == null || techIdRaw.isEmpty()) ? 0 : Integer.parseInt(techIdRaw);
+            boolean success = dao.assignTechnician(taskId, techId);
+            response.sendRedirect("maintenance?action=detail&id=" + taskId + "&msg=" + (success ? "assign_success" : "error"));
         }
     }
+
     @Override
     public String getServletInfo() {
         return "Short description";

@@ -154,7 +154,7 @@
                                                         <td colspan="3" class="text-end text-uppercase">Final Total (Estimated):</td>
                                                         <td class="text-end text-primary fs-5">
                                                             <fmt:formatNumber value="${totalSpareParts + (task.laborHours * (not empty laborRate ? laborRate : 0))}" 
-                                                                              type="currency" currencySymbol="₫"/>
+                                                                              type="currency" currencySymbol=""/>
                                                         </td>
                                                     </tr>
                                                 </tfoot>

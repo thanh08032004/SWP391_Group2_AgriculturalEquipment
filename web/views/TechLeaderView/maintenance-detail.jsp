@@ -166,20 +166,37 @@
                         </c:if>
                     </div>
 
-                    <!--Assign to staff-->
+                    <!--Assign to staff-->               
                     <c:if test="${task.status == 'PENDING'}">
-                        <div class="mt-4 p-3 bg-light border rounded d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-muted">Send to task pool:</span>
-                            <div class="d-flex gap-2">
-                                <form action="${pageContext.request.contextPath}/leader/maintenance" method="post" style="display:inline;">
+                        <div class="card border-0 shadow-sm mb-4 border-start border-primary border-4">
+                            <div class="card-header bg-white fw-bold text-primary">
+                                <i class="bi bi-person-plus-fill"></i> Assign Technician
+                            </div>
+                            <div class="card-body">
+                                <form action="${pageContext.request.contextPath}/leader/maintenance" method="post" class="row align-items-end">
                                     <input type="hidden" name="action" value="assign">
-                                    <input type="hidden" name="id" value="${task.id}"> <button type="submit" class="btn btn-sm btn-outline-dark">
-                                        Assign Staff
-                                    </button>
+                                    <input type="hidden" name="id" value="${task.id}">
+
+                                    <div class="col-md-8">
+                                        <label class="form-label small text-muted text-uppercase fw-bold">Select Available Technician</label>
+                                        <select name="technicianId" class="form-select">
+                                            <option value="" selected disabled>-- Choose a staff member --</option>
+                                            <c:forEach var="tech" items="${technicians}">
+                                                <option value="${tech.id}">${tech.fullname} (ID: ${tech.id})</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <button type="submit" class="btn btn-primary w-100 fw-bold">
+                                            Confirm Assignment
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
                     </c:if>
+
                     <!--duyet chuan doan-->
                     <c:if test="${task.status == 'TECHNICIAN_SUBMITTED'}">
                         <div class="mt-4 p-3 bg-light border rounded d-flex justify-content-between align-items-center">

@@ -4,6 +4,7 @@ import dto.MaintenanceDTO;
 import java.sql.*;
 import java.util.*;
 import model.Maintenance;
+import model.User;
 
 public class MaintenanceDAO extends DBContext {
 
@@ -158,6 +159,46 @@ public class MaintenanceDAO extends DBContext {
         }
         return list;
     }
+    
+    
+public List<User> getAllTechnicians() {
+    List<User> list = new ArrayList<>();
+    String sql = "SELECT u.id, up.fullname FROM users u " +
+                 "JOIN user_profile up ON u.id = up.user_id " +
+                 "WHERE u.role_id = 3 AND u.active = true";
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            list.add(User.builder()
+                         .id(rs.getInt("id"))
+                         .fullname(rs.getString("fullname"))
+                         .build());
+        }
+    } catch (SQLException e) { 
+        e.printStackTrace(); 
+    }
+    return list;
+}
+
+public boolean assignTechnician(int taskId, int techId) {
+    String sql = "UPDATE maintenance SET technician_id = ?, status = ? WHERE id = ?";
+    
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        if (techId > 0) {
+            ps.setInt(1, techId);
+            ps.setString(2, "TECHNICIAN_ACCEPTED");
+        } else {
+            ps.setNull(1, java.sql.Types.INTEGER);
+            ps.setString(2, "WAITING_FOR_TECHNICIAN");
+        }
+        ps.setInt(3, taskId);
+        
+        return ps.executeUpdate() > 0; 
+    } catch (SQLException e) { 
+        e.printStackTrace(); 
+    }
+    return false;
+}
 
 //    public List<MaintenanceDTO> getWaitingForTechnician() {
 //        List<MaintenanceDTO> list = new ArrayList<>();
