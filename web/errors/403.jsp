@@ -19,28 +19,31 @@
             <c:set var="roleHome" value="${pageContext.request.contextPath}/customer/home" />
             <c:set var="navHome" value="${pageContext.request.contextPath}/customer/home" />
         </c:when>
+        <c:when test="${sessionScope.userRole == 'TECHLEADER'}">
+            <c:set var="roleHome" value="${pageContext.request.contextPath}/leader/maintenance" />
+        </c:when>
     </c:choose>
 </c:if>
 <!DOCTYPE html>
 <html>
-<head>
-    <jsp:include page="../common/head.jsp"></jsp:include>
-    <title>403 - Access Denied</title>
-</head>
-<body>
+    <head>
+        <jsp:include page="../common/head.jsp"></jsp:include>
+            <title>403 - Access Denied</title>
+        </head>
+        <body>
 
-    <div class="container text-center" style="padding: 100px 0;">
-        <div class="error-content">
-            <h1 class="display-1 fw-bold text-danger">403</h1>
-            <h2 class="mb-3">Access Denied</h2>
-            <p class="text-muted mb-4">You do not have permission to access this resource.<br>Please contact your administrator if you believe this is an error.</p>
-            <div class="d-flex justify-content-center gap-3">
-                <a href="${roleHome}" class="btn btn-danger shadow-sm">Return Home</a>
+            <div class="container text-center" style="padding: 100px 0;">
+                <div class="error-content">
+                    <h1 class="display-1 fw-bold text-danger">403</h1>
+                    <h2 class="mb-3">Access Denied</h2>
+                    <p class="text-muted mb-4">You do not have permission to access this resource.<br>Please contact your administrator if you believe this is an error.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="${roleHome}" class="btn btn-danger shadow-sm">Return Home</a>
+                </div>
             </div>
         </div>
-    </div>
 
         <jsp:include page="../common/scripts.jsp"></jsp:include>
 
-</body>
+    </body>
 </html>

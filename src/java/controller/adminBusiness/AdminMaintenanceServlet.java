@@ -48,7 +48,7 @@ public class AdminMaintenanceServlet extends HttpServlet {
             request.setAttribute("currentName", name);
             request.setAttribute("currentStatus", status);
 
-            request.getRequestDispatcher("/views/TechLeaderView/maintenance-list.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/AdminBusinessView/maintenance-list.jsp").forward(request, response);
         }
     }
 
