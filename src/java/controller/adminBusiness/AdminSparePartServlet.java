@@ -27,7 +27,7 @@ public class AdminSparePartServlet extends HttpServlet {
         switch (action) {
             case "list":
                 String search = request.getParameter("search") == null ? "" : request.getParameter("search");
-                int pageSize = 3; 
+                int pageSize = 3;
                 int pageIndex = 1;
                 String raw_page = request.getParameter("page");
                 if (raw_page != null && !raw_page.isEmpty()) {
@@ -72,9 +72,30 @@ public class AdminSparePartServlet extends HttpServlet {
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
                     String json = String.format(
-                            "{\"id\":%d, \"name\":\"%s\", \"model\":\"%s\", \"serial\":\"%s\", \"status\":\"%s\", \"image\":\"%s\", \"customer\":\"%s\"}",
+                            "{\"id\":%d, \"name\":\"%s\", \"model\":\"%s\", \"serial\":\"%s\", \"status\":\"%s\", \"image\":\"%s\", \"customer\":\"%s\", \"customerId\":%d}",
                             device.getId(), device.getMachineName(), device.getModel(),
-                            device.getSerialNumber(), device.getStatus(), device.getImage(), device.getCustomerName()
+                            device.getSerialNumber(), device.getStatus(), device.getImage(),
+                            device.getCustomerName(), device.getCustomerId()
+                    );
+                    response.getWriter().write(json);
+                }
+                return;
+            case "getCustomerDetail":
+                int userId = Integer.parseInt(request.getParameter("customerId"));
+                dal.UserProfileDAO uProfileDao = new dal.UserProfileDAO();
+                model.UserProfile profile = uProfileDao.getUserProfileById(userId);
+
+                if (profile != null) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    String json = String.format(
+                            "{\"fullname\":\"%s\", \"phone\":\"%s\", \"email\":\"%s\", \"address\":\"%s\", \"avatar\":\"%s\", \"role\":\"%s\"}",
+                            profile.getFullname(),
+                            profile.getPhone() != null ? profile.getPhone() : "N/A",
+                            profile.getEmail(),
+                            profile.getAddress() != null ? profile.getAddress() : "N/A",
+                            profile.getAvatar() != null ? profile.getAvatar() : "default.jpg",
+                            profile.getUser().getRoleName()
                     );
                     response.getWriter().write(json);
                 }

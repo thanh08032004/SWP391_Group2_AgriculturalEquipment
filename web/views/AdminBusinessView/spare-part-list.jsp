@@ -5,35 +5,35 @@
 <html>
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
-        <title>Spare Management - AgriCMS</title>
-        <style>
-            .component-link {
-                cursor: pointer;
-                color: #0d6efd;
-                transition: 0.2s;
-            }
-            .component-link:hover {
-                color: #0a58ca;
-                text-decoration: underline;
-            }
-            .pagination .page-link {
-                color: #212529;
-            }
-            .pagination .page-item.active .page-link {
-                background-color: #212529;
-                border-color: #212529;
-                color: white;
-            }
-        </style>
-    </head>
-    <body class="bg-light">
-        <header><jsp:include page="/common/header.jsp"></jsp:include></header>
+            <title>Spare Management - AgriCMS</title>
+            <style>
+                .component-link {
+                    cursor: pointer;
+                    color: #0d6efd;
+                    transition: 0.2s;
+                }
+                .component-link:hover {
+                    color: #0a58ca;
+                    text-decoration: underline;
+                }
+                .pagination .page-link {
+                    color: #212529;
+                }
+                .pagination .page-item.active .page-link {
+                    background-color: #212529;
+                    border-color: #212529;
+                    color: white;
+                }
+            </style>
+        </head>
+        <body class="bg-light">
+            <header><jsp:include page="/common/header.jsp"></jsp:include></header>
 
-        <div class="admin-layout d-flex">
+            <div class="admin-layout d-flex">
             <jsp:include page="/common/side-bar.jsp"></jsp:include>
-            <div class="admin-content p-4 w-100">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold">Spare Management</h2>
+                <div class="admin-content p-4 w-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold">Spare Management</h2>
 
                     <c:if test="${param.msg == 'delete_success'}">
                         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -100,8 +100,8 @@
                                             <c:choose>
                                                 <c:when test="${p.quantity > 0}">
                                                     <span class="text-muted"><i class="bi bi-trash3 fs-5"></i></span>
-                                                </c:when>
-                                                <c:otherwise>
+                                                    </c:when>
+                                                    <c:otherwise>
                                                     <a href="spare-parts?action=delete&id=${p.id}" class="text-danger" 
                                                        onclick="return confirm('Delete this component?')">
                                                         <i class="bi bi-trash3 fs-5"></i>
@@ -145,7 +145,7 @@
                 </div>
             </div>
         </div>
-
+        <!--compa device-->
         <div class="modal fade" id="deviceListModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow">
@@ -160,51 +160,141 @@
                 </div>
             </div>
         </div>
+        <!--spec device-->
+        <div class="modal fade" id="fullDeviceModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title"><i class="bi bi-cpu"></i> Device Specifications</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4" id="fullDeviceContent">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--customer-->
+        <div class="modal fade" id="customerModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                    <div class="modal-body p-0" id="customerContent">
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <jsp:include page="/common/scripts.jsp"></jsp:include>
 
-        <script>
-            function showCompatibleDevices(partName, deviceIdsStr) {
-                const ids = deviceIdsStr.replace(/[\[\]\s]/g, '').split(',').filter(id => id !== "");
-                document.getElementById('modalPartName').innerText = "Compatible with: " + partName;
-                const listGroup = document.getElementById('deviceListGroup');
-                
-                const modal = new bootstrap.Modal(document.getElementById('deviceListModal'));
-                modal.show();
+            <script>
+                function showCompatibleDevices(partName, deviceIdsStr) {
+                    const ids = deviceIdsStr.replace(/[\[\]\s]/g, '').split(',').filter(id => id !== "");
+                    document.getElementById('modalPartName').innerText = "Compatible with: " + partName;
+                    const listGroup = document.getElementById('deviceListGroup');
 
-                if (ids.length === 0) {
-                    listGroup.innerHTML = '<li class="list-group-item text-center py-4 text-muted">No specific devices linked.</li>';
-                    return;
+                    const modal = new bootstrap.Modal(document.getElementById('deviceListModal'));
+                    modal.show();
+
+                    if (ids.length === 0) {
+                        listGroup.innerHTML = '<li class="list-group-item text-center py-4 text-muted">No specific devices linked.</li>';
+                        return;
+                    }
+
+                    listGroup.innerHTML = '<div class="p-4 text-center"><div class="spinner-border text-primary"></div></div>';
+
+                    const requests = ids.map(id =>
+                        fetch('spare-parts?action=getDeviceDetail&deviceId=' + id).then(res => res.json())
+                    );
+
+                    Promise.all(requests).then(devices => {
+                        listGroup.innerHTML = "";
+                        devices.forEach(dev => {
+                            const li = document.createElement('li');
+                            li.className = "list-group-item list-group-item-action d-flex align-items-center justify-content-between p-3";
+                            // Thay đổi đoạn render li.innerHTML trong Promise.all của hàm showCompatibleDevices:
+                            li.innerHTML = `
+                                <div class="d-flex align-items-center w-100">
+                                    <img src="${pageContext.request.contextPath}/assets/images/devices/\${dev.image || 'default.jpg'}" 
+                                            class="rounded me-3 border" style="width: 45px; height: 45px; object-fit: cover;">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold text-primary" style="cursor:pointer; text-decoration: underline;" 
+                                                onclick="viewFullDeviceDetail(\${dev.id}); event.stopPropagation();">
+                                        \${dev.name}
+                                     </div>
+                                     <small class="text-muted">
+                                    Model: \${dev.model} | Owner: 
+                                    <span class="text-primary fw-bold" style="cursor:pointer; text-decoration: underline;" 
+                                    onclick="viewCustomerDetail(\${dev.customerId}); event.stopPropagation();">
+                                    \${dev.customer}
+                                    </span>
+                                    </small>
+                                    </div>
+                                    <span class="badge bg-\${dev.status === 'ACTIVE' ? 'success' : 'warning text-dark'}">\${dev.status}</span>
+                                    </div>
+                                    `;
+                            listGroup.appendChild(li);
+                        });
+                    }).catch(err => {
+                        listGroup.innerHTML = '<li class="list-group-item text-danger text-center py-3">Error loading device details.</li>';
+                    });
+                }
+                function viewFullDeviceDetail(deviceId) {
+                    fetch('spare-parts?action=getDeviceDetail&deviceId=' + deviceId)
+                            .then(res => res.json())
+                            .then(dev => {
+                                document.getElementById('fullDeviceContent').innerHTML = `
+                <div class="text-center mb-3">
+                    <img src="${pageContext.request.contextPath}/assets/images/devices/\${dev.image || 'default.jpg'}" 
+                         class="img-fluid rounded shadow-sm" style="max-height: 200px;">
+                </div>
+                <div class="row g-2">
+                    <div class="col-5 text-muted small uppercase">Machine Name:</div>
+                    <div class="col-7 fw-bold">\${dev.name}</div>
+                    <div class="col-5 text-muted small uppercase">Model / Serial:</div>
+                    <div class="col-7">\${dev.model} / #\${dev.serial}</div>
+                    <div class="col-5 text-muted small uppercase">Current Status:</div>
+                    <div class="col-7"><span class="badge bg-\${dev.status === 'ACTIVE' ? 'success' : 'warning text-dark'}">\${dev.status}</span></div>
+                    <div class="col-5 text-muted small uppercase">Owner:</div>
+                    <div class="col-7 text-primary fw-bold">\<span class="text-primary fw-bold" style="cursor:pointer; text-decoration: underline;" 
+                                    onclick="viewCustomerDetail(\${dev.customerId}); event.stopPropagation();">
+                                    \${dev.customer}
+                                    </span></div>
+                </div>
+            `;
+                                new bootstrap.Modal(document.getElementById('fullDeviceModal')).show();
+                            });
                 }
 
-                listGroup.innerHTML = '<div class="p-4 text-center"><div class="spinner-border text-primary"></div></div>';
-
-                const requests = ids.map(id =>
-                    fetch('spare-parts?action=getDeviceDetail&deviceId=' + id).then(res => res.json())
-                );
-
-                Promise.all(requests).then(devices => {
-                    listGroup.innerHTML = "";
-                    devices.forEach(dev => {
-                        const li = document.createElement('li');
-                        li.className = "list-group-item list-group-item-action d-flex align-items-center justify-content-between p-3";
-                        li.innerHTML = `
-                            <div class="d-flex align-items-center">
-                                <img src="${pageContext.request.contextPath}/assets/images/devices/\${dev.image || 'default.jpg'}" 
-                                     class="rounded me-3 border" style="width: 45px; height: 45px; object-fit: cover;">
-                                <div>
-                                    <div class="fw-bold text-dark">\${dev.name}</div>
-                                    <small class="text-muted">Model: \${dev.model} | Owner: \${dev.customer}</small>
-                                </div>
-                            </div>
-                            <span class="badge bg-\${dev.status === 'ACTIVE' ? 'success' : 'warning text-dark'}">\${dev.status}</span>
-                        `;
-                        listGroup.appendChild(li);
-                    });
-                }).catch(err => {
-                    listGroup.innerHTML = '<li class="list-group-item text-danger text-center py-3">Error loading device details.</li>';
-                });
-            }
+                function viewCustomerDetail(customerId) {
+                    fetch('spare-parts?action=getCustomerDetail&customerId=' + customerId)
+                            .then(res => res.json())
+                            .then(cus => {
+                                document.getElementById('customerContent').innerHTML = `
+                <div class="bg-primary p-4 text-center text-white" style="border-radius: 15px 15px 0 0;">
+                    <img src="${pageContext.request.contextPath}/assets/images/avatars/\${cus.avatar || 'user.jpg'}" 
+                         class="rounded-circle border border-3 border-white mb-2 shadow" 
+                         style="width: 80px; height: 80px; object-fit: cover;">
+                    <h5 class="mb-0">\${cus.fullname}</h5>
+                    <small class="opacity-75">\${cus.role}</small>
+                </div>
+                <div class="p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-telephone text-primary me-3 fs-5"></i>
+                        <div><small class="text-muted d-block">Phone</small><strong>\${cus.phone}</strong></div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-envelope text-primary me-3 fs-5"></i>
+                        <div><small class="text-muted d-block">Email</small><strong class="small">\${cus.email}</strong></div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-geo-alt text-primary me-3 fs-5"></i>
+                        <div><small class="text-muted d-block">Address</small><strong>\${cus.address}</strong></div>
+                    </div>
+                </div>
+            `;
+                                new bootstrap.Modal(document.getElementById('customerModal')).show();
+                            })
+                            .catch(err => console.error("Error loading customer:", err));
+                }
         </script>
     </body>
 </html>
