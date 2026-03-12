@@ -38,11 +38,27 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             request.setAttribute("technicians", technicians);
             request.getRequestDispatcher("/views/TechLeaderView/maintenance-detail.jsp").forward(request, response);
         } else {
-            //list or search
+            //search or list
             String name = request.getParameter("customerName");
             String status = request.getParameter("status");
-            List<Maintenance> list = dao.searchMaintenanceRequests(name, status);
+
+            int pageSize = 3;
+            int pageIndex = 1;
+            String rawPage = request.getParameter("page");
+            if (rawPage != null && !rawPage.isEmpty()) {
+                pageIndex = Integer.parseInt(rawPage);
+            }
+
+            int totalRecords = dao.countMaintenanceRequests(name, status);
+            int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+            List<Maintenance> list = dao.searchMaintenanceRequestsPaging(name, status, pageIndex, pageSize);
+
             request.setAttribute("reqList", list);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("currentPage", pageIndex);
+            request.setAttribute("currentName", name);
+            request.setAttribute("currentStatus", status);
+
             request.getRequestDispatcher("/views/TechLeaderView/maintenance-list.jsp").forward(request, response);
         }
     }

@@ -9,25 +9,45 @@ import model.SparePart;
 
 public class SparePartDAO extends DBContext {
 
-    public List<SparePart> findAllSpareParts(String keyword) {
-        List<SparePart> list = new ArrayList<>();
-        String sql = "SELECT sp.*, inv.quantity"
-                + " FROM spare_part sp "
-                + "LEFT JOIN inventory inv ON sp.id = inv.spare_part_id "
-                + "WHERE sp.name LIKE ? OR sp.part_code LIKE ? ORDER BY sp.id DESC";
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, "%" + keyword + "%");
-            ps.setString(2, "%" + keyword + "%");
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapSparePart(rs));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
+public int getTotalSpareParts(String keyword) {
+    String sql = "SELECT COUNT(*) FROM spare_part WHERE name LIKE ? OR part_code LIKE ?";
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, "%" + keyword + "%");
+        ps.setString(2, "%" + keyword + "%");
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) return rs.getInt(1);
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    return 0;
+}
+
+public List<SparePart> findAllSparePartsPaging(String keyword, int pageIndex, int pageSize) {
+    List<SparePart> list = new ArrayList<>();
+    String sql = "SELECT sp.*, inv.quantity " +
+                 "FROM spare_part sp " +
+                 "LEFT JOIN inventory inv ON sp.id = inv.spare_part_id " +
+                 "WHERE sp.name LIKE ? OR sp.part_code LIKE ? " +
+                 "ORDER BY sp.id DESC " +
+                 "LIMIT ? OFFSET ?";
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, "%" + keyword + "%");
+        ps.setString(2, "%" + keyword + "%");
+        ps.setInt(3, pageSize);
+        ps.setInt(4, (pageIndex - 1) * pageSize);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                SparePart sp = mapSparePart(rs);
+                sp.setCompatibleDeviceIds(getLinkedDeviceIds(sp.getId()));
+                list.add(sp);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
 
     public boolean insertNewSparePart(SparePart sp) {
         String sql = "INSERT INTO spare_part"
