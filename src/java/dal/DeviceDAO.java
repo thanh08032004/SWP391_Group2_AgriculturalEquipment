@@ -338,7 +338,7 @@ public class DeviceDAO extends DBContext {
             params.add(status);
         }
 
-        sql.append(" ORDER BY d.id DESC LIMIT ? OFFSET ?");
+        sql.append(" ORDER BY c.name ASC, d.id DESC LIMIT ? OFFSET ?");
         int offset = (pageIndex - 1) * pageSize;
         params.add(pageSize);
         params.add(offset);

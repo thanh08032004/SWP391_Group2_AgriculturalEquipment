@@ -1,6 +1,9 @@
 package controller.adminBusiness;
 
 import dal.DeviceDAO;
+import dto.CategoryDTO;
+import java.util.Comparator;
+
 import dto.DeviceDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
@@ -42,14 +45,6 @@ public class AdminDeviceServlet extends HttpServlet {
                     String brandId = request.getParameter("brandId");
                     String status = request.getParameter("status");
 
-                    int pageSize = 5;
-                    int pageIndex = 1;
-
-                    String pageParam = request.getParameter("page");
-                    if (pageParam != null) {
-                        pageIndex = Integer.parseInt(pageParam);
-                    }
-
                     List<DeviceDTO> deviceList
                             = deviceDAO.searchAndFilterPaging(
                                     keyword,
@@ -57,26 +52,53 @@ public class AdminDeviceServlet extends HttpServlet {
                                     categoryId,
                                     brandId,
                                     status,
-                                    pageIndex,
-                                    pageSize
+                                    1,
+                                    Integer.MAX_VALUE
                             );
 
-                    int totalRecord
-                            = deviceDAO.countSearchAndFilter(
-                                    keyword,
-                                    customerName,
-                                    categoryId,
-                                    brandId,
-                                    status
-                            );
+                    java.util.Set<String> catsWithDevices = new java.util.LinkedHashSet<>();
+                    for (DeviceDTO d : deviceList) {
+                        if (d.getCategoryName() != null) {
+                            catsWithDevices.add(d.getCategoryName());
+                        }
+                    }
 
-                    int totalPage = (int) Math.ceil((double) totalRecord / pageSize);
+                    // Lay tat ca category, day category co device len dau
+                    List<CategoryDTO> allCategories = deviceDAO.getAllCategories();
+
+                    List<CategoryDTO> withDevices = new java.util.ArrayList<>();
+                    List<CategoryDTO> withoutDevices = new java.util.ArrayList<>();
+
+                    for (CategoryDTO c : allCategories) {
+                        if (catsWithDevices.contains(c.getName())) {
+                            withDevices.add(c);
+                        } else {
+                            withoutDevices.add(c);
+                        }
+                    }
+                    List<CategoryDTO> sortedCategories = new java.util.ArrayList<>();
+                    sortedCategories.addAll(withDevices);
+                    sortedCategories.addAll(withoutDevices);
+
+                    int catPageSize = 5;
+                    int catPageIndex = 1;
+                    String pageParam = request.getParameter("page");
+                    if (pageParam != null) {
+                        catPageIndex = Integer.parseInt(pageParam);
+                    }
+                    int totalCategoryPage = (int) Math.ceil((double) sortedCategories.size() / catPageSize);
+                    int fromIndex = (catPageIndex - 1) * catPageSize;
+                    int toIndex = Math.min(fromIndex + catPageSize, sortedCategories.size());
+                    List<CategoryDTO> pagedCategories = sortedCategories.subList(fromIndex, toIndex);
+
+                    deviceList.sort(Comparator.comparing(DeviceDTO::getCategoryName, Comparator.nullsLast(String::compareTo)));
 
                     request.setAttribute("deviceList", deviceList);
-                    request.setAttribute("categoryList", deviceDAO.getAllCategories());
+                    request.setAttribute("categoryList", pagedCategories);
+                    request.setAttribute("filterCategoryList", sortedCategories);
                     request.setAttribute("brandList", deviceDAO.getAllBrands());
-                    request.setAttribute("currentPage", pageIndex);
-                    request.setAttribute("totalPage", totalPage);
+                    request.setAttribute("currentPage", catPageIndex);
+                    request.setAttribute("totalPage", totalCategoryPage);
 
                     request.getRequestDispatcher("/views/AdminBusinessView/device-list.jsp")
                             .forward(request, response);
@@ -122,6 +144,18 @@ public class AdminDeviceServlet extends HttpServlet {
                     response.sendRedirect("devices?action=list");
                     break;
                 }
+                case "updateStatus": {
+                    int id = Integer.parseInt(request.getParameter("id"));
+                    String newStatus = request.getParameter("status");
+
+                    if (newStatus != null && (newStatus.equals("ACTIVE") || newStatus.equals("MAINTENANCE") || newStatus.equals("BROKEN"))) {
+                        deviceDAO.updateDeviceStatus(id, newStatus);
+                    }
+
+                    response.setStatus(200);
+                    response.getWriter().write("ok");
+                    break;
+                }
 
                 default: {
                     response.sendRedirect("devices?action=list");
@@ -164,7 +198,7 @@ public class AdminDeviceServlet extends HttpServlet {
                         request.setAttribute("errorPrice", "Price phải > 0");
                         hasError = true;
                     }
-                }else if (price.compareTo(BigDecimal.ZERO) == 0) {
+                } else if (price.compareTo(BigDecimal.ZERO) == 0) {
                     request.setAttribute("errorPrice", "Price không được để trống");
                     hasError = true;
                 }
@@ -247,9 +281,10 @@ public class AdminDeviceServlet extends HttpServlet {
 
             boolean success = deviceDAO.createDevice(d);
 
-            if (success) 
+            if (success) {
                 response.sendRedirect("devices?action=list");
-         
+            }
+
         } else if ("update".equals(action)) {
 
             DeviceDTO d = new DeviceDTO();
