@@ -97,7 +97,6 @@ public class MaintenanceDAO extends DBContext {
         return list;
     }
 
-
     // Admin & Customer view device status/diagnostic info
     public Maintenance getMaintenanceById(int id) {
         String sql = "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name "
@@ -226,7 +225,6 @@ public class MaintenanceDAO extends DBContext {
         }
         return false;
     }
-
 
     // 2. Staff accept job
     public boolean acceptJob(int maintenanceId, int technicianId) {
@@ -377,7 +375,6 @@ public class MaintenanceDAO extends DBContext {
         return false;
     }
 
-
     public List<MaintenanceDTO> searchMyTasks(int technicianId, String name, String status) {
 
         List<MaintenanceDTO> list = new ArrayList<>();
@@ -444,7 +441,7 @@ public class MaintenanceDAO extends DBContext {
             String name, int pageIndex, int pageSize) {
 
         List<MaintenanceDTO> list = new ArrayList<>();
-        String sql = "SELECT m.*, u.fullname AS customerName, d.machine_name as machineName\n"
+        String sql = "SELECT m.*, u.fullname AS customerName, d.machine_name as machineName, d.customer_id AS customerId\n"
                 + "            FROM maintenance m\n"
                 + "            JOIN device d ON m.device_id = d.id\n"
                 + "            JOIN user_profile u ON d.customer_id = u.user_id\n"
@@ -480,6 +477,7 @@ public class MaintenanceDAO extends DBContext {
                 m.setEndDate(rs.getTimestamp("end_date"));
                 m.setCustomerName(rs.getString("customerName"));
                 m.setMachineName(rs.getString("machineName"));
+                m.setCustomerId(rs.getInt("customerId"));
                 list.add(m);
             }
 
@@ -531,7 +529,7 @@ public class MaintenanceDAO extends DBContext {
         List<MaintenanceDTO> list = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder("""
-        SELECT m.*, u.fullname AS customerName, d.machine_name AS machineName
+        SELECT m.*, u.fullname AS customerName, d.machine_name AS machineName, d.customer_id AS customerId
         FROM maintenance m
         JOIN device d ON m.device_id = d.id
         JOIN user_profile u ON d.customer_id = u.user_id
@@ -583,6 +581,8 @@ public class MaintenanceDAO extends DBContext {
                 m.setEndDate(rs.getTimestamp("end_date"));
                 m.setCustomerName(rs.getString("customerName"));
                 m.setMachineName(rs.getString("machineName"));
+                m.setCustomerId(rs.getInt("customerId"));
+
                 list.add(m);
             }
 

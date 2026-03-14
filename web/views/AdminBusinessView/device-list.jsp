@@ -503,5 +503,7 @@
                 </div>
             </div>
         </div>
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
+
     </body>
 </html>

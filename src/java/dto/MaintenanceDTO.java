@@ -29,4 +29,5 @@ public class MaintenanceDTO {
     private String customerName;
     private String machineName;
     private String serialNumber;
+    private int customerId;
 }

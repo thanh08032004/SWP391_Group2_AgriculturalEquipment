@@ -151,27 +151,6 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             req.setAttribute("totalPage", totalPage);
             req.getRequestDispatcher("/views/technicianView/my-tasks.jsp").forward(req, resp);
         }
-//        if ("work".equals(action)) {
-//            int id = Integer.parseInt(req.getParameter("id"));
-//            MaintenanceDTO m = dao.findById(id);
-//
-//            // Kiểm tra quyền truy cập
-//            if (m.getTechnicianId() != technicianId) {
-//                req.getSession().setAttribute("error", "Access denied!");
-//                resp.sendRedirect("maintenance?action=mytasks");
-//                return;
-//            }
-//
-//            req.setAttribute("m", m);
-//
-//            // Lấy spare parts của device
-//            req.setAttribute("spareParts", spDao.getSparePartByDeviceId(m.getDeviceId()));
-//
-//            // Lấy maintenance items đã chọn (nếu có)
-//            req.setAttribute("selectedItems", dao.getMaintenanceItems(id));
-//
-//            req.getRequestDispatcher("/views/technicianView/maintenance-work.jsp").forward(req, resp);
-//        }
 
         if ("work".equals(action)) {
 
@@ -239,6 +218,58 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             }
 
             resp.sendRedirect("maintenance?action=mytasks");
+        }
+
+        if ("getDeviceDetailJson".equals(action)) {
+            int dId = Integer.parseInt(req.getParameter("id"));
+            dal.DeviceDAO deviceDAO = new dal.DeviceDAO();
+            dto.DeviceDTO dev = deviceDAO.getDeviceById(dId);
+            if (dev != null) {
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                String json = String.format(
+                        "{\"id\":%d,\"serial\":\"%s\",\"machineName\":\"%s\",\"model\":\"%s\","
+                        + "\"price\":\"%s\",\"status\":\"%s\",\"categoryName\":\"%s\","
+                        + "\"brandName\":\"%s\",\"customerName\":\"%s\","
+                        + "\"purchaseDate\":\"%s\",\"warrantyEndDate\":\"%s\",\"image\":\"%s\"}",
+                        dev.getId(), dev.getSerialNumber(), dev.getMachineName(), dev.getModel(),
+                        dev.getPrice() != null ? dev.getPrice().toPlainString() : "N/A",
+                        dev.getStatus(), dev.getCategoryName(), dev.getBrandName(),
+                        dev.getCustomerName(),
+                        dev.getPurchaseDate() != null ? dev.getPurchaseDate().toString() : "N/A",
+                        dev.getWarrantyEndDate() != null ? dev.getWarrantyEndDate().toString() : "N/A",
+                        dev.getImage() != null ? dev.getImage() : "default_device.jpg"
+                );
+                resp.getWriter().write(json);
+            }
+            return;
+        }
+
+        if ("getCustomerDetailJson".equals(action)) {
+            int cusId = Integer.parseInt(req.getParameter("id"));
+            dal.UserProfileDAO uDao = new dal.UserProfileDAO();
+            model.UserProfile profile = uDao.getUserProfileById(cusId);
+            if (profile != null) {
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                String json = String.format(
+                        "{\"id\":%d,\"username\":\"%s\",\"role\":\"%s\",\"fullname\":\"%s\","
+                        + "\"email\":\"%s\",\"phone\":\"%s\",\"gender\":\"%s\","
+                        + "\"birthDate\":\"%s\",\"address\":\"%s\",\"avatar\":\"%s\"}",
+                        profile.getUser().getId(),
+                        profile.getUser().getUsername(),
+                        profile.getUser().getRoleName(),
+                        profile.getFullname(),
+                        profile.getEmail() != null ? profile.getEmail() : "N/A",
+                        profile.getPhone() != null ? profile.getPhone() : "N/A",
+                        profile.getGender() != null ? profile.getGender() : "N/A",
+                        profile.getBirthDate() != null ? profile.getBirthDate().toString() : "N/A",
+                        profile.getAddress() != null ? profile.getAddress() : "N/A",
+                        profile.getAvatar() != null ? profile.getAvatar() : "default.jpg"
+                );
+                resp.getWriter().write(json);
+            }
+            return;
         }
 
     }
