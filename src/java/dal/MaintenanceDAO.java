@@ -99,7 +99,7 @@ public class MaintenanceDAO extends DBContext {
 
     // Admin & Customer view device status/diagnostic info
     public Maintenance getMaintenanceById(int id) {
-        String sql = "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name "
+        String sql = "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name,d.customer_id AS customerId "
                 + "FROM maintenance m "
                 + "JOIN device d ON m.device_id = d.id "
                 + "JOIN user_profile up ON d.customer_id = up.user_id "
@@ -111,6 +111,7 @@ public class MaintenanceDAO extends DBContext {
                 return Maintenance.builder()
                         .id(rs.getInt("id"))
                         .deviceId(rs.getInt("device_id"))
+                        .customerId(rs.getInt("customerId"))
                         .technicianId(rs.getInt("technician_id"))
                         .description(rs.getString("description"))
                         .status(rs.getString("status"))

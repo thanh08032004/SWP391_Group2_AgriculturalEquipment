@@ -1896,6 +1896,10 @@ h2::before {
 
 header {
     border-bottom: 2px solid #8C593B;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #ffffff;
 }
 /* Back button admin */
 .back-wrapper {
