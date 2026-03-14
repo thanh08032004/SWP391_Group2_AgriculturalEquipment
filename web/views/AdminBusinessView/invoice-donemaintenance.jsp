@@ -11,8 +11,8 @@
             <div class="admin-layout d-flex">
             <jsp:include page="/common/side-bar.jsp"></jsp:include>
                 <div class="admin-content p-4 w-100">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="fw-bold">Maintenance Requests</h2>
+                    <div style="margin-top: 40px" class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold">Maintenance Done</h2>
                         <form action="${pageContext.request.contextPath}/admin-business/donemaintenance" method="get" class="d-flex gap-2">
                         <input type="text" name="customerName" class="form-control" placeholder="Enter name of Customer" value="${currentName}">
                         <select name="status" class="form-select">
@@ -29,7 +29,7 @@
                     </form>
                 </div>
 
-                <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                        <div style="margin-top: 40px" class="card shadow-sm border-0 rounded-3 overflow-hidden">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-muted text-uppercase small">
                             <tr>

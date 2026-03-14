@@ -59,8 +59,7 @@ body{
 
 .info-label{
     font-weight:600;
-    color:#555;
-}
+    color: #555}
 
 .info-value{
     font-weight:500;
