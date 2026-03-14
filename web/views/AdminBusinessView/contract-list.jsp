@@ -70,7 +70,14 @@
                                         <tr>
                                             <td>${c.id}</td>
                                             <td>${c.contractCode}</td>
-                                            <td>${c.customerName}</td>
+                                            <td>
+                                                <span onclick="showCustomerDetail(${c.customerId})"
+                                                      style="cursor:pointer;color:#0d6efd;font-weight:600;"
+                                                      onmouseover="this.style.textDecoration = 'underline'"
+                                                      onmouseout="this.style.textDecoration = 'none'">
+                                                    ${c.customerName}
+                                                </span>
+                                            </td>
                                             <td>${c.signedAt}</td>
                                             <td>
                                                 <fmt:formatNumber value="${c.totalValue}" type="number" groupingUsed="true"/> VNĐ
@@ -115,5 +122,76 @@
         </div>
 
         <jsp:include page="/common/scripts.jsp"></jsp:include>
+
+            <!-- Customer Detail Modal -->
+            <div class="modal fade" id="customerDetailModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg" style="border-radius:15px;">
+                        <div class="modal-body p-0" id="customerDetailContent">
+                            <div class="text-center p-4">
+                                <div class="spinner-border text-primary"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+
+                function esc(str) {
+                    if (!str)
+                        return "";
+                    return String(str)
+                            .replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(/"/g, "&quot;");
+                }
+
+                function showCustomerDetail(customerId) {
+
+                    var modal = new bootstrap.Modal(document.getElementById('customerDetailModal'));
+
+                    document.getElementById('customerDetailContent').innerHTML =
+                            '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+
+                    modal.show();
+
+                    fetch('${pageContext.request.contextPath}/admin-business/contracts?action=getCustomerDetail&id=' + customerId)
+
+                            .then(res => res.json())
+
+                            .then(cus => {
+
+                                document.getElementById('customerDetailContent').innerHTML =
+                                        '<div class="bg-primary p-4 text-center text-white" style="border-radius:15px 15px 0 0;">' +
+                                        '<img src="${pageContext.request.contextPath}/assets/images/avatars/' + (cus.avatar || 'default.jpg') + '" ' +
+                                        'class="rounded-circle border border-3 border-white mb-2 shadow" ' +
+                                        'style="width:80px;height:80px;object-fit:cover;">' +
+                                        '<h5 class="mb-0">' + esc(cus.fullname) + '</h5>' +
+                                        '<small class="opacity-75">' + esc(cus.role) + '</small>' +
+                                        '</div>' +
+                                        '<div class="p-4">' +
+                                        '<table class="table table-bordered mb-3">' +
+                                        '<tr><th style="width:40%">Username</th><td>' + esc(cus.username) + '</td></tr>' +
+                                        '<tr><th>Full Name</th><td>' + esc(cus.fullname) + '</td></tr>' +
+                                        '<tr><th>Email</th><td>' + esc(cus.email) + '</td></tr>' +
+                                        '<tr><th>Phone</th><td>' + esc(cus.phone) + '</td></tr>' +
+                                        '<tr><th>Gender</th><td>' + esc(cus.gender) + '</td></tr>' +
+                                        '<tr><th>Date of Birth</th><td>' + esc(cus.birthDate) + '</td></tr>' +
+                                        '<tr><th>Address</th><td>' + esc(cus.address) + '</td></tr>' +
+                                        '</table>' +
+                                        '</div>';
+
+                            })
+
+                            .catch(function () {
+                                document.getElementById('customerDetailContent').innerHTML =
+                                        '<p class="text-danger text-center p-4">Error loading customer details.</p>';
+                            });
+                }
+
+        </script>
+
     </body>
 </html>

@@ -21,12 +21,41 @@ import java.sql.*;
 @AllArgsConstructor
 @Builder
 public class Contract {
+
     private int id;
     private String contractCode;
     private int customerId;
-    private String customerName; 
+    private String customerName;
+
+    // bên A (công ty)
+    private String partyA;
+
+    // ngày ký
     private Date signedAt;
+
+    // ngày hiệu lực
+    private Date effectiveDate;
+
+    // ngày hết hạn
+    private Date expiryDate;
+
+    // tổng giá trị hợp đồng
     private BigDecimal totalValue;
+
+    // điều khoản thanh toán
+    private String paymentTerms;
+
+    // mô tả hợp đồng
+    private String description;
+
+    // trạng thái hợp đồng
     private String status;
+
+    // file hợp đồng
+    private String fileUrl;
+
+    // nhân viên tạo
+    private int createdBy;
+
     private Timestamp createdAt;
 }

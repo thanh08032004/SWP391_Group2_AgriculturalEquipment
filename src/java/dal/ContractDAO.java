@@ -18,11 +18,12 @@ public class ContractDAO extends DBContext {
     public Contract getById(int id) {
 
         String sql = """
-        SELECT c.*, u.username
-        FROM contract c
-        JOIN users u ON c.customer_id = u.id
-        WHERE c.id = ?
-    """;
+            SELECT c.*, up.fullname
+            FROM contract c
+            JOIN users u ON c.customer_id = u.id
+            JOIN user_profile up ON u.id = up.user_id
+            WHERE c.id = ?
+        """;
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
 
@@ -30,20 +31,35 @@ public class ContractDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+
                 Contract c = new Contract();
+
                 c.setId(rs.getInt("id"));
                 c.setContractCode(rs.getString("contract_code"));
                 c.setCustomerId(rs.getInt("customer_id"));
-                c.setCustomerName(rs.getString("username"));
+                c.setCustomerName(rs.getString("fullname"));
+
+                c.setPartyA(rs.getString("party_a"));
+
                 c.setSignedAt(rs.getDate("signed_at"));
+                c.setEffectiveDate(rs.getDate("effective_date"));
+                c.setExpiryDate(rs.getDate("expiry_date"));
+
                 c.setTotalValue(rs.getBigDecimal("total_value"));
+
+                c.setPaymentTerms(rs.getString("payment_terms"));
+                c.setDescription(rs.getString("description"));
+                c.setFileUrl(rs.getString("file_url"));
+
+                c.setCreatedBy(rs.getInt("created_by"));
                 c.setStatus(rs.getString("status"));
                 c.setCreatedAt(rs.getTimestamp("created_at"));
+
                 return c;
             }
 
         } catch (Exception e) {
-            System.err.println("Error get contract by id");
+            e.printStackTrace();
         }
 
         return null;
@@ -113,11 +129,12 @@ public class ContractDAO extends DBContext {
         List<Contract> list = new ArrayList<>();
 
         String sql = """
-            SELECT c.*, u.username
+            SELECT c.*, up.fullname
             FROM contract c
             JOIN users u ON c.customer_id = u.id
+            JOIN user_profile up ON u.id = up.user_id
             WHERE c.contract_code LIKE ?
-               OR u.username LIKE ?
+               OR up.fullname LIKE ?
             ORDER BY c.id DESC
             LIMIT ? OFFSET ?
         """;
@@ -131,15 +148,22 @@ public class ContractDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+
                 Contract c = new Contract();
+
                 c.setId(rs.getInt("id"));
                 c.setContractCode(rs.getString("contract_code"));
                 c.setCustomerId(rs.getInt("customer_id"));
-                c.setCustomerName(rs.getString("username"));
+                c.setCustomerName(rs.getString("fullname"));
+
                 c.setSignedAt(rs.getDate("signed_at"));
+                c.setEffectiveDate(rs.getDate("effective_date"));
+                c.setExpiryDate(rs.getDate("expiry_date"));
+
                 c.setTotalValue(rs.getBigDecimal("total_value"));
                 c.setStatus(rs.getString("status"));
                 c.setCreatedAt(rs.getTimestamp("created_at"));
+
                 list.add(c);
             }
         } catch (Exception e) {
@@ -148,4 +172,5 @@ public class ContractDAO extends DBContext {
 
         return list;
     }
+
 }

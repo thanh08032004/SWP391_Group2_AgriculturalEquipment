@@ -39,7 +39,7 @@ public class UserDAO extends DBContext {
             e.printStackTrace();
         }
 
-        return null; 
+        return null;
     }
 
     public User findByEmail(String email) {
@@ -100,9 +100,7 @@ public class UserDAO extends DBContext {
         """;
 
         try (
-            Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username.trim());
 
@@ -125,4 +123,6 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
+
+
 }

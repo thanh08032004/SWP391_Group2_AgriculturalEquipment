@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Acer
  */
 import dal.ContractDAO;
+import dal.DeviceDAO;
+import dto.DeviceDTO;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
@@ -75,6 +77,74 @@ public class AdminContractServlet extends HttpServlet {
 
             request.getRequestDispatcher("/views/AdminBusinessView/contract-list.jsp")
                     .forward(request, response);
+        } else if (action.equals("getCustomerDetail")) {
+
+            int cusId = Integer.parseInt(request.getParameter("id"));
+
+            dal.UserProfileDAO uDao = new dal.UserProfileDAO();
+            model.UserProfile profile = uDao.getUserProfileById(cusId);
+
+            if (profile != null) {
+
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+
+                String json = String.format(
+                        "{\"id\":%d,\"username\":\"%s\",\"role\":\"%s\",\"fullname\":\"%s\","
+                        + "\"email\":\"%s\",\"phone\":\"%s\",\"gender\":\"%s\","
+                        + "\"birthDate\":\"%s\",\"address\":\"%s\",\"avatar\":\"%s\"}",
+                        profile.getUser().getId(),
+                        profile.getUser().getUsername(),
+                        profile.getUser().getRoleName(),
+                        profile.getFullname(),
+                        profile.getEmail() != null ? profile.getEmail() : "N/A",
+                        profile.getPhone() != null ? profile.getPhone() : "N/A",
+                        profile.getGender() != null ? profile.getGender() : "N/A",
+                        profile.getBirthDate() != null ? profile.getBirthDate().toString() : "N/A",
+                        profile.getAddress() != null ? profile.getAddress() : "N/A",
+                        profile.getAvatar() != null ? profile.getAvatar() : "default.jpg"
+                );
+
+                response.getWriter().write(json);
+            }
+
+            return;
+        } else if (action.equals("getDeviceDetailJson")) {
+
+            int deviceId = Integer.parseInt(request.getParameter("id"));
+
+            DeviceDAO deviceDAO = new DeviceDAO();
+            DeviceDTO dev = deviceDAO.getDeviceById(deviceId);
+
+            if (dev != null) {
+
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+
+                String json = String.format(
+                        "{\"id\":%d,\"serial\":\"%s\",\"machineName\":\"%s\",\"model\":\"%s\","
+                        + "\"price\":\"%s\",\"status\":\"%s\",\"categoryName\":\"%s\","
+                        + "\"brandName\":\"%s\",\"customerName\":\"%s\","
+                        + "\"purchaseDate\":\"%s\",\"warrantyEndDate\":\"%s\",\"image\":\"%s\"}",
+                        dev.getId(),
+                        dev.getSerialNumber(),
+                        dev.getMachineName(),
+                        dev.getModel(),
+                        dev.getPrice() != null ? dev.getPrice().toPlainString() : "N/A",
+                        dev.getStatus(),
+                        dev.getCategoryName(),
+                        dev.getBrandName(),
+                        dev.getCustomerName(),
+                        dev.getPurchaseDate() != null ? dev.getPurchaseDate().toString() : "N/A",
+                        dev.getWarrantyEndDate() != null ? dev.getWarrantyEndDate().toString() : "N/A",
+                        dev.getImage() != null ? dev.getImage() : "default_device.jpg"
+                );
+
+                response.getWriter().write(json);
+            }
+
+            return;
         }
+        
     }
 }
