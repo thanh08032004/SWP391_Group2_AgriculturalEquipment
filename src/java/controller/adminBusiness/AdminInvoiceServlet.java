@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Invoice;
+import model.Maintenance;
+import model.UserProfile;
 
 public class AdminInvoiceServlet extends HttpServlet {
 
@@ -30,35 +32,93 @@ public class AdminInvoiceServlet extends HttpServlet {
     } 
 
     @Override
- protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-          String keyword = request.getParameter("keyword");
-        String filter = request.getParameter("filter");
+    String action = request.getParameter("action");
 
-        int page = 1;
-        int pageSize = 5;
+    InvoiceDAO dao = new InvoiceDAO();
 
-        if (request.getParameter("page") != null) {
-            page = Integer.parseInt(request.getParameter("page"));
-        }
+    // ================= CUSTOMER DETAIL =================
+    if ("getCustomerDetail".equals(action)) {
 
-        InvoiceDAO dao = new InvoiceDAO();
+        int id = Integer.parseInt(request.getParameter("id"));
 
-        List<Invoice> ListI = dao.searchFilterInvoice(
-                keyword, filter, page, pageSize);
+        UserProfile c = dao.getCustomerDetail(id);
 
-        int totalRecords = dao.countInvoice(keyword, filter);
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-        request.setAttribute("ListI", ListI);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
+        PrintWriter out = response.getWriter();
 
-        request.getRequestDispatcher("/views/AdminBusinessView/invoice-list.jsp")
-                .forward(request, response);
+        if (c != null) {
+
+    out.print("{");
+    out.print("\"fullname\":\""+c.getFullname()+"\",");
+    out.print("\"email\":\""+c.getEmail()+"\",");
+    out.print("\"phone\":\""+c.getPhone()+"\",");
+    out.print("\"gender\":\""+c.getGender()+"\",");
+    out.print("\"birthDate\":\""+c.getBirthDate()+"\",");
+    out.print("\"address\":\""+c.getAddress()+"\",");
+    out.print("\"avatar\":\""+c.getAvatar()+"\"");
+    out.print("}");
+
+}
+
+        return;
     }
 
+    // ================= MAINTENANCE DETAIL =================
+    if ("getMaintenanceDetail".equals(action)) {
+
+        int id = Integer.parseInt(request.getParameter("id"));
+
+        Maintenance m = dao.getMaintenanceDetail(id);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        PrintWriter out = response.getWriter();
+
+        if (m != null) {
+
+            out.print("{");
+            out.print("\"id\":"+m.getId()+",");
+            out.print("\"machineName\":\""+m.getMachineName()+"\",");
+            out.print("\"problem\":\""+m.getDescription()+"\",");
+            out.print("\"status\":\""+m.getStatus()+"\",");
+            out.print("\"startDate\":\""+m.getStartDate()+"\",");
+            out.print("\"finishDate\":\""+m.getEndDate()+"\"");
+            out.print("}");
+
+        }
+
+        return;
+    }
+
+    // ================= INVOICE LIST =================
+    String keyword = request.getParameter("keyword");
+    String filter = request.getParameter("filter");
+
+    int page = 1;
+    int pageSize = 5;
+
+    if (request.getParameter("page") != null) {
+        page = Integer.parseInt(request.getParameter("page"));
+    }
+
+    List<Invoice> ListI = dao.searchFilterInvoice(keyword, filter, page, pageSize);
+
+    int totalRecords = dao.countInvoice(keyword, filter);
+    int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+    request.setAttribute("ListI", ListI);
+    request.setAttribute("currentPage", page);
+    request.setAttribute("totalPages", totalPages);
+
+    request.getRequestDispatcher("/views/AdminBusinessView/invoice-list.jsp")
+            .forward(request, response);
+}
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {

@@ -10,6 +10,7 @@ import java.util.List;
 import model.Invoice;
 import model.Maintenance;
 import model.SparePart;
+import model.UserProfile;
 
 public class InvoiceDAO extends DBContext {
 
@@ -339,7 +340,9 @@ public List<Invoice> searchFilterInvoice(String keyword, String filter,
     List<Invoice> list = new ArrayList<>();
 
     StringBuilder sql = new StringBuilder(
-        "SELECT DISTINCT i.*, up.fullname AS customer_name " +
+        "SELECT DISTINCT i.*, " +
+        "u.id AS customer_id, " +
+        "up.fullname AS customer_name " +
         "FROM invoice i " +
         "LEFT JOIN maintenance m ON i.maintenance_id = m.id " +
         "LEFT JOIN device d ON m.device_id = d.id " +
@@ -392,12 +395,18 @@ public List<Invoice> searchFilterInvoice(String keyword, String filter,
         ResultSet rs = ps.executeQuery();
 
         while (rs.next()) {
+
             Invoice inv = new Invoice();
+
             inv.setId(rs.getInt("id"));
             inv.setMaintenanceId(rs.getInt("maintenance_id"));
+
+            // NEW
+            inv.setCustomerId(rs.getInt("customer_id"));
             inv.setCustomerName(rs.getString("customer_name"));
             inv.setTotalAmount(rs.getDouble("total_amount"));
             inv.setPaymentStatus(rs.getString("payment_status"));
+            inv.setIssuedAt(rs.getTimestamp("issued_at"));
             list.add(inv);
         }
 
@@ -406,6 +415,82 @@ public List<Invoice> searchFilterInvoice(String keyword, String filter,
     }
 
     return list;
+}
+public UserProfile getCustomerDetail(int id) {
+
+    String sql =
+        "SELECT up.email, up.fullname, up.phone, up.gender, up.date_of_birth, up.address, up.avatar " +
+        "FROM users u " +
+        "LEFT JOIN user_profile up ON u.id = up.user_id " +
+        "WHERE u.id = ?";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+
+            UserProfile c = new UserProfile();
+
+            c.setUserId(id);
+            c.setFullname(rs.getString("fullname"));
+            c.setEmail(rs.getString("email"));
+            c.setPhone(rs.getString("phone"));
+            c.setGender(rs.getString("gender"));
+            c.setAddress(rs.getString("address"));
+            c.setAvatar(rs.getString("avatar"));
+
+            Date dob = rs.getDate("date_of_birth");
+            if (dob != null) {
+                c.setBirthDate(dob.toLocalDate());
+            }
+
+            return c;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return null;
+}
+public Maintenance getMaintenanceDetail(int id){
+
+    String sql =
+        "SELECT m.*, d.machine_name " +
+        "FROM maintenance m " +
+        "LEFT JOIN device d ON m.device_id = d.id " +
+        "WHERE m.id = ?";
+
+    try(Connection con = getConnection();
+        PreparedStatement ps = con.prepareStatement(sql)){
+
+        ps.setInt(1,id);
+
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next()){
+
+            Maintenance m = new Maintenance();
+
+            m.setId(rs.getInt("id"));
+            m.setDeviceId(rs.getInt("device_id"));
+            m.setDescription(rs.getString("description"));
+            m.setStatus(rs.getString("status"));
+            m.setStartDate(rs.getTimestamp("start_date"));
+            m.setEndDate(rs.getTimestamp("end_date"));
+            m.setMachineName(rs.getString("machine_name"));
+
+            return m;
+        }
+
+    }catch(Exception e){
+        e.printStackTrace();
+    }
+
+    return null;
 }
 public int countInvoice(String keyword, String filter) {
     int total = 0;
@@ -992,6 +1077,8 @@ public MaintenanceDTO getMaintenanceById(int id) {
     return null;
 }
     public static void main(String[] args) {
-        InvoiceDAO dao = new InvoiceDAO();
+        InvoiceDAO i = new InvoiceDAO();
+        System.out.println(i.getCustomerDetail(4));
+        
     }
 }

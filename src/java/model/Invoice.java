@@ -1,32 +1,33 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package model;
+    /*
+     * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+     * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+     */
+    package model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+    import lombok.AllArgsConstructor;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
+    import java.math.BigDecimal;
+    import java.sql.Timestamp;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Invoice {
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class Invoice {
 
-    private int id;
-    private int maintenanceId;   // FK tới maintenance
-    private String customerName;
-    private int voucherId;
-    private double laborCost;       // tiền công
-    private double discountAmount;  // giảm giá
-    private double totalAmount;     // tổng tiền phải trả
-    private String description;
-    private String paymentStatus;       // UNPAID, PAID
-    private String paymentMethod;       // CASH, BANK_TRANSFER, EWALLET
+        private int id;
+        private int maintenanceId;   // FK tới maintenance
+        private String customerName;
+        private int voucherId;
+        private int customerId;
+        private double laborCost;       // tiền công
+        private double discountAmount;  // giảm giá
+        private double totalAmount;     // tổng tiền phải trả
+        private String description;
+        private String paymentStatus;       // UNPAID, PAID
+        private String paymentMethod;       // CASH, BANK_TRANSFER, EWALLET
 
-    private Timestamp issuedAt;         // thời gian tạo hóa đơn
-    private Timestamp paidAt;           // thời gian thanh toán (NULL nếu chưa)
-}
+        private Timestamp issuedAt;         // thời gian tạo hóa đơn
+        private Timestamp paidAt;           // thời gian thanh toán (NULL nếu chưa)
+    }
