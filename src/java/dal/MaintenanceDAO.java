@@ -97,53 +97,7 @@ public class MaintenanceDAO extends DBContext {
         return list;
     }
 
-//    public List<Maintenance> searchMaintenanceRequests(String customerName, String status) {
-//        List<Maintenance> list = new ArrayList<>();
-//        StringBuilder sql = new StringBuilder(
-//                "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name "
-//                + "FROM maintenance m "
-//                + "JOIN device d ON m.device_id = d.id "
-//                + "JOIN user_profile up ON d.customer_id = up.user_id WHERE 1=1 "
-//        );
-//
-//        if (status == null || status.equals("All Status")) {
-//            sql.append(" AND m.status != 'READY' ");
-//        } else {
-//            sql.append(" AND m.status = ? ");
-//        }
-//
-//        if (customerName != null && !customerName.isEmpty()) {
-//            sql.append(" AND up.fullname LIKE ? ");
-//        }
-//
-//        sql.append(" ORDER BY m.id DESC");
-//
-//        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
-//            int paramIdx = 1;
-//            if (status != null && !status.equals("All Status")) {
-//                ps.setString(paramIdx++, status);
-//            }
-//            if (customerName != null && !customerName.isEmpty()) {
-//                ps.setString(paramIdx++, "%" + customerName + "%");
-//            }
-//
-//            ResultSet rs = ps.executeQuery();
-//            while (rs.next()) {
-//                list.add(Maintenance.builder()
-//                        .id(rs.getInt("id"))
-//                        .description(rs.getString("description"))
-//                        .status(rs.getString("status"))
-//                        .startDate(rs.getTimestamp("start_date"))
-//                        .machineName(rs.getString("machine_name"))
-//                        .modelName(rs.getString("model"))
-//                        .customerName(rs.getString("customer_name"))
-//                        .build());
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return list;
-//    }
+
     // Admin & Customer view device status/diagnostic info
     public Maintenance getMaintenanceById(int id) {
         String sql = "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name "
@@ -273,40 +227,7 @@ public class MaintenanceDAO extends DBContext {
         return false;
     }
 
-//    public List<MaintenanceDTO> getWaitingForTechnician() {
-//        List<MaintenanceDTO> list = new ArrayList<>();
-//        String sql = """
-//            SELECT m.*, u.fullname AS customerName, d.machine_name as machineName
-//            FROM maintenance m
-//            JOIN device d ON m.device_id = d.id
-//            JOIN user_profile u ON d.customer_id = u.user_id
-//            WHERE m.status = 'WAITING_FOR_TECHNICIAN'
-//            AND m.technician_id IS NULL
-//            ORDER BY m.id DESC
-//        """;
-//
-//        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-//
-//            ResultSet rs = ps.executeQuery();
-//            while (rs.next()) {
-//                MaintenanceDTO m = new MaintenanceDTO();
-//                m.setId(rs.getInt("id"));
-//                m.setDeviceId(rs.getInt("device_id"));
-//                m.setTechnicianId(rs.getInt("technician_id"));
-//                m.setDescription(rs.getString("description"));
-//                m.setStatus(rs.getString("status"));
-//                m.setStartDate(rs.getTimestamp("start_date"));
-//                m.setEndDate(rs.getTimestamp("end_date"));
-//
-//                m.setCustomerName(rs.getString("customerName"));
-//                m.setMachineName(rs.getString("machineName"));
-//                list.add(m);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return list;
-//    }
+
     // 2. Staff accept job
     public boolean acceptJob(int maintenanceId, int technicianId) {
         String sql = """
@@ -456,46 +377,7 @@ public class MaintenanceDAO extends DBContext {
         return false;
     }
 
-//    public List<MaintenanceDTO> searchWaitingForTechnician(String name) {
-//        List<MaintenanceDTO> list = new ArrayList<>();
-//        String sql = "SELECT m.*, u.fullname AS customerName, d.machine_name as machineName\n" +
-//"            FROM maintenance m\n" +
-//"            JOIN device d ON m.device_id = d.id\n" +
-//"            JOIN user_profile u ON d.customer_id = u.user_id\n" +
-//"            WHERE m.status = 'WAITING_FOR_TECHNICIAN'\n" +
-//"            AND m.technician_id IS NULL\n"
-//;
-//
-//        if (name != null && !name.trim().isEmpty()) {
-//            sql += " AND u.fullname LIKE ?";
-//        }
-//
-//        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-//
-//            if (name != null && !name.trim().isEmpty()) {
-//                ps.setString(1, "%" + name + "%");
-//            }
-//
-//            ResultSet rs = ps.executeQuery();
-//            while (rs.next()) {
-//                MaintenanceDTO m = new MaintenanceDTO();
-//                m.setId(rs.getInt("id"));
-//                m.setDeviceId(rs.getInt("device_id"));
-//                m.setTechnicianId(rs.getInt("technician_id"));
-//                m.setDescription(rs.getString("description"));
-//                m.setStatus(rs.getString("status"));
-//                m.setStartDate(rs.getTimestamp("start_date"));
-//                m.setEndDate(rs.getTimestamp("end_date"));
-//                m.setCustomerName(rs.getString("customerName"));
-//                m.setMachineName(rs.getString("machineName"));
-//                list.add(m);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        return list;
-//    }
+
     public List<MaintenanceDTO> searchMyTasks(int technicianId, String name, String status) {
 
         List<MaintenanceDTO> list = new ArrayList<>();

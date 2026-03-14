@@ -125,25 +125,6 @@ public class AdminDeviceServlet extends HttpServlet {
                             .forward(request, response);
                     break;
                 }
-
-                case "view": {
-                    int id = Integer.parseInt(request.getParameter("id"));
-                    DeviceDTO device = deviceDAO.getDeviceById(id);
-                    System.out.println("device = " + device);
-                    request.setAttribute("device", device);
-                    request.getRequestDispatcher("/views/AdminBusinessView/device-detail.jsp")
-                            .forward(request, response);
-                    break;
-                }
-                case "delete": {
-                    int id = Integer.parseInt(request.getParameter("id"));
-
-                    boolean success = deviceDAO.deleteDevice(id);
-
-                    // Dù thành công hay không cũng quay lại list
-                    response.sendRedirect("devices?action=list");
-                    break;
-                }
                 case "updateStatus": {
                     int id = Integer.parseInt(request.getParameter("id"));
                     String newStatus = request.getParameter("status");
@@ -156,6 +137,54 @@ public class AdminDeviceServlet extends HttpServlet {
                     response.getWriter().write("ok");
                     break;
                 }
+                case "getDeviceDetailJson":
+                    int dId = Integer.parseInt(request.getParameter("id"));
+                    DeviceDTO dev = deviceDAO.getDeviceById(dId);
+                    if (dev != null) {
+                        response.setContentType("application/json");
+                        response.setCharacterEncoding("UTF-8");
+                        String json = String.format(
+                                "{\"id\":%d,\"serial\":\"%s\",\"machineName\":\"%s\",\"model\":\"%s\","
+                                + "\"price\":\"%s\",\"status\":\"%s\",\"categoryName\":\"%s\","
+                                + "\"brandName\":\"%s\",\"customerName\":\"%s\","
+                                + "\"purchaseDate\":\"%s\",\"warrantyEndDate\":\"%s\",\"image\":\"%s\"}",
+                                dev.getId(), dev.getSerialNumber(), dev.getMachineName(), dev.getModel(),
+                                dev.getPrice() != null ? dev.getPrice().toPlainString() : "N/A",
+                                dev.getStatus(), dev.getCategoryName(), dev.getBrandName(),
+                                dev.getCustomerName(),
+                                dev.getPurchaseDate() != null ? dev.getPurchaseDate().toString() : "N/A",
+                                dev.getWarrantyEndDate() != null ? dev.getWarrantyEndDate().toString() : "N/A",
+                                dev.getImage() != null ? dev.getImage() : "default_device.jpg"
+                        );
+                        response.getWriter().write(json);
+                    }
+
+                    return;
+                case "getCustomerDetailJson":
+                    int cusId = Integer.parseInt(request.getParameter("id"));
+                    dal.UserProfileDAO uDao = new dal.UserProfileDAO();
+                    model.UserProfile profile = uDao.getUserProfileById(cusId);
+                    if (profile != null) {
+                        response.setContentType("application/json");
+                        response.setCharacterEncoding("UTF-8");
+                        String json = String.format(
+                                "{\"id\":%d,\"username\":\"%s\",\"role\":\"%s\",\"fullname\":\"%s\","
+                                + "\"email\":\"%s\",\"phone\":\"%s\",\"gender\":\"%s\","
+                                + "\"birthDate\":\"%s\",\"address\":\"%s\",\"avatar\":\"%s\"}",
+                                profile.getUser().getId(),
+                                profile.getUser().getUsername(),
+                                profile.getUser().getRoleName(),
+                                profile.getFullname(),
+                                profile.getEmail() != null ? profile.getEmail() : "N/A",
+                                profile.getPhone() != null ? profile.getPhone() : "N/A",
+                                profile.getGender() != null ? profile.getGender() : "N/A",
+                                profile.getBirthDate() != null ? profile.getBirthDate().toString() : "N/A",
+                                profile.getAddress() != null ? profile.getAddress() : "N/A",
+                                profile.getAvatar() != null ? profile.getAvatar() : "default.jpg"
+                        );
+                        response.getWriter().write(json);
+                    }
+                    return;
 
                 default: {
                     response.sendRedirect("devices?action=list");
@@ -288,21 +317,63 @@ public class AdminDeviceServlet extends HttpServlet {
         } else if ("update".equals(action)) {
 
             DeviceDTO d = new DeviceDTO();
+            boolean hasErrorUpdate = false;
 
             d.setId(Integer.parseInt(request.getParameter("id")));
             d.setSerialNumber(request.getParameter("serialNumber"));
-            d.setMachineName(request.getParameter("machineName"));
-            d.setCustomerId(Integer.parseInt(request.getParameter("customerId")));
+
+            String machineName = request.getParameter("machineName");
+            if (machineName == null || machineName.trim().isEmpty()) {
+                request.setAttribute("errorMachineName", "Machine name không được để trống");
+                hasError = true;
+            }
+            d.setMachineName(machineName);
+
+            try {
+                int customerId = Integer.parseInt(request.getParameter("customerId"));
+                if (!deviceDAO.isCustomerExists(customerId)) {
+                    request.setAttribute("errorCustomerId", "Customer ID không tồn tại");
+                    hasError = true;
+                }
+                d.setCustomerId(customerId);
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorCustomerId", "Customer ID phải là số");
+                hasError = true;
+            }
+
             d.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             d.setBrandId(Integer.parseInt(request.getParameter("brandId")));
-            d.setPurchaseDate(Date.valueOf(request.getParameter("purchaseDate")));
-            d.setWarrantyEndDate(Date.valueOf(request.getParameter("warrantyEndDate")));
+            try {
+                Date purchaseDate = Date.valueOf(request.getParameter("purchaseDate"));
+                Date warrantyDate = Date.valueOf(request.getParameter("warrantyEndDate"));
+                if (purchaseDate.after(warrantyDate)) {
+                    request.setAttribute("errorDate", "Purchase date phải trước Warranty end date");
+                    hasError = true;
+                }
+                d.setPurchaseDate(purchaseDate);
+                d.setWarrantyEndDate(warrantyDate);
+            } catch (Exception e) {
+                request.setAttribute("errorDate", "Ngày không hợp lệ");
+                hasError = true;
+            }
             d.setStatus(request.getParameter("status")); // ACTIVE / MAINTENANCE / BROKEN
             d.setModel(request.getParameter("model"));
             String priceStr = request.getParameter("price");
             BigDecimal price = new BigDecimal("0.00");
-            if (priceStr != null && !priceStr.trim().isEmpty()) {
-                price = new BigDecimal(priceStr);
+            try {
+                if (priceStr != null && !priceStr.trim().isEmpty()) {
+                    price = new BigDecimal(priceStr);
+                    if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                        request.setAttribute("errorPrice", "Price phải > 0");
+                        hasError = true;
+                    }
+                } else {
+                    request.setAttribute("errorPrice", "Price không được để trống");
+                    hasError = true;
+                }
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorPrice", "Price phải là số");
+                hasError = true;
             }
             d.setPrice(price);
             Part filePart = request.getPart("image");
@@ -321,12 +392,23 @@ public class AdminDeviceServlet extends HttpServlet {
 
             d.setImage(fileName);
 
+            if (hasError) {
+                request.setAttribute("deviceEdit", d);
+                request.setAttribute("categories", deviceDAO.getAllCategories());
+                request.setAttribute("brands", deviceDAO.getAllBrands());
+                request.getRequestDispatcher("/views/AdminBusinessView/device-edit.jsp").forward(request, response);
+                return;
+            }
+
             boolean success = deviceDAO.updateDevice(d);
 
             if (success) {
                 response.sendRedirect("devices?action=list");
             } else {
                 request.setAttribute("error", "Update device failed!");
+                request.setAttribute("deviceEdit", d);
+                request.setAttribute("categories", deviceDAO.getAllCategories());
+                request.setAttribute("brands", deviceDAO.getAllBrands());
                 request.getRequestDispatcher("/views/AdminBusinessView/device-edit.jsp")
                         .forward(request, response);
             }

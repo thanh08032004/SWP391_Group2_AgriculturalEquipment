@@ -23,10 +23,14 @@
                                 <form action="${pageContext.request.contextPath}/admin-business/devices?action=update"
                                   method="post" enctype="multipart/form-data">
 
+                                <c:if test="${not empty error}">
+                                    <div class="alert alert-danger"><i class="bi bi-exclamation-circle me-2"></i>${error}</div>
+                                    </c:if>
+
                                 <!-- ID -->
                                 <input type="hidden" name="id" value="${deviceEdit.id}">
                                 <input type="hidden" name="oldImage" value="${deviceEdit.image}">
-                                
+
                                 <div class="mb-3 text-center">
                                     <img src="${pageContext.request.contextPath}/assets/images/devices/${empty deviceEdit.image ? 'default.png' : deviceEdit.image}"
                                          class="rounded border shadow-sm"
@@ -38,6 +42,7 @@
                                     </label>
                                     <input type="file"
                                            name="image"
+                                           value="${deviceEdit.image}"
                                            class="form-control"
                                            accept="image/*">
                                     <small class="text-muted">Leave empty to keep current image</small>
@@ -61,6 +66,9 @@
                                     <input type="text" name="machineName"
                                            class="form-control"
                                            value="${deviceEdit.machineName}" required>
+                                    <c:if test="${not empty errorMachineName}">
+                                        <div class="text-danger small mt-1">${errorMachineName}</div>
+                                    </c:if>
                                 </div>
 
                                 <!-- MODEL -->
@@ -83,6 +91,9 @@
                                            step="0.01"
                                            min="0"
                                            placeholder="0.00">
+                                    <c:if test="${not empty errorPrice}">
+                                        <div class="text-danger small mt-1">${errorPrice}</div>
+                                    </c:if>
                                 </div>
 
                                 <!-- CUSTOMER -->
@@ -96,6 +107,9 @@
                                            value="${deviceEdit.customerId}"
                                            required
                                            min="1"/>
+                                    <c:if test="${not empty errorCustomerId}">
+                                        <div class="text-danger small mt-1">${errorCustomerId}</div>
+                                    </c:if>
                                 </div>
 
                                 <!-- CATEGORY -->
@@ -148,6 +162,9 @@
                                     <input type="date" name="warrantyEndDate"
                                            class="form-control"
                                            value="${deviceEdit.warrantyEndDate}">
+                                    <c:if test="${not empty errorDate}">
+                                        <div class="text-danger small mt-1">${errorDate}</div>
+                                    </c:if>
                                 </div>
 
                                 <!-- STATUS -->

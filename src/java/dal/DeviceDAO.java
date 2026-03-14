@@ -208,20 +208,6 @@ public class DeviceDAO extends DBContext {
         return false;
     }
 
-    public boolean deleteDevice(int id) {
-        String sql = "DELETE FROM device WHERE id = ?";
-
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public boolean isSerialExists(String serial) {
         String sql = "SELECT 1 FROM device WHERE serial_number = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -302,7 +288,7 @@ public class DeviceDAO extends DBContext {
         List<DeviceDTO> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
             SELECT d.id, d.serial_number, d.machine_name, d.model, d.status,
-                   d.purchase_date, d.warranty_end_date, d.image, d.price, 
+                   d.purchase_date, d.warranty_end_date, d.image, d.price,d.customer_id,
                    c.name AS categoryName, b.name AS brandName, up.fullname AS customerName
             FROM device d
             JOIN category c ON d.category_id = c.id
@@ -355,6 +341,7 @@ public class DeviceDAO extends DBContext {
                 d.setMachineName(rs.getString("machine_name"));
                 d.setModel(rs.getString("model"));
                 d.setPrice(rs.getBigDecimal("price"));
+                d.setCustomerId(rs.getInt("customer_id"));
                 d.setStatus(rs.getString("status"));
                 d.setPurchaseDate(rs.getDate("purchase_date"));
                 d.setWarrantyEndDate(rs.getDate("warranty_end_date"));
