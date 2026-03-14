@@ -654,11 +654,16 @@ public class MaintenanceDAO extends DBContext {
         return false;
     }
 
-    public boolean updateTechnicianWork(int maintenanceId, String note, double hours) {
+    public boolean updateTechnicianWork(int maintenanceId,
+            String note,
+            double hours,
+            String image) {
 
         String sql = """
             UPDATE maintenance
-            SET technician_note = ?, labor_hours = ?
+            SET technician_note = ?,
+                labor_hours = ?,
+                image = ?
             WHERE id = ?
         """;
 
@@ -666,7 +671,8 @@ public class MaintenanceDAO extends DBContext {
 
             ps.setString(1, note);
             ps.setDouble(2, hours);
-            ps.setInt(3, maintenanceId);
+            ps.setString(3, image);
+            ps.setInt(4, maintenanceId);
 
             return ps.executeUpdate() > 0;
 

@@ -10,9 +10,12 @@ import dto.MaintenanceDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +27,11 @@ import model.User;
  *
  * @author LOQ
  */
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 50
+)
 public class TechnicianMaintenanceServlet extends HttpServlet {
 
     /**
@@ -276,7 +284,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+            throws IOException, ServletException {
 
         User user = (User) req.getSession().getAttribute("user");
         int technicianId = user.getId();
@@ -291,12 +299,36 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             String hoursStr = req.getParameter("workHours");
             double laborHours = 0;
 
+            Part filePart = req.getPart("diagnosticImage");
+            String fileName = null;
+
+            if (filePart != null && filePart.getSize() > 0) {
+
+                fileName = System.currentTimeMillis() + "_"
+                        + filePart.getSubmittedFileName();
+
+                String uploadPath = getServletContext()
+                        .getRealPath("/assets/images/maintenance");
+
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                filePart.write(uploadPath + File.separator + fileName);
+            }
+
             if (hoursStr != null && !hoursStr.trim().isEmpty()) {
                 laborHours = Double.parseDouble(hoursStr);
             }
 
-            // lưu note + hours
-            dao.updateTechnicianWork(maintenanceId, technicianNote, laborHours);
+            // lưu note + hours + image
+            dao.updateTechnicianWork(
+                    maintenanceId,
+                    technicianNote,
+                    laborHours,
+                    fileName
+            );
 
             // Lấy danh sách spare parts được chọn - spare parts (optional)
             String[] sparePartIds = req.getParameterValues("sparePartIds");

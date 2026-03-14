@@ -88,7 +88,8 @@
                                 </div>
                             </form>
 
-                            <form method="post" action="${pageContext.request.contextPath}/technician/maintenance">
+                            <form method="post" action="${pageContext.request.contextPath}/technician/maintenance" 
+                                  enctype="multipart/form-data">
                                 <input type="hidden" name="action" value="submitwork"/>
                                 <input type="hidden" name="maintenanceId" value="${m.id}"/>
 
@@ -110,6 +111,20 @@
                                            step="0.5"
                                            required
                                            placeholder="Enter number of hours">
+                                </div>
+
+
+                                <div class="mb-3">
+                                    <label class="form-label">Diagnostic Image</label>
+
+                                    <input type="file"
+                                           name="diagnosticImage"
+                                           class="form-control"
+                                           accept="image/*">
+
+                                    <small class="text-muted">
+                                        Upload image of device problem (optional)
+                                    </small>
                                 </div>
 
                                 <div class="table-responsive"> 
