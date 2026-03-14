@@ -4,8 +4,10 @@
  */
 package controller.technician;
 
+import dal.DeviceDAO;
 import dal.MaintenanceDAO;
 import dal.SparePartDAO;
+import dto.DeviceDTO;
 import dto.MaintenanceDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -203,6 +205,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
 
             // set attribute cho JSP
             req.setAttribute("m", m);
+            req.setAttribute("customerId", m.getCustomerId());
             req.setAttribute("spareParts", spareParts);
             req.setAttribute("selectedItems", selectedItems);
             req.setAttribute("currentPage", pageIndex);
@@ -228,38 +231,18 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             resp.sendRedirect("maintenance?action=mytasks");
         }
 
-        if ("getDeviceDetailJson".equals(action)) {
-            int dId = Integer.parseInt(req.getParameter("id"));
-            dal.DeviceDAO deviceDAO = new dal.DeviceDAO();
-            dto.DeviceDTO dev = deviceDAO.getDeviceById(dId);
-            if (dev != null) {
-                resp.setContentType("application/json");
-                resp.setCharacterEncoding("UTF-8");
-                String json = String.format(
-                        "{\"id\":%d,\"serial\":\"%s\",\"machineName\":\"%s\",\"model\":\"%s\","
-                        + "\"price\":\"%s\",\"status\":\"%s\",\"categoryName\":\"%s\","
-                        + "\"brandName\":\"%s\",\"customerName\":\"%s\","
-                        + "\"purchaseDate\":\"%s\",\"warrantyEndDate\":\"%s\",\"image\":\"%s\"}",
-                        dev.getId(), dev.getSerialNumber(), dev.getMachineName(), dev.getModel(),
-                        dev.getPrice() != null ? dev.getPrice().toPlainString() : "N/A",
-                        dev.getStatus(), dev.getCategoryName(), dev.getBrandName(),
-                        dev.getCustomerName(),
-                        dev.getPurchaseDate() != null ? dev.getPurchaseDate().toString() : "N/A",
-                        dev.getWarrantyEndDate() != null ? dev.getWarrantyEndDate().toString() : "N/A",
-                        dev.getImage() != null ? dev.getImage() : "default_device.jpg"
-                );
-                resp.getWriter().write(json);
-            }
-            return;
-        }
+        else if (action.equals("getCustomerDetail")) {
 
-        if ("getCustomerDetailJson".equals(action)) {
             int cusId = Integer.parseInt(req.getParameter("id"));
+
             dal.UserProfileDAO uDao = new dal.UserProfileDAO();
             model.UserProfile profile = uDao.getUserProfileById(cusId);
+
             if (profile != null) {
+
                 resp.setContentType("application/json");
                 resp.setCharacterEncoding("UTF-8");
+
                 String json = String.format(
                         "{\"id\":%d,\"username\":\"%s\",\"role\":\"%s\",\"fullname\":\"%s\","
                         + "\"email\":\"%s\",\"phone\":\"%s\",\"gender\":\"%s\","
@@ -275,8 +258,45 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
                         profile.getAddress() != null ? profile.getAddress() : "N/A",
                         profile.getAvatar() != null ? profile.getAvatar() : "default.jpg"
                 );
+
                 resp.getWriter().write(json);
             }
+
+            return;
+        } else if (action.equals("getDeviceDetailJson")) {
+
+            int deviceId = Integer.parseInt(req.getParameter("id"));
+
+            DeviceDAO deviceDAO = new DeviceDAO();
+            DeviceDTO dev = deviceDAO.getDeviceById(deviceId);
+
+            if (dev != null) {
+
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+
+                String json = String.format(
+                        "{\"id\":%d,\"serial\":\"%s\",\"machineName\":\"%s\",\"model\":\"%s\","
+                        + "\"price\":\"%s\",\"status\":\"%s\",\"categoryName\":\"%s\","
+                        + "\"brandName\":\"%s\",\"customerName\":\"%s\","
+                        + "\"purchaseDate\":\"%s\",\"warrantyEndDate\":\"%s\",\"image\":\"%s\"}",
+                        dev.getId(),
+                        dev.getSerialNumber(),
+                        dev.getMachineName(),
+                        dev.getModel(),
+                        dev.getPrice() != null ? dev.getPrice().toPlainString() : "N/A",
+                        dev.getStatus(),
+                        dev.getCategoryName(),
+                        dev.getBrandName(),
+                        dev.getCustomerName(),
+                        dev.getPurchaseDate() != null ? dev.getPurchaseDate().toString() : "N/A",
+                        dev.getWarrantyEndDate() != null ? dev.getWarrantyEndDate().toString() : "N/A",
+                        dev.getImage() != null ? dev.getImage() : "default_device.jpg"
+                );
+
+                resp.getWriter().write(json);
+            }
+
             return;
         }
 

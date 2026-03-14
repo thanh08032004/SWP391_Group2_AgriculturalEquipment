@@ -250,7 +250,11 @@ public class MaintenanceDAO extends DBContext {
     // 3. Chi tiết maintenance
     public MaintenanceDTO findById(int id) {
         String sql = """
-            SELECT m.*, u.fullname AS customerName, d.machine_name as machineName
+            SELECT 
+                m.*, 
+                d.customer_id,
+                u.fullname AS customerName, 
+                d.machine_name AS machineName
             FROM maintenance m
             JOIN device d ON m.device_id = d.id
             JOIN user_profile u ON d.customer_id = u.user_id
@@ -266,6 +270,7 @@ public class MaintenanceDAO extends DBContext {
                         .id(rs.getInt("id"))
                         .deviceId(rs.getInt("device_id"))
                         .technicianId(rs.getInt("technician_id"))
+                        .customerId(rs.getInt("customer_id")) 
                         .description(rs.getString("description"))
                         .status(rs.getString("status"))
                         .startDate(rs.getTimestamp("start_date"))
