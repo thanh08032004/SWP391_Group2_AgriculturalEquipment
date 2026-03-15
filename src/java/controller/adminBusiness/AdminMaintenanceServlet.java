@@ -1,6 +1,9 @@
 package controller.adminBusiness;
 
+import dal.DeviceDAO;
 import dal.MaintenanceDAO;
+import dal.UserProfileDAO;
+import dto.DeviceDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import java.io.IOException;
@@ -8,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import model.Maintenance;
+import model.UserProfile;
 
 public class AdminMaintenanceServlet extends HttpServlet {
 
@@ -15,6 +19,46 @@ public class AdminMaintenanceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         MaintenanceDAO dao = new MaintenanceDAO();
+        DeviceDAO dDao = new DeviceDAO();
+        if ("getDeviceDetail".equals(action)) {
+            int devId = Integer.parseInt(request.getParameter("deviceId"));
+            DeviceDTO device = dDao.getDeviceById(devId);
+            if (device != null) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                String json = String.format(
+                        "{\"id\":%d, \"name\":\"%s\", \"model\":\"%s\", \"serial\":\"%s\", \"status\":\"%s\", \"image\":\"%s\", \"customer\":\"%s\", \"customerId\":%d}",
+                        device.getId(), device.getMachineName(), device.getModel(),
+                        device.getSerialNumber(), device.getStatus(),
+                        (device.getImage() != null ? device.getImage() : "default.jpg"),
+                        device.getCustomerName(), device.getCustomerId()
+                );
+                response.getWriter().write(json);
+            }
+            return;
+        }
+
+        if ("getCustomerDetail".equals(action)) {
+            int userId = Integer.parseInt(request.getParameter("customerId"));
+            UserProfileDAO uProfileDao = new UserProfileDAO();
+            UserProfile profile = uProfileDao.getUserProfileById(userId);
+            if (profile != null) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                String json = String.format(
+                        "{\"fullname\":\"%s\", \"phone\":\"%s\", \"email\":\"%s\", \"address\":\"%s\", \"avatar\":\"%s\", \"role\":\"%s\"}",
+                        profile.getFullname(),
+                        profile.getPhone() != null ? profile.getPhone() : "N/A",
+                        profile.getEmail(),
+                        profile.getAddress() != null ? profile.getAddress() : "N/A",
+                        profile.getAvatar() != null ? profile.getAvatar() : "user.jpg",
+                        "CUSTOMER"
+                );
+                response.getWriter().write(json);
+            }
+            return;
+        }
+
         //hien thi 1 chi tiet bao tri
         if ("detail".equals(action)) {
             //labor cost per hour

@@ -55,7 +55,8 @@ public class MaintenanceDAO extends DBContext {
 
     public List<Maintenance> searchMaintenanceRequestsPaging(String name, String status, int pageIndex, int pageSize) {
         List<Maintenance> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name "
+        StringBuilder sql = new StringBuilder("SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name ,"
+                + "d.customer_id AS customerId, m.device_id AS deviceId "
                 + "FROM maintenance m "
                 + "JOIN device d ON m.device_id = d.id "
                 + "JOIN user_profile up ON d.customer_id = up.user_id WHERE 1=1 ");
@@ -84,6 +85,8 @@ public class MaintenanceDAO extends DBContext {
             while (rs.next()) {
                 list.add(Maintenance.builder()
                         .id(rs.getInt("id"))
+                        .deviceId(rs.getInt("deviceId"))
+                        .customerId(rs.getInt("customerId"))
                         .machineName(rs.getString("machine_name"))
                         .modelName(rs.getString("model"))
                         .customerName(rs.getString("customer_name"))
