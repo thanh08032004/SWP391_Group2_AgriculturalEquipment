@@ -26,7 +26,7 @@
                 <div class="admin-content p-4 w-100">
                     <div style="margin-top: 40px" class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="fw-bold">Maintenance Done</h2>
-                        <form action="${pageContext.request.contextPath}/admin-business/donemaintenance" method="get" class="d-flex gap-2">
+                        <form action="${pageContext.request.contextPath}/admin-business/invoice/donemaintenance" method="get" class="d-flex gap-2">
                         <input type="text" name="customerName" class="form-control" placeholder="Enter name of Customer" value="${currentName}">
                         <select name="status" class="form-select">
                             <option value="All Status">All Status</option>
@@ -98,7 +98,7 @@
                                     <td>
                                         <c:choose>
                                             <c:when test="${r.status == 'DONE'}">
-                                                <a href="${pageContext.request.contextPath}/admin-business/addinvoice?maintenanceId=${r.id}"
+                                                <a href="${pageContext.request.contextPath}/admin-business/invoice/add?maintenanceId=${r.id}"
                                                    class="btn btn-sm btn-outline-success">
                                                     Invoice
                                                 </a>
@@ -142,7 +142,7 @@
 
                 modal.show();
 
-                fetch(CTX + '/admin-business/donemaintenance?action=getCustomerDetail&id=' + id)
+                fetch(CTX + '/admin-business/invoice/donemaintenance?action=getCustomerDetail&id=' + id)
 
                         .then(res => res.json())
 
@@ -171,7 +171,7 @@
 
                 modal.show();
 
-                fetch(CTX + '/admin-business/donemaintenance?action=getCustomerDetail&id=' + id)
+                fetch(CTX + '/admin-business/invoice/donemaintenance?action=getCustomerDetail&id=' + id)
 
                         .then(res => res.json())
 
@@ -201,7 +201,7 @@ function showDeviceDetail(deviceId) {
 
     modal.show();
 
-    fetch(CTX + '/admin-business/donemaintenance?action=getDeviceDetailJson&id=' + deviceId)
+    fetch(CTX + '/admin-business/invoice/donemaintenance?action=getDeviceDetailJson&id=' + deviceId)
 
     .then(res => res.json())
 

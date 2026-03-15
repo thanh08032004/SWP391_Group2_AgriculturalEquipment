@@ -33,48 +33,84 @@ public class RoleDAO extends DBContext {
     }
 
     public List<PermissionDTO> getPermissionsByRole(int roleId) {
-        List<PermissionDTO> list = new ArrayList<>();
 
-        String sql = """
-            SELECT
-                p.id,
-                p.code,
-                p.name,
-                p.description,
-                CASE
-                    WHEN rp.role_id IS NOT NULL THEN 1
-                    ELSE 0
-                END AS checked
-            FROM permission p
-            LEFT JOIN role_permission rp
-                   ON p.id = rp.permission_id
-                  AND rp.role_id = ?
-        """;
+    List<PermissionDTO> list = new ArrayList<>();
 
-        try (
-                Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, roleId);
+    String sql = """
+        SELECT
+            p.id,
+            p.code,
+            p.name,
+            p.description,
+            CASE
+                WHEN rp.role_id IS NOT NULL THEN 1
+                ELSE 0
+            END AS checked
+        FROM permission p
+        LEFT JOIN role_permission rp
+               ON p.id = rp.permission_id
+              AND rp.role_id = ?
+        JOIN role r ON r.id = ?
+        WHERE p.code LIKE CONCAT(r.prefix,'%')
+    """;
 
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                PermissionDTO dto = PermissionDTO.builder()
-                        .id(rs.getInt("id"))
-                        .code(rs.getString("code"))
-                        .name(rs.getString("name"))
-                        .description(rs.getString("description"))
-                        .checked(rs.getInt("checked") == 1)
-                        .build();
+    try (
+        Connection conn = getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)
+    ) {
 
-                list.add(dto);
-            }
+        ps.setInt(1, roleId);
+        ps.setInt(2, roleId);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+
+            PermissionDTO dto = PermissionDTO.builder()
+                    .id(rs.getInt("id"))
+                    .code(rs.getString("code"))
+                    .name(rs.getString("name"))
+                    .description(rs.getString("description"))
+                    .checked(rs.getInt("checked") == 1)
+                    .build();
+
+            list.add(dto);
         }
 
-        return list;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
 
+    return list;
+}
+    public List<String> getPermissionCodesByRole(int roleId) {
+
+    List<String> list = new ArrayList<>();
+
+    String sql = """
+        SELECT p.code
+        FROM permission p
+        JOIN role_permission rp ON p.id = rp.permission_id
+        WHERE rp.role_id = ?
+    """;
+
+    try(Connection con = getConnection();
+        PreparedStatement ps = con.prepareStatement(sql)){
+
+        ps.setInt(1, roleId);
+
+        ResultSet rs = ps.executeQuery();
+
+        while(rs.next()){
+            list.add(rs.getString("code"));
+        }
+
+    }catch(Exception e){
+        e.printStackTrace();
+    }
+
+    return list;
+}
     public Role getRoleById(int roleId) {
         String sql = "SELECT id, name, description, active FROM role WHERE id = ?";
         try (

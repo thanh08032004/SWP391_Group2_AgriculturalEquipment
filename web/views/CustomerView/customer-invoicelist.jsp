@@ -106,7 +106,7 @@
                             <div class="table-responsive p-3">
                                 <!-- SEARCH -->
                                 <form method="get"
-                                      action="${pageContext.request.contextPath}/customer/invoice-list"
+                                      action="${pageContext.request.contextPath}/customer/invoice/list"
                                 class="row g-2 mb-3">
                                 <div class="col-md-3">
                                     <select name="filter"
@@ -146,7 +146,7 @@
                                 </div>
                                 <div class="col-md-auto">
 
-                                    <a href="${pageContext.request.contextPath}/customer/invoice-list"
+                                    <a href="${pageContext.request.contextPath}/customer/invoice/list"
                                        class="btn btn-outline-secondary">
                                         Reset
                                     </a>
@@ -210,7 +210,7 @@
                                             </td>
                                             <td class="text-center">
 
-                                                <a href="${pageContext.request.contextPath}/customer/invoicedetail?id=${i.id}"
+                                                <a href="${pageContext.request.contextPath}/customer/invoice/detail?id=${i.id}"
                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
@@ -254,7 +254,7 @@
                     document.getElementById('maintenanceContent').innerHTML =
                             '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
                     modal.show();
-                    fetch(CTX + '/customer/invoice-list?action=getMaintenanceDetail&id=' + id)
+                    fetch(CTX + '/customer/invoice/list?action=getMaintenanceDetail&id=' + id)
                             .then(res => res.json())
                             .then(m => {
                                 document.getElementById('maintenanceContent').innerHTML =
@@ -277,7 +277,7 @@
 
                     modal.show();
 
-                    fetch(CTX + '/customer/invoice-list?action=getCustomerDetail&id=' + id)
+                    fetch(CTX + '/customer/invoice/list?action=getCustomerDetail&id=' + id)
 
                             .then(res => res.json())
 

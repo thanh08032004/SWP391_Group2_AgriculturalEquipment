@@ -9,8 +9,8 @@
     <ul class="nav flex-column">
         <c:choose>
             <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
-                <li><a href="${pageContext.request.contextPath}/admin/users">User Management</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin/roles">Role Management</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin/user">User Management</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin/role">Role Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin/password-reset">Reset Password</a></li>
                 </c:when>
                 <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
@@ -25,8 +25,8 @@
                         Voucher Management
                     </a>
                 </li>
-                <li><a href="${pageContext.request.contextPath}/admin-business/invoicelist">Invoice Management</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin-business/feedbacklist">Feedback Management</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin-business/invoice/list">Invoice Management</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin-business/feedback/list">Feedback Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/maintenance">Maintenance History</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/contracts">Contract Management</a></li>
 

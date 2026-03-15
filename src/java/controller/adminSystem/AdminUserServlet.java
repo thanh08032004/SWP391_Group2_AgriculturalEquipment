@@ -48,11 +48,11 @@ public class AdminUserServlet extends HttpServlet {
                     boolean status = Boolean.parseBoolean(request.getParameter("status"));
                     User currentUser = (User) request.getSession().getAttribute("user");
                     if (currentUser != null && toggleId == currentUser.getId()) {
-                        response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
+                        response.sendRedirect(request.getContextPath() + "/admin/user?action=list");
                         return;
                     }
                     adminDAO.toggleUserStatus(toggleId, status);
-                    response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
+                    response.sendRedirect(request.getContextPath() + "/admin/user?action=list");
                     break;
                 case "search":
                     String txtSearch = request.getParameter("txt");
@@ -91,7 +91,7 @@ public class AdminUserServlet extends HttpServlet {
             );
 
             if (success) {
-                response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
+                response.sendRedirect(request.getContextPath() + "/admin/user?action=list");
             } else {
                 request.setAttribute("error", "Username or email already exists!");
                 request.setAttribute("username", username);

@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 public class Permission {
     private Integer id;
-    private String code;        // /home, /about,...
+    private String code;
     private String name;
     private String description;
 }

@@ -46,7 +46,7 @@ public class AdminDeleteInvoiceServlet extends HttpServlet {
             e.printStackTrace();
         }
         response.sendRedirect(
-            request.getContextPath() + "/admin-business/invoicelist"
+            request.getContextPath() + "/admin-business/invoice/list"
         );
     }
 

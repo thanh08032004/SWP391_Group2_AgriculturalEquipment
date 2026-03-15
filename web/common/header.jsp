@@ -8,7 +8,7 @@
 <c:if test="${not empty sessionScope.userRole}">
     <c:choose>
         <c:when test="${sessionScope.userRole == 'ADMIN_SYSTEM'}">
-            <c:set var="roleHome" value="${pageContext.request.contextPath}/admin/users" />
+            <c:set var="roleHome" value="${pageContext.request.contextPath}/admin/user" />
         </c:when>
         <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
             <c:set var="roleHome" value="${pageContext.request.contextPath}/admin-business/devices" />
@@ -41,8 +41,8 @@
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/devices">My Devices</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/maintenance">History</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/vouchers">My Voucher</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/invoice-list">My Invoice</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/feedbacklist">My Feedback</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/invoice/list">My Invoice</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/feedback/list">My Feedback</a></li>
                             </c:if>
                             <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Support</a></li>
                         </c:if>

@@ -51,7 +51,7 @@ public class CustomerInvoiceDetail extends HttpServlet {
                 = dao.getInvoiceDetailByIdAndCustomer(invoiceId, customerId);
 
         if (invoice == null) {
-            response.sendRedirect(request.getContextPath() + "/customer/invoicelist");
+            response.sendRedirect(request.getContextPath() + "/customer/invoice/list");
             return;
         }
 
@@ -89,7 +89,7 @@ public class CustomerInvoiceDetail extends HttpServlet {
         String voucherRaw = request.getParameter("voucherId");
 
         if (invoiceRaw == null || voucherRaw == null || voucherRaw.isBlank()) {
-            response.sendRedirect(request.getContextPath() + "/customer/invoicelist");
+            response.sendRedirect(request.getContextPath() + "/customer/invoice/list");
             return;
         }
 
@@ -101,7 +101,7 @@ public class CustomerInvoiceDetail extends HttpServlet {
 
         response.sendRedirect(
                 request.getContextPath()
-                + "/customer/invoicedetail?id=" + invoiceId
+                + "/customer/invoice/detail?id=" + invoiceId
         );
     }
 

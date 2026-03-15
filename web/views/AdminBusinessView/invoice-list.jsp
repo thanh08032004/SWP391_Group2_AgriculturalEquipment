@@ -102,7 +102,7 @@
                                 <i class="bi bi-receipt me-2"></i>
                                 Invoice Management
                             </h2>
-                            <a href="${pageContext.request.contextPath}/admin-business/donemaintenance"
+                            <a href="${pageContext.request.contextPath}/admin-business/invoice/donemaintenance"
                            class="btn btn-primary shadow-sm">
 
                             <i class="bi bi-plus-circle-fill"></i>
@@ -113,7 +113,7 @@
                         <div class="table-responsive p-3">
                             <!-- SEARCH -->
                             <form method="get"
-                                  action="${pageContext.request.contextPath}/admin-business/invoicelist"
+                                  action="${pageContext.request.contextPath}/admin-business/invoice/list"
                                   class="row g-2 mb-3">
                                 <div class="col-md-3">
                                     <select name="filter"
@@ -153,7 +153,7 @@
                                 </div>
                                 <div class="col-md-auto">
 
-                                    <a href="${pageContext.request.contextPath}/admin-business/invoicelist"
+                                    <a href="${pageContext.request.contextPath}/admin-business/invoice/list"
                                        class="btn btn-outline-secondary">
                                         Reset
                                     </a>
@@ -217,11 +217,11 @@
                                             </td>
                                             <td class="text-center">
 
-                                                <a href="${pageContext.request.contextPath}/admin-business/invoicedetail?id=${i.id}"
+                                                <a href="${pageContext.request.contextPath}/admin-business/invoice/detail?id=${i.id}"
                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-                                                <form action="${pageContext.request.contextPath}/admin-business/deleteinvoice"
+                                                <form action="${pageContext.request.contextPath}/admin-business/invoice/delete"
                                                       method="post"
                                                       style="display:inline"
                                                       onsubmit="return confirm('Delete this invoice?')">
@@ -270,7 +270,7 @@
                     document.getElementById('maintenanceContent').innerHTML =
                             '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
                     modal.show();
-                    fetch(CTX + '/admin-business/invoicelist?action=getMaintenanceDetail&id=' + id)
+                    fetch(CTX + '/admin-business/invoice/list?action=getMaintenanceDetail&id=' + id)
                             .then(res => res.json())
                             .then(m => {
                                 document.getElementById('maintenanceContent').innerHTML =
@@ -293,7 +293,7 @@
 
                     modal.show();
 
-                    fetch(CTX + '/admin-business/invoicelist?action=getCustomerDetail&id=' + id)
+                    fetch(CTX + '/admin-business/invoice/list?action=getCustomerDetail&id=' + id)
 
                             .then(res => res.json())
 

@@ -51,7 +51,7 @@
                 Role: <span class="text-primary">${role.name}</span>
             </h2>
 
-            <form action="${pageContext.request.contextPath}/admin/permissionupdate" method="post" id="roleForm">
+            <form action="${pageContext.request.contextPath}/admin/role/permissionupdate" method="post" id="roleForm">
 
                 <!-- hidden roleId -->
                 <input type="hidden" name="roleId" value="${role.id}"/>

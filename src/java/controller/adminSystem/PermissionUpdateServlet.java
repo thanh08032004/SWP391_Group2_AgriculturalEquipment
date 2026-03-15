@@ -52,7 +52,7 @@ public class PermissionUpdateServlet extends HttpServlet {
                 dao.insertRolePermission(roleId, Integer.parseInt(pid));
             }
         }
-        response.sendRedirect("rolepermission?roleId=" + roleId);
+        response.sendRedirect(request.getContextPath() + "/admin/role/permission?roleId=" + roleId);
     }
 
     @Override

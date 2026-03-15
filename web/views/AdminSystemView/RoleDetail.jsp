@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="${pageContext.request.contextPath}/admin/roleupdate" method="post">
+                    <form action="${pageContext.request.contextPath}/admin/role/update" method="post">
 
                         <input type="hidden" name="roleId" value="${listD.id}" />
 

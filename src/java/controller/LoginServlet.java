@@ -1,5 +1,6 @@
 package controller;
 
+import dal.RoleDAO;
 import dal.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -8,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.List;
 import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -46,9 +48,14 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        HttpSession session = request.getSession();
-        session.setAttribute("user", user);
+HttpSession session = request.getSession();
 
+session.setAttribute("user", user);
+
+RoleDAO roleDAO = new RoleDAO();
+List<String> permissions = roleDAO.getPermissionCodesByRole(user.getRoleId());
+
+session.setAttribute("permissions", permissions);
         // Save role
         switch (user.getRoleId()) {
             case 1 -> session.setAttribute("userRole", "ADMIN_SYSTEM");
@@ -73,7 +80,7 @@ public class LoginServlet extends HttpServlet {
 
         String ctx = request.getContextPath();
         switch (user.getRoleId()) {
-            case 1 -> response.sendRedirect(ctx + "/admin/users");
+            case 1 -> response.sendRedirect(ctx + "/admin/user");
             case 2 -> response.sendRedirect(ctx + "/admin-business/devices");
             case 3 -> response.sendRedirect(ctx + "/technician/maintenance");
             case 4 -> response.sendRedirect(ctx + "/customer/home");

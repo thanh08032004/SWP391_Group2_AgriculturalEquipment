@@ -23,7 +23,7 @@
                                 Bạn đang chỉnh sửa tài khoản của chính mình. Quyền hạn (Role) không thể thay đổi.
                             </div>
                         </c:if>
-                        <form action="${pageContext.request.contextPath}/admin/users?action=update" method="post">
+                        <form action="${pageContext.request.contextPath}/admin/user?action=update" method="post">
                             <input type="hidden" name="id" value="${userEdit.id}">
 
                             <div class="mb-3">
@@ -58,7 +58,7 @@
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-warning fw-bold">Update Changes</button>
-                                <a href="${pageContext.request.contextPath}/admin/users?action=list" class="btn btn-outline-secondary">Cancel</a>
+                                <a href="${pageContext.request.contextPath}/admin/user?action=list" class="btn btn-outline-secondary">Cancel</a>
                             </div>
                         </form>
                     </div>

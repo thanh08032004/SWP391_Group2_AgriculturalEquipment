@@ -61,7 +61,7 @@ public class AdminAddInvoiceServlet extends HttpServlet {
 
         response.sendRedirect(
                 request.getContextPath()
-                + "/admin-business/invoicelist"
+                + "/admin-business/invoice/list"
         );
     }
 }

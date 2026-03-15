@@ -25,7 +25,7 @@
                                     <strong>Lỗi:</strong> ${error}
                                 </div>
                             </c:if>
-                            <form action="${pageContext.request.contextPath}/admin/users?action=create" method="post">
+                            <form action="${pageContext.request.contextPath}/admin/user?action=create" method="post">
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">USERNAME</label>
                                     <input type="text" name="username" class="form-control" 
@@ -56,7 +56,7 @@
 
                                 <div class="d-grid gap-2">
                                     <button type="submit" class="btn btn-primary">Create User</button>
-                                    <a href="${pageContext.request.contextPath}/admin/users?action=list" class="btn btn-outline-secondary">Cancel</a>
+                                    <a href="${pageContext.request.contextPath}/admin/user?action=list" class="btn btn-outline-secondary">Cancel</a>
                                 </div>
                             </form>
                         </div>

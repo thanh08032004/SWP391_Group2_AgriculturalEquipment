@@ -61,7 +61,7 @@
                                             <td>${r.createdAt}</td>
 
                                             <td class="text-center pe-4">
-                                                <a href="${pageContext.request.contextPath}/admin/user-detail?userId=${r.userId}"
+                                                <a href="${pageContext.request.contextPath}/admin/user/detail?userId=${r.userId}"
                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-eye"></i> View
                                                 </a>

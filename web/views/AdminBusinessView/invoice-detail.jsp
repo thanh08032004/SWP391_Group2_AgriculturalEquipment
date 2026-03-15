@@ -250,7 +250,7 @@ body{
         </div>
         <div class="text-end mt-3">
 
-            <a href="${pageContext.request.contextPath}/admin-business/invoicelist"
+            <a href="${pageContext.request.contextPath}/admin-business/invoice/list"
                class="btn btn-secondary">
                 Back to Invoice List
             </a>

@@ -9,22 +9,6 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <servlet>
-        <servlet-name>TechnicianInvoiceServlet</servlet-name>
-        <servlet-class>controller.technician.TechnicianInvoiceServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>TechnicianInvoiceDetailServlet</servlet-name>
-        <servlet-class>controller.technician.TechnicianInvoiceDetailServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>TechnicianDeleteInvoiceServlet</servlet-name>
-        <servlet-class>controller.technician.TechnicianDeleteInvoiceServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>TechnicianAddInvoiceServlet</servlet-name>
-        <servlet-class>controller.technician.TechnicianAddInvoiceServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>CustomerFeedbackServlet</servlet-name>
         <servlet-class>controller.customer.CustomerFeedbackServlet</servlet-class>
     </servlet>
@@ -46,27 +30,11 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>CustomerInvoiceDetail</servlet-name>
-        <url-pattern>/customer/invoicedetail</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>TechnicianInvoiceServlet</servlet-name>
-        <url-pattern>/technician/invoicelist</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>TechnicianInvoiceDetailServlet</servlet-name>
-        <url-pattern>/technician/invoicedetail</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>TechnicianDeleteInvoiceServlet</servlet-name>
-        <url-pattern>/technician/deleteinvoice</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>TechnicianAddInvoiceServlet</servlet-name>
-        <url-pattern>/technician/addinvoice</url-pattern>
+        <url-pattern>/customer/invoice/detail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CustomerFeedbackServlet</servlet-name>
-        <url-pattern>/customer/feedbacklist</url-pattern>
+        <url-pattern>/customer/feedback/list</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminContractServlet</servlet-name>
@@ -82,7 +50,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminDoneMantenanceServlet</servlet-name>
-        <url-pattern>/admin-business/donemaintenance</url-pattern>
+        <url-pattern>/admin-business/invoice/donemaintenance</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
@@ -244,7 +212,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>CustomerInvoiceServlet</servlet-name>
-        <url-pattern>/customer/invoice-list</url-pattern>
+        <url-pattern>/customer/invoice/list</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>homeServlet</servlet-name>
@@ -264,15 +232,15 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminSystemDashboardServlet</servlet-name>
-        <url-pattern>/adminsystemdashboard</url-pattern>
+        <url-pattern>/admin/dashboard</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminBusinessDashboardServlet</servlet-name>
-        <url-pattern>/adminbusinessdashboard</url-pattern>
+        <url-pattern>/admin-business/dashboard</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>TechnicanHomeServlet</servlet-name>
-        <url-pattern>/technicanhome</url-pattern>
+        <url-pattern>/technician/home</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UserProfileServlet</servlet-name>
@@ -296,7 +264,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminUserServlet</servlet-name>
-        <url-pattern>/admin/users</url-pattern>
+        <url-pattern>/admin/user</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminPasswordResetServlet</servlet-name>
@@ -304,7 +272,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminUserDetailServlet</servlet-name>
-        <url-pattern>/admin/user-detail</url-pattern>
+        <url-pattern>/admin/user/detail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>PasswordResetTokenServlet</servlet-name>
@@ -312,11 +280,11 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminPrivateResetPassServlet</servlet-name>
-        <url-pattern>/admin-private-reset-password</url-pattern>
+        <url-pattern>/admin/private-reset-password</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RoleServlet</servlet-name>
-        <url-pattern>/admin/roles</url-pattern>
+        <url-pattern>/admin/role</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminDeviceServlet</servlet-name>
@@ -344,7 +312,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminDetailInvoiceServlet</servlet-name>
-        <url-pattern>/admin-business/invoicedetail</url-pattern>
+        <url-pattern>/admin-business/invoice/detail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CustomerMaintenanceServlet</servlet-name>
@@ -356,15 +324,15 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminInvoiceServlet</servlet-name>
-        <url-pattern>/admin-business/invoicelist</url-pattern>
+        <url-pattern>/admin-business/invoice/list</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminAddInvoiceServlet</servlet-name>
-        <url-pattern>/admin-business/addinvoice</url-pattern>
+        <url-pattern>/admin-business/invoice/add</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminDeleteInvoiceServlet</servlet-name>
-        <url-pattern>/admin-business/deleteinvoice</url-pattern>
+        <url-pattern>/admin-business/invoice/delete</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CustomerDeviceServlet</servlet-name>
@@ -420,19 +388,19 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>RolePermissionServlet</servlet-name>
-        <url-pattern>/admin/rolepermission</url-pattern>
+        <url-pattern>/admin/role/permission</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>PermissionUpdateServlet</servlet-name>
-        <url-pattern>/admin/permissionupdate</url-pattern>
+        <url-pattern>/admin/role/permissionupdate</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RoleDetail</servlet-name>
-        <url-pattern>/admin/roledetail</url-pattern>
+        <url-pattern>/admin/role/detail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RoleUpdateServlet</servlet-name>
-        <url-pattern>/admin/roleupdate</url-pattern>
+        <url-pattern>/admin/role/update</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SystemAdminServlet</servlet-name>

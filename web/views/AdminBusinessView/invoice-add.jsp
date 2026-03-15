@@ -48,7 +48,7 @@
                 <h2 class="fw-bold mb-4">Create Invoice</h2>
 
                 <form method="post"
-                      action="${pageContext.request.contextPath}/admin-business/addinvoice">
+                      action="${pageContext.request.contextPath}/admin-business/invoice/add">
 
                     <input type="hidden" name="maintenanceId" value="${maintenance.id}"/>
 
@@ -192,7 +192,7 @@
 
                     <div class="text-end">
 
-                        <a href="${pageContext.request.contextPath}/admin-business/invoicelist"
+                        <a href="${pageContext.request.contextPath}/admin-business/invoice/list"
                            class="btn btn-secondary">
                             Cancel
                         </a>

@@ -193,7 +193,7 @@ body{
             <div class="voucher-box">
 
                 <form method="post"
-                      action="${pageContext.request.contextPath}/customer/invoicedetail">
+                      action="${pageContext.request.contextPath}/customer/invoice/detail">
 
                     <input type="hidden"
                            name="invoiceId"
@@ -333,7 +333,7 @@ body{
 
     <div class="text-end mt-3">
 
-        <a href="${pageContext.request.contextPath}/customer/invoice-list"
+        <a href="${pageContext.request.contextPath}/customer/invoice/list"
            class="btn btn-secondary">
             Back to Invoice List
         </a>

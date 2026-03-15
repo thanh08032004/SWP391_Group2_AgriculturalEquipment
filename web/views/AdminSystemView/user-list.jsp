@@ -21,7 +21,7 @@
 
                             <div class="d-flex gap-3">
                             <%-- Form Search --%>
-                            <form action="${pageContext.request.contextPath}/admin/users" method="get" class="d-flex shadow-sm gap-2">
+                            <form action="${pageContext.request.contextPath}/admin/user" method="get" class="d-flex shadow-sm gap-2">
                                 <input type="hidden" name="action" value="search">
 
                                 <div class="input-group">
@@ -33,13 +33,13 @@
                                 </div>
 
                                 <c:if test="${not empty searchValue}">
-                                    <a href="${pageContext.request.contextPath}/admin/users?action=list" class="btn btn-outline-secondary d-flex align-items-center">
+                                    <a href="${pageContext.request.contextPath}/admin/user?action=list" class="btn btn-outline-secondary d-flex align-items-center">
                                         <i class="bi bi-arrow-clockwise me-1"></i> Reset
                                     </a>
                                 </c:if>
                             </form>
 
-                            <a href="${pageContext.request.contextPath}/admin/users?action=add" class="btn btn-success px-4 shadow-sm">
+                            <a href="${pageContext.request.contextPath}/admin/user?action=add" class="btn btn-success px-4 shadow-sm">
                                 <i class="bi bi-person-plus-fill me-1"></i>Add New User
                             </a>
                         </div>
@@ -74,7 +74,7 @@
                                             </td>
                                             <td>${u.createdAt}</td>
                                             <td class="text-center pe-4">
-                                                <a href="${pageContext.request.contextPath}/admin/users?action=edit&id=${u.id}" 
+                                                <a href="${pageContext.request.contextPath}/admin/user?action=edit&id=${u.id}" 
                                                    class="btn btn-sm btn-outline-primary mx-1 shadow-sm">
                                                     <i class="bi bi-pencil"></i> Edit
                                                 </a>
@@ -86,7 +86,7 @@
                                                         </button>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <a href="${pageContext.request.contextPath}/admin/users?action=toggle&id=${u.id}&status=${u.active}" 
+                                                        <a href="${pageContext.request.contextPath}/admin/user?action=toggle&id=${u.id}&status=${u.active}" 
                                                            class="btn btn-sm ${u.active ? 'btn-outline-danger' : 'btn-outline-success'} mx-1 shadow-sm"
                                                            onclick="return confirm('Xác nhận thay đổi trạng thái tài khoản?')">
                                                             <i class="bi ${u.active ? 'bi-lock' : 'bi-unlock'}"></i>

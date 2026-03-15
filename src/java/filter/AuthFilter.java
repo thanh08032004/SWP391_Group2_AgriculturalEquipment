@@ -1,12 +1,16 @@
 package filter;
 
+import dal.RoleDAO;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.*;
+
 import java.io.IOException;
+import java.util.*;
+
 import model.User;
 
-@WebFilter(urlPatterns = {"/*"})
+@WebFilter("/*")
 public class AuthFilter implements Filter {
 
     @Override
@@ -16,56 +20,67 @@ public class AuthFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        HttpSession session = req.getSession(false);
         String uri = req.getRequestURI();
-        String contextPath = req.getContextPath();
+        String context = req.getContextPath();
 
-        // Allow static resources
-        if (uri.contains("/assets/") || uri.contains("/common/")
-                || uri.endsWith(".css") || uri.endsWith(".js")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        // Allow public pages
-        if (uri.endsWith("/home") || uri.endsWith("/login")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        // Block direct JSP acces
-        if (uri.endsWith(".jsp")) {
-            res.sendRedirect(contextPath + "/home");
-            return;
-        }
-
-        // Check user login
+        HttpSession session = req.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
-        if (user == null) {
-            if (uri.contains("/admin") || uri.contains("/technician")
-                    || uri.contains("/customer") || uri.contains("/admin-business") || uri.contains("/leader")) {
-                res.sendRedirect(contextPath + "/login");
-                return;
-            }
-        } else {
-            int role = user.getRoleId();
+        // STATIC
+        if (uri.contains("/assets/")
+                || uri.contains("/common/")
+                || uri.endsWith(".css")
+                || uri.endsWith(".js")
+                || uri.endsWith(".png")
+                || uri.endsWith(".jpg")
+                || uri.endsWith(".svg")) {
 
-            if (uri.contains("/admin/") && !uri.contains("/admin-business/") && role != 1) {
-                res.sendError(HttpServletResponse.SC_FORBIDDEN); return;
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // PUBLIC
+        if (uri.endsWith("/home")
+                || uri.endsWith("/login")
+                || uri.endsWith("/logout")
+                || uri.contains("/error")) {
+
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // BLOCK JSP
+        if (uri.endsWith(".jsp")) {
+            res.sendRedirect(context + "/home");
+            return;
+        }
+
+        // CHECK LOGIN
+        if (user == null) {
+            res.sendRedirect(context + "/login");
+            return;
+        }
+
+        // ===============================
+        // LOAD PERMISSION
+        // ===============================
+
+        RoleDAO dao = new RoleDAO();
+        List<String> permissions = dao.getPermissionCodesByRole(user.getRoleId());
+
+        boolean allowed = false;
+
+        for (String p : permissions) {
+
+            if (uri.startsWith(context + p)) {
+                allowed = true;
+                break;
             }
-            if (uri.contains("/admin-business/") && role != 2) {
-                res.sendError(HttpServletResponse.SC_FORBIDDEN); return;
-            }
-            if (uri.contains("/technician/") && role != 3) {
-                res.sendError(HttpServletResponse.SC_FORBIDDEN); return;
-            }
-            if (uri.contains("/customer/") && role != 4) {
-                res.sendError(HttpServletResponse.SC_FORBIDDEN); return;
-            }
-             if (uri.contains("/leader/") && role != 5) {
-                res.sendError(HttpServletResponse.SC_FORBIDDEN); return;
-            }
+        }
+
+        if (!allowed) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
 
         chain.doFilter(request, response);
