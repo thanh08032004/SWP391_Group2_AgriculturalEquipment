@@ -418,6 +418,7 @@ public class DeviceDAO extends DBContext {
         }
         return false;
     }
+<<<<<<< Updated upstream
     
     public List<Map<String, Object>> getDevicesByCustomerPaging(int customerId, String keyword, int pageIndex, int pageSize) {
     List<Map<String, Object>> list = new ArrayList<>();
@@ -464,4 +465,29 @@ public int countDevicesByCustomer(int customerId, String keyword) {
     } catch (Exception e) { e.printStackTrace(); }
     return 0;
 }
+=======
+
+    public List<Map<String, Object>> getAllCustomersForDropdown() {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = """
+        SELECT u.id, up.fullname
+        FROM users u
+        JOIN role r ON u.role_id = r.id
+        JOIN user_profile up ON u.id = up.user_id
+        WHERE r.name = 'CUSTOMER'
+        ORDER BY up.fullname ASC
+    """;
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", rs.getInt("id"));
+                map.put("fullname", rs.getString("fullname"));
+                list.add(map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+>>>>>>> Stashed changes
 }

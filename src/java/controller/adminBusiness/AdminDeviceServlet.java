@@ -108,6 +108,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 case "add": {
                     request.setAttribute("categories", deviceDAO.getAllCategories());
                     request.setAttribute("brands", deviceDAO.getAllBrands());
+                     request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown()); 
                     request.getRequestDispatcher("/views/AdminBusinessView/device-add.jsp")
                             .forward(request, response);
                     break;
@@ -120,6 +121,7 @@ public class AdminDeviceServlet extends HttpServlet {
                     request.setAttribute("deviceEdit", device);
                     request.setAttribute("categories", deviceDAO.getAllCategories());
                     request.setAttribute("brands", deviceDAO.getAllBrands());
+                    request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
 
                     request.getRequestDispatcher("/views/AdminBusinessView/device-edit.jsp")
                             .forward(request, response);
@@ -303,6 +305,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.setAttribute("warrantyEndDate", request.getParameter("warrantyEndDate"));
                 request.setAttribute("categories", deviceDAO.getAllCategories());
                 request.setAttribute("brands", deviceDAO.getAllBrands());
+                request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
 
                 request.getRequestDispatcher("/views/AdminBusinessView/device-add.jsp").forward(request, response);
                 return;
@@ -396,6 +399,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.setAttribute("deviceEdit", d);
                 request.setAttribute("categories", deviceDAO.getAllCategories());
                 request.setAttribute("brands", deviceDAO.getAllBrands());
+                request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
                 request.getRequestDispatcher("/views/AdminBusinessView/device-edit.jsp").forward(request, response);
                 return;
             }

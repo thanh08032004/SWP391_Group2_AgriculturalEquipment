@@ -98,19 +98,50 @@
 
                                 <!-- CUSTOMER -->
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold text-muted">
-                                        CUSTOMER
-                                    </label>
-                                    <input type="number"
-                                           name="customerId"
-                                           class="form-control"
-                                           value="${deviceEdit.customerId}"
-                                           required
-                                           min="1"/>
+                                    <label class="form-label small fw-bold text-muted">CUSTOMER</label>
+
+                                    <!-- Ô search -->
+                                    <input type="text"
+                                           id="customerSearch"
+                                           class="form-control mb-1"
+                                           placeholder="Search customer by name...">
+
+                                    <!-- Dropdown -->
+                                    <select name="customerId" id="customerSelect" class="form-select" required>
+                                        <option value="">-- Select Customer --</option>
+                                        <c:forEach var="cus" items="${customerList}">
+                                            <option value="${cus.id}"
+                                                    <c:if test="${cus.id == deviceEdit.customerId}">selected</c:if>>
+                                                ${cus.fullname} (ID: ${cus.id})
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+
                                     <c:if test="${not empty errorCustomerId}">
                                         <div class="text-danger small mt-1">${errorCustomerId}</div>
                                     </c:if>
                                 </div>
+
+                                <script>
+                                    document.getElementById('customerSearch').addEventListener('input', function () {
+                                        const keyword = this.value.toLowerCase().trim();
+                                        const select = document.getElementById('customerSelect');
+                                        const options = select.querySelectorAll('option');
+
+                                        options.forEach(function (opt) {
+                                            if (opt.value === '')
+                                                return; // giữ option "-- Select Customer --"
+                                            const text = opt.textContent.toLowerCase();
+                                            opt.style.display = text.includes(keyword) ? '' : 'none';
+                                        });
+
+                                        // Nếu option đang selected bị ẩn thì reset về placeholder
+                                        const selected = select.options[select.selectedIndex];
+                                        if (selected && selected.style.display === 'none') {
+                                            select.value = '';
+                                        }
+                                    });
+                                </script>
 
                                 <!-- CATEGORY -->
                                 <div class="mb-3">
