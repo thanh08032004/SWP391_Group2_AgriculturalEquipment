@@ -13,7 +13,6 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CategoryDTO {
     private int id;
     private String name;

@@ -8,6 +8,68 @@ import java.util.*;
 
 public class DeviceDAO extends DBContext {
 
+    public DeviceDTO getDeviceByIdAndCustomer(int deviceId, int customerId) {
+
+        String sql = """
+            SELECT d.id,
+                   d.serial_number,
+                   d.machine_name,
+                   d.model,
+                   d.status,
+                   d.price,
+                   d.purchase_date,
+                   d.warranty_end_date,
+                   d.customer_id,
+                   d.category_id,
+                   d.brand_id,
+                   d.image,
+                   c.name AS category_name,
+                   b.name AS brand_name,
+                   up.fullname AS customer_name
+            FROM device d
+            LEFT JOIN category c ON d.category_id = c.id
+            LEFT JOIN brand b ON d.brand_id = b.id
+            LEFT JOIN users u ON d.customer_id = u.id
+            LEFT JOIN user_profile up ON u.id = up.user_id
+            WHERE d.id = ?
+            AND d.customer_id = ?
+        """;
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, deviceId);
+            ps.setInt(2, customerId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                return DeviceDTO.builder()
+                        .id(rs.getInt("id"))
+                        .serialNumber(rs.getString("serial_number"))
+                        .machineName(rs.getString("machine_name"))
+                        .model(rs.getString("model"))
+                        .status(rs.getString("status"))
+                        .customerId(rs.getInt("customer_id"))
+                        .categoryId(rs.getInt("category_id"))
+                        .price(rs.getBigDecimal("price"))
+                        .brandId(rs.getInt("brand_id"))
+                        .purchaseDate(rs.getDate("purchase_date"))
+                        .warrantyEndDate(rs.getDate("warranty_end_date"))
+                        .image(rs.getString("image"))
+                        .categoryName(rs.getString("category_name"))
+                        .brandName(rs.getString("brand_name"))
+                        .customerName(rs.getString("customer_name"))
+                        .build();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public List<CategoryDTO> getAllCategories() {
         List<CategoryDTO> list = new ArrayList<>();
         String sql = """
@@ -418,54 +480,58 @@ public class DeviceDAO extends DBContext {
         }
         return false;
     }
-<<<<<<< Updated upstream
-    
+
     public List<Map<String, Object>> getDevicesByCustomerPaging(int customerId, String keyword, int pageIndex, int pageSize) {
-    List<Map<String, Object>> list = new ArrayList<>();
-    String sql = "SELECT d.*, m.id as current_maintenance_id, m.status as maintenanceStatus "
-            + "FROM device d "
-            + "LEFT JOIN maintenance m ON m.id = ("
-            + "    SELECT m2.id FROM maintenance m2 "
-            + "    WHERE m2.device_id = d.id "
-            + "    AND m2.status NOT IN ('DONE', 'READY') "
-            + "    ORDER BY m2.id DESC LIMIT 1"
-            + ") "
-            + "WHERE d.customer_id = ? AND d.machine_name LIKE ? "
-            + "ORDER BY d.id DESC LIMIT ? OFFSET ?";
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT d.*, m.id as current_maintenance_id, m.status as maintenanceStatus "
+                + "FROM device d "
+                + "LEFT JOIN maintenance m ON m.id = ("
+                + "    SELECT m2.id FROM maintenance m2 "
+                + "    WHERE m2.device_id = d.id "
+                + "    AND m2.status NOT IN ('DONE', 'READY') "
+                + "    ORDER BY m2.id DESC LIMIT 1"
+                + ") "
+                + "WHERE d.customer_id = ? AND d.machine_name LIKE ? "
+                + "ORDER BY d.id DESC LIMIT ? OFFSET ?";
 
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, customerId);
-        ps.setString(2, "%" + keyword + "%");
-        ps.setInt(3, pageSize);
-        ps.setInt(4, (pageIndex - 1) * pageSize);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", rs.getInt("id"));
-            map.put("serialNumber", rs.getString("serial_number"));
-            map.put("machineName", rs.getString("machine_name"));
-            map.put("model", rs.getString("model"));
-            map.put("status", rs.getString("status"));
-            map.put("image", rs.getString("image"));
-            map.put("currentMaintenanceId", rs.getInt("current_maintenance_id"));
-            map.put("maintenanceStatus", rs.getString("maintenanceStatus"));
-            list.add(map);
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setString(2, "%" + keyword + "%");
+            ps.setInt(3, pageSize);
+            ps.setInt(4, (pageIndex - 1) * pageSize);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", rs.getInt("id"));
+                map.put("serialNumber", rs.getString("serial_number"));
+                map.put("machineName", rs.getString("machine_name"));
+                map.put("model", rs.getString("model"));
+                map.put("status", rs.getString("status"));
+                map.put("image", rs.getString("image"));
+                map.put("currentMaintenanceId", rs.getInt("current_maintenance_id"));
+                map.put("maintenanceStatus", rs.getString("maintenanceStatus"));
+                list.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) { e.printStackTrace(); }
-    return list;
-}
+        return list;
+    }
 
-public int countDevicesByCustomer(int customerId, String keyword) {
-    String sql = "SELECT COUNT(*) FROM device WHERE customer_id = ? AND machine_name LIKE ?";
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, customerId);
-        ps.setString(2, "%" + keyword + "%");
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) return rs.getInt(1);
-    } catch (Exception e) { e.printStackTrace(); }
-    return 0;
-}
-=======
+    public int countDevicesByCustomer(int customerId, String keyword) {
+        String sql = "SELECT COUNT(*) FROM device WHERE customer_id = ? AND machine_name LIKE ?";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setString(2, "%" + keyword + "%");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
     public List<Map<String, Object>> getAllCustomersForDropdown() {
         List<Map<String, Object>> list = new ArrayList<>();
@@ -489,5 +555,5 @@ public int countDevicesByCustomer(int customerId, String keyword) {
         }
         return list;
     }
->>>>>>> Stashed changes
+
 }

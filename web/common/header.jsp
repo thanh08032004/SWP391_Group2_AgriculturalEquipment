@@ -43,6 +43,7 @@
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/vouchers">My Voucher</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/invoice/list">My Invoice</a></li>
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/feedback/list">My Feedback</a></li>
+                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/contract/list">My Contract</a></li>
                             </c:if>
                             <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/support">Support</a></li>
                         </c:if>

@@ -173,4 +173,121 @@ public class ContractDAO extends DBContext {
         return list;
     }
 
+    // =========================================== CUSTOMER =================================================== //
+    public int countByCustomer(int customerId, String keyword) {
+
+        String sql = """
+            SELECT COUNT(*)
+            FROM contract c
+            WHERE c.customer_id = ?
+            AND c.contract_code LIKE ?
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+            ps.setString(2, "%" + keyword + "%");
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public List<Contract> getByCustomer(int customerId, String keyword, int page, int pageSize) {
+
+        List<Contract> list = new ArrayList<>();
+
+        String sql = """
+            SELECT *
+            FROM contract
+            WHERE customer_id = ?
+            AND contract_code LIKE ?
+            ORDER BY id DESC
+            LIMIT ? OFFSET ?
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+            ps.setString(2, "%" + keyword + "%");
+            ps.setInt(3, pageSize);
+            ps.setInt(4, (page - 1) * pageSize);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Contract c = new Contract();
+
+                c.setId(rs.getInt("id"));
+                c.setContractCode(rs.getString("contract_code"));
+                c.setSignedAt(rs.getDate("signed_at"));
+                c.setTotalValue(rs.getBigDecimal("total_value"));
+                c.setStatus(rs.getString("status"));
+
+                list.add(c);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public Contract getByIdAndCustomer(int id, int customerId) {
+
+        String sql = """
+            SELECT 
+                c.*,
+                up.fullname AS customer_name
+            FROM contract c
+            JOIN user_profile up 
+                ON c.customer_id = up.user_id
+            WHERE c.id = ?
+            AND c.customer_id = ?
+        """;
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ps.setInt(2, customerId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Contract c = new Contract();
+
+                c.setId(rs.getInt("id"));
+                c.setContractCode(rs.getString("contract_code"));
+                c.setCustomerName(rs.getString("customer_name"));
+                c.setPartyA(rs.getString("party_a"));
+                c.setSignedAt(rs.getDate("signed_at"));
+                c.setEffectiveDate(rs.getDate("effective_date"));
+                c.setExpiryDate(rs.getDate("expiry_date"));
+                c.setTotalValue(rs.getBigDecimal("total_value"));
+                c.setPaymentTerms(rs.getString("payment_terms"));
+                c.setStatus(rs.getString("status"));
+                c.setDescription(rs.getString("description"));
+                c.setFileUrl(rs.getString("file_url"));
+
+                return c;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 }

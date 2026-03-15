@@ -13,7 +13,6 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class BrandDTO {
     private int id;
     private String name;
