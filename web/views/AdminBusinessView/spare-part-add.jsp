@@ -4,30 +4,48 @@
 <html>
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
-        <title>Add Component - AgriCMS</title>
-    </head>
-    <body class="bg-light">
-        <header><jsp:include page="/common/header.jsp"></jsp:include></header>
-        <div class="admin-layout d-flex">
+            <title>Add Component - AgriCMS</title>
+        </head>
+        <body class="bg-light">
+            <header><jsp:include page="/common/header.jsp"></jsp:include></header>
+            <div class="admin-layout d-flex">
             <jsp:include page="/common/side-bar.jsp"></jsp:include>
-            <div class="admin-content p-4 w-100">
-                <div class="card shadow-sm mx-auto" style="max-width: 900px;">
-                    <div class="card-header bg-dark text-white py-3"><h5 class="mb-0">Add New Component</h5></div>
-                    <div class="card-body p-4">
-                        <form action="spare-parts?action=create" method="post" enctype="multipart/form-data">
-                            <div class="row">
-                                <div class="col-md-7 border-end">
-                                    <div class="mb-3">
-                                        <label class="fw-bold">Code</label>
-                                        <input type="text" name="partCode" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="fw-bold">Name</label>
-                                        <input type="text" name="name" class="form-control" required>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-6 mb-3"><label class="fw-bold">Price (vnđ)</label><input type="number" name="price" class="form-control" required></div>
-                                        <div class="col-6 mb-3"><label class="fw-bold">Unit</label><input type="text" name="unit" class="form-control" placeholder="Cái, Bộ..." required></div>
+                <div class="admin-content p-4 w-100">
+                    <div class="card shadow-sm mx-auto" style="max-width: 900px;">
+                        <div class="card-header bg-dark text-white py-3"><h5 class="mb-0">Add New Component</h5></div>
+                        <div class="card-body p-4">
+                            <form action="spare-parts?action=create" method="post" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-7 border-end">
+                                        <div class="mb-3">
+                                            <label class="fw-bold">Code</label>
+                                            <input type="text" name="partCode" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="fw-bold">Name</label>
+                                            <input type="text" name="name" class="form-control" required>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6 mb-3">
+                                                <label class="fw-bold">Price</label>
+                                                <input type="number" 
+                                                       name="price" 
+                                                       class="form-control" 
+                                                       min="0" 
+                                                       oninput="if(this.value < 0) this.value = 0;" 
+                                                       onkeypress="return event.charCode >= 48"
+                                                       placeholder="0"
+                                                       required>
+                                            </div>                                            
+                                            <div class="col-6 mb-3">
+                                                <label class="fw-bold">Unit</label>
+                                                <select name="unit" class="form-select" required>
+                                                    <option value="" disabled selected>-- Select Unit --</option>
+                                                <c:forEach var="u" items="${unitTypes}">
+                                                    <option value="${u}">${u}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
                                     </div>
                                     <div class="mb-3">
                                         <label class="fw-bold text-primary">Compatible Devices (Hold Ctrl to select)</label>
@@ -59,7 +77,8 @@
         <script>
             document.getElementById('imageInput').onchange = evt => {
                 const [file] = document.getElementById('imageInput').files;
-                if (file) document.getElementById('preview').src = URL.createObjectURL(file);
+                if (file)
+                    document.getElementById('preview').src = URL.createObjectURL(file);
             }
         </script>
     </body>

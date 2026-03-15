@@ -47,11 +47,20 @@
                         <form action="spare-parts" method="get" class="d-flex gap-2">
                             <input type="hidden" name="action" value="list">
                             <div class="input-group shadow-sm">
-                                <%-- Sử dụng searchValue từ Servlet gửi sang để giữ text trong ô search --%>
-                                <input type="text" name="search" class="form-control" placeholder="Search component..." value="${searchValue}" style="min-width: 300px;">
-                                <button class="btn btn-primary" type="submit">Search</button>
+                                <input type="text" name="search" class="form-control" 
+                                       placeholder="Search spare part..." 
+                                       value="${searchValue}" style="min-width: 300px;">
+
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="bi bi-search me-1"></i>Search
+                                </button>
+
+                                <a href="spare-parts?action=list" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Reset
+                                </a>
                             </div>
                         </form>
+
                         <a href="spare-parts?action=add" class="btn btn-success shadow-sm">
                             <i class="bi bi-plus-circle me-1"></i>Add New
                         </a>
@@ -64,8 +73,9 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th class="ps-4">Image</th>
-                                    <th>Component</th>
-                                    <th>Replacer Price</th>
+                                    <th>Name / Code</th>
+                                    <th>Price</th>
+                                    <th>Unit</th>
                                     <th>Inventory</th>
                                     <th>Status</th>
                                     <th class="text-center">Action</th>
@@ -85,7 +95,8 @@
                                             </div>
                                             <small class="text-muted">${p.partCode}</small>
                                         </td>
-                                        <td><fmt:formatNumber value="${p.price}" type="currency" currencySymbol=""/> vnđ / ${p.unit}</td>
+                                        <td><fmt:formatNumber value="${p.price}" type="currency" currencySymbol=""/></td>
+                                        <td>${p.unit}</td>
                                         <td class="fw-bold">${p.quantity}</td>
                                         <td>
                                             <c:choose>
@@ -98,13 +109,18 @@
                                                 <i class="bi bi-pencil-square fs-5"></i>
                                             </a>
                                             <c:choose>
-                                                <c:when test="${p.quantity > 0}">
-                                                    <span class="text-muted"><i class="bi bi-trash3 fs-5"></i></span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                    <a href="spare-parts?action=delete&id=${p.id}" class="text-danger" 
-                                                       onclick="return confirm('Delete this component?')">
-                                                        <i class="bi bi-trash3 fs-5"></i>
+                                                <c:when test="${p.active}">
+                                                    <a href="spare-parts?action=toggleStatus&id=${p.id}&active=true&page=${currentPage}&search=${searchValue}" 
+                                                       class="text-success" title="Deactivate"
+                                                       onclick="return confirm('Deactivate this component?')">
+                                                        <i class="bi bi-toggle-on fs-4"></i>
+                                                    </a>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a href="spare-parts?action=toggleStatus&id=${p.id}&active=false&page=${currentPage}&search=${searchValue}" 
+                                                       class="text-muted" title="Activate"
+                                                       onclick="return confirm('Activate this component?')">
+                                                        <i class="bi bi-toggle-off fs-4"></i>
                                                     </a>
                                                 </c:otherwise>
                                             </c:choose>

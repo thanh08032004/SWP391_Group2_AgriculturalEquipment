@@ -82,6 +82,28 @@ public List<SparePart> findAllSparePartsPaging(String keyword, int pageIndex, in
         }
         return false;
     }
+    public List<String> getAllPartUnits() {
+    List<String> units = new ArrayList<>();
+    String sql = "SHOW COLUMNS FROM spare_part LIKE 'unit'";
+    
+    try (Connection con = getConnection(); 
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        
+        if (rs.next()) {
+            String enumDefinition = rs.getString("Type");
+            
+            enumDefinition = enumDefinition.replace("enum(", "").replace(")", "");
+            String[] values = enumDefinition.split(",");
+            for (String v : values) {
+                units.add(v.replace("'", ""));
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return units;
+}
 
     public boolean updateSparePartInfo(SparePart sp) {
         String sql = "UPDATE spare_part "
@@ -173,35 +195,47 @@ public List<SparePart> findAllSparePartsPaging(String keyword, int pageIndex, in
                 .price(rs.getBigDecimal("price"))
                 .imageUrl(rs.getString("image"))
                 .quantity(rs.getInt("quantity"))
+                .active(rs.getBoolean("active"))
                 .build();
     }
 
-    public boolean deleteSparePart(int id) {
-        String checkSql = "SELECT quantity FROM inventory WHERE spare_part_id = ?";
-        String deleteSql = "DELETE FROM spare_part WHERE id = ?";
-
-        try (Connection con = getConnection()) {
-            try (PreparedStatement psCheck = con.prepareStatement(checkSql)) {
-                psCheck.setInt(1, id);
-                ResultSet rs = psCheck.executeQuery();
-                if (rs.next()) {
-                    int quantity = rs.getInt("quantity");
-                    if (quantity > 0) {
-                        return false;
-                    }
-                }
-            }
-
-            try (PreparedStatement psDelete = con.prepareStatement(deleteSql)) {
-                psDelete.setInt(1, id);
-                return psDelete.executeUpdate() > 0;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
+//    public boolean deleteSparePart(int id) {
+//        String checkSql = "SELECT quantity FROM inventory WHERE spare_part_id = ?";
+//        String deleteSql = "DELETE FROM spare_part WHERE id = ?";
+//
+//        try (Connection con = getConnection()) {
+//            try (PreparedStatement psCheck = con.prepareStatement(checkSql)) {
+//                psCheck.setInt(1, id);
+//                ResultSet rs = psCheck.executeQuery();
+//                if (rs.next()) {
+//                    int quantity = rs.getInt("quantity");
+//                    if (quantity > 0) {
+//                        return false;
+//                    }
+//                }
+//            }
+//
+//            try (PreparedStatement psDelete = con.prepareStatement(deleteSql)) {
+//                psDelete.setInt(1, id);
+//                return psDelete.executeUpdate() > 0;
+//            }
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
+    public boolean toggleActiveStatus(int id, boolean status) {
+    String sql = "UPDATE spare_part SET active = ? WHERE id = ?";
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setBoolean(1, status);
+        ps.setInt(2, id);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return false;
+}
 
     public List<Map<String, Object>> getAvailableParts() {
         List<Map<String, Object>> list = new ArrayList<>();

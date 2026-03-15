@@ -46,23 +46,38 @@ public class AdminSparePartServlet extends HttpServlet {
                 break;
             case "add":
                 request.setAttribute("devices", dDao.searchAndFilterPaging("", "", "", "", "", 1, 1000));
+                request.setAttribute("unitTypes", dao.getAllPartUnits());
                 request.getRequestDispatcher("/views/AdminBusinessView/spare-part-add.jsp").forward(request, response);
                 break;
             case "edit":
                 int id = Integer.parseInt(request.getParameter("id"));
+                request.setAttribute("unitTypes", dao.getAllPartUnits());
                 request.setAttribute("part", dao.findSparePartById(id));
                 request.setAttribute("devices", dDao.searchAndFilterPaging("", "", "", "", "", 1, 1000));
                 request.getRequestDispatcher("/views/AdminBusinessView/spare-part-edit.jsp").forward(request, response);
                 break;
-            case "delete":
-                int deleteId = Integer.parseInt(request.getParameter("id"));
-                boolean isDeleted = dao.deleteSparePart(deleteId);
-
-                if (isDeleted) {
-                    response.sendRedirect("spare-parts?action=list&msg=delete_success");
-                } else {
-                    response.sendRedirect("spare-parts?action=list&msg=delete_fail_inventory");
+//            case "delete":
+//                int deleteId = Integer.parseInt(request.getParameter("id"));
+//                boolean isDeleted = dao.deleteSparePart(deleteId);
+//
+//                if (isDeleted) {
+//                    response.sendRedirect("spare-parts?action=list&msg=delete_success");
+//                } else {
+//                    response.sendRedirect("spare-parts?action=list&msg=delete_fail_inventory");
+//                }
+//                break;
+            case "toggleStatus":
+                int togId = Integer.parseInt(request.getParameter("id"));
+                boolean currentActive = Boolean.parseBoolean(request.getParameter("active"));
+                String page = request.getParameter("page");
+                String togSearch = request.getParameter("search");
+                dao.toggleActiveStatus(togId, !currentActive);
+                String redirectUrl = "spare-parts?action=list&page=" + (page != null ? page : "1");
+                if (togSearch != null && !togSearch.isEmpty()) {
+                    redirectUrl += "&search=" + java.net.URLEncoder.encode(togSearch, "UTF-8");
                 }
+
+                response.sendRedirect(redirectUrl);
                 break;
             case "getDeviceDetail":
                 int devId = Integer.parseInt(request.getParameter("deviceId"));

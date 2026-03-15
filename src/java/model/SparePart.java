@@ -18,6 +18,7 @@ public class SparePart {
     private String imageUrl;
     
     private List<Integer> compatibleDeviceIds; 
+    private boolean active;
     private int quantity; 
     private int stock;
 }
