@@ -9,45 +9,47 @@ import model.SparePart;
 
 public class SparePartDAO extends DBContext {
 
-public int getTotalSpareParts(String keyword) {
-    String sql = "SELECT COUNT(*) FROM spare_part WHERE name LIKE ? OR part_code LIKE ?";
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setString(1, "%" + keyword + "%");
-        ps.setString(2, "%" + keyword + "%");
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) return rs.getInt(1);
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    return 0;
-}
-
-public List<SparePart> findAllSparePartsPaging(String keyword, int pageIndex, int pageSize) {
-    List<SparePart> list = new ArrayList<>();
-    String sql = "SELECT sp.*, inv.quantity " +
-                 "FROM spare_part sp " +
-                 "LEFT JOIN inventory inv ON sp.id = inv.spare_part_id " +
-                 "WHERE sp.name LIKE ? OR sp.part_code LIKE ? " +
-                 "ORDER BY sp.id DESC " +
-                 "LIMIT ? OFFSET ?";
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setString(1, "%" + keyword + "%");
-        ps.setString(2, "%" + keyword + "%");
-        ps.setInt(3, pageSize);
-        ps.setInt(4, (pageIndex - 1) * pageSize);
-        
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                SparePart sp = mapSparePart(rs);
-                sp.setCompatibleDeviceIds(getLinkedDeviceIds(sp.getId()));
-                list.add(sp);
+    public int getTotalSpareParts(String keyword) {
+        String sql = "SELECT COUNT(*) FROM spare_part WHERE name LIKE ? OR part_code LIKE ?";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, "%" + keyword + "%");
+            ps.setString(2, "%" + keyword + "%");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return 0;
     }
-    return list;
-}
+
+    public List<SparePart> findAllSparePartsPaging(String keyword, int pageIndex, int pageSize) {
+        List<SparePart> list = new ArrayList<>();
+        String sql = "SELECT sp.*, inv.quantity "
+                + "FROM spare_part sp "
+                + "LEFT JOIN inventory inv ON sp.id = inv.spare_part_id "
+                + "WHERE sp.name LIKE ? OR sp.part_code LIKE ? "
+                + "ORDER BY sp.id DESC "
+                + "LIMIT ? OFFSET ?";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, "%" + keyword + "%");
+            ps.setString(2, "%" + keyword + "%");
+            ps.setInt(3, pageSize);
+            ps.setInt(4, (pageIndex - 1) * pageSize);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    SparePart sp = mapSparePart(rs);
+                    sp.setCompatibleDeviceIds(getLinkedDeviceIds(sp.getId()));
+                    list.add(sp);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
     public boolean insertNewSparePart(SparePart sp) {
         String sql = "INSERT INTO spare_part"
@@ -82,28 +84,27 @@ public List<SparePart> findAllSparePartsPaging(String keyword, int pageIndex, in
         }
         return false;
     }
+
     public List<String> getAllPartUnits() {
-    List<String> units = new ArrayList<>();
-    String sql = "SHOW COLUMNS FROM spare_part LIKE 'unit'";
-    
-    try (Connection con = getConnection(); 
-         PreparedStatement ps = con.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-        
-        if (rs.next()) {
-            String enumDefinition = rs.getString("Type");
-            
-            enumDefinition = enumDefinition.replace("enum(", "").replace(")", "");
-            String[] values = enumDefinition.split(",");
-            for (String v : values) {
-                units.add(v.replace("'", ""));
+        List<String> units = new ArrayList<>();
+        String sql = "SHOW COLUMNS FROM spare_part LIKE 'unit'";
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                String enumDefinition = rs.getString("Type");
+
+                enumDefinition = enumDefinition.replace("enum(", "").replace(")", "");
+                String[] values = enumDefinition.split(",");
+                for (String v : values) {
+                    units.add(v.replace("'", ""));
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return units;
     }
-    return units;
-}
 
     public boolean updateSparePartInfo(SparePart sp) {
         String sql = "UPDATE spare_part "
@@ -226,16 +227,18 @@ public List<SparePart> findAllSparePartsPaging(String keyword, int pageIndex, in
 //        return false;
 //    }
     public boolean toggleActiveStatus(int id, boolean status) {
-    String sql = "UPDATE spare_part SET active = ? WHERE id = ?";
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setBoolean(1, status);
-        ps.setInt(2, id);
-        return ps.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
+
+        String sql = "UPDATE spare_part SET active = ? WHERE id = ?";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setBoolean(1, status);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+        return false;
     }
-    return false;
-}
 
     public List<Map<String, Object>> getAvailableParts() {
         List<Map<String, Object>> list = new ArrayList<>();
@@ -347,6 +350,7 @@ public List<SparePart> findAllSparePartsPaging(String keyword, int pageIndex, in
             JOIN inventory i ON sp.id = i.spare_part_id
             WHERE dsp.device_id = ?
             AND sp.name LIKE ?
+            AND sp.active = TRUE
             ORDER BY sp.id DESC
             LIMIT ? OFFSET ?
         """;

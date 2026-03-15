@@ -74,7 +74,7 @@
 
                     <!-- Button hiển thị -->
                     <div class="mb-3">
-                        <button type="button" class="btn btn-outline-primary" onclick="toggleSpareParts()">
+                        <button type="button" class="btn btn-outline-primary" onclick="toggleSpareParts(this)">
                             <i class="bi bi-plus-circle"></i> Add Spare Parts || Tech Note
                         </button>
                     </div>
@@ -105,7 +105,7 @@
                             </form>
 
                             <form method="post" action="${pageContext.request.contextPath}/technician/maintenance" 
-                                  enctype="multipart/form-data">
+                                  enctype="multipart/form-data" onsubmit="clearMaintenanceSession()">
                                 <input type="hidden" name="action" value="submitwork"/>
                                 <input type="hidden" name="maintenanceId" value="${m.id}"/>
 
@@ -244,8 +244,13 @@
                         .replace(/"/g, "&quot;");
             }
 
-            /* DEVICE POPUP */
+            /* ======================================================
+             DEVICE POPUP
+             ====================================================== */
+
             function showDeviceDetail(deviceId) {
+
+                sessionStorage.setItem("openDeviceModal", deviceId);
 
                 var modal = new bootstrap.Modal(document.getElementById('deviceDetailModal'));
 
@@ -254,10 +259,8 @@
 
                 modal.show();
 
-                fetch(CTX + '/technician/maintenance?action=getCustomerDetail&id=' + deviceId)
-
+                fetch(CTX + '/technician/maintenance?action=getDeviceDetailJson&id=' + deviceId)
                         .then(res => res.json())
-
                         .then(dev => {
 
                             document.getElementById('deviceDetailContent').innerHTML =
@@ -275,17 +278,17 @@
                                     '<tr><th>Brand</th><td>' + esc(dev.brandName) + '</td></tr>' +
                                     '<tr><th>Customer</th><td>' + esc(dev.customerName) + '</td></tr>' +
                                     '</table>';
-                        })
 
-                        .catch(() => {
-                            document.getElementById('deviceDetailContent').innerHTML =
-                                    '<p class="text-danger text-center">Error loading device details.</p>';
                         });
-
             }
 
-            /* CUSTOMER POPUP */
+            /* ======================================================
+             CUSTOMER POPUP
+             ====================================================== */
+
             function showCustomerDetail(customerId) {
+
+                sessionStorage.setItem("openCustomerModal", customerId);
 
                 var modal = new bootstrap.Modal(document.getElementById('customerDetailModal'));
 
@@ -295,9 +298,7 @@
                 modal.show();
 
                 fetch(CTX + '/technician/maintenance?action=getCustomerDetail&id=' + customerId)
-
                         .then(res => res.json())
-
                         .then(cus => {
 
                             document.getElementById('customerDetailContent').innerHTML =
@@ -318,81 +319,161 @@
                                     '<tr><th>Address</th><td>' + esc(cus.address) + '</td></tr>' +
                                     '</table>' +
                                     '</div>';
-                        });
 
+                        });
             }
 
-        </script>
+            /* ======================================================
+             SAVE SPARE PARTS
+             ====================================================== */
 
-        <script>
+            function saveSpareParts() {
 
-            // Enable/disable quantity input based on checkbox
-            document.querySelectorAll('.spare-part-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function () {
-                    const sparePartId = this.value;
-                    const qtyInput = document.getElementById('qty-' + sparePartId);
-                    qtyInput.disabled = !this.checked;
-                    if (!this.checked) {
-                        qtyInput.value = 1;
+                let stored = JSON.parse(sessionStorage.getItem("selectedSpareParts") || "{}");
+
+                document.querySelectorAll(".spare-part-checkbox").forEach(cb => {
+
+                    const id = cb.value;
+                    const qtyInput = document.getElementById("qty-" + id);
+
+                    if (cb.checked) {
+
+                        stored[id] = {
+                            qty: qtyInput ? qtyInput.value : 1
+                        };
+
+                    } else {
+
+                        delete stored[id];
+
                     }
-                });
-            });
 
-            // Validate trước khi submit
-            document.querySelector('form[action*="submitwork"]').addEventListener('submit', function (e) {
-                const checkedBoxes = document.querySelectorAll('.spare-part-checkbox:checked');
-                const errors = [];
-
-                checkedBoxes.forEach(checkbox => {
-                    const sparePartId = checkbox.value;
-                    const name = checkbox.dataset.name;
-                    const stock = parseInt(checkbox.dataset.stock);
-                    const qty = parseInt(document.getElementById('qty-' + sparePartId).value);
-
-                    if (qty > stock) {
-                        errors.push(`❌ <strong>${name}</strong>: yêu cầu ${qty}, chỉ còn ${stock} trong kho`);
-                    }
-                    if (qty <= 0) {
-                        errors.push(`❌ <strong>${name}</strong>: số lượng phải lớn hơn 0`);
-                    }
                 });
 
-                // Chỉ validate nếu có chọn linh kiện
-                if (checkedBoxes.length > 0) {
+                sessionStorage.setItem("selectedSpareParts", JSON.stringify(stored));
+            }
 
-                    checkedBoxes.forEach(checkbox => {
-                        const sparePartId = checkbox.value;
-                        const name = checkbox.dataset.name;
-                        const stock = parseInt(checkbox.dataset.stock);
-                        const qty = parseInt(document.getElementById('qty-' + sparePartId).value);
+            /* ======================================================
+             DOM READY
+             ====================================================== */
 
-                        if (qty > stock) {
-                            errors.push(`❌ <strong>${name}</strong>: yêu cầu ${qty}, chỉ còn ${stock} trong kho`);
+            document.addEventListener("DOMContentLoaded", function () {
+
+                /* checkbox event */
+
+                document.querySelectorAll(".spare-part-checkbox").forEach(cb => {
+
+                    cb.addEventListener("change", function () {
+
+                        const qtyInput = document.getElementById("qty-" + this.value);
+
+                        if (qtyInput) {
+                            qtyInput.disabled = !this.checked;
+                            if (!this.checked)
+                                qtyInput.value = 1;
                         }
 
-                        if (qty <= 0) {
-                            errors.push(`❌ <strong>${name}</strong>: số lượng phải lớn hơn 0`);
-                        }
+                        saveSpareParts();
+
                     });
 
-                }
+                });
 
-                if (errors.length > 0) {
-                    e.preventDefault(); // Chặn submit
+                /* quantity change */
 
-                    // Hiển thị thông báo lỗi
-                    let alertBox = document.getElementById('stock-error-alert');
-                    if (!alertBox) {
-                        alertBox = document.createElement('div');
-                        alertBox.id = 'stock-error-alert';
-                        alertBox.className = 'alert alert-danger alert-dismissible mt-3';
-                        document.querySelector('.card-body').prepend(alertBox);
+                document.querySelectorAll(".quantity-input").forEach(input => {
+
+                    input.addEventListener("input", saveSpareParts);
+
+                });
+
+                /* save note + hours */
+
+                document.addEventListener("input", function () {
+
+                    const noteField = document.querySelector("textarea[name='technicianNote']");
+                    const hourField = document.querySelector("input[name='workHours']");
+
+                    if (noteField) {
+                        sessionStorage.setItem("technicianNote", noteField.value);
                     }
-                    alertBox.innerHTML = errors.join('<br>') +
-                            `<button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>`;
-                    alertBox.scrollIntoView({behavior: 'smooth'});
+
+                    if (hourField) {
+                        sessionStorage.setItem("workHours", hourField.value);
+                    }
+
+                });
+
+                /* restore note */
+
+                const note = sessionStorage.getItem("technicianNote");
+                if (note) {
+                    const noteField = document.querySelector("textarea[name='technicianNote']");
+                    if (noteField)
+                        noteField.value = note;
                 }
+
+                /* restore hours */
+
+                const hours = sessionStorage.getItem("workHours");
+                if (hours) {
+                    const hourField = document.querySelector("input[name='workHours']");
+                    if (hourField)
+                        hourField.value = hours;
+                }
+
+                /* restore spare parts */
+
+                const stored = JSON.parse(sessionStorage.getItem("selectedSpareParts") || "{}");
+
+                Object.keys(stored).forEach(id => {
+
+                    const checkbox = document.querySelector('.spare-part-checkbox[value="' + id + '"]');
+
+                    if (checkbox) {
+
+                        checkbox.checked = true;
+
+                        const qtyInput = document.getElementById("qty-" + id);
+
+                        if (qtyInput) {
+                            qtyInput.disabled = false;
+                            qtyInput.value = stored[id].qty;
+                        }
+
+                    }
+
+                });
+
+                /* keep section open */
+
+                if (Object.keys(stored).length > 0) {
+
+                    const section = document.getElementById("sparePartsSection");
+
+                    if (section) {
+                        section.classList.remove("d-none");
+                    }
+
+                }
+
+                /* restore modals */
+
+                const deviceId = sessionStorage.getItem("openDeviceModal");
+                if (deviceId) {
+                    showDeviceDetail(deviceId);
+                }
+
+                const customerId = sessionStorage.getItem("openCustomerModal");
+                if (customerId) {
+                    showCustomerDetail(customerId);
+                }
+
             });
+
+            /* ======================================================
+             TOGGLE SPARE PARTS
+             ====================================================== */
 
             function toggleSpareParts(btn) {
 
@@ -406,6 +487,15 @@
                     btn.innerHTML = '<i class="bi bi-x-circle"></i> Hide Spare Parts';
                 }
             }
+
+            function clearMaintenanceSession() {
+                sessionStorage.removeItem("technicianNote");
+                sessionStorage.removeItem("workHours");
+                sessionStorage.removeItem("selectedSpareParts");
+                sessionStorage.removeItem("openDeviceModal");
+                sessionStorage.removeItem("openCustomerModal");
+            }
+
         </script>
 
         <!-- Device Detail Modal -->
@@ -431,6 +521,6 @@
                 </div>
             </div>
         </div>
-        
+
     </body>
 </html>
