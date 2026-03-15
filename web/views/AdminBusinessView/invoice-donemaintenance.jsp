@@ -5,6 +5,19 @@
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
             <title>Maintenance Requests Pool - Admin</title>
+            <style>
+
+                .invoice-link{
+                    color:#0d6efd;
+                    font-weight:600;
+                    cursor:pointer;
+                }
+
+                .invoice-link:hover{
+                    text-decoration:underline;
+                }
+
+            </style>
         </head>
         <body class="bg-light">
         <jsp:include page="/common/header.jsp"></jsp:include>
@@ -29,13 +42,14 @@
                     </form>
                 </div>
 
-                        <div style="margin-top: 40px" class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                <div style="margin-top: 40px" class="card shadow-sm border-0 rounded-3 overflow-hidden">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-muted text-uppercase small">
                             <tr>
                                 <th class="ps-4">ID</th>
                                 <th>Customer</th>
                                 <th>Device</th>
+                                <th>Technician</th>
                                 <th>Status</th>
                                 <th>Detail</th>
                                 <th>Action</th>
@@ -45,8 +59,26 @@
                             <c:forEach var="r" items="${reqList}">
                                 <tr>
                                     <td class="ps-4">#${r.id}</td>
-                                    <td><span class="fw-bold">${r.customerName}</span></td>
-                                    <td>${r.machineName} <br><small class="text-muted">${r.modelName}</small></td>
+                                    <td>
+                                        <span class="invoice-link"
+                                              onclick="showCustomerDetail(${r.customerId})">
+                                            ${r.customerName}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="invoice-link"
+                                              onclick="showDeviceDetail(${r.deviceId})">
+                                            ${r.machineName}
+                                        </span>
+                                        <br>
+                                        <small class="text-muted">${r.modelName}</small>
+                                    </td>
+                                    <td>
+                                        <span class="invoice-link"
+                                              onclick="showTechnicianDetail(${r.technicianId})">
+                                            ${r.technicianName}
+                                        </span>
+                                    </td>
                                     <td>
                                         <c:choose>
                                             <c:when test="${r.status == 'PENDING'}"><span class="badge bg-warning text-dark">New Request</span></c:when>
@@ -97,6 +129,164 @@
                 </div>
             </div>
         </div>
+        <script>
+
+            var CTX = '${pageContext.request.contextPath}';
+
+            function showCustomerDetail(id) {
+
+                var modal = new bootstrap.Modal(document.getElementById('customerModal'));
+
+                document.getElementById('customerContent').innerHTML =
+                        '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+
+                modal.show();
+
+                fetch(CTX + '/admin-business/donemaintenance?action=getCustomerDetail&id=' + id)
+
+                        .then(res => res.json())
+
+                        .then(c => {
+
+                            document.getElementById('customerContent').innerHTML =
+                                    '<div class="text-center mb-3">' +
+                                    '<img src="' + CTX + '/assets/images/avatars/' + (c.avatar || 'default.jpg') + '" class="rounded-circle border" style="width:80px;height:80px;object-fit:cover">' +
+                                    '<h5>' + c.fullname + '</h5>' +
+                                    '</div>' +
+                                    '<table class="table table-bordered">' +
+                                    '<tr><th>Email</th><td>' + c.email + '</td></tr>' +
+                                    '<tr><th>Phone</th><td>' + c.phone + '</td></tr>' +
+                                    '<tr><th>Gender</th><td>' + c.gender + '</td></tr>' +
+                                    '<tr><th>Date of Birth</th><td>' + c.birthDate + '</td></tr>' +
+                                    '<tr><th>Address</th><td>' + c.address + '</td></tr>' +
+                                    '</table>';
+                        })
+            }
+            function showTechnicianDetail(id) {
+
+                var modal = new bootstrap.Modal(document.getElementById('technicianModal'));
+
+                document.getElementById('technicianContent').innerHTML =
+                        '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+
+                modal.show();
+
+                fetch(CTX + '/admin-business/donemaintenance?action=getCustomerDetail&id=' + id)
+
+                        .then(res => res.json())
+
+                        .then(c => {
+
+                            document.getElementById('technicianContent').innerHTML =
+                                    '<div class="text-center mb-3">' +
+                                    '<img src="' + CTX + '/assets/images/avatars/' + (c.avatar || 'default.jpg') + '" class="rounded-circle border" style="width:80px;height:80px;object-fit:cover">' +
+                                    '<h5>' + c.fullname + '</h5>' +
+                                    '</div>' +
+                                    '<table class="table table-bordered">' +
+                                    '<tr><th>Email</th><td>' + c.email + '</td></tr>' +
+                                    '<tr><th>Phone</th><td>' + c.phone + '</td></tr>' +
+                                    '<tr><th>Gender</th><td>' + c.gender + '</td></tr>' +
+                                    '<tr><th>Date of Birth</th><td>' + c.birthDate + '</td></tr>' +
+                                    '<tr><th>Address</th><td>' + c.address + '</td></tr>' +
+                                    '</table>';
+
+                        });
+            }
+function showDeviceDetail(deviceId) {
+
+    var modal = new bootstrap.Modal(document.getElementById('deviceDetailModal'));
+
+    document.getElementById('deviceDetailContent').innerHTML =
+        '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+
+    modal.show();
+
+    fetch(CTX + '/admin-business/donemaintenance?action=getDeviceDetailJson&id=' + deviceId)
+
+    .then(res => res.json())
+
+    .then(dev => {
+
+        var statusBadge;
+
+        if (dev.status === 'ACTIVE')
+            statusBadge = '<span class="badge bg-success">Active</span>';
+        else if (dev.status === 'MAINTENANCE')
+            statusBadge = '<span class="badge bg-warning text-dark">Maintenance</span>';
+        else
+            statusBadge = '<span class="badge bg-danger">Broken</span>';
+
+        document.getElementById('deviceDetailContent').innerHTML =
+            '<div class="text-center mb-4">'+
+            '<img src="'+CTX+'/assets/images/devices/'+(dev.image || 'default_device.jpg')+'" '+
+            'class="rounded shadow-sm border" style="max-width:250px">'+
+            '</div>'+
+
+            '<table class="table table-bordered">'+
+            '<tr><th>Serial</th><td>'+dev.serial+'</td></tr>'+
+            '<tr><th>Machine Name</th><td>'+dev.machineName+'</td></tr>'+
+            '<tr><th>Model</th><td>'+dev.model+'</td></tr>'+
+            '<tr><th>Price</th><td>'+dev.price+' VNĐ</td></tr>'+
+            '<tr><th>Status</th><td>'+statusBadge+'</td></tr>'+
+            '<tr><th>Category</th><td>'+dev.categoryName+'</td></tr>'+
+            '<tr><th>Brand</th><td>'+dev.brandName+'</td></tr>'+
+            '<tr><th>Customer</th><td>'+dev.customerName+'</td></tr>'+
+            '</table>';
+
+    });
+
+}
+        </script>
+
+        <!-- Customer Modal -->
+        <div class="modal fade" id="customerModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            Customer Detail
+                        </h5>
+                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body" id="customerContent"></div>
+
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="technicianModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title">Technician Detail</h5>
+                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body" id="technicianContent"></div>
+
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="deviceDetailModal">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Device Detail</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" id="deviceDetailContent">
+                <div class="text-center">
+                    <div class="spinner-border text-primary"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
         <jsp:include page="/common/scripts.jsp"></jsp:include>
     </body>
 

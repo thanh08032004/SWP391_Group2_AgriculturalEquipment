@@ -12,6 +12,7 @@ public class Maintenance {
     private int id;
     private int deviceId;
     private int technicianId;
+    private String technicianName;
     private  int customerId;
     private String description;
     private String technicianNote;

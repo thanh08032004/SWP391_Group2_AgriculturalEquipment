@@ -1,5 +1,6 @@
 package dal;
 
+import dto.DeviceDTO;
 import dto.InvoiceDetailDTO;
 import dto.MaintenanceDTO;
 import dto.SparePartDTO;
@@ -163,7 +164,8 @@ public class InvoiceDAO extends DBContext {
     }
 
     public void deleteInvoice(int invoiceId) {
-        String sql = "DELETE FROM invoice WHERE id = ?";
+        String sql = "DELETE FROM invoice WHERE id = ?"
+                + " and payment_status = 'UNPAID'";
 
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -539,11 +541,65 @@ public int countInvoice(String keyword, String filter) {
 
     return total;
 }
+public int countInvoiceByCustomer(int customerId, String keyword, String filter) {
+
+    int total = 0;
+
+    StringBuilder sql = new StringBuilder("""
+        SELECT COUNT(DISTINCT i.id)
+        FROM invoice i
+        JOIN maintenance m ON i.maintenance_id = m.id
+        JOIN device d ON m.device_id = d.id
+        JOIN users u ON d.customer_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        WHERE u.id = ?
+    """);
+
+    if (keyword != null && !keyword.trim().isEmpty()) {
+        sql.append(" AND up.fullname LIKE ? ");
+    }
+
+    if (filter != null &&
+        (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+        sql.append(" AND i.payment_status = ? ");
+    }
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+        int i = 1;
+
+        ps.setInt(i++, customerId);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            ps.setString(i++, "%" + keyword + "%");
+        }
+
+        if (filter != null &&
+            (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+            ps.setString(i++, filter);
+        }
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            total = rs.getInt(1);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return total;
+}
 public List<Invoice> getInvoicesByCustomer(int customerId, String keyword, String filter, int page, int pageSize) {
+
     List<Invoice> list = new ArrayList<>();
 
     StringBuilder sql = new StringBuilder("""
-        SELECT DISTINCT i.*, up.fullname AS customer_name
+        SELECT DISTINCT i.*, 
+               u.id AS customer_id,
+               up.fullname AS customer_name
         FROM invoice i
         JOIN maintenance m ON i.maintenance_id = m.id
         JOIN device d ON m.device_id = d.id
@@ -595,16 +651,21 @@ public List<Invoice> getInvoicesByCustomer(int customerId, String keyword, Strin
         ps.setInt(i++, (page - 1) * pageSize);
 
         ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            Invoice inv = new Invoice();
-            inv.setId(rs.getInt("id"));
-            inv.setMaintenanceId(rs.getInt("maintenance_id"));
-            inv.setCustomerName(rs.getString("customer_name"));
-            inv.setTotalAmount(rs.getDouble("total_amount"));
-            inv.setPaymentStatus(rs.getString("payment_status"));
-            list.add(inv);
-        }
 
+        while (rs.next()) {
+
+    Invoice inv = new Invoice();
+
+    inv.setId(rs.getInt("id"));
+    inv.setMaintenanceId(rs.getInt("maintenance_id"));
+    inv.setCustomerId(rs.getInt("customer_id"));   // THÊM DÒNG NÀY
+    inv.setCustomerName(rs.getString("customer_name"));
+    inv.setTotalAmount(rs.getDouble("total_amount"));
+    inv.setPaymentStatus(rs.getString("payment_status"));
+    inv.setIssuedAt(rs.getTimestamp("issued_at"));
+
+    list.add(inv);
+}
     } catch (Exception e) {
         e.printStackTrace();
     }
@@ -955,7 +1016,6 @@ public List<Maintenance> getMaintenanceDone(String name, String status,
 
     List<Maintenance> list = new ArrayList<>();
 
-    // Nếu chọn status khác DONE thì không hiển thị gì
     if (status != null && !status.equals("DONE") && !status.equals("All Status")) {
         return list;
     }
@@ -964,17 +1024,27 @@ public List<Maintenance> getMaintenanceDone(String name, String status,
         SELECT 
             m.id,
             m.status,
+                 d.id AS device_id,
             d.machine_name,
             d.model,
-            up.fullname
+            d.customer_id,
+                 m.technician_id,
+            cus.fullname AS customer_name,
+            tech.fullname AS technician_name
         FROM maintenance m
         JOIN device d ON m.device_id = d.id
-        JOIN users u ON d.customer_id = u.id
-        JOIN user_profile up ON u.id = up.user_id
+        
+        JOIN users u_cus ON d.customer_id = u_cus.id
+        JOIN user_profile cus ON u_cus.id = cus.user_id
+        
+        LEFT JOIN users u_tech ON m.technician_id = u_tech.id
+        LEFT JOIN user_profile tech ON u_tech.id = tech.user_id
+        
         LEFT JOIN invoice i ON i.maintenance_id = m.id
+        
         WHERE m.status = 'DONE'
         AND i.id IS NULL
-        AND up.fullname LIKE ?
+        AND cus.fullname LIKE ?
         ORDER BY m.id DESC
         LIMIT ? OFFSET ?
     """;
@@ -996,7 +1066,12 @@ public List<Maintenance> getMaintenanceDone(String name, String status,
             m.setStatus(rs.getString("status"));
             m.setMachineName(rs.getString("machine_name"));
             m.setModelName(rs.getString("model"));
-            m.setCustomerName(rs.getString("fullname"));
+
+            m.setCustomerId(rs.getInt("customer_id"));   // ⭐ QUAN TRỌNG
+            m.setTechnicianId(rs.getInt("technician_id"));
+            m.setDeviceId(rs.getInt("device_id"));
+            m.setCustomerName(rs.getString("customer_name"));
+            m.setTechnicianName(rs.getString("technician_name"));
 
             list.add(m);
         }
@@ -1007,6 +1082,61 @@ public List<Maintenance> getMaintenanceDone(String name, String status,
 
     return list;
 }
+public DeviceDTO getDeviceById(int id) {
+        String sql = """
+        SELECT d.id,
+               d.serial_number,
+               d.machine_name,
+               d.model,
+               d.status,
+               d.price,
+               d.purchase_date,
+               d.warranty_end_date,
+               d.customer_id,
+               d.category_id,     
+               d.brand_id,
+               d.image,
+               c.name AS category_name,
+               b.name AS brand_name,
+               up.fullname AS customer_name
+        FROM device d
+        LEFT JOIN category c ON d.category_id = c.id
+        LEFT JOIN brand b ON d.brand_id = b.id
+        LEFT JOIN users u ON d.customer_id = u.id
+        LEFT JOIN user_profile up ON u.id = up.user_id
+        WHERE d.id = ?
+    """;
+
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return DeviceDTO.builder()
+                        .id(rs.getInt("id"))
+                        .serialNumber(rs.getString("serial_number"))
+                        .machineName(rs.getString("machine_name"))
+                        .model(rs.getString("model"))
+                        .status(rs.getString("status"))
+                        .customerId(rs.getInt("customer_id"))
+                        .categoryId(rs.getInt("category_id"))
+                        .price(rs.getBigDecimal("price"))
+                        .brandId(rs.getInt("brand_id"))
+                        .purchaseDate(rs.getDate("purchase_date"))
+                        .warrantyEndDate(rs.getDate("warranty_end_date"))
+                        .image(rs.getString("image"))
+                        .categoryName(rs.getString("category_name"))
+                        .brandName(rs.getString("brand_name"))
+                        .customerName(rs.getString("customer_name"))
+                        .build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 public int countMaintenanceDone(String name, String status) {
 
     String sql = """

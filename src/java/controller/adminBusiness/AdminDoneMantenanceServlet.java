@@ -1,6 +1,7 @@
 package controller.adminBusiness;
 import dal.InvoiceDAO;
 import dal.MaintenanceDAO;
+import dto.DeviceDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Maintenance;
+import model.UserProfile;
 
 public class AdminDoneMantenanceServlet extends HttpServlet {
 
@@ -33,39 +35,93 @@ public class AdminDoneMantenanceServlet extends HttpServlet {
 
   @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
 
-        String name = request.getParameter("customerName");
-        String status = request.getParameter("status");
+    String action = request.getParameter("action");
 
-        int page = 1;
-        int pageSize = 5;
+    InvoiceDAO dao = new InvoiceDAO();
 
-        if (request.getParameter("page") != null) {
-            page = Integer.parseInt(request.getParameter("page"));
+    // ================= CUSTOMER DETAIL =================
+    if ("getCustomerDetail".equals(action)) {
+
+        int id = Integer.parseInt(request.getParameter("id"));
+
+        UserProfile c = dao.getCustomerDetail(id);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        PrintWriter out = response.getWriter();
+
+        if (c != null) {
+
+            out.print("{");
+            out.print("\"fullname\":\""+c.getFullname()+"\",");
+            out.print("\"email\":\""+c.getEmail()+"\",");
+            out.print("\"phone\":\""+c.getPhone()+"\",");
+            out.print("\"gender\":\""+c.getGender()+"\",");
+            out.print("\"birthDate\":\""+c.getBirthDate()+"\",");
+            out.print("\"address\":\""+c.getAddress()+"\",");
+            out.print("\"avatar\":\""+c.getAvatar()+"\"");
+            out.print("}");
         }
 
-        InvoiceDAO dao = new InvoiceDAO();
+        return;
+    }
+// ================= TECHNICIAN DETAIL =================
+if ("getDeviceDetailJson".equals(action)) {
 
-        // lấy data theo trang
-        List<Maintenance> list = dao.getMaintenanceDone(name, status, page, pageSize);
+    int id = Integer.parseInt(request.getParameter("id"));
 
-        // đếm tổng record
-        int totalRecords = dao.countMaintenanceDone(name, status);
+    DeviceDTO dev = dao.getDeviceById(id);
 
-        // tính tổng trang
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
 
-        request.setAttribute("reqList", list);
-        request.setAttribute("currentName", name);
-        request.setAttribute("currentStatus", status);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
+    PrintWriter out = response.getWriter();
 
-        request.getRequestDispatcher("/views/AdminBusinessView/invoice-donemaintenance.jsp")
-                .forward(request, response);
+    if (dev != null) {
+
+        out.print("{");
+        out.print("\"serial\":\""+dev.getSerialNumber()+"\",");
+        out.print("\"machineName\":\""+dev.getMachineName()+"\",");
+        out.print("\"model\":\""+dev.getModel()+"\",");
+        out.print("\"status\":\""+dev.getStatus()+"\",");
+        out.print("\"price\":\""+dev.getPrice()+"\",");
+        out.print("\"image\":\""+dev.getImage()+"\",");
+        out.print("\"categoryName\":\""+dev.getCategoryName()+"\",");
+        out.print("\"brandName\":\""+dev.getBrandName()+"\",");
+        out.print("\"customerName\":\""+dev.getCustomerName()+"\"");
+        out.print("}");
     }
 
+    return;
+}
+    // ================= LOAD MAINTENANCE LIST =================
+    String name = request.getParameter("customerName");
+    String status = request.getParameter("status");
+
+    int page = 1;
+    int pageSize = 5;
+
+    if (request.getParameter("page") != null) {
+        page = Integer.parseInt(request.getParameter("page"));
+    }
+
+    List<Maintenance> list = dao.getMaintenanceDone(name, status, page, pageSize);
+
+    int totalRecords = dao.countMaintenanceDone(name, status);
+    int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+    request.setAttribute("reqList", list);
+    request.setAttribute("currentName", name);
+    request.setAttribute("currentStatus", status);
+    request.setAttribute("currentPage", page);
+    request.setAttribute("totalPages", totalPages);
+
+    request.getRequestDispatcher("/views/AdminBusinessView/invoice-donemaintenance.jsp")
+            .forward(request, response);
+}
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
