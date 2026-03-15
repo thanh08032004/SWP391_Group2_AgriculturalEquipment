@@ -60,10 +60,10 @@ public class MaintenanceDAO extends DBContext {
                 + "JOIN device d ON m.device_id = d.id "
                 + "JOIN user_profile up ON d.customer_id = up.user_id WHERE 1=1 ");
 
-        if (name != null && !name.isEmpty()) {
+        if (name != null && !name.trim().isEmpty()) {
             sql.append(" AND up.fullname LIKE ? ");
         }
-        if (status != null && !status.isEmpty()) {
+        if (status != null && !status.trim().isEmpty()) {
             sql.append(" AND m.status = ? ");
         }
 
@@ -270,7 +270,7 @@ public class MaintenanceDAO extends DBContext {
                         .id(rs.getInt("id"))
                         .deviceId(rs.getInt("device_id"))
                         .technicianId(rs.getInt("technician_id"))
-                        .customerId(rs.getInt("customer_id")) 
+                        .customerId(rs.getInt("customer_id"))
                         .description(rs.getString("description"))
                         .status(rs.getString("status"))
                         .startDate(rs.getTimestamp("start_date"))

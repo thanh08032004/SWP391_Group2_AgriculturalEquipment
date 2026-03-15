@@ -13,25 +13,38 @@
                 <div class="admin-content p-4 w-100">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="fw-bold">Maintenance Requests</h2>
-                        <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="get" class="d-flex gap-2">
-                        <input type="text" name="customerName" class="form-control" placeholder="Enter name of Customer" value="${currentName}">
-                        <select name="status" class="form-select">
-                            <option value="All Status">All Status</option>
-                            <option value="PENDING" ${currentStatus == 'PENDING' ? 'selected' : ''}>New Request</option>
-                            <option value="WAITING_FOR_TECHNICIAN" ${currentStatus == 'WAITING_FOR_TECHNICIAN' ? 'selected' : ''}>Awaiting Assignment</option>
-                            <option value="TECHNICIAN_ACCEPTED" ${currentStatus == 'TECHNICIAN_ACCEPTED' ? 'selected' : ''}>Technician Accepted</option>
-                            <option value="TECHNICIAN_SUBMITTED" ${currentStatus == 'TECHNICIAN_SUBMITTED' ? 'selected' : ''}>Technician Submitted</option>
-                            <option value="DIAGNOSIS READY" ${currentStatus == 'DIAGNOSIS READY' ? 'selected' : ''}>Diagnosis Ready</option>
-                            <option value="IN_PROGRESS" ${currentStatus == 'IN_PROGRESS' ? 'selected' : ''}>Repair In Progress</option>
-                            <option value="DONE" ${currentStatus == 'DONE' ? 'selected' : ''}>Completed</option>
-                        </select>
-                        <button type="submit" class="btn btn-secondary px-5 d-flex align-items-center justify-content-center">Search</button>
+                        <form action="${pageContext.request.contextPath}/admin-business/maintenance" method="get" class="mb-4">
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+
+                            <input type="text" name="customerName" class="form-control border-start-0" 
+                                   placeholder="Customer name..." value="${currentName}">
+
+                            <select name="status" class="form-select" style="max-width: 200px;">
+                                <option value="All Status">-- All Status --</option>
+                                <option value="PENDING" ${currentStatus == 'PENDING' ? 'selected' : ''}>New Request</option>
+                                <option value="WAITING_FOR_TECHNICIAN" ${currentStatus == 'WAITING_FOR_TECHNICIAN' ? 'selected' : ''}>Awaiting Assignment</option>
+                                <option value="TECHNICIAN_ACCEPTED" ${currentStatus == 'TECHNICIAN_ACCEPTED' ? 'selected' : ''}>Staff Accepted</option>
+                                <option value="TECHNICIAN_SUBMITTED" ${currentStatus == 'TECHNICIAN_SUBMITTED' ? 'selected' : ''}>Staff Submitted</option>
+                                <option value="DIAGNOSIS READY" ${currentStatus == 'DIAGNOSIS READY' ? 'selected' : ''}>Diagnosis Ready</option>
+                                <option value="IN_PROGRESS" ${currentStatus == 'IN_PROGRESS' ? 'selected' : ''}>Repairing</option>
+                                <option value="DONE" ${currentStatus == 'DONE' ? 'selected' : ''}>Completed</option>
+                            </select>
+
+                            <button type="submit" class="btn btn-primary px-4">Filter</button>
+
+                            <a href="maintenance" class="btn btn-outline-secondary" title="Reset filters">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </a>
+                        </div>
                     </form>
                 </div>
 
                 <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-muted text-uppercase small">
+                        <thead class="table-dark text-muted text-uppercase small">
                             <tr>
                                 <th class="ps-4">ID</th>
                                 <th>Customer</th>

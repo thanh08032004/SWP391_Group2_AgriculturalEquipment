@@ -176,7 +176,7 @@
                                 <form action="${pageContext.request.contextPath}/leader/maintenance" method="post" class="row align-items-end">
                                     <input type="hidden" name="action" value="assign">
                                     <input type="hidden" name="id" value="${task.id}">
-
+                                    <input type="hidden" name="from" value="detail">
                                     <div class="col-md-8">
                                         <label class="form-label small text-muted text-uppercase fw-bold">Select Available Technician</label>
                                         <select name="technicianId" class="form-select">

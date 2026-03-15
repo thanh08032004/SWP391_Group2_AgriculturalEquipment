@@ -42,6 +42,12 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             String name = request.getParameter("customerName");
             String status = request.getParameter("status");
 
+            if (name == null) {
+                name = "";
+            }
+            if (status == null || status.equals("All Status")) {
+                status = "";
+            }
             int pageSize = 3;
             int pageIndex = 1;
             String rawPage = request.getParameter("page");
@@ -90,8 +96,15 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             int taskId = Integer.parseInt(request.getParameter("id"));
             String techIdRaw = request.getParameter("technicianId");
             int techId = (techIdRaw == null || techIdRaw.isEmpty()) ? 0 : Integer.parseInt(techIdRaw);
+            //nguon gui yeu cau
+            String from = request.getParameter("from");
+
             boolean success = dao.assignTechnician(taskId, techId);
-            response.sendRedirect("maintenance?action=detail&id=" + taskId + "&msg=" + (success ? "assign_success" : "error"));
+            if ("list".equals(from)) {
+                response.sendRedirect("maintenance?msg=" + (success ? "assign_success" : "error"));
+            } else {
+                response.sendRedirect("maintenance?action=detail&id=" + taskId + "&msg=" + (success ? "assign_success" : "error"));
+            }
         }
     }
 

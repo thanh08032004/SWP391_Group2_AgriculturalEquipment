@@ -30,7 +30,12 @@ public class AdminMaintenanceServlet extends HttpServlet {
             //search or list
             String name = request.getParameter("customerName");
             String status = request.getParameter("status");
-
+            if (name == null) {
+                name = "";
+            }
+            if (status == null || status.equals("All Status")) {
+                status = "";
+            }
             int pageSize = 3;
             int pageIndex = 1;
             String rawPage = request.getParameter("page");
