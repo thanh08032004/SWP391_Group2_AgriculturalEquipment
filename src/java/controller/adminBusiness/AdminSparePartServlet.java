@@ -125,6 +125,7 @@ public class AdminSparePartServlet extends HttpServlet {
 
         Part filePart = request.getPart("imageFile");
         String fileName = request.getParameter("currentImage");
+        int quantity = Integer.parseInt(request.getParameter("quantity"));
         if (filePart != null && filePart.getSize() > 0) {
             String uploadPath = getServletContext().getRealPath("/assets/images/parts/");
             fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
@@ -147,6 +148,7 @@ public class AdminSparePartServlet extends HttpServlet {
                 .description(request.getParameter("description"))
                 .imageUrl(fileName)
                 .compatibleDeviceIds(devIds)
+                .quantity(quantity)
                 .build();
 
         if ("create".equals(action)) {

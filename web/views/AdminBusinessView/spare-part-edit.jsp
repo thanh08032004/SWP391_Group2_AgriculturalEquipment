@@ -37,7 +37,11 @@
                                                    value="${part.price}"
                                                    required>
                                         </div>                                          
-
+                                        <div class="col-6 mb-3">
+                                            <label class="fw-bold">Current Stock Quantity</label>
+                                            <input type="number" name="quantity" class="form-control" 
+                                                   value="${part.quantity}" min="0" required>
+                                        </div>         
                                         <div class="col-6 mb-3">
                                             <label class="fw-bold">Unit</label>
                                             <select name="unit" class="form-select" required>

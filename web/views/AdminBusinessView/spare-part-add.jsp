@@ -36,6 +36,10 @@
                                                        onkeypress="return event.charCode >= 48"
                                                        placeholder="0"
                                                        required>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="fw-bold">Quantity In Stock</label>
+                                                <input type="number" name="quantity" class="form-control" min="0" value="0" required>
                                             </div>                                            
                                             <div class="col-6 mb-3">
                                                 <label class="fw-bold">Unit</label>

@@ -52,9 +52,8 @@ public class SparePartDAO extends DBContext {
     }
 
     public boolean insertNewSparePart(SparePart sp) {
-        String sql = "INSERT INTO spare_part"
-                + "(part_code, name, description, unit, price, image)"
-                + " VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO spare_part (part_code, name, description, unit, price, image) VALUES (?, ?, ?, ?, ?, ?)";
+
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
             try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -65,12 +64,12 @@ public class SparePartDAO extends DBContext {
                 ps.setBigDecimal(5, sp.getPrice());
                 ps.setString(6, sp.getImageUrl());
                 ps.executeUpdate();
+
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     int spId = rs.getInt(1);
-                    //init inventory
-                    executeSimple(con, "INSERT INTO inventory(spare_part_id, quantity) VALUES (?, 0)", spId);
-                    //link to spec device
+                    executeSimple(con, "INSERT INTO inventory(spare_part_id, quantity) VALUES (?, ?)", spId, sp.getQuantity());
+
                     saveDeviceLinks(con, spId, sp.getCompatibleDeviceIds());
                 }
                 con.commit();
@@ -107,9 +106,8 @@ public class SparePartDAO extends DBContext {
     }
 
     public boolean updateSparePartInfo(SparePart sp) {
-        String sql = "UPDATE spare_part "
-                + "SET name=?, description=?, unit=?, price=?, image=? "
-                + "WHERE id=?";
+        String sql = "UPDATE spare_part SET name=?, description=?, unit=?, price=?, image=? WHERE id=?";
+
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
             try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -120,9 +118,16 @@ public class SparePartDAO extends DBContext {
                 ps.setString(5, sp.getImageUrl());
                 ps.setInt(6, sp.getId());
                 ps.executeUpdate();
-                // cap nhat lai lien ket thiet bi
-                executeSimple(con, "DELETE FROM device_spare_part WHERE spare_part_id = ?", sp.getId());
+
+                executeSimple(con, "UPDATE inventory SET quantity = ? WHERE spare_part_id = ?", sp.getQuantity(), sp.getId());
+
+                try (PreparedStatement psDel = con.prepareStatement("DELETE FROM device_spare_part WHERE spare_part_id = ?")) {
+                    psDel.setInt(1, sp.getId());
+                    psDel.executeUpdate();
+                }
+
                 saveDeviceLinks(con, sp.getId(), sp.getCompatibleDeviceIds());
+
                 con.commit();
                 return true;
             } catch (SQLException e) {
@@ -150,9 +155,10 @@ public class SparePartDAO extends DBContext {
         }
     }
 
-    private void executeSimple(Connection con, String sql, int id) throws SQLException {
+    private void executeSimple(Connection con, String sql, int val, int id) throws SQLException {
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, id);
+            ps.setInt(1, val);
+            ps.setInt(2, id);
             ps.executeUpdate();
         }
     }
