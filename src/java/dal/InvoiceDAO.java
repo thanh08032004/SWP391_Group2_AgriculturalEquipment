@@ -223,56 +223,66 @@ public class InvoiceDAO extends DBContext {
 
     public InvoiceDetailDTO getInvoiceDetailById(int invoiceId) {
 
-        String sql = """
-            SELECT 
-                i.id AS invoice_id,
-                m.id AS maintenance_id,
+    String sql = """
+        SELECT 
+            i.id AS invoice_id,
+            m.id AS maintenance_id,
 
-                cus.fullname AS customer_name,
-                tech.fullname AS technician_name,
+            u_cus.id AS customer_id,
+            u_tech.id AS technician_id,
 
-                d.machine_name,
-                d.model,
-                d.serial_number,
-                b.name AS brand_name,
-                c.name AS category_name,
+            cus.fullname AS customer_name,
+            tech.fullname AS technician_name,
 
-                v.code AS voucher_code,
-                v.discount_type,
-                v.discount_value,
+            d.machine_name,
+            d.model,
+            d.serial_number,
+            b.name AS brand_name,
+            c.name AS category_name,
 
-                i.labor_cost,
-                i.discount_amount,
-                i.total_amount,
-                i.payment_status,
-                i.payment_method
+            v.code AS voucher_code,
+            v.discount_type,
+            v.discount_value,
 
-            FROM invoice i
-            JOIN maintenance m ON i.maintenance_id = m.id
-            JOIN device d ON m.device_id = d.id
-            JOIN brand b ON d.brand_id = b.id
-            JOIN category c ON d.category_id = c.id
+            i.labor_cost,
+            i.discount_amount,
+            i.total_amount,
+            i.payment_status,
+            i.payment_method
 
-            JOIN users u_cus ON d.customer_id = u_cus.id
-            JOIN user_profile cus ON u_cus.id = cus.user_id
+        FROM invoice i
+        JOIN maintenance m ON i.maintenance_id = m.id
+        JOIN device d ON m.device_id = d.id
+        JOIN brand b ON d.brand_id = b.id
+        JOIN category c ON d.category_id = c.id
 
-            JOIN users u_tech ON m.technician_id = u_tech.id
-            JOIN user_profile tech ON u_tech.id = tech.user_id
+        JOIN users u_cus ON d.customer_id = u_cus.id
+        JOIN user_profile cus ON u_cus.id = cus.user_id
 
-            LEFT JOIN voucher v ON i.voucher_id = v.id
+        JOIN users u_tech ON m.technician_id = u_tech.id
+        JOIN user_profile tech ON u_tech.id = tech.user_id
 
-            WHERE i.id = ?
-        """;
+        LEFT JOIN voucher v ON i.voucher_id = v.id
 
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, invoiceId);
-            ResultSet rs = ps.executeQuery();
+        WHERE i.id = ?
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, invoiceId);
+
+        try (ResultSet rs = ps.executeQuery()) {
 
             if (rs.next()) {
+
                 InvoiceDetailDTO dto = new InvoiceDetailDTO();
 
                 dto.setInvoiceId(rs.getInt("invoice_id"));
                 dto.setMaintenanceId(rs.getInt("maintenance_id"));
+
+                dto.setCustomerId(rs.getInt("customer_id"));
+                dto.setTechnicianId(rs.getInt("technician_id"));
 
                 dto.setCustomerName(rs.getString("customer_name"));
                 dto.setTechnicianName(rs.getString("technician_name"));
@@ -296,11 +306,14 @@ public class InvoiceDAO extends DBContext {
 
                 return dto;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return null;
+
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+
+    return null;
+}
 
     public List<SparePartDTO> getSparePartsByInvoiceId(int invoiceId) {
 
@@ -1305,19 +1318,31 @@ public double getLaborCostByMaintenance(int maintenanceId) {
 public MaintenanceDTO getMaintenanceById(int id) {
 
     String sql = """
-        SELECT m.id,
+        SELECT 
+               m.id,
+               
                d.machine_name,
                d.model,
+               
+               u.id AS customer_id,
+               tu.id AS technician_id,
+               
                up.fullname AS customer_name,
                tp.fullname AS technician_name,
+               
                m.labor_hours,
                m.labor_cost_per_hour
+               
         FROM maintenance m
+        
         JOIN device d ON m.device_id = d.id
+        
         JOIN users u ON d.customer_id = u.id
         JOIN user_profile up ON u.id = up.user_id
+        
         LEFT JOIN users tu ON m.technician_id = tu.id
         LEFT JOIN user_profile tp ON tu.id = tp.user_id
+        
         WHERE m.id = ?
     """;
 
@@ -1333,8 +1358,13 @@ public MaintenanceDTO getMaintenanceById(int id) {
             MaintenanceDTO m = new MaintenanceDTO();
 
             m.setId(rs.getInt("id"));
+
             m.setMachineName(rs.getString("machine_name"));
             m.setModel(rs.getString("model"));
+
+            m.setCustomerId(rs.getInt("customer_id"));
+            m.setTechnicianId(rs.getInt("technician_id"));
+
             m.setCustomerName(rs.getString("customer_name"));
             m.setTechnicianName(rs.getString("technician_name"));
 

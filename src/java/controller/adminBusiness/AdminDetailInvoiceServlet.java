@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import model.Maintenance;
+import model.UserProfile;
 
 public class AdminDetailInvoiceServlet extends HttpServlet {
 
@@ -34,22 +36,70 @@ public class AdminDetailInvoiceServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-           int invoiceId = Integer.parseInt(request.getParameter("id"));
+        throws ServletException, IOException {
 
-        InvoiceDAO dao = new InvoiceDAO();
+    InvoiceDAO dao = new InvoiceDAO();
+    String action = request.getParameter("action");
 
-        InvoiceDetailDTO invoice = dao.getInvoiceDetailById(invoiceId);
-        List<SparePartDTO> spareParts = dao.getSparePartsByInvoiceId(invoiceId);
+    // ===== CUSTOMER DETAIL =====
+    if ("getCustomerDetail".equals(action)) {
 
-        request.setAttribute("invoice", invoice);
-        request.setAttribute("spareParts", spareParts);
+        int id = Integer.parseInt(request.getParameter("id"));
+        UserProfile c = dao.getCustomerDetail(id);
 
-        request.getRequestDispatcher("/views/AdminBusinessView/invoice-detail.jsp")
-               .forward(request, response);
-    } 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
 
+        if (c != null) {
+            out.print("{");
+            out.print("\"fullname\":\"" + c.getFullname() + "\",");
+            out.print("\"email\":\"" + c.getEmail() + "\",");
+            out.print("\"phone\":\"" + c.getPhone() + "\",");
+            out.print("\"gender\":\"" + c.getGender() + "\",");
+            out.print("\"birthDate\":\"" + c.getBirthDate() + "\",");
+            out.print("\"address\":\"" + c.getAddress() + "\",");
+            out.print("\"avatar\":\"" + c.getAvatar() + "\"");
+            out.print("}");
+        }
+        return;
+    }
 
+    // ===== MAINTENANCE DETAIL =====
+    if ("getMaintenanceDetail".equals(action)) {
+
+        int id = Integer.parseInt(request.getParameter("id"));
+        Maintenance m = dao.getMaintenanceDetail(id);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+
+        if (m != null) {
+            out.print("{");
+            out.print("\"id\":" + m.getId() + ",");
+            out.print("\"machineName\":\"" + m.getMachineName() + "\",");
+            out.print("\"problem\":\"" + m.getDescription() + "\",");
+            out.print("\"status\":\"" + m.getStatus() + "\",");
+            out.print("\"startDate\":\"" + m.getStartDate() + "\",");
+            out.print("\"finishDate\":\"" + m.getEndDate() + "\"");
+            out.print("}");
+        }
+        return;
+    }
+
+    // ===== LOAD INVOICE DETAIL PAGE =====
+    int invoiceId = Integer.parseInt(request.getParameter("id"));
+
+    InvoiceDetailDTO invoice = dao.getInvoiceDetailById(invoiceId);
+    List<SparePartDTO> spareParts = dao.getSparePartsByInvoiceId(invoiceId);
+
+    request.setAttribute("invoice", invoice);
+    request.setAttribute("spareParts", spareParts);
+
+    request.getRequestDispatcher("/views/AdminBusinessView/invoice-detail.jsp")
+            .forward(request, response);
+}
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {

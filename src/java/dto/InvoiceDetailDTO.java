@@ -19,7 +19,8 @@ public class InvoiceDetailDTO {
     private String serialNumber;
     private String brandName;
     private String categoryName;
-
+    private int customerId;
+    private int technicianId;
     private String voucherCode;
     private String voucherDiscountType;
     private double voucherDiscountValue;
