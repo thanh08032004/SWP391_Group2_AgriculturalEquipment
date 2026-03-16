@@ -185,23 +185,31 @@
                                             </td>
                                             <td>
                                                 <c:choose>
+
                                                     <c:when test="${c.status eq 'ACTIVE'}">
-                                                        <span class="status-badge s-active">
+                                                        <span style="padding:4px 10px;border-radius:12px;font-size:13px;font-weight:600;background:#28a745;color:white;">
                                                             ACTIVE
                                                         </span>
                                                     </c:when>
 
-                                                    <c:when test="${c.status eq 'EXPIRED'}">
-                                                        <span class="status-badge s-expired">
-                                                            EXPIRED
+                                                    <c:when test="${c.status eq 'DRAFT'}">
+                                                        <span style="padding:4px 10px;border-radius:12px;font-size:13px;font-weight:600;background:#ffc107;color:#333;">
+                                                            DRAFT
+                                                        </span>
+                                                    </c:when>
+
+                                                    <c:when test="${c.status eq 'COMPLETED' || c.status eq 'CANCELED'}">
+                                                        <span style="padding:4px 10px;border-radius:12px;font-size:13px;font-weight:600;background:#dc3545;color:white;">
+                                                            ${c.status}
                                                         </span>
                                                     </c:when>
 
                                                     <c:otherwise>
-                                                        <span class="status-badge s-other">
+                                                        <span style="padding:4px 10px;border-radius:12px;font-size:13px;font-weight:600;background:#6c757d;color:white;">
                                                             ${c.status}
                                                         </span>
                                                     </c:otherwise>
+
                                                 </c:choose>
                                             </td>
 

@@ -86,7 +86,25 @@
                                 </div>
                                 <div class="col-md-6">
                                     <strong>Status:</strong>
-                                    <span class="badge bg-success">${contract.status}</span>
+
+                                    <c:choose>
+                                        <c:when test="${contract.status == 'ACTIVE'}">
+                                            <span class="badge bg-success">ACTIVE</span>
+                                        </c:when>
+
+                                        <c:when test="${contract.status == 'DRAFT'}">
+                                            <span class="badge bg-warning text-dark">DRAFT</span>
+                                        </c:when>
+
+                                        <c:when test="${contract.status == 'COMPLETED' || contract.status == 'CANCELED'}">
+                                            <span class="badge bg-danger">${contract.status}</span>
+                                        </c:when>
+
+                                        <c:otherwise>
+                                            <span class="badge bg-secondary">${contract.status}</span>
+                                        </c:otherwise>
+                                    </c:choose>
+
                                 </div>
                             </div>
 

@@ -83,9 +83,23 @@
                                                 <fmt:formatNumber value="${c.totalValue}" type="number" groupingUsed="true"/> VNĐ
                                             </td>
                                             <td>
-                                                <span class="badge bg-success">
-                                                    ${c.status}
-                                                </span>
+                                                <c:choose>
+                                                    <c:when test="${c.status == 'ACTIVE'}">
+                                                        <span class="badge bg-success">ACTIVE</span>
+                                                    </c:when>
+
+                                                    <c:when test="${c.status == 'DRAFT'}">
+                                                        <span class="badge bg-warning text-dark">DRAFT</span>
+                                                    </c:when>
+
+                                                    <c:when test="${c.status == 'COMPLETED' || c.status == 'CANCELED'}">
+                                                        <span class="badge bg-danger">${c.status}</span>
+                                                    </c:when>
+
+                                                    <c:otherwise>
+                                                        <span class="badge bg-secondary">${c.status}</span>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </td>
                                             <td>
                                                 <a href="contracts?action=detail&id=${c.id}" 

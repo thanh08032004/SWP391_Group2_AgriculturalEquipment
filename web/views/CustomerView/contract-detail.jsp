@@ -99,12 +99,17 @@
                         <div class="col-md-6">
 
                             <strong>Status:</strong>
+
                             <c:choose>
                                 <c:when test="${contract.status eq 'ACTIVE'}">
-                                    <span class="badge bg-success">${contract.status}</span>
+                                    <span class="badge bg-success">ACTIVE</span>
                                 </c:when>
 
-                                <c:when test="${contract.status eq 'EXPIRED'}">
+                                <c:when test="${contract.status eq 'DRAFT'}">
+                                    <span class="badge bg-warning text-dark">DRAFT</span>
+                                </c:when>
+
+                                <c:when test="${contract.status eq 'COMPLETED' || contract.status eq 'CANCELED'}">
                                     <span class="badge bg-danger">${contract.status}</span>
                                 </c:when>
 
@@ -112,6 +117,7 @@
                                     <span class="badge bg-secondary">${contract.status}</span>
                                 </c:otherwise>
                             </c:choose>
+
                         </div>
                     </div>
 
