@@ -25,10 +25,16 @@
                             <div class="card-header bg-white fw-bold">Device & Customer Info</div>
                             <div class="card-body">
                                 <p class="mb-1 text-muted small">Machine / Model</p>
-                                <h6 class="fw-bold">${task.machineName} - ${task.modelName}</h6>
+                                <h6 class="fw-bold text-primary" style="cursor:pointer; text-decoration:underline;" 
+                                    onclick="viewDeviceDetail(${task.deviceId})">
+                                    ${task.machineName} - ${task.modelName}
+                                </h6>
                                 <hr>
                                 <p class="mb-1 text-muted small">Customer Name</p>
-                                <h6>${task.customerName}</h6>
+                                <h6 class="fw-bold text-primary" style="cursor:pointer; text-decoration:underline;" 
+                                    onclick="viewCustomerDetail(${task.customerId})">
+                                    ${task.customerName}
+                                </h6>
                                 <p class="mb-1 text-muted small mt-3">Current Status</p>
                                 <c:choose>
                                     <c:when test="${task.status == 'PENDING'}"><span class="badge bg-warning text-dark">New Request</span></c:when>
@@ -257,5 +263,88 @@
             </div>
         </div>
         <jsp:include page="/common/scripts.jsp"></jsp:include>
+            <div class="modal fade" id="deviceModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title"><i class="bi bi-cpu"></i> Device Detail</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" id="deviceContent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="customerModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-sm modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                        <div id="customerContent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function viewDeviceDetail(id) {
+                    document.getElementById('deviceContent').innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+                    new bootstrap.Modal(document.getElementById('deviceModal')).show();
+
+                    fetch('${pageContext.request.contextPath}/leader/maintenance?action=getDeviceDetail&deviceId=' + id)
+                            .then(res => res.json())
+                            .then(dev => {
+                                document.getElementById('deviceContent').innerHTML = `
+                                <div class="text-center mb-3">
+                                    <img src="${pageContext.request.contextPath}/assets/images/devices/\${dev.image}" 
+                                         class="img-fluid rounded border shadow-sm" style="max-height:200px; width:100%; object-fit:cover;">
+                                </div>
+                                <table class="table table-sm table-borderless">
+                                    <tr><td width="30%" class="text-muted">Name:</td><td class="fw-bold">\${dev.name}</td></tr>
+                                    <tr><td class="text-muted">Model:</td><td>\${dev.model}</td></tr>
+                                    <tr><td class="text-muted">Serial:</td><td><code class="fw-bold">\${dev.serial}</code></td></tr>
+                                    <tr><td class="text-muted">Status:</td><td><span class="badge bg-info">\${dev.status}</span></td></tr>
+                                </table>`;
+                            });
+                }
+
+                function viewCustomerDetail(id) {
+    document.getElementById('customerContent').innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>';
+    const modalObj = new bootstrap.Modal(document.getElementById('customerModal'));
+    modalObj.show();
+
+    fetch('${pageContext.request.contextPath}/leader/maintenance?action=getCustomerDetail&customerId=' + id)
+        .then(res => res.json())
+        .then(cus => {
+            document.getElementById('customerContent').innerHTML = `
+                <div class="bg-primary p-4 text-center text-white" style="border-radius: 15px 15px 0 0;">
+                    <img src="${pageContext.request.contextPath}/assets/images/avatars/\${cus.avatar}" 
+                         class="rounded-circle mb-2 border border-3 border-white shadow-sm" 
+                         style="width:90px; height:90px; object-fit:cover;">
+                    <h5 class="mb-0 fw-bold">\${cus.fullname}</h5>
+                    <small class="opacity-75">\${cus.role}</small>
+                </div>
+                <div class="p-4">
+                    <div class="d-flex mb-3">
+                        <i class="bi bi-telephone text-primary me-3"></i>
+                        <div><small class="text-muted d-block">Phone</small><strong>\${cus.phone}</strong></div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <i class="bi bi-envelope text-primary me-3"></i>
+                        <div><small class="text-muted d-block">Email</small><strong>\${cus.email}</strong></div>
+                    </div>
+                    <div class="d-flex">
+                        <i class="bi bi-geo-alt text-primary me-3"></i>
+                        <div><small class="text-muted d-block">Address</small><strong>\${cus.address}</strong></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center">
+                    <button type="button" class="btn  btn-sm px-4 shadow-sm" data-bs-dismiss="modal" style="border-radius: 20px;">
+                        Close
+                    </button>
+                </div>`;
+        })
+        .catch(err => {
+            document.getElementById('customerContent').innerHTML = '<div class="alert alert-danger m-3">Error loading data.</div>';
+        });
+}
+        </script>
     </body>
 </html>
