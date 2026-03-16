@@ -231,7 +231,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             resp.sendRedirect("maintenance?action=mytasks");
         }
 
-        else if (action.equals("getCustomerDetail")) {
+        else if (action.equals("getCustomerDetailJson")) {
 
             int cusId = Integer.parseInt(req.getParameter("id"));
 
