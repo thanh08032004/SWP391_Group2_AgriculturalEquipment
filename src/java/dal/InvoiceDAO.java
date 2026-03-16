@@ -709,7 +709,6 @@ public List<VoucherDTO> getAvailableVouchersByCustomer(int customerId) {
         WHERE cv.customer_id = ?
         AND cv.is_used = FALSE
         AND v.is_active = TRUE
-        AND CURDATE() BETWEEN v.start_date AND v.end_date
     """;
 
     try (Connection con = getConnection();
