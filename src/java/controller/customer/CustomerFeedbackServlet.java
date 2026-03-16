@@ -32,28 +32,51 @@ public class CustomerFeedbackServlet extends HttpServlet {
 
     @Override
      protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
+    HttpSession session = request.getSession(false);
 
-        User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 4) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-        FeedbackDAO feedbackDAO = new FeedbackDAO();
-        List<MaintenanceFeedback> feedbackList = feedbackDAO.getFeedbackByCustomer(user.getId());
-        request.setAttribute("feedbackList", feedbackList);
-
-        request.getRequestDispatcher("/views/CustomerView/customer-feedbacklist.jsp")
-               .forward(request, response);
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
     }
 
+    User user = (User) session.getAttribute("user");
 
+    if (user.getRoleId() != 4) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
+
+    String keyword = request.getParameter("keyword");
+    String rating = request.getParameter("rating");
+
+    int page = 1;
+    int pageSize = 5;
+
+    if (request.getParameter("page") != null) {
+        page = Integer.parseInt(request.getParameter("page"));
+    }
+
+    FeedbackDAO dao = new FeedbackDAO();
+
+    List<MaintenanceFeedback> feedbackList =
+            dao.getFeedbackByCustomer(user.getId(), keyword, rating, page, pageSize);
+
+    int totalRecords =
+            dao.countFeedbackByCustomer(user.getId(), keyword, rating);
+
+    int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+    request.setAttribute("feedbackList", feedbackList);
+    request.setAttribute("currentPage", page);
+    request.setAttribute("totalPages", totalPages);
+    request.setAttribute("keyword", keyword);
+    request.setAttribute("rating", rating);
+
+    request.getRequestDispatcher("/views/CustomerView/customer-feedbacklist.jsp")
+            .forward(request, response);
+}
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {

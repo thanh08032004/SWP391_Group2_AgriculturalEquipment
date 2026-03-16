@@ -33,7 +33,6 @@
     <header><jsp:include page="/common/header.jsp"></jsp:include></header>
 
     <div class="admin-layout d-flex">
-        <jsp:include page="/common/side-bar.jsp"></jsp:include>
 
         <div class="admin-content p-4 w-100">
             <div class="d-flex justify-content-between align-items-center mb-4">

@@ -1168,17 +1168,157 @@ public int countMaintenanceDone(String name, String status) {
 
     return 0;
 }
+public int countMaintenanceDoneByCustomer(int customerId) {
+
+    String sql = """
+        SELECT COUNT(*)
+        FROM maintenance m
+        JOIN device d ON m.device_id = d.id
+        WHERE m.status = 'DONE'
+        AND d.customer_id = ?
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, customerId);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return 0;
+}
+
+public List<Maintenance> getMaintenanceDoneByCustomer(
+        int customerId,
+        String name,
+        String status,
+        int page,
+        int pageSize) {
+
+    List<Maintenance> list = new ArrayList<>();
+
+    String sql = """
+        SELECT 
+            m.id,
+            m.status,
+            d.id AS device_id,
+            d.machine_name,
+            d.model,
+            d.customer_id,
+            m.technician_id,
+            cus.fullname AS customer_name,
+            tech.fullname AS technician_name
+        FROM maintenance m
+        JOIN device d ON m.device_id = d.id
+        JOIN users u_cus ON d.customer_id = u_cus.id
+        JOIN user_profile cus ON u_cus.id = cus.user_id
+        LEFT JOIN users u_tech ON m.technician_id = u_tech.id
+        LEFT JOIN user_profile tech ON u_tech.id = tech.user_id
+        WHERE d.customer_id = ?
+                 and m.status = 'DONE'
+        """;
+
+    if (name != null && !name.isEmpty()) {
+        sql += " AND cus.fullname LIKE ? ";
+    }
+
+    if (status != null && !status.equals("All Status")) {
+        sql += " AND m.status = ? ";
+    }
+
+    sql += " ORDER BY m.id DESC LIMIT ? OFFSET ?";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        int index = 1;
+
+        ps.setInt(index++, customerId);
+
+        if (name != null && !name.isEmpty()) {
+            ps.setString(index++, "%" + name + "%");
+        }
+
+        if (status != null && !status.equals("All Status")) {
+            ps.setString(index++, status);
+        }
+
+        ps.setInt(index++, pageSize);
+        ps.setInt(index, (page - 1) * pageSize);
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Maintenance m = new Maintenance();
+
+            m.setId(rs.getInt("id"));
+            m.setStatus(rs.getString("status"));
+            m.setMachineName(rs.getString("machine_name"));
+            m.setModelName(rs.getString("model"));
+            m.setCustomerId(rs.getInt("customer_id"));
+            m.setTechnicianId(rs.getInt("technician_id"));
+            m.setDeviceId(rs.getInt("device_id"));
+            m.setCustomerName(rs.getString("customer_name"));
+            m.setTechnicianName(rs.getString("technician_name"));
+
+            list.add(m);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+public double getLaborCostByMaintenance(int maintenanceId) {
+
+    String sql = """
+        SELECT labor_hours * labor_cost_per_hour AS labor_cost
+        FROM maintenance
+        WHERE id = ?
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, maintenanceId);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            return rs.getDouble("labor_cost");
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return 0;
+}
 public MaintenanceDTO getMaintenanceById(int id) {
 
     String sql = """
         SELECT m.id,
                d.machine_name,
                d.model,
-               up.fullname
+               up.fullname AS customer_name,
+               tp.fullname AS technician_name,
+               m.labor_hours,
+               m.labor_cost_per_hour
         FROM maintenance m
         JOIN device d ON m.device_id = d.id
         JOIN users u ON d.customer_id = u.id
         JOIN user_profile up ON u.id = up.user_id
+        LEFT JOIN users tu ON m.technician_id = tu.id
+        LEFT JOIN user_profile tp ON tu.id = tp.user_id
         WHERE m.id = ?
     """;
 
@@ -1190,12 +1330,17 @@ public MaintenanceDTO getMaintenanceById(int id) {
         ResultSet rs = ps.executeQuery();
 
         if (rs.next()) {
+
             MaintenanceDTO m = new MaintenanceDTO();
 
             m.setId(rs.getInt("id"));
             m.setMachineName(rs.getString("machine_name"));
             m.setModel(rs.getString("model"));
-            m.setCustomerName(rs.getString("fullname"));
+            m.setCustomerName(rs.getString("customer_name"));
+            m.setTechnicianName(rs.getString("technician_name"));
+
+            m.setLaborHours(rs.getInt("labor_hours"));
+            m.setLaborCostPerHour(rs.getDouble("labor_cost_per_hour"));
 
             return m;
         }
@@ -1208,7 +1353,6 @@ public MaintenanceDTO getMaintenanceById(int id) {
 }
     public static void main(String[] args) {
         InvoiceDAO i = new InvoiceDAO();
-        System.out.println(i.getCustomerDetail(4));
-        
-    }
+
+}
 }

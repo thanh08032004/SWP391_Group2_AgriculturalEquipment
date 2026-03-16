@@ -17,6 +17,14 @@
         <servlet-class>controller.adminBusiness.AdminContractServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>CustomerFeedbackAdd</servlet-name>
+        <servlet-class>controller.customer.CustomerFeedbackAdd</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CustomerMaintenanceDoneServlet</servlet-name>
+        <servlet-class>controller.customer.CustomerMaintenanceDoneServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>AdminReportServlet</servlet-name>
         <servlet-class>controller.adminBusiness.AdminReportServlet</servlet-class>
     </servlet>
@@ -43,6 +51,14 @@
     <servlet-mapping>
         <servlet-name>AdminContractServlet</servlet-name>
         <url-pattern>/admin-business/contracts</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CustomerFeedbackAdd</servlet-name>
+        <url-pattern>/customer/feedback/add</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CustomerMaintenanceDoneServlet</servlet-name>
+        <url-pattern>/customer/maintenance/done</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminReportServlet</servlet-name>

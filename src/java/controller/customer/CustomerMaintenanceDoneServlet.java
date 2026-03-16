@@ -1,4 +1,4 @@
-package controller.adminBusiness;
+package controller.customer;
 import dal.InvoiceDAO;
 import dal.MaintenanceDAO;
 import dto.DeviceDTO;
@@ -12,9 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Maintenance;
+import model.User;
 import model.UserProfile;
 
-public class AdminDoneMantenanceServlet extends HttpServlet {
+public class CustomerMaintenanceDoneServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -34,18 +35,16 @@ public class AdminDoneMantenanceServlet extends HttpServlet {
 
 
   @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
 
     String action = request.getParameter("action");
 
     InvoiceDAO dao = new InvoiceDAO();
 
-    // ================= CUSTOMER DETAIL =================
     if ("getCustomerDetail".equals(action)) {
 
         int id = Integer.parseInt(request.getParameter("id"));
-
         UserProfile c = dao.getCustomerDetail(id);
 
         response.setContentType("application/json");
@@ -68,38 +67,48 @@ public class AdminDoneMantenanceServlet extends HttpServlet {
 
         return;
     }
-// ================= DEVICE DETAIL =================
-if ("getDeviceDetailJson".equals(action)) {
 
-    int id = Integer.parseInt(request.getParameter("id"));
+    if ("getDeviceDetailJson".equals(action)) {
 
-    DeviceDTO dev = dao.getDeviceById(id);
+        int id = Integer.parseInt(request.getParameter("id"));
+        DeviceDTO dev = dao.getDeviceById(id);
 
-    response.setContentType("application/json");
-    response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-    PrintWriter out = response.getWriter();
+        PrintWriter out = response.getWriter();
 
-    if (dev != null) {
+        if (dev != null) {
 
-        out.print("{");
-        out.print("\"serial\":\""+dev.getSerialNumber()+"\",");
-        out.print("\"machineName\":\""+dev.getMachineName()+"\",");
-        out.print("\"model\":\""+dev.getModel()+"\",");
-        out.print("\"status\":\""+dev.getStatus()+"\",");
-        out.print("\"price\":\""+dev.getPrice()+"\",");
-        out.print("\"image\":\""+dev.getImage()+"\",");
-        out.print("\"categoryName\":\""+dev.getCategoryName()+"\",");
-        out.print("\"brandName\":\""+dev.getBrandName()+"\",");
-        out.print("\"customerName\":\""+dev.getCustomerName()+"\"");
-        out.print("}");
+            out.print("{");
+            out.print("\"serial\":\""+dev.getSerialNumber()+"\",");
+            out.print("\"machineName\":\""+dev.getMachineName()+"\",");
+            out.print("\"model\":\""+dev.getModel()+"\",");
+            out.print("\"status\":\""+dev.getStatus()+"\",");
+            out.print("\"price\":\""+dev.getPrice()+"\",");
+            out.print("\"image\":\""+dev.getImage()+"\",");
+            out.print("\"categoryName\":\""+dev.getCategoryName()+"\",");
+            out.print("\"brandName\":\""+dev.getBrandName()+"\",");
+            out.print("\"customerName\":\""+dev.getCustomerName()+"\"");
+            out.print("}");
+        }
+
+        return;
     }
 
+    // ================= LOAD LIST =================
+
+    HttpSession session = request.getSession(false);
+User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+if (user == null) {
+    response.sendRedirect(request.getContextPath() + "/login");
     return;
 }
-    // ================= LOAD MAINTENANCE LIST =================
-    String name = request.getParameter("customerName");
-    String status = request.getParameter("status");
+
+int customerId = user.getId();
+String name = request.getParameter("customerName");
+String status = request.getParameter("status");
 
     int page = 1;
     int pageSize = 5;
@@ -108,19 +117,23 @@ if ("getDeviceDetailJson".equals(action)) {
         page = Integer.parseInt(request.getParameter("page"));
     }
 
-    List<Maintenance> list = dao.getMaintenanceDone(name, status, page, pageSize);
+    List<Maintenance> list = dao.getMaintenanceDoneByCustomer(customerId, name, status, page, pageSize);
 
-    int totalRecords = dao.countMaintenanceDone(name, status);
+    int totalRecords =
+            dao.countMaintenanceDoneByCustomer(customerId);
+
     int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
     request.setAttribute("reqList", list);
     request.setAttribute("currentName", name);
-    request.setAttribute("currentStatus", status);
+request.setAttribute("currentStatus", status);
     request.setAttribute("currentPage", page);
     request.setAttribute("totalPages", totalPages);
+    
 
-    request.getRequestDispatcher("/views/AdminBusinessView/invoice-donemaintenance.jsp")
-            .forward(request, response);
+    request.getRequestDispatcher(
+        "/views/CustomerView/customer-maintenancehistory.jsp")
+        .forward(request, response);
 }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

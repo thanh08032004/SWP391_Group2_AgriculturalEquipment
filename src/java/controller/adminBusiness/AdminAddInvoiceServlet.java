@@ -4,9 +4,7 @@ import dal.InvoiceDAO;
 import dto.MaintenanceDTO;
 import dto.SparePartDTO;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 
@@ -15,14 +13,20 @@ public class AdminAddInvoiceServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         InvoiceDAO dao = new InvoiceDAO();
+
         String midRaw = request.getParameter("maintenanceId");
+
         if (midRaw != null && !midRaw.isEmpty()) {
+
             int maintenanceId = Integer.parseInt(midRaw);
+
             MaintenanceDTO maintenance = dao.getMaintenanceById(maintenanceId);
 
             List<SparePartDTO> itemList =
                     dao.getSparePartsByMaintenance(maintenanceId);
+
             double spareTotal = itemList.stream()
                     .mapToDouble(i -> i.getTotal().doubleValue())
                     .sum();
@@ -30,7 +34,6 @@ public class AdminAddInvoiceServlet extends HttpServlet {
             request.setAttribute("maintenance", maintenance);
             request.setAttribute("itemList", itemList);
             request.setAttribute("spareTotal", spareTotal);
-
         }
 
         request.getRequestDispatcher(
@@ -44,15 +47,28 @@ public class AdminAddInvoiceServlet extends HttpServlet {
 
         InvoiceDAO dao = new InvoiceDAO();
 
-        int maintenanceId = Integer.parseInt(request.getParameter("maintenanceId"));
+        int maintenanceId =
+                Integer.parseInt(request.getParameter("maintenanceId"));
 
-        double laborCost = Double.parseDouble(request.getParameter("laborCost"));
         String description = request.getParameter("description");
-        double spareTotal = dao.getTotalSpareCostByMaintenance(maintenanceId);
-        double totalAmount = spareTotal + laborCost;
+
+        Integer voucherId = null;
+
+        String voucherRaw = request.getParameter("voucherId");
+
+        if (voucherRaw != null && !voucherRaw.isEmpty()) {
+            voucherId = Integer.parseInt(voucherRaw);
+        }
+        double laborCost = dao.getLaborCostByMaintenance(maintenanceId);
+
+        double spareTotal =
+                dao.getTotalSpareCostByMaintenance(maintenanceId);
+
+        double totalAmount = laborCost + spareTotal;
+
         dao.insertInvoice(
                 maintenanceId,
-                null,
+                voucherId,
                 laborCost,
                 0,
                 totalAmount,
