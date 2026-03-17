@@ -77,21 +77,21 @@
 
                         <!-- Comment -->
 
-<div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex justify-content-between align-items-start">
 
-    <p class="mb-3">${f.comment}</p>
+                            <p class="mb-3">${f.comment}</p>
 
-    <a class="btn btn-sm btn-outline-primary"
-       href="${pageContext.request.contextPath}/customer/feedback/edit?id=${f.id}">
-        Edit
-    </a>
+                            <a class="btn btn-sm btn-outline-primary"
+                               href="${pageContext.request.contextPath}/customer/feedback/edit?id=${f.id}">
+                                Edit
+                            </a>
 
-</div>
+                        </div>
                         <!-- Images -->
                         <c:if test="${not empty f.images}">
                             <div class="d-flex gap-3 flex-wrap">
                                 <c:forEach items="${f.images}" var="img">
-                                    <img src="${img.imageUrl}"
+                                    <img src="${pageContext.request.contextPath}/${img.imageUrl}"
                                          width="120"
                                          class="rounded border">
                                 </c:forEach>

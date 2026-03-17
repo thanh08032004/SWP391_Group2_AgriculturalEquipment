@@ -133,7 +133,7 @@
 
                                 <div>
 
-                                    <img src="${img.imageUrl}" class="feedback-image">
+                                    <img src="${pageContext.request.contextPath}/${img.imageUrl}" class="feedback-image">
 
                                     <div class="text-center mt-1">
 
