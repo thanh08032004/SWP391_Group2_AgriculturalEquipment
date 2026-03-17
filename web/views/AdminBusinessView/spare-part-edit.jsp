@@ -12,7 +12,7 @@
             <jsp:include page="/common/side-bar.jsp"></jsp:include>
                 <div class="admin-content p-4 w-100">
                     <div class="card shadow-sm mx-auto" style="max-width: 900px;">
-                        <div class="card-header bg-primary text-white py-3"><h5 class="mb-0">Edit Component: ${part.partCode}</h5></div>
+                        <div class="card-header bg-primary text-white py-3"><h5 class="mb-0">Edit Spare Part: ${part.partCode}</h5></div>
                     <div class="card-body p-4">
                         <form action="spare-parts?action=update" method="post" enctype="multipart/form-data">
                             <input type="hidden" name="id" value="${part.id}">
@@ -85,6 +85,8 @@
                 </div>
             </div>
         </div>
+                <jsp:include page="/common/scripts.jsp"></jsp:include>
+
         <script>
             document.getElementById('imageInput').onchange = evt => {
                 const [file] = document.getElementById('imageInput').files;
