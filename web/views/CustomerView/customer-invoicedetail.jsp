@@ -93,17 +93,35 @@
 
                     <div class="info-row">
                         <div class="info-label">Maintenance ID</div>
-                        <div class="info-value">${invoice.maintenanceId}</div>
+                        <div class="info-value">
+                            <a href="javascript:void(0)"
+                               onclick="showMaintenanceDetail(${invoice.maintenanceId})"
+                               class="text-primary fw-bold">
+                                ${invoice.maintenanceId}
+                            </a>
+                        </div>
                     </div>
 
                     <div class="info-row">
                         <div class="info-label">Customer</div>
-                        <div class="info-value">${invoice.customerName}</div>
+                        <div class="info-value">
+                            <a href="javascript:void(0)"
+                               onclick="showCustomerDetail(${invoice.customerId})"
+                               class="text-primary fw-bold">
+                                ${invoice.customerName}
+                            </a>
+                        </div>
                     </div>
 
                     <div class="info-row">
                         <div class="info-label">Technician</div>
-                        <div class="info-value">${invoice.technicianName}</div>
+                        <div class="info-value">
+                            <a href="javascript:void(0)"
+                               onclick="showCustomerDetail(${invoice.technicianId})"
+                               class="text-primary fw-bold">
+                                ${invoice.technicianName}
+                            </a>
+                        </div>
                     </div>
 
                     <div class="info-row">
@@ -135,7 +153,6 @@
                     </div>
 
                 </div>
-
             </div>
             <!-- ===== Spare Parts ===== -->
             <div class="card mt-4">
@@ -187,32 +204,24 @@
                             <fmt:formatNumber value="${totalSpare}" type="number"/> đ
                         </div>
                     </div>
-
                     <div class="info-row">
                         <div class="info-label">Labor Cost</div>
                         <div class="money">
                             <fmt:formatNumber value="${invoice.laborCost}" type="number"/> đ
                         </div>
                     </div>
-
                     <!-- Apply Voucher -->
                     <c:if test="${invoice.paymentStatus eq 'UNPAID'}">
-
                         <form method="post"
                               action="${pageContext.request.contextPath}/customer/invoice/detail">
-
                             <input type="hidden"
                                    name="invoiceId"
                                    value="${invoice.invoiceId}" />
-
                             <div class="info-row align-items-center">
-
                                 <div class="info-label">
                                     Voucher
                                 </div>
-
                                 <div style="display:flex; gap:8px; align-items:center;">
-
                                     <select name="voucherId"
                                             class="form-select form-select-sm"
                                             style="width:220px;">
@@ -222,51 +231,111 @@
                                                 ${v.code} (-${v.discountValue} ${v.discountType})
                                             </option>
                                         </c:forEach>
-
                                     </select>
-
                                     <button class="btn btn-primary btn-sm">
                                         Apply
                                     </button>
-
                                 </div>
-
                             </div>
-
                         </form>
-
                     </c:if>
-
-
                     <div class="info-row">
                         <div class="info-label">Voucher Discount</div>
                         <div class="text-danger">
                             -<fmt:formatNumber value="${invoice.discountAmount}" type="number"/> đ
                         </div>
                     </div>
-
                     <div class="info-row fs-5 fw-bold">
                         <div class="info-label">Grand Total</div>
                         <div class="money">
                             <fmt:formatNumber value="${invoice.totalAmount}" type="number"/> đ
                         </div>
                     </div>
-
                 </div>
-
             </div>
-
-
             <div class="text-end mt-3">
-
                 <a href="${pageContext.request.contextPath}/customer/invoice/list"
                    class="btn btn-secondary">
                     Back to Invoice List
                 </a>
-
             </div>
-
         </div>
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
+            <script>
 
+                var CTX = '${pageContext.request.contextPath}';
+                function showMaintenanceDetail(id) {
+                    var modal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
+                    document.getElementById('maintenanceContent').innerHTML =
+                            '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+                    modal.show();
+                    fetch(CTX + '/customer/invoice/detail?action=getMaintenanceDetail&id=' + id)
+                            .then(res => res.json())
+                            .then(m => {
+                                document.getElementById('maintenanceContent').innerHTML =
+                                        '<table class="table table-bordered">' +
+                                        '<tr><th>ID</th><td>' + m.id + '</td></tr>' +
+                                        '<tr><th>Device</th><td>' + m.machineName + '</td></tr>' +
+                                        '<tr><th>Problem</th><td>' + m.problem + '</td></tr>' +
+                                        '<tr><th>Status</th><td>' + m.status + '</td></tr>' +
+                                        '<tr><th>Start Date</th><td>' + m.startDate + '</td></tr>' +
+                                        '<tr><th>Finish Date</th><td>' + m.finishDate + '</td></tr>' +
+                                        '</table>';
+                            })
+                }
+                function showCustomerDetail(id) {
+
+                    var modal = new bootstrap.Modal(document.getElementById('customerModal'));
+
+                    document.getElementById('customerContent').innerHTML =
+                            '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+                    modal.show();
+                    fetch(CTX + '/customer/invoice/detail?action=getCustomerDetail&id=' + id)
+                            .then(res => res.json())
+                            .then(c => {
+                                document.getElementById('customerContent').innerHTML =
+                                        '<div class="text-center mb-3">' +
+                                        '<img src="' + CTX + '/assets/images/avatars/' + (c.avatar || 'default.jpg') + '" class="rounded-circle border" style="width:80px;height:80px;object-fit:cover">' +
+                                        '<h5>' + c.fullname + '</h5>' +
+                                        '</div>' +
+                                        '<table class="table table-bordered">' +
+                                        '<tr><th>Email</th><td>' + c.email + '</td></tr>' +
+                                        '<tr><th>Phone</th><td>' + c.phone + '</td></tr>' +
+                                        '<tr><th>Gender</th><td>' + c.gender + '</td></tr>' +
+                                        '<tr><th>Date of Birth</th><td>' + c.birthDate + '</td></tr>' +
+                                        '<tr><th>Address</th><td>' + c.address + '</td></tr>' +
+                                        '</table>';
+
+                            })
+                }
+        </script>
+        <!-- Maintenance Modal -->
+        <div class="modal fade" id="maintenanceModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            Maintenance Detail
+                        </h5>
+                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="maintenanceContent"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Customer Modal -->
+        <div class="modal fade" id="customerModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            Customer Detail
+                        </h5>
+                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="customerContent"></div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

@@ -16,7 +16,8 @@ public class MaintenanceFeedback {
 
     private int id;
     private String customerName;
-    private String maintenanceID;
+    private String deviceName;
+    private int maintenanceID;
     private String avatarUrl;
     private int rating;
     private String comment;

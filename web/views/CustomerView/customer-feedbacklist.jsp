@@ -62,7 +62,7 @@
 
                         <!-- Machine Name -->
                         <h5 class="fw-bold text-primary">
-                            ${f.maintenanceID}
+                            ${f.deviceName}
                         </h5>
 
                         <!-- Rating + Date -->
@@ -76,8 +76,17 @@
                         </div>
 
                         <!-- Comment -->
-                        <p class="mb-3">${f.comment}</p>
 
+<div class="d-flex justify-content-between align-items-start">
+
+    <p class="mb-3">${f.comment}</p>
+
+    <a class="btn btn-sm btn-outline-primary"
+       href="${pageContext.request.contextPath}/customer/feedback/edit?id=${f.id}">
+        Edit
+    </a>
+
+</div>
                         <!-- Images -->
                         <c:if test="${not empty f.images}">
                             <div class="d-flex gap-3 flex-wrap">

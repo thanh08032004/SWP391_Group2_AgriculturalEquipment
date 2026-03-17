@@ -52,7 +52,7 @@ public class CustomerFeedbackServlet extends HttpServlet {
     String rating = request.getParameter("rating");
 
     int page = 1;
-    int pageSize = 5;
+    int pageSize = 3;
 
     if (request.getParameter("page") != null) {
         page = Integer.parseInt(request.getParameter("page"));

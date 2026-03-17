@@ -8,16 +8,16 @@ import model.MaintenanceFeedbackImage;
 
 public class FeedbackDAO extends DBContext {
 
-  public List<MaintenanceFeedback> getFeedbackByCustomer(
-        int customerId,
-        String keyword,
-        String rating,
-        int page,
-        int pageSize) {
+    public List<MaintenanceFeedback> getFeedbackByCustomer(
+            int customerId,
+            String keyword,
+            String rating,
+            int page,
+            int pageSize) {
 
-    List<MaintenanceFeedback> list = new ArrayList<>();
+        List<MaintenanceFeedback> list = new ArrayList<>();
 
-    String sql = """
+        String sql = """
         SELECT mr.id, mr.rating, mr.comment, mr.created_at,
                d.machine_name
         FROM maintenance_rating mr
@@ -26,61 +26,107 @@ public class FeedbackDAO extends DBContext {
         WHERE mr.customer_id = ?
     """;
 
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        sql += " AND d.machine_name LIKE ?";
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql += " AND d.machine_name LIKE ?";
+        }
+
+        if (rating != null && !rating.isEmpty()) {
+            sql += " AND mr.rating = ?";
+        }
+
+        sql += " ORDER BY mr.created_at DESC LIMIT ?, ?";
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            int index = 1;
+
+            ps.setInt(index++, customerId);
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(index++, "%" + keyword + "%");
+            }
+
+            if (rating != null && !rating.isEmpty()) {
+                ps.setInt(index++, Integer.parseInt(rating));
+            }
+
+            ps.setInt(index++, (page - 1) * pageSize);
+            ps.setInt(index, pageSize);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                MaintenanceFeedback f = new MaintenanceFeedback();
+
+                f.setId(rs.getInt("id"));
+                f.setRating(rs.getInt("rating"));
+                f.setComment(rs.getString("comment"));
+                f.setCreatedDate(rs.getDate("created_at"));
+                f.setDeviceName(rs.getString("machine_name"));
+                f.setImages(getImagesByRatingId(f.getId()));
+
+                list.add(f);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
-    if (rating != null && !rating.isEmpty()) {
-        sql += " AND mr.rating = ?";
-    }
+    public MaintenanceFeedback getFeedbackById(int id) {
 
-    sql += " ORDER BY mr.created_at DESC LIMIT ?, ?";
+    String sql = """
+        SELECT mr.id,
+               mr.rating,
+               mr.comment,
+               mr.created_at,
+               mr.maintenance_id,
+               d.machine_name
+        FROM maintenance_rating mr
+        JOIN maintenance m ON mr.maintenance_id = m.id
+        JOIN device d ON m.device_id = d.id
+        WHERE mr.id = ?
+    """;
 
     try (Connection con = getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
 
-        int index = 1;
-
-        ps.setInt(index++, customerId);
-
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            ps.setString(index++, "%" + keyword + "%");
-        }
-
-        if (rating != null && !rating.isEmpty()) {
-            ps.setInt(index++, Integer.parseInt(rating));
-        }
-
-        ps.setInt(index++, (page - 1) * pageSize);
-        ps.setInt(index, pageSize);
+        ps.setInt(1, id);
 
         ResultSet rs = ps.executeQuery();
 
-        while (rs.next()) {
+        if (rs.next()) {
 
             MaintenanceFeedback f = new MaintenanceFeedback();
 
             f.setId(rs.getInt("id"));
+            f.setMaintenanceID(rs.getInt("maintenance_id"));
+            f.setDeviceName(rs.getString("machine_name"));
             f.setRating(rs.getInt("rating"));
             f.setComment(rs.getString("comment"));
-            f.setCreatedDate(rs.getDate("created_at"));
-            f.setMaintenanceID(rs.getString("machine_name"));
+            f.setCreatedDate(rs.getTimestamp("created_at"));
+
+            // 🔥 LOAD IMAGES
             f.setImages(getImagesByRatingId(f.getId()));
 
-            list.add(f);
+            return f;
         }
 
     } catch (Exception e) {
         e.printStackTrace();
     }
 
-    return list;
+    return null;
 }
-public int countFeedbackByCustomer(int customerId, String keyword, String rating) {
 
-    int total = 0;
+    public int countFeedbackByCustomer(int customerId, String keyword, String rating) {
 
-    String sql = """
+        int total = 0;
+
+        String sql = """
         SELECT COUNT(*)
         FROM maintenance_rating mr
         JOIN maintenance m ON mr.maintenance_id = m.id
@@ -88,73 +134,72 @@ public int countFeedbackByCustomer(int customerId, String keyword, String rating
         WHERE mr.customer_id = ?
     """;
 
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        sql += " AND d.machine_name LIKE ?";
-    }
-
-    if (rating != null && !rating.isEmpty()) {
-        sql += " AND mr.rating = ?";
-    }
-
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-
-        int index = 1;
-
-        ps.setInt(index++, customerId);
-
         if (keyword != null && !keyword.trim().isEmpty()) {
-            ps.setString(index++, "%" + keyword + "%");
+            sql += " AND d.machine_name LIKE ?";
         }
 
         if (rating != null && !rating.isEmpty()) {
-            ps.setInt(index++, Integer.parseInt(rating));
+            sql += " AND mr.rating = ?";
         }
 
-        ResultSet rs = ps.executeQuery();
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        if (rs.next()) {
-            total = rs.getInt(1);
+            int index = 1;
+
+            ps.setInt(index++, customerId);
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(index++, "%" + keyword + "%");
+            }
+
+            if (rating != null && !rating.isEmpty()) {
+                ps.setInt(index++, Integer.parseInt(rating));
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return total;
     }
 
-    return total;
-}
     private List<MaintenanceFeedbackImage> getImagesByRatingId(int ratingId) {
-    List<MaintenanceFeedbackImage> images = new ArrayList<>();
+        List<MaintenanceFeedbackImage> images = new ArrayList<>();
 
-    String sql = """
+        String sql = """
         SELECT id, rating_id, image_url 
         FROM maintenance_rating_image 
         WHERE rating_id = ?
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, ratingId);
-        ResultSet rs = ps.executeQuery();
+            ps.setInt(1, ratingId);
+            ResultSet rs = ps.executeQuery();
 
-        while (rs.next()) {
-            MaintenanceFeedbackImage img = MaintenanceFeedbackImage.builder()
-                    .id(rs.getInt("id"))
-                    .feedbackId(rs.getInt("rating_id"))
-                    .imageUrl(rs.getString("image_url"))
-                    .build();
+            while (rs.next()) {
+                MaintenanceFeedbackImage img = MaintenanceFeedbackImage.builder()
+                        .id(rs.getInt("id"))
+                        .feedbackId(rs.getInt("rating_id"))
+                        .imageUrl(rs.getString("image_url"))
+                        .build();
 
-            images.add(img);
+                images.add(img);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return images;
     }
 
-    return images;
-}
-    
     public int insertFeedback(int maintenanceId, int customerId, int rating, String comment) {
 
         String sql = """
@@ -163,8 +208,7 @@ public int countFeedbackByCustomer(int customerId, String keyword, String rating
                 VALUES (?, ?, ?, ?)
                 """;
 
-        try (Connection conn = new DBContext().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, maintenanceId);
             ps.setInt(2, customerId);
@@ -194,8 +238,7 @@ public int countFeedbackByCustomer(int customerId, String keyword, String rating
                 VALUES (?, ?)
                 """;
 
-        try (Connection conn = new DBContext().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             for (String img : images) {
 
@@ -209,5 +252,47 @@ public int countFeedbackByCustomer(int customerId, String keyword, String rating
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void updateFeedback(int id, int rating, String comment) {
+
+        String sql = """
+        UPDATE maintenance_rating
+        SET rating = ?, comment = ?
+        WHERE id = ?
+    """;
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, rating);
+            ps.setString(2, comment);
+            ps.setInt(3, id);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteImages(List<Integer> ids) {
+
+        String sql = "DELETE FROM maintenance_rating_image WHERE id = ?";
+
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            for (int id : ids) {
+
+                ps.setInt(1, id);
+                ps.addBatch();
+
+            }
+
+            ps.executeBatch();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
