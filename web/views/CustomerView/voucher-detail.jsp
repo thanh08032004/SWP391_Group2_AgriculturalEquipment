@@ -109,16 +109,7 @@
                                             </span>
                                         </c:otherwise>
                                     </c:choose>
-                                </div>
-                                
-<!--                                 Assigned At 
-                                <h6 class="fw-bold text-primary mb-3">Assigned At</h6>
-                                <div class="border rounded p-3 mb-4 bg-light">
-                                    <tr>
-                                        <th class="bg-light" style="width: 30%">Time</th>
-                                        <td>${voucher.assignedAt}</td>
-                                    </tr>
-                                </div>-->
+                                </div>                                                           
 
                             </c:if>
 

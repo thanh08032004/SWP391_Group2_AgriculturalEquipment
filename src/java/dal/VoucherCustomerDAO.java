@@ -17,7 +17,7 @@ public class VoucherCustomerDAO extends DBContext {
         WHERE v.is_active = TRUE
         AND (
                 v.voucher_type = 'GLOBAL'
-             OR cv.customer_id IS NOT NULL
+            OR cv.customer_id IS NOT NULL
         )
         AND (cv.is_used = 0 OR cv.is_used IS NULL)
         AND v.code LIKE ?
@@ -53,7 +53,7 @@ public class VoucherCustomerDAO extends DBContext {
         List<Voucher> list = new ArrayList<>();
 
         String sql = """
-        SELECT v.*
+        SELECT DISTINCT v.*
         FROM voucher v
         LEFT JOIN customer_voucher cv
         ON v.id = cv.voucher_id AND cv.customer_id = ?
@@ -64,7 +64,8 @@ public class VoucherCustomerDAO extends DBContext {
         )
         AND (cv.is_used = 0 OR cv.is_used IS NULL)
         AND v.code LIKE ?
-        LIMIT ?, ?
+        ORDER BY v.id DESC
+        LIMIT ?, ? 
     """;
 
         try {
@@ -113,8 +114,9 @@ public class VoucherCustomerDAO extends DBContext {
                      LEFT JOIN customer_voucher cv
                      ON v.id = cv.voucher_id AND cv.customer_id = ?
                      WHERE v.id = ?
-                     AND (
-                           v.voucher_type = 'GLOBAL'
+                     AND v.is_active = TRUE
+                     AND (cv.is_used = 0 OR cv.is_used IS NULL)
+                     AND (v.voucher_type = 'GLOBAL'
                         OR cv.customer_id IS NOT NULL
                      )
                      """;
@@ -122,8 +124,8 @@ public class VoucherCustomerDAO extends DBContext {
         try {
             Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setInt(1, id);
-            ps.setInt(2, customer_id);
+            ps.setInt(1, customer_id);
+            ps.setInt(2, id);
 
             ResultSet rs = ps.executeQuery();
 

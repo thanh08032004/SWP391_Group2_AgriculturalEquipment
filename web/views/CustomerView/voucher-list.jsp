@@ -131,7 +131,7 @@
                                     <c:if test="${currentPage > 1}">
                                         <li class="page-item">
                                             <a class="page-link"
-                                               href="${pageContext.request.contextPath}/customer/vouchers?page=${currentPage - 1}">
+                                               href="${pageContext.request.contextPath}/customer/vouchers?page=${currentPage - 1}&keyword=${keyword}">
                                                 &laquo;
                                             </a>
                                         </li>
@@ -149,7 +149,7 @@
                                     <c:if test="${currentPage < totalPage}">
                                         <li class="page-item">
                                             <a class="page-link"
-                                               href="${pageContext.request.contextPath}/customer/vouchers?page=${currentPage + 1}">
+                                               href="${pageContext.request.contextPath}/customer/vouchers?page=${currentPage + 1}&keyword=${keyword}">
                                                 &raquo;
                                             </a>
                                         </li>

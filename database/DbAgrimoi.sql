@@ -9,7 +9,8 @@ CREATE TABLE role (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,   -- ADMIN_SYSTEM, ADMIN_BUSINESS...
   description TEXT,
-  active BOOLEAN DEFAULT TRUE
+  active BOOLEAN DEFAULT TRUE,
+  prefix VARCHAR(50)
 ) ENGINE=InnoDB;
 
 -- =================================================
@@ -164,10 +165,11 @@ CREATE TABLE maintenance (
   description TEXT,
   technician_note TEXT,
   labor_hours DECIMAL(5,2) DEFAULT 0,
+  labor_cost_per_hour DECIMAL(10,2) DEFAULT 100000,
   status ENUM('READY', 'PENDING', 'WAITING_FOR_TECHNICIAN', 'TECHNICIAN_ACCEPTED','TECHNICIAN_SUBMITTED', 'DIAGNOSIS READY', 'IN_PROGRESS', 'DONE') DEFAULT 'READY',
   image VARCHAR(255),
-  start_date DATE NOT NULL,
-  end_date DATE,
+  start_date DATETIME NOT NULL,
+  end_date DATETIME,
   FOREIGN KEY (device_id) REFERENCES device(id) ON DELETE CASCADE,
   FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
@@ -180,11 +182,12 @@ CREATE TABLE spare_part (
   part_code VARCHAR(50) NOT NULL UNIQUE,
   name VARCHAR(150) NOT NULL,
   description TEXT,
-  unit VARCHAR(50),
+  unit ENUM('Cái', 'Bộ', 'Chiếc', 'Hộp', 'Lít', 'Mét', 'Kg') NOT NULL,
   price DECIMAL(12,2) NOT NULL,
-  image VARCHAR(255)
+  image VARCHAR(255),
+  active BOOLEAN DEFAULT TRUE
 ) ENGINE=InnoDB;
-
+-- sp1
 -- =================================================
 -- 13. INVENTORY – kho linh kiện
 -- =================================================
@@ -269,20 +272,23 @@ voucher_id INT NULL,
 -- =================================================
 CREATE TABLE contract (
   id INT AUTO_INCREMENT PRIMARY KEY,
-
-  contract_code VARCHAR(50) NOT NULL UNIQUE, -- mã hợp đồng
-  customer_id INT NOT NULL,                  -- khách hàng ký hợp đồng
-
-  signed_at DATE NOT NULL,                   -- ngày ký
-  total_value DECIMAL(12,2) NOT NULL,        -- tổng giá trị hợp đồng
-
-  status ENUM('ACTIVE','COMPLETED','CANCELED') DEFAULT 'ACTIVE',
+  contract_code VARCHAR(50) NOT NULL UNIQUE,
+  customer_id INT NOT NULL,      -- bên B (khách hàng)
+  party_a VARCHAR(255),          -- bên A (công ty)
+  signed_at DATE NOT NULL,       -- ngày ký
+  effective_date DATE,           -- ngày hiệu lực
+  expiry_date DATE,              -- ngày hết hạn
+  total_value DECIMAL(12,2) NOT NULL,
+  payment_terms VARCHAR(255),    -- điều khoản thanh toán
+  description TEXT,              -- mô tả hợp đồng
+  status ENUM('DRAFT','ACTIVE','COMPLETED','CANCELED') DEFAULT 'DRAFT',
+  file_url VARCHAR(255),         -- file PDF hợp đồng
+  created_by INT,                -- nhân viên tạo
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
   FOREIGN KEY (customer_id)
     REFERENCES users(id)
     ON DELETE RESTRICT
-) ENGINE=InnoDB;
+);
 
 -- =================================================
 -- 18. CONTRACT_DEVICE – thiết bị thuộc hợp đồng
@@ -389,61 +395,63 @@ CREATE TABLE maintenance_rating_image (
 
 -- t1
 -- insert data
-INSERT INTO role (name, description, active) VALUES
-('ADMIN_SYSTEM',   'Quản trị toàn hệ thống', TRUE),
-('ADMIN_BUSINESS', 'Quản lý vận hành, báo cáo, nhân sự', TRUE),
-('TECHNICIAN',     'Nhân viên bảo trì', TRUE),
-('CUSTOMER',       'Khách hàng sử dụng dịch vụ', TRUE),
-('TECHLEADER',     'Trưởng ban kĩ thuật (bảo trì)',TRUE )
-;
+INSERT INTO role (name, description, active, prefix) VALUES
+('ADMIN_SYSTEM',   'Quản trị toàn hệ thống', TRUE, '/admin/'),
+('ADMIN_BUSINESS', 'Quản lý vận hành, báo cáo, nhân sự', TRUE, '/admin-business/'),
+('TECHNICIAN',     'Nhân viên bảo trì', TRUE, '/technician/'),
+('CUSTOMER',       'Khách hàng sử dụng dịch vụ', TRUE, '/customer/'),
+('TECHLEADER',     'Trưởng ban kĩ thuật (bảo trì)', TRUE, '/leader/');
 INSERT INTO permission (code, name, description) VALUES
-('/admin/users',              'Quản lý user',        'Xem / thêm / sửa / khóa user'),
-('/admin/roles',              'Quản lý role',        'Quản lý role'),
-('/admin/permissions',        'Quản lý permission',  'Quản lý quyền'),
-('/system/config',            'Cấu hình hệ thống',   'Cấu hình toàn hệ thống'),
-
+('/admin/user',              'Quản lý user',        'Xem / thêm / sửa / khóa user'),
+('/admin/role',              'Quản lý role',        'Quản lý role'),
+('/admin/system/config',            'Cấu hình hệ thống',   'Cấu hình toàn hệ thống'),
 ('/admin/customers',          'Quản lý khách hàng',  'Xem & quản lý khách'),
 ('/admin/devices',            'Quản lý thiết bị',    'Quản lý máy móc'),
 ('/admin/maintenance',        'Quản lý bảo trì',     'Phân công bảo trì'),
-('/admin/reports',            'Xem báo cáo',         'Xem thống kê'),
-
-('/tech/maintenance',         'Xem bảo trì',         'Xem công việc'),
-('/tech/maintenance/update',  'Cập nhật bảo trì',   'Cập nhật trạng thái'),
-
+('/admin-business/reports',            'Xem báo cáo',         'Xem thống kê'),
+('/technician/maintenance',         'Xem bảo trì',         'Xem công việc'),
+('/technician/maintenance/update',  'Cập nhật bảo trì',   'Cập nhật trạng thái'),
 ('/customer/devices',         'Xem thiết bị',        'Xem thiết bị của tôi'),
 ('/customer/vouchers',        'Xem voucher',         'Xem voucher'),
-('/customer/rating',          'Đánh giá',            'Đánh giá thiết bị');
+('/admin-business/dashboard','Admin Business Dashboard','Trang dashboard business'),
+('/admin-business/devices','Quản lý thiết bị business','Business quản lý thiết bị'),
+('/admin-business/categories','Quản lý category','Quản lý loại thiết bị'),
+('/admin-business/brands','Quản lý brand','Quản lý hãng thiết bị'),
+('/admin-business/vouchers','Quản lý voucher','Quản lý voucher'),
+('/admin-business/spare-parts','Quản lý linh kiện','Quản lý spare part'),
+('/admin-business/contracts','Quản lý hợp đồng','Quản lý contract'),
+('/admin-business/maintenance','Quản lý bảo trì business','Quản lý maintenance'),
+('/admin-business/invoice','Quản lý invoice','Tất cả chức năng invoice'),
+('/technician/home','Trang technician','Trang chủ technician'),
+('/technician/mytask','Công việc technician','Danh sách task'),
+('/leader/maintenance','Leader quản lý maintenance','Leader maintenance'),
+('/customer/home','Trang chủ customer','Customer dashboard'),
+('/customer/invoice','Xem invoice','Customer xem hóa đơn'),
+('/customer/maintenance','Xem bảo trì','Customer maintenance'),
+('/customer/feedback','Feedback thiết bị','Customer feedback');
 
 INSERT INTO role_permission (role_id, permission_id)
-SELECT 1, id FROM permission
-WHERE code IN (
-  '/admin/users',
-  '/admin/roles',
-  '/admin/permissions',
-  '/system/config'
-);
+SELECT 1, id
+FROM permission
+WHERE code LIKE '/admin/%';
 
 INSERT INTO role_permission (role_id, permission_id)
-SELECT 2, id FROM permission
-WHERE code IN (
-  '/admin/customers',
-  '/admin/devices',
-  '/admin/maintenance',
-  '/admin/reports'
-);
+SELECT 2, id
+FROM permission
+WHERE code LIKE '/admin-business/%';
+
 INSERT INTO role_permission (role_id, permission_id)
-SELECT 3, id FROM permission
-WHERE code IN (
-  '/tech/maintenance',
-  '/tech/maintenance/update'
-);
+SELECT 3, id
+FROM permission
+WHERE code LIKE '/technician/%';
 INSERT INTO role_permission (role_id, permission_id)
-SELECT 4, id FROM permission
-WHERE code IN (
-  '/customer/devices',
-  '/customer/vouchers',
-  '/customer/rating'
-);
+SELECT 4, id
+FROM permission
+WHERE code LIKE '/customer/%';
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 5, id
+FROM permission
+WHERE code LIKE '/leader/%';
 INSERT INTO users (username, password, role_id) VALUES
 ('admin','$2a$10$FVDjXIMwma2lrHkABJpi2O62ydScIgVsJ9oxzdRZAAX/Cl7wM7fa6', 1),
 ('business','$2a$10$FVDjXIMwma2lrHkABJpi2O62ydScIgVsJ9oxzdRZAAX/Cl7wM7fa6', 2),
@@ -683,43 +691,85 @@ VALUES
 INSERT INTO contract (
   contract_code,
   customer_id,
+  party_a,
   signed_at,
+  effective_date,
+  expiry_date,
   total_value,
-  status
+  payment_terms,
+  description,
+  status,
+  file_url,
+  created_by
 ) VALUES (
   'HD-2026-001',
   4,
+  'AgriCMS Company',
   '2026-02-01',
+  '2026-02-01',
+  '2029-02-01',
   1470000000.00,
-  'ACTIVE'
+  'Thanh toán 50% khi ký, 50% khi bàn giao',
+  'Hợp đồng mua máy cày và máy gặt',
+  'ACTIVE',
+  '300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
+  2
 );
 
 INSERT INTO contract (
   contract_code,
   customer_id,
+  party_a,
   signed_at,
+  effective_date,
+  expiry_date,
   total_value,
-  status
+  payment_terms,
+  description,
+  status,
+  file_url,
+  created_by
 ) VALUES (
   'HD-2026-002',
   7,
+  'AgriCMS Company',
   '2026-02-05',
+  '2026-02-05',
+  '2028-02-05',
   700000000.00,
-  'COMPLETED'
+  'Thanh toán một lần',
+  'Hợp đồng mua máy phun thuốc',
+  'COMPLETED',
+  '300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
+  2
 );
 
 INSERT INTO contract (
   contract_code,
   customer_id,
+  party_a,
   signed_at,
+  effective_date,
+  expiry_date,
   total_value,
-  status
+  payment_terms,
+  description,
+  status,
+  file_url,
+  created_by
 ) VALUES (
   'HD-2026-003',
   8,
+  'AgriCMS Company',
   '2026-02-10',
+  '2026-02-10',
+  '2029-02-10',
   1500000000.00,
-  'ACTIVE'
+  'Thanh toán theo 3 đợt',
+  'Hợp đồng mua máy gặt New Holland',
+  'ACTIVE',
+  '300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
+  2
 );
 
 INSERT INTO contract_device (
@@ -748,6 +798,14 @@ INSERT INTO contract_device (
   delivery_date
 ) VALUES
 (3, 8, 1500000000.00, '2026-02-25');
+INSERT INTO permission (code, name, description)
+VALUES ('/admin/password-reset','Reset mật khẩu user','Admin reset mật khẩu');
+
 -- ========================================================================== --
+INSERT INTO permission (code, name, description)
+VALUES ('/customer/contract/list','Danh sách hợp đồng của chính customer','Khách hàng xem danh sách hợp đồng của chính mình');
+
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (4, 29);
 
 

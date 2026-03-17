@@ -78,20 +78,29 @@ public class CustomerVoucherServlet extends HttpServlet {
                 break;
 
             // ================= DETAIL =================
-            case "detail": 
-                //check id null
+            case "detail":
+
                 String idParam = req.getParameter("id");
 
-                if (idParam == null) {
+                // check null hoặc rỗng
+                if (idParam == null || idParam.trim().isEmpty()) {
                     resp.sendRedirect(req.getContextPath() + "/customer/vouchers");
                     return;
                 }
 
-                int id = Integer.parseInt(idParam);
-                
+                int id;
+
+                // bắt lỗi parse
+                try {
+                    id = Integer.parseInt(idParam);
+                } catch (NumberFormatException e) {
+                    resp.sendRedirect(req.getContextPath() + "/customer/vouchers");
+                    return;
+                }
+
                 Voucher voucher = dao.getVoucherByIdAndUser(id, user.getId());
-                
-                //check voucher null
+
+                // nếu không có voucher
                 if (voucher == null) {
                     resp.sendRedirect(req.getContextPath() + "/customer/vouchers");
                     return;
@@ -101,6 +110,7 @@ public class CustomerVoucherServlet extends HttpServlet {
 
                 req.getRequestDispatcher("/views/CustomerView/voucher-detail.jsp")
                         .forward(req, resp);
+
                 break;
         }
     }

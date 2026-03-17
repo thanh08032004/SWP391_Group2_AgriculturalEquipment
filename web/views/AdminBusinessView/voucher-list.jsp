@@ -109,7 +109,7 @@
                                                 </c:choose>
                                             </td>
 
-                                            <td class="text-center">${v.minServicePrice}</td>
+                                            <td class="text-center">${v.minServicePrice} VND</td>
 
                                             <td class="text-center">${v.voucherType}</td>
 
