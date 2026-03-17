@@ -75,6 +75,57 @@ public class FeedbackDAO extends DBContext {
 
         return list;
     }
+public boolean hasFeedbackByMaintenance(int maintenanceId) {
+    String sql = """
+        SELECT 1 FROM maintenance_rating 
+        WHERE maintenance_id = ?
+        LIMIT 1
+    """;
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, maintenanceId);
+        ResultSet rs = ps.executeQuery();
+        return rs.next(); // có record là true
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+public MaintenanceFeedback getFeedbackByMaintenanceId(int maintenanceId) {
+    String sql = """
+        SELECT mr.id, mr.rating, mr.comment, mr.created_at,
+               d.machine_name, mr.maintenance_id
+        FROM maintenance_rating mr
+        JOIN maintenance m ON mr.maintenance_id = m.id
+        JOIN device d ON m.device_id = d.id
+        WHERE mr.maintenance_id = ?
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, maintenanceId);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            MaintenanceFeedback f = new MaintenanceFeedback();
+            f.setId(rs.getInt("id"));
+            f.setRating(rs.getInt("rating"));
+            f.setComment(rs.getString("comment"));
+            f.setCreatedDate(rs.getTimestamp("created_at"));
+            f.setDeviceName(rs.getString("machine_name"));
+            f.setMaintenanceID(rs.getInt("maintenance_id"));
+            f.setImages(getImagesByRatingId(f.getId()));
+            return f;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
 
     public MaintenanceFeedback getFeedbackById(int id) {
 
@@ -295,4 +346,5 @@ public class FeedbackDAO extends DBContext {
         }
 
     }
+    
 }

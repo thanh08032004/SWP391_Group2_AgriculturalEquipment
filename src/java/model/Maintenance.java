@@ -11,6 +11,7 @@ public class Maintenance {
     private int id;
     private int deviceId;
     private int technicianId;
+    private boolean hasFeedback;
     private String technicianName;
     private  int customerId;
     private String description;

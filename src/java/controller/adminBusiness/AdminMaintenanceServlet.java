@@ -1,6 +1,7 @@
 package controller.adminBusiness;
 
 import dal.DeviceDAO;
+import dal.FeedbackDAO;
 import dal.MaintenanceDAO;
 import dal.UserProfileDAO;
 import dto.DeviceDTO;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import model.Maintenance;
+import model.MaintenanceFeedback;
 import model.UserProfile;
 
 public class AdminMaintenanceServlet extends HttpServlet {
@@ -18,6 +20,10 @@ public class AdminMaintenanceServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
+if ("feedback-detail".equals(action)) {
+    handleFeedbackDetailPage(request, response);
+    return;
+}
         MaintenanceDAO dao = new MaintenanceDAO();
         DeviceDAO dDao = new DeviceDAO();
         if ("getDeviceDetail".equals(action)) {
@@ -100,7 +106,19 @@ public class AdminMaintenanceServlet extends HttpServlet {
             request.getRequestDispatcher("/views/AdminBusinessView/maintenance-list.jsp").forward(request, response);
         }
     }
+private void handleFeedbackDetailPage(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
+   int id = Integer.parseInt(request.getParameter("id"));
+
+    FeedbackDAO fDao = new FeedbackDAO();
+    MaintenanceFeedback f = fDao.getFeedbackByMaintenanceId(id);
+
+    request.setAttribute("feedback", f);
+
+    request.getRequestDispatcher("/views/TechLeaderView/feedback-detail.jsp")
+           .forward(request, response);
+}
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");

@@ -1,6 +1,7 @@
 package controller.techLeader;
 
 import dal.DeviceDAO;
+import dal.FeedbackDAO;
 import dal.MaintenanceDAO;
 import dal.UserProfileDAO;
 import dto.DeviceDTO;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import model.Maintenance;
+import model.MaintenanceFeedback;
+import model.MaintenanceFeedbackImage;
 import model.UserProfile;
 
 public class LeaderMaintenanceServlet extends HttpServlet {
@@ -20,8 +23,10 @@ public class LeaderMaintenanceServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        if (action == null) action = "list";
-        
+        if (action == null) {
+            action = "list";
+        }
+
         MaintenanceDAO dao = new MaintenanceDAO();
         DeviceDAO dDao = new DeviceDAO();
 
@@ -29,15 +34,17 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             case "getDeviceDetail":
                 handleGetDeviceDetail(request, response, dDao);
                 break;
-                
+
             case "getCustomerDetail":
                 handleGetCustomerDetail(request, response);
                 break;
-                
+
             case "detail":
                 handleViewDetail(request, response, dao);
                 break;
-                
+            case "feedback-detail":
+    handleFeedbackDetailPage(request, response);
+    break;
             case "list":
             default:
                 handleListRequests(request, response, dao);
@@ -53,16 +60,29 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             String json = String.format(
-                "{\"id\":%d, \"name\":\"%s\", \"model\":\"%s\", \"serial\":\"%s\", \"status\":\"%s\", \"image\":\"%s\", \"customer\":\"%s\", \"customerId\":%d}",
-                device.getId(), device.getMachineName(), device.getModel(),
-                device.getSerialNumber(), device.getStatus(), 
-                (device.getImage() != null ? device.getImage() : "default.jpg"),
-                device.getCustomerName(), device.getCustomerId()
+                    "{\"id\":%d, \"name\":\"%s\", \"model\":\"%s\", \"serial\":\"%s\", \"status\":\"%s\", \"image\":\"%s\", \"customer\":\"%s\", \"customerId\":%d}",
+                    device.getId(), device.getMachineName(), device.getModel(),
+                    device.getSerialNumber(), device.getStatus(),
+                    (device.getImage() != null ? device.getImage() : "default.jpg"),
+                    device.getCustomerName(), device.getCustomerId()
             );
             response.getWriter().write(json);
         }
     }
 
+   private void handleFeedbackDetailPage(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+
+    int id = Integer.parseInt(request.getParameter("id"));
+
+    FeedbackDAO fDao = new FeedbackDAO();
+    MaintenanceFeedback f = fDao.getFeedbackByMaintenanceId(id);
+
+    request.setAttribute("feedback", f);
+
+    request.getRequestDispatcher("/views/TechLeaderView/feedback-detail.jsp")
+           .forward(request, response);
+}
     private void handleGetCustomerDetail(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(request.getParameter("customerId"));
         UserProfileDAO uProfileDao = new UserProfileDAO();
@@ -72,13 +92,13 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             String json = String.format(
-                "{\"fullname\":\"%s\", \"phone\":\"%s\", \"email\":\"%s\", \"address\":\"%s\", \"avatar\":\"%s\", \"role\":\"%s\"}",
-                profile.getFullname(),
-                profile.getPhone() != null ? profile.getPhone() : "N/A",
-                profile.getEmail(),
-                profile.getAddress() != null ? profile.getAddress() : "N/A",
-                profile.getAvatar() != null ? profile.getAvatar() : "user.jpg",
-                "CUSTOMER"
+                    "{\"fullname\":\"%s\", \"phone\":\"%s\", \"email\":\"%s\", \"address\":\"%s\", \"avatar\":\"%s\", \"role\":\"%s\"}",
+                    profile.getFullname(),
+                    profile.getPhone() != null ? profile.getPhone() : "N/A",
+                    profile.getEmail(),
+                    profile.getAddress() != null ? profile.getAddress() : "N/A",
+                    profile.getAvatar() != null ? profile.getAvatar() : "user.jpg",
+                    "CUSTOMER"
             );
             response.getWriter().write(json);
         }
@@ -90,7 +110,7 @@ public class LeaderMaintenanceServlet extends HttpServlet {
         Maintenance task = dao.getMaintenanceById(id);
         List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
         List<model.User> technicians = dao.getAllTechnicians();
-        
+
         request.setAttribute("task", task);
         request.setAttribute("items", items);
         request.setAttribute("laborRate", laborRate);
@@ -102,8 +122,12 @@ public class LeaderMaintenanceServlet extends HttpServlet {
         String name = request.getParameter("customerName");
         String status = request.getParameter("status");
 
-        if (name == null) name = "";
-        if (status == null || status.equals("All Status")) status = "";
+        if (name == null) {
+            name = "";
+        }
+        if (status == null || status.equals("All Status")) {
+            status = "";
+        }
 
         int pageSize = 3;
         int pageIndex = 1;
@@ -135,7 +159,7 @@ public class LeaderMaintenanceServlet extends HttpServlet {
         if ("send-to-customer".equals(action)) {
             boolean success = dao.updateStatus(id, "DIAGNOSIS READY");
             response.sendRedirect("maintenance?msg=" + (success ? "sent_success" : "error"));
-            
+
         } else if ("reject-diagnosis".equals(action)) {
             boolean updateStatus = dao.updateStatus(id, "TECHNICIAN_ACCEPTED");
             boolean clearItems = dao.saveMaintenanceItems(id, new ArrayList<>(), new ArrayList<>());
@@ -145,12 +169,12 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             } else {
                 response.sendRedirect(redirectUrl + "&msg=error");
             }
-            
+
         } else if ("assign".equals(action)) {
             String techIdRaw = request.getParameter("technicianId");
             int techId = (techIdRaw == null || techIdRaw.isEmpty()) ? 0 : Integer.parseInt(techIdRaw);
             boolean success = dao.assignTechnician(id, techId);
-            
+
             if ("list".equals(from)) {
                 response.sendRedirect("maintenance?msg=" + (success ? "assign_success" : "error"));
             } else {

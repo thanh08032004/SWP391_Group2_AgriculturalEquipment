@@ -90,9 +90,21 @@
                                     <td>
                                         <c:choose>
                                             <c:when test="${r.status == 'DONE'}">
-                                                <button class="btn btn-sm btn-outline-success">Invoice</button>
+
+                                                <c:choose>
+                                                    <c:when test="${r.hasFeedback}">
+                                                        <a href="${pageContext.request.contextPath}/admin-business/maintenance?action=feedback-detail&id=${r.id}"
+                                                           class="btn btn-sm btn-outline-success">
+                                                            View Feedback
+                                                        </a>
+                                                    </c:when>
+
+                                                    <c:otherwise>
+                                                        <span class="text-muted small">Tracking...</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+
                                             </c:when>
-                                            <c:otherwise><span class="text-muted small">Tracking...</span></c:otherwise>
                                         </c:choose>
                                     </td>
                                 </tr>

@@ -39,7 +39,26 @@
                 border-radius:8px;
                 border:1px solid #ddd;
             }
+            .image-wrapper {
+                position: relative;
+                display: inline-block;
+            }
 
+            .delete-btn {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background: red;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 22px;
+                height: 22px;
+                font-size: 14px;
+                cursor: pointer;
+                line-height: 18px;
+                text-align: center;
+            }
         </style>
 
     </head>
@@ -131,20 +150,24 @@
 
                             <c:forEach items="${feedback.images}" var="img">
 
-                                <div>
+                                <div class="image-wrapper">
 
-                                    <img src="${pageContext.request.contextPath}/${img.imageUrl}" class="feedback-image">
+                                    <img src="${pageContext.request.contextPath}/${img.imageUrl}" 
+                                         class="feedback-image">
 
-                                    <div class="text-center mt-1">
+                                    <!-- hidden checkbox -->
+                                    <input type="checkbox"
+                                           name="deleteImages"
+                                           value="${img.id}"
+                                           id="img_${img.id}"
+                                           style="display:none;">
 
-                                        <label>
-                                            <input type="checkbox"
-                                                   name="deleteImages"
-                                                   value="${img.id}">
-                                            Delete
-                                        </label>
-
-                                    </div>
+                                    <!-- nút X -->
+                                    <button type="button"
+                                            class="delete-btn"
+                                            onclick="markDelete(${img.id}, this)">
+                                        ×
+                                    </button>
 
                                 </div>
 
@@ -193,6 +216,22 @@
         </div>
 
         <jsp:include page="/common/scripts.jsp"/>
+<script>
+    function markDelete(id, btn) {
+        // tìm checkbox tương ứng
+        let checkbox = document.getElementById("img_" + id);
 
+        if (checkbox) {
+            checkbox.checked = true; // tick để submit về server
+        }
+
+        // làm mờ ảnh
+        let wrapper = btn.parentElement;
+        wrapper.style.opacity = "0.4";
+
+        // disable nút X
+        btn.disabled = true;
+    }
+</script>
     </body>
 </html>

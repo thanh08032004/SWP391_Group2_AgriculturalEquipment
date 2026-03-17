@@ -54,52 +54,69 @@ public class MaintenanceDAO extends DBContext {
     }
 
     public List<Maintenance> searchMaintenanceRequestsPaging(String name, String status, int pageIndex, int pageSize) {
-        List<Maintenance> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name ,"
-                + "d.customer_id AS customerId, m.device_id AS deviceId "
-                + "FROM maintenance m "
-                + "JOIN device d ON m.device_id = d.id "
-                + "JOIN user_profile up ON d.customer_id = up.user_id WHERE 1=1 ");
+    List<Maintenance> list = new ArrayList<>();
 
-        if (name != null && !name.trim().isEmpty()) {
-            sql.append(" AND up.fullname LIKE ? ");
-        }
-        if (status != null && !status.trim().isEmpty()) {
-            sql.append(" AND m.status = ? ");
-        }
+    StringBuilder sql = new StringBuilder(
+        "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name, " +
+        "d.customer_id AS customerId, m.device_id AS deviceId, " +
+        "CASE WHEN COUNT(mr.id) > 0 THEN 1 ELSE 0 END AS hasFeedback " +
+        "FROM maintenance m " +
+        "JOIN device d ON m.device_id = d.id " +
+        "JOIN user_profile up ON d.customer_id = up.user_id " +
+        "LEFT JOIN maintenance_rating mr ON m.id = mr.maintenance_id " +
+        "WHERE 1=1 "
+    );
 
-        sql.append(" ORDER BY m.id DESC LIMIT ? OFFSET ?");
-
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
-            int paramIdx = 1;
-            if (name != null && !name.isEmpty()) {
-                ps.setString(paramIdx++, "%" + name + "%");
-            }
-            if (status != null && !status.isEmpty()) {
-                ps.setString(paramIdx++, status);
-            }
-            ps.setInt(paramIdx++, pageSize);
-            ps.setInt(paramIdx++, (pageIndex - 1) * pageSize);
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(Maintenance.builder()
-                        .id(rs.getInt("id"))
-                        .deviceId(rs.getInt("deviceId"))
-                        .customerId(rs.getInt("customerId"))
-                        .machineName(rs.getString("machine_name"))
-                        .modelName(rs.getString("model"))
-                        .customerName(rs.getString("customer_name"))
-                        .status(rs.getString("status"))
-                        .startDate(rs.getTimestamp("start_date"))
-                        .build());
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
+    if (name != null && !name.trim().isEmpty()) {
+        sql.append(" AND up.fullname LIKE ? ");
     }
 
+    if (status != null && !status.trim().isEmpty()) {
+        sql.append(" AND m.status = ? ");
+    }
+
+    sql.append(" GROUP BY m.id "); // 🔥 QUAN TRỌNG (tránh duplicate)
+
+    sql.append(" ORDER BY m.id DESC LIMIT ? OFFSET ?");
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+        int paramIdx = 1;
+
+        if (name != null && !name.trim().isEmpty()) {
+            ps.setString(paramIdx++, "%" + name + "%");
+        }
+
+        if (status != null && !status.trim().isEmpty()) {
+            ps.setString(paramIdx++, status);
+        }
+
+        ps.setInt(paramIdx++, pageSize);
+        ps.setInt(paramIdx++, (pageIndex - 1) * pageSize);
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            list.add(Maintenance.builder()
+                    .id(rs.getInt("id"))
+                    .deviceId(rs.getInt("deviceId"))
+                    .customerId(rs.getInt("customerId"))
+                    .machineName(rs.getString("machine_name"))
+                    .modelName(rs.getString("model"))
+                    .customerName(rs.getString("customer_name"))
+                    .status(rs.getString("status"))
+                    .startDate(rs.getTimestamp("start_date"))
+                    .hasFeedback(rs.getInt("hasFeedback") == 1) // 🔥 THÊM DÒNG NÀY
+                    .build());
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
     // Admin & Customer view device status/diagnostic info
     public Maintenance getMaintenanceById(int id) {
         String sql = "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name,d.customer_id AS customerId "
