@@ -8,6 +8,7 @@ package dal;
  *
  * @author Acer
  */
+import dto.DeviceDTO;
 import model.Contract;
 import java.sql.*;
 import java.util.*;
@@ -70,15 +71,15 @@ public class ContractDAO extends DBContext {
         List<ContractDevice> list = new ArrayList<>();
 
         String sql = """
-        SELECT 
-            d.id,
-            d.machine_name,
-            cd.price,
-            cd.delivery_date
-        FROM contract_device cd
-        JOIN device d ON cd.device_id = d.id
-        WHERE cd.contract_id = ?
-    """;
+            SELECT 
+                d.id,
+                d.machine_name,
+                cd.price,
+                cd.delivery_date
+            FROM contract_device cd
+            JOIN device d ON cd.device_id = d.id
+            WHERE cd.contract_id = ?
+        """;
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
 
@@ -288,6 +289,194 @@ public class ContractDAO extends DBContext {
         }
 
         return null;
+    }
+
+    public int insert(Contract c) {
+
+        String sql = """
+            INSERT INTO contract
+            (contract_code, customer_id, party_a,
+             signed_at, effective_date, expiry_date,
+             total_value, payment_terms, description,
+             status, file_url, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+
+        try (PreparedStatement ps = getConnection()
+                .prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, c.getContractCode());
+            ps.setInt(2, c.getCustomerId());
+            ps.setString(3, c.getPartyA());
+
+            ps.setDate(4, new java.sql.Date(c.getSignedAt().getTime()));
+
+            if (c.getEffectiveDate() != null) {
+                ps.setDate(5, new java.sql.Date(c.getEffectiveDate().getTime()));
+            } else {
+                ps.setNull(5, java.sql.Types.DATE);
+            }
+
+            if (c.getExpiryDate() != null) {
+                ps.setDate(6, new java.sql.Date(c.getExpiryDate().getTime()));
+            } else {
+                ps.setNull(6, java.sql.Types.DATE);
+            }
+
+            if (c.getTotalValue() != null) {
+                ps.setBigDecimal(7, c.getTotalValue());
+            } else {
+                ps.setNull(7, java.sql.Types.DECIMAL);
+            }
+
+            ps.setString(8, c.getPaymentTerms());
+            ps.setString(9, c.getDescription());
+            ps.setString(10, c.getStatus());
+            ps.setString(11, c.getFileUrl());
+            ps.setInt(12, c.getCreatedBy());
+
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1); // contractId
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    public void addDeviceToContract(int contractId, int deviceId) {
+
+        DeviceDAO deviceDAO = new DeviceDAO();
+        DeviceDTO d = deviceDAO.getDeviceById(deviceId);
+
+        if (d == null) {
+            return;
+        }
+
+        String sql = """
+            INSERT INTO contract_device
+            (contract_id, device_id, price, delivery_date)
+            VALUES (?, ?, ?, ?)
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setInt(1, contractId);
+            ps.setInt(2, deviceId);
+
+            // price
+            if (d.getPrice() != null) {
+                ps.setBigDecimal(3, d.getPrice());
+            } else {
+                ps.setNull(3, Types.DECIMAL);
+            }
+
+            // delivery_date
+            if (d.getPurchaseDate() != null) {
+                ps.setDate(4, new java.sql.Date(d.getPurchaseDate().getTime()));
+            } else {
+                ps.setNull(4, Types.DATE);
+            }
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void update(Contract c) {
+
+        String sql = """
+            UPDATE contract SET
+                contract_code = ?,
+                customer_id = ?,
+                party_a = ?,
+                signed_at = ?,
+                effective_date = ?,
+                expiry_date = ?,
+                total_value = ?,
+                payment_terms = ?,
+                description = ?,
+                status = ?,
+                file_url = ?
+            WHERE id = ?
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setString(1, c.getContractCode());
+            ps.setInt(2, c.getCustomerId());
+            ps.setString(3, c.getPartyA());
+            ps.setDate(4, new java.sql.Date(c.getSignedAt().getTime()));
+
+            if (c.getEffectiveDate() != null) {
+                ps.setDate(5, new java.sql.Date(c.getEffectiveDate().getTime()));
+            } else {
+                ps.setNull(5, Types.DATE);
+            }
+
+            if (c.getExpiryDate() != null) {
+                ps.setDate(6, new java.sql.Date(c.getExpiryDate().getTime()));
+            } else {
+                ps.setNull(6, Types.DATE);
+            }
+
+            if (c.getTotalValue() != null) {
+                ps.setBigDecimal(7, c.getTotalValue());
+            } else {
+                ps.setNull(7, Types.DECIMAL);
+            }
+
+            ps.setString(8, c.getPaymentTerms());
+            ps.setString(9, c.getDescription());
+            ps.setString(10, c.getStatus());
+            ps.setString(11, c.getFileUrl());
+            ps.setInt(12, c.getId());
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Integer> getDeviceIdsByContract(int contractId) {
+
+        List<Integer> list = new ArrayList<>();
+        String sql = "SELECT device_id FROM contract_device WHERE contract_id = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, contractId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(rs.getInt("device_id"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public void removeDeviceFromContract(int contractId, int deviceId) {
+
+        String sql = "DELETE FROM contract_device WHERE contract_id = ? AND device_id = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, contractId);
+            ps.setInt(2, deviceId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

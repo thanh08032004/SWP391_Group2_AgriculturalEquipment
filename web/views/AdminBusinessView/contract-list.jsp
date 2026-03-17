@@ -22,18 +22,24 @@
                             <h2 class="fw-bold">
                                 <i class="bi bi-file-earmark-text-fill"></i> Contract Management
                             </h2>
-                        </div>
 
-                        <!-- SEARCH -->
-                        <form method="get" action="contracts" class="row g-2 mb-3">
-                            <input type="hidden" name="action" value="list"/>
+                            <a href="${pageContext.request.contextPath}/admin-business/contracts?action=create"
+                           class="btn btn-primary fw-bold">
+                            <i class="bi bi-plus-circle me-1"></i>
+                            Add Contract
+                        </a>
+                    </div>
 
-                            <div class="col-md-4">
-                                <input type="text"
-                                       name="keyword"
-                                       class="form-control"
-                                       placeholder="Search by contract code or customer..."
-                                       value="${keyword}">
+                    <!-- SEARCH -->
+                    <form method="get" action="contracts" class="row g-2 mb-3">
+                        <input type="hidden" name="action" value="list"/>
+
+                        <div class="col-md-4">
+                            <input type="text"
+                                   name="keyword"
+                                   class="form-control"
+                                   placeholder="Search by contract code or customer..."
+                                   value="${keyword}">
                         </div>
 
                         <div class="col-md-auto">
@@ -105,6 +111,10 @@
                                                 <a href="contracts?action=detail&id=${c.id}" 
                                                    class="btn btn-sm btn-info">
                                                     <i class="bi bi-eye"></i> View
+                                                </a>
+                                                <a href="contracts?action=edit&id=${c.id}" 
+                                                   class="btn btn-sm btn-warning">
+                                                    <i class="bi bi-pencil-square"></i> Update
                                                 </a>
                                             </td>
                                         </tr>

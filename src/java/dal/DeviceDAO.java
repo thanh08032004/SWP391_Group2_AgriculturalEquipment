@@ -556,4 +556,95 @@ public class DeviceDAO extends DBContext {
         return list;
     }
 
+    public List<DeviceDTO> getDevicesWithoutCustomer() {
+        List<DeviceDTO> list = new ArrayList<>();
+
+        String sql = """
+            SELECT d.*, c.name AS category_name, b.name AS brand_name
+            FROM device d
+            JOIN category c ON d.category_id = c.id
+            JOIN brand b ON d.brand_id = b.id
+            WHERE d.customer_id IS NULL
+        """;
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                DeviceDTO d = new DeviceDTO();
+                d.setId(rs.getInt("id"));
+                d.setSerialNumber(rs.getString("serial_number"));
+                d.setMachineName(rs.getString("machine_name"));
+                d.setModel(rs.getString("model"));
+                d.setPrice(rs.getBigDecimal("price"));
+                d.setStatus(rs.getString("status"));
+                d.setCategoryName(rs.getString("category_name"));
+                d.setBrandName(rs.getString("brand_name"));
+                list.add(d);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<DeviceDTO> getDevicesByCustomerId(int customerId) {
+        List<DeviceDTO> list = new ArrayList<>();
+
+        String sql = """
+            SELECT d.*, c.name AS category_name, b.name AS brand_name
+            FROM device d
+            JOIN category c ON d.category_id = c.id
+            JOIN brand b ON d.brand_id = b.id
+            WHERE d.customer_id = ?
+        """;
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                DeviceDTO d = new DeviceDTO();
+                d.setId(rs.getInt("id"));
+                d.setSerialNumber(rs.getString("serial_number"));
+                d.setMachineName(rs.getString("machine_name"));
+                d.setModel(rs.getString("model"));
+                d.setPrice(rs.getBigDecimal("price"));
+                d.setStatus(rs.getString("status"));
+                d.setCategoryName(rs.getString("category_name"));
+                d.setBrandName(rs.getString("brand_name"));
+                list.add(d);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public boolean updateCustomerForDevice(int deviceId, Integer customerId) {
+        String sql = "UPDATE device SET customer_id = ? WHERE id = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // Cho phép NULL nếu không chọn customer
+            if (customerId == null || customerId == 0) {
+                ps.setNull(1, Types.INTEGER);
+            } else {
+                ps.setInt(1, customerId);
+            }
+
+            ps.setInt(2, deviceId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

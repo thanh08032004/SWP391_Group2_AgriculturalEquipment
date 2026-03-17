@@ -5,6 +5,8 @@
 package dal;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import model.User;
 
 public class UserDAO extends DBContext {
@@ -124,5 +126,43 @@ public class UserDAO extends DBContext {
         return null;
     }
 
+    // ======================================================== LIST CUSTOMER ================================================================== //
+    public List<User> getAllCustomers() {
+        List<User> list = new ArrayList<>();
+
+        String sql = """
+            SELECT u.id, u.username, u.role_id, r.name AS role_name,
+                   u.active, u.created_at,
+                   up.fullname, up.email
+            FROM users u
+            JOIN role r ON u.role_id = r.id
+            LEFT JOIN user_profile up ON u.id = up.user_id
+            WHERE r.name = 'CUSTOMER'
+        """;
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                User u = User.builder()
+                        .id(rs.getInt("id"))
+                        .username(rs.getString("username"))
+                        .roleId(rs.getInt("role_id"))
+                        .roleName(rs.getString("role_name"))
+                        .fullname(rs.getString("fullname"))
+                        .email(rs.getString("email"))
+                        .active(rs.getBoolean("active"))
+                        .createdAt(rs.getTimestamp("created_at"))
+                        .build();
+
+                list.add(u);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    // ======================================================================================================================================== //
 
 }
