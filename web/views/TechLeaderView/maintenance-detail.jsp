@@ -6,6 +6,41 @@
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
             <title>Admin - Maintenance Detail</title>
+
+            <style>
+                .photo-row {
+                    display: flex;
+                    gap: 10px;
+                    margin-bottom: 20px;
+                }
+                .photo-card {
+                    flex: 1;
+                    background: #fff;
+                    border: 1px solid #ddd;
+                    border-radius: 10px;
+                    padding: 10px;
+                    text-align: center;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                }
+                .img-horizontal {
+                    width: 100%;
+                    height: 120px;
+                    object-fit: cover;
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
+                .img-horizontal:hover {
+                    opacity: 0.8;
+                }
+                .photo-card small {
+                    font-size: 0.65rem;
+                    font-weight: bold;
+                    color: #888;
+                    text-transform: uppercase;
+                    display: block;
+                    margin-bottom: 5px;
+                }
+            </style>
         </head>
         <body class="bg-light">
         <jsp:include page="/common/header.jsp"></jsp:include>
@@ -48,9 +83,55 @@
                                 </c:choose>
                             </div>
                         </div>
+
+      
                     </div>
 
+
                     <div class="col-md-8">
+                        <div class="photo-row">
+                            <div class="photo-card">
+                                <small>Initial</small>
+                                <c:set var="imgPending" value="" />
+                                <c:forEach items="${task.images}" var="img">
+                                    <c:if test="${img.status == 'PENDING'}"><c:set var="imgPending" value="${img.imageUrl}" /></c:if>
+                                </c:forEach>
+                                <c:choose>
+                                    <c:when test="${not empty imgPending}">
+                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${imgPending}" class="img-horizontal" onclick="window.open(this.src)">
+                                    </c:when>
+                                    <c:otherwise><div class="img-horizontal bg-light d-flex align-items-center justify-content-center text-muted small">No Image</div></c:otherwise>
+                                </c:choose>
+                            </div>
+
+                            <div class="photo-card">
+                                <small>Diagnosis</small>
+                                <c:set var="imgTech" value="" />
+                                <c:forEach items="${task.images}" var="img">
+                                    <c:if test="${img.status == 'TECHNICIAN_SUBMITTED'}"><c:set var="imgTech" value="${img.imageUrl}" /></c:if>
+                                </c:forEach>
+                                <c:choose>
+                                    <c:when test="${not empty imgTech}">
+                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${imgTech}" class="img-horizontal" onclick="window.open(this.src)">
+                                    </c:when>
+                                    <c:otherwise><div class="img-horizontal bg-light d-flex align-items-center justify-content-center text-muted small">No Image</div></c:otherwise>
+                                </c:choose>
+                            </div>
+
+                            <div class="photo-card">
+                                <small>Result</small>
+                                <c:set var="imgDone" value="" />
+                                <c:forEach items="${task.images}" var="img">
+                                    <c:if test="${img.status == 'DONE'}"><c:set var="imgDone" value="${img.imageUrl}" /></c:if>
+                                </c:forEach>
+                                <c:choose>
+                                    <c:when test="${not empty imgDone}">
+                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${imgDone}" class="img-horizontal" onclick="window.open(this.src)">
+                                    </c:when>
+                                    <c:otherwise><div class="img-horizontal bg-light d-flex align-items-center justify-content-center text-muted small">No Image</div></c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
                         <!--khoi init request-->
                         <div class="card border-0 shadow-sm mb-4">
                             <div class="card-header bg-white fw-bold text-primary">Initial Request</div>
@@ -65,19 +146,7 @@
                                         </small>
                                     </div>
                                     <div class="col-md-4 text-end">
-                                        <p class="fw-bold mb-1 small text-muted text-uppercase">Attached Image:</p>
-                                        <c:choose>
-                                            <c:when test="${not empty task.images}">
-                                                <img src="${pageContext.request.contextPath}/assets/images/maintenance/${task.images[0].imageUrl}"
-                                                     alt="Customer Upload"
-                                                     class="img-thumbnail shadow-sm"
-                                                     style="max-width: 100%; cursor: pointer;"
-                                                     onclick="window.open(this.src)">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div class="py-4 bg-light border rounded text-muted small italic text-center">No image attached</div>
-                                            </c:otherwise>
-                                        </c:choose>
+                                       
                                     </div>
                                 </div>
                             </div>
@@ -161,7 +230,7 @@
                                                         <td class="text-end text-primary fs-5">
                                                             <fmt:formatNumber value="${totalSpareParts + (task.laborHours * (not empty laborRate ? laborRate : 0))}" 
                                                                               type="currency" currencySymbol=""/>
-                                                            
+
                                                         </td>
                                                     </tr>
                                                 </tfoot>
