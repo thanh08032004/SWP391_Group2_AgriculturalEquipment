@@ -83,12 +83,18 @@ public class LeaderMaintenanceServlet extends HttpServlet {
                 response.sendRedirect("maintenance?action=detail&id=" + id + "&msg=error");
             }
         } else if ("assign".equals(action)) {
-            String techIdRaw = request.getParameter("technicianId");
-            int techId = (techIdRaw == null || techIdRaw.isEmpty()) ? 0 : Integer.parseInt(techIdRaw);
-            boolean success = dao.assignTechnician(id, techId);
-            String redirectUrl = "list".equals(from) ? "maintenance" : "maintenance?action=detail&id=" + id;
-            response.sendRedirect(redirectUrl + "&msg=" + (success ? "assign_success" : "error"));
+        String techIdRaw = request.getParameter("technicianId");
+        int techId = (techIdRaw == null || techIdRaw.isEmpty()) ? 0 : Integer.parseInt(techIdRaw);
+        boolean success = dao.assignTechnician(id, techId);
+                String redirectUrl = "";
+        if ("list".equals(from)) {
+            redirectUrl = "maintenance?action=list&msg=" + (success ? "assign_success" : "error");
+        } else {
+            redirectUrl = "maintenance?action=detail&id=" + id + "&msg=" + (success ? "assign_success" : "error");
         }
+        
+        response.sendRedirect(redirectUrl);
+    }
     }
 
     private void handleGetDeviceDetail(HttpServletRequest request, HttpServletResponse response, DeviceDAO dDao) throws IOException {
