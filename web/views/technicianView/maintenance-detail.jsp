@@ -146,39 +146,7 @@
                                         </div>
                                     </div>
 
-                                    <%-- === FORM UPLOAD COMPLETION IMAGE (chỉ hiện khi showCompletionForm == true) === --%>
-                                    <c:if test="${showCompletionForm == true}">
-                                        <div class="card border-0 shadow-sm mb-4 border-start border-success border-4">
-                                            <div class="card-header bg-white fw-bold text-success">
-                                                <i class="bi bi-check2-circle"></i> Complete Task — Upload Confirmation Image
-                                            </div>
-                                            <div class="card-body">
-                                                <form action="${pageContext.request.contextPath}/technician/maintenance"
-                                                      method="post" enctype="multipart/form-data">
-                                                    <input type="hidden" name="action" value="completewithimage">
-                                                    <input type="hidden" name="maintenanceId" value="${task.id}">
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label fw-bold">Completion Image <span class="text-muted fw-normal">(optional)</span></label>
-                                                        <input type="file" name="completionImage" class="form-control" accept="image/*"
-                                                               onchange="previewCompletion(this)">
-                                                        <div class="mt-2" id="previewBox" style="display:none;">
-                                                            <img id="previewImg" src="#" class="img-thumbnail" style="max-height:200px;">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="d-flex gap-2">
-                                                        <button type="submit" class="btn btn-success px-4"
-                                                                onclick="return confirm('Mark this task as DONE?')">
-                                                            <i class="bi bi-check-circle"></i> Confirm Done
-                                                        </button>
-                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks"
-                                                           class="btn btn-outline-secondary">Cancel</a>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </c:if>
+                                   
 
                                     <%-- Script preview ảnh --%>
                                     <script>
@@ -193,7 +161,7 @@
                                             }
                                         }
                                     </script>
-                                   
+
 
                                     <%-- BLOCK 2: Technician Diagnosis Image --%>
                                     <c:if test="${task.status != 'PENDING' && task.status != 'READY' && task.status != 'WAITING_FOR_TECHNICIAN'}">
@@ -295,41 +263,61 @@
                                 </div>
                             </div>
                         </c:if>
-                        <c:if test="${task.status == 'WAITING_FOR_TECHNICIAN' 
-                                      || task.status == 'TECHNICIAN_ACCEPTED' 
-                                      || task.status == 'IN_PROGRESS'}">
-                              <div class="card border-0 shadow-sm mb-4 border-start border-primary border-4">
-                                  <div class="card-header bg-white fw-bold text-primary">
-                                      Technician Action:
-                                  </div>
-                                  <div class="card-body text-center">
-                                      <c:choose>
-                                          <%-- WAITING FOR TECHNICIAN --%>
-                                          <c:when test="${task.status == 'WAITING_FOR_TECHNICIAN'}">
-                                              <a href="${pageContext.request.contextPath}/technician/maintenance?action=accept&id=${task.id}"
-                                                 class="btn btn-success px-4"
-                                                 onclick="return confirm('Accept this maintenance task?')">
-                                                  <i class="bi bi-check-circle"></i> Accept
-                                              </a>
-                                          </c:when>
-                                          <%-- TECHNICIAN ACCEPTED --%>
-                                          <c:when test="${task.status == 'TECHNICIAN_ACCEPTED'}">
-                                              <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${task.id}"
-                                                 class="btn btn-primary px-4">
-                                                  <i class="bi bi-tools"></i> Work
-                                              </a>
-                                          </c:when>
-                                          <%-- IN PROGRESS --%>
-                                          <c:when test="${task.status == 'IN_PROGRESS'}">
-                                              <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${task.id}"
-                                                 class="btn btn-success px-4"
-                                                 onclick="return confirm('Mark this task as DONE?');">
-                                                  <i class="bi bi-check-circle"></i> Done
-                                              </a>
-                                          </c:when>
-                                      </c:choose>
-                                  </div>
-                              </div>
+                        <%-- Thay đoạn Technician Action cũ thành: --%>
+                        <c:if test="${task.status == 'WAITING_FOR_TECHNICIAN' || task.status == 'TECHNICIAN_ACCEPTED' || task.status == 'IN_PROGRESS'}">
+                            <div class="card border-0 shadow-sm mb-4 border-start border-primary border-4">
+                                <div class="card-header bg-white fw-bold text-primary">
+                                    Technician Action:
+                                </div>
+                                <div class="card-body text-center">
+                                    <c:choose>
+                                        <%-- WAITING FOR TECHNICIAN --%>
+                                        <c:when test="${task.status == 'WAITING_FOR_TECHNICIAN'}">
+                                            <a href="${pageContext.request.contextPath}/technician/maintenance?action=accept&id=${task.id}"
+                                               class="btn btn-success px-4"
+                                               onclick="return confirm('Accept this maintenance task?')">
+                                                <i class="bi bi-check-circle"></i> Accept
+                                            </a>
+                                        </c:when>
+
+                                        <%-- TECHNICIAN ACCEPTED --%>
+                                        <c:when test="${task.status == 'TECHNICIAN_ACCEPTED'}">
+                                            <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${task.id}"
+                                               class="btn btn-primary px-4">
+                                                <i class="bi bi-tools"></i> Work
+                                            </a>
+                                        </c:when>
+
+                                        <%-- IN PROGRESS → Hiện form upload thay cho nút Done --%>
+                                        <c:when test="${task.status == 'IN_PROGRESS'}">
+                                            <form action="${pageContext.request.contextPath}/technician/maintenance"
+                                                  method="post" enctype="multipart/form-data" class="text-start">
+                                                <input type="hidden" name="action" value="completewithimage">
+                                                <input type="hidden" name="maintenanceId" value="${task.id}">
+
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">
+                                                        Completion Image 
+                                                        <span class="text-muted fw-normal">(optional)</span>
+                                                    </label>
+                                                    <input type="file" name="completionImage" class="form-control" 
+                                                           accept="image/*" onchange="previewCompletion(this)">
+                                                    <div class="mt-2" id="previewBox" style="display:none;">
+                                                        <img id="previewImg" src="#" class="img-thumbnail" style="max-height:200px;">
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <button type="submit" class="btn btn-success px-4">
+                                                        <i class="bi bi-check-circle"></i> Confirm Done
+                                                    </button>
+                                                    
+                                                </div>
+                                            </form>
+                                        </c:when>
+                                    </c:choose>
+                                </div>
+                            </div>
                         </c:if>
                     </div>
                 </div>

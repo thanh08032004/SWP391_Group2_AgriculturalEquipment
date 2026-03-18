@@ -400,6 +400,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
                     uploadDir.mkdirs();
                 }
                 filePart.write(uploadPath + File.separator + fileName);
+                
             }
 
             // Lưu ảnh với status DONE
