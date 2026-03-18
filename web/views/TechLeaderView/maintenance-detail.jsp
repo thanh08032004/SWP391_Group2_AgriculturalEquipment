@@ -67,9 +67,11 @@
                                     <div class="col-md-4 text-end">
                                         <p class="fw-bold mb-1 small text-muted text-uppercase">Attached Image:</p>
                                         <c:choose>
-                                            <c:when test="${not empty task.image}">
-                                                <img src="${pageContext.request.contextPath}/assets/images/maintenance/${task.image}" 
-                                                     alt="Customer Upload" class="img-thumbnail shadow-sm" style="max-width: 100%; cursor: pointer;"
+                                            <c:when test="${not empty task.images}">
+                                                <img src="${pageContext.request.contextPath}/assets/images/maintenance/${task.images[0].imageUrl}"
+                                                     alt="Customer Upload"
+                                                     class="img-thumbnail shadow-sm"
+                                                     style="max-width: 100%; cursor: pointer;"
                                                      onclick="window.open(this.src)">
                                             </c:when>
                                             <c:otherwise>
@@ -141,7 +143,6 @@
                                                         <c:set var="totalSpareParts" value="${totalSpareParts + (item.price * item.quantity)}" />
                                                     </c:forEach>
 
-                                                    <%-- KHỐI HIỆN THỊ TIỀN CÔNG --%>
                                                     <c:if test="${not empty task.laborHours}">
                                                         <c:set var="laborCost" value="${task.laborHours * laborRate}" />
                                                         <tr class="table-info">
@@ -154,13 +155,13 @@
                                                         </tr>
                                                     </c:if>
 
-                                                    <%-- TỔNG CỘNG CUỐI CÙNG --%>
                                                 <tfoot class="table-light fw-bold">
                                                     <tr>
                                                         <td colspan="3" class="text-end text-uppercase">Final Total (Estimated):</td>
                                                         <td class="text-end text-primary fs-5">
                                                             <fmt:formatNumber value="${totalSpareParts + (task.laborHours * (not empty laborRate ? laborRate : 0))}" 
                                                                               type="currency" currencySymbol=""/>
+                                                            
                                                         </td>
                                                     </tr>
                                                 </tfoot>
@@ -306,14 +307,14 @@
                 }
 
                 function viewCustomerDetail(id) {
-    document.getElementById('customerContent').innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>';
-    const modalObj = new bootstrap.Modal(document.getElementById('customerModal'));
-    modalObj.show();
+                    document.getElementById('customerContent').innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>';
+                    const modalObj = new bootstrap.Modal(document.getElementById('customerModal'));
+                    modalObj.show();
 
-    fetch('${pageContext.request.contextPath}/leader/maintenance?action=getCustomerDetail&customerId=' + id)
-        .then(res => res.json())
-        .then(cus => {
-            document.getElementById('customerContent').innerHTML = `
+                    fetch('${pageContext.request.contextPath}/leader/maintenance?action=getCustomerDetail&customerId=' + id)
+                            .then(res => res.json())
+                            .then(cus => {
+                                document.getElementById('customerContent').innerHTML = `
                 <div class="bg-primary p-4 text-center text-white" style="border-radius: 15px 15px 0 0;">
                     <img src="${pageContext.request.contextPath}/assets/images/avatars/\${cus.avatar}" 
                          class="rounded-circle mb-2 border border-3 border-white shadow-sm" 
@@ -340,11 +341,11 @@
                         Close
                     </button>
                 </div>`;
-        })
-        .catch(err => {
-            document.getElementById('customerContent').innerHTML = '<div class="alert alert-danger m-3">Error loading data.</div>';
-        });
-}
+                            })
+                            .catch(err => {
+                                document.getElementById('customerContent').innerHTML = '<div class="alert alert-danger m-3">Error loading data.</div>';
+                            });
+                }
         </script>
     </body>
 </html>

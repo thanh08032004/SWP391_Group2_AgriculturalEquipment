@@ -11,7 +11,7 @@ import lombok.*;
 public class Maintenance {
     private int id;
     private int deviceId;
-    private int technicianId;
+    private Integer  technicianId;
     private boolean hasFeedback;
     private String technicianName;
     private  int customerId;

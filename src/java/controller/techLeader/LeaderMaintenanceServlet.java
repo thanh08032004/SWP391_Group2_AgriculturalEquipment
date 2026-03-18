@@ -55,7 +55,8 @@ public class LeaderMaintenanceServlet extends HttpServlet {
         Maintenance task = dao.getMaintenanceById(id);
         List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
         List<model.User> technicians = dao.getAllTechnicians();
-
+        double laborRate = 100000;
+        request.setAttribute("laborRate", laborRate);
         request.setAttribute("task", task);
         request.setAttribute("items", items);
         request.setAttribute("technicians", technicians);
