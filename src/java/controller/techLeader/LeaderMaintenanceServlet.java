@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import model.Maintenance;
 import model.MaintenanceFeedback;
-import model.MaintenanceFeedbackImage;
 import model.UserProfile;
 
 public class LeaderMaintenanceServlet extends HttpServlet {
@@ -34,21 +33,60 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             case "getDeviceDetail":
                 handleGetDeviceDetail(request, response, dDao);
                 break;
-
             case "getCustomerDetail":
                 handleGetCustomerDetail(request, response);
                 break;
-
             case "detail":
                 handleViewDetail(request, response, dao);
                 break;
             case "feedback-detail":
-    handleFeedbackDetailPage(request, response);
-    break;
+                handleFeedbackDetailPage(request, response);
+                break;
             case "list":
             default:
                 handleListRequests(request, response, dao);
                 break;
+        }
+    }
+
+    private void handleViewDetail(HttpServletRequest request, HttpServletResponse response, MaintenanceDAO dao) throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+
+        Maintenance task = dao.getMaintenanceById(id);
+        List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
+        List<model.User> technicians = dao.getAllTechnicians();
+
+        request.setAttribute("task", task);
+        request.setAttribute("items", items);
+        request.setAttribute("technicians", technicians);
+        request.getRequestDispatcher("/views/TechLeaderView/maintenance-detail.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        MaintenanceDAO dao = new MaintenanceDAO();
+        int id = Integer.parseInt(request.getParameter("id"));
+        String from = request.getParameter("from");
+
+        if ("send-to-customer".equals(action)) {
+            boolean success = dao.updateStatus(id, "DIAGNOSIS READY");
+            response.sendRedirect("maintenance?msg=" + (success ? "sent_success" : "error"));
+        } else if ("reject-diagnosis".equals(action)) {
+            boolean updateStatus = dao.updateStatus(id, "TECHNICIAN_ACCEPTED");
+            boolean clearItems = dao.saveMaintenanceItems(id, new ArrayList<>(), new ArrayList<>());
+
+            if (updateStatus && clearItems) {
+                response.sendRedirect("maintenance?action=detail&id=" + id + "&msg=rejected_and_cleared");
+            } else {
+                response.sendRedirect("maintenance?action=detail&id=" + id + "&msg=error");
+            }
+        } else if ("assign".equals(action)) {
+            String techIdRaw = request.getParameter("technicianId");
+            int techId = (techIdRaw == null || techIdRaw.isEmpty()) ? 0 : Integer.parseInt(techIdRaw);
+            boolean success = dao.assignTechnician(id, techId);
+            String redirectUrl = "list".equals(from) ? "maintenance" : "maintenance?action=detail&id=" + id;
+            response.sendRedirect(redirectUrl + "&msg=" + (success ? "assign_success" : "error"));
         }
     }
 
@@ -70,19 +108,20 @@ public class LeaderMaintenanceServlet extends HttpServlet {
         }
     }
 
-   private void handleFeedbackDetailPage(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+    private void handleFeedbackDetailPage(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-    int id = Integer.parseInt(request.getParameter("id"));
+        int id = Integer.parseInt(request.getParameter("id"));
 
-    FeedbackDAO fDao = new FeedbackDAO();
-    MaintenanceFeedback f = fDao.getFeedbackByMaintenanceId(id);
+        FeedbackDAO fDao = new FeedbackDAO();
+        MaintenanceFeedback f = fDao.getFeedbackByMaintenanceId(id);
 
-    request.setAttribute("feedback", f);
+        request.setAttribute("feedback", f);
 
-    request.getRequestDispatcher("/views/TechLeaderView/feedback-detail.jsp")
-           .forward(request, response);
-}
+        request.getRequestDispatcher("/views/TechLeaderView/feedback-detail.jsp")
+                .forward(request, response);
+    }
+
     private void handleGetCustomerDetail(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(request.getParameter("customerId"));
         UserProfileDAO uProfileDao = new UserProfileDAO();
@@ -102,20 +141,6 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             );
             response.getWriter().write(json);
         }
-    }
-
-    private void handleViewDetail(HttpServletRequest request, HttpServletResponse response, MaintenanceDAO dao) throws ServletException, IOException {
-        double laborRate = 100000.0;
-        int id = Integer.parseInt(request.getParameter("id"));
-        Maintenance task = dao.getMaintenanceById(id);
-        List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
-        List<model.User> technicians = dao.getAllTechnicians();
-
-        request.setAttribute("task", task);
-        request.setAttribute("items", items);
-        request.setAttribute("laborRate", laborRate);
-        request.setAttribute("technicians", technicians);
-        request.getRequestDispatcher("/views/TechLeaderView/maintenance-detail.jsp").forward(request, response);
     }
 
     private void handleListRequests(HttpServletRequest request, HttpServletResponse response, MaintenanceDAO dao) throws ServletException, IOException {
@@ -149,37 +174,4 @@ public class LeaderMaintenanceServlet extends HttpServlet {
         request.getRequestDispatcher("/views/TechLeaderView/maintenance-list.jsp").forward(request, response);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        MaintenanceDAO dao = new MaintenanceDAO();
-        int id = Integer.parseInt(request.getParameter("id"));
-        String from = request.getParameter("from"); // Nguồn gửi yêu cầu (list/detail)
-
-        if ("send-to-customer".equals(action)) {
-            boolean success = dao.updateStatus(id, "DIAGNOSIS READY");
-            response.sendRedirect("maintenance?msg=" + (success ? "sent_success" : "error"));
-
-        } else if ("reject-diagnosis".equals(action)) {
-            boolean updateStatus = dao.updateStatus(id, "TECHNICIAN_ACCEPTED");
-            boolean clearItems = dao.saveMaintenanceItems(id, new ArrayList<>(), new ArrayList<>());
-            String redirectUrl = "maintenance?action=detail&id=" + id;
-            if (updateStatus && clearItems) {
-                response.sendRedirect(redirectUrl + "&msg=rejected_and_cleared");
-            } else {
-                response.sendRedirect(redirectUrl + "&msg=error");
-            }
-
-        } else if ("assign".equals(action)) {
-            String techIdRaw = request.getParameter("technicianId");
-            int techId = (techIdRaw == null || techIdRaw.isEmpty()) ? 0 : Integer.parseInt(techIdRaw);
-            boolean success = dao.assignTechnician(id, techId);
-
-            if ("list".equals(from)) {
-                response.sendRedirect("maintenance?msg=" + (success ? "assign_success" : "error"));
-            } else {
-                response.sendRedirect("maintenance?action=detail&id=" + id + "&msg=" + (success ? "assign_success" : "error"));
-            }
-        }
-    }
 }

@@ -5,92 +5,162 @@
 <html lang="en">
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
-            <title>Maintenance Diagnostic - Agri CMS</title>
-        </head>
-        <body class="bg-light">
-            <header><jsp:include page="/common/header.jsp"></jsp:include></header>
-            <div class="container py-5">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold">Diagnostic Report #${task.id}</h2>
-                <a href="${pageContext.request.contextPath}/customer/devices" class="btn btn-outline-secondary">Back to My Devices</a>
+        <title>Maintenance Diagnostic - Agri CMS</title>
+        <style>
+            .img-thumbnail-custom {
+                width: 100%;
+                height: 120px;
+                object-fit: cover;
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+            .img-thumbnail-custom:hover {
+                transform: scale(1.05);
+            }
+            .section-title {
+                font-size: 0.75rem;
+                letter-spacing: 0.05rem;
+            }
+        </style>
+    </head>
+    <body class="bg-light">
+        <header><jsp:include page="/common/header.jsp"></jsp:include></header>
+        
+        <div class="container py-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">Diagnostic Report #${task.id}</h2>
+                <a href="${pageContext.request.contextPath}/customer/devices" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to My Devices
+                </a>
             </div>
 
             <div class="row">
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm mb-4 text-center p-3">
-                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${task.image}" 
-                             class="img-fluid rounded mb-3 shadow-sm" style="max-height: 250px; object-fit: cover;">
-                        <h5 class="fw-bold">${task.machineName}</h5>
+                        <h5 class="fw-bold mt-2">${task.machineName}</h5>
                         <p class="text-muted small">${task.modelName}</p>
-                        <span class="badge bg-primary px-3 py-2">${task.status}</span>
+                        <div class="mb-2">
+                            <span class="badge bg-primary px-3 py-2 text-uppercase">${task.status}</span>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm p-3">
+                        <h6 class="fw-bold text-secondary border-bottom pb-2 mb-3">Service Photos</h6>
+                        
+                        <p class="section-title fw-bold mb-2 text-muted text-uppercase">Initial Request:</p>
+                        <div class="row g-2 mb-4">
+                            <c:set var="hasReadyImg" value="false" />
+                            <c:forEach items="${task.images}" var="img">
+                                <c:if test="${img.status == 'READY'}">
+                                    <div class="col-6">
+                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}" 
+                                             class="img-fluid rounded border img-thumbnail-custom" 
+                                             onclick="window.open(this.src)" title="Click to enlarge">
+                                    </div>
+                                    <c:set var="hasReadyImg" value="true" />
+                                </c:if>
+                            </c:forEach>
+                            <c:if test="${!hasReadyImg}">
+                                <div class="col-12"><small class="text-muted fst-italic">No initial photos available.</small></div>
+                            </c:if>
+                        </div>
+
+                        <p class="section-title fw-bold mb-2 text-muted text-uppercase">Diagnostic Photos:</p>
+                        <div class="row g-2">
+                            <c:set var="hasTechImg" value="false" />
+                            <c:forEach items="${task.images}" var="img">
+                                <c:if test="${img.status == 'TECHNICIAN_SUBMITTED'}">
+                                    <div class="col-6">
+                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}" 
+                                             class="img-fluid rounded border img-thumbnail-custom"
+                                             onclick="window.open(this.src)" title="Click to enlarge">
+                                    </div>
+                                    <c:set var="hasTechImg" value="true" />
+                                </c:if>
+                            </c:forEach>
+                            <c:if test="${!hasTechImg}">
+                                <div class="col-12"><small class="text-muted fst-italic">Waiting for technical photos...</small></div>
+                            </c:if>
+                        </div>
                     </div>
                 </div>
 
                 <div class="col-md-8">
                     <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white fw-bold text-primary">Technical Analysis & Quotation</div>
-                        <div class="card-body">
-                            <p class="small text-muted mb-1 text-uppercase fw-bold">Technician's Note:</p>
-                            <p class="p-3 bg-light rounded">${task.description}</p>
+                        <div class="card-header bg-white fw-bold text-primary py-3">
+                            <i class="bi bi-file-earmark-medical me-2"></i>Technical Analysis & Quotation
+                        </div>
+                        <div class="card-body p-4">
+                            <p class="small text-muted mb-2 text-uppercase fw-bold">Technician's Diagnosis:</p>
+                            <p class="p-3 bg-light rounded border-start border-primary border-4">${task.technicianNote != null ? task.technicianNote : task.description}</p>
 
-                            <h6 class="mt-4 fw-bold small text-uppercase">Proposed Parts:</h6>
-                            <table class="table table-sm table-bordered mt-2">
-                                <thead class="table-light text-center">
-                                    <tr>
-                                        <th>Part Name</th>
-                                        <th>Quantity</th>
-                                        <th>Unit</th>
-                                        <th class="text-end">Price</th>
-
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:set var="totalSpareParts" value="0" />
-                                    <c:forEach var="item" items="${items}">
+                            <h6 class="mt-4 fw-bold small text-uppercase mb-3">Proposed Spare Parts:</h6>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered">
+                                    <thead class="table-light text-center">
                                         <tr>
-                                            <td>${item.name}</td>
-                                            <td class="text-center">${item.quantity}</td>
-                                            <td class="text-center">${item.unit}</td>
-                                            <td class="text-end">
-                                                <fmt:formatNumber value="${item.price}" type="currency" currencySymbol=""/>
+                                            <th>Part Name</th>
+                                            <th>Quantity</th>
+                                            <th>Unit</th>
+                                            <th class="text-end">Unit Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:set var="totalSpareParts" value="0" />
+                                        <c:forEach var="item" items="${items}">
+                                            <tr>
+                                                <td class="ps-3">${item.name}</td>
+                                                <td class="text-center">${item.quantity}</td>
+                                                <td class="text-center">${item.unit}</td>
+                                                <td class="text-end pe-3">
+                                                    <fmt:formatNumber value="${item.price}" type="currency" currencySymbol="₫"/>
+                                                </td>
+                                            </tr>
+                                            <c:set var="totalSpareParts" value="${totalSpareParts + (item.price * item.quantity)}" />
+                                        </c:forEach>
+
+                                        <c:if test="${task.laborHours > 0}">
+                                            <c:set var="laborCost" value="${task.laborHours * task.laborCostPerHour}" />
+                                            <tr class="table-info">
+                                                <td class="fw-bold ps-3">Labor Cost (${task.laborHours} Hours)</td>
+                                                <td colspan="2" class="text-center text-muted small">Rate: <fmt:formatNumber value="${task.laborCostPerHour}" type="currency" currencySymbol="₫"/>/hr</td>
+                                                <td class="text-end pe-3 fw-bold">
+                                                    <fmt:formatNumber value="${laborCost}" type="currency" currencySymbol="₫"/>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                    </tbody>
+                                    <tfoot class="table-light fw-bold">
+                                        <tr>
+                                            <td colspan="3" class="text-end text-uppercase py-3">Final Total (Estimated):</td>
+                                            <td class="text-end text-primary fs-5 pe-3 py-3">
+                                                <fmt:formatNumber value="${totalSpareParts + (task.laborHours * task.laborCostPerHour)}" 
+                                                                  type="currency" currencySymbol="₫"/>
                                             </td>
                                         </tr>
-                                        <c:set var="totalSpareParts" value="${totalSpareParts + (item.price * item.quantity)}" />
-                                    </c:forEach>
-
-                                    <c:if test="${not empty task.laborHours}">
-                                        <c:set var="laborCost" value="${task.laborHours * laborRate}" />
-                                        <tr class="table-info">
-                                            <td class="fw-bold">Labor Cost</td>
-                                            <td class="text-center">${task.laborHours}</td>
-                                            <td class="text-center">Hours</td>
-                                            <td class="text-end fw-bold">
-                                                <fmt:formatNumber value="${laborCost}" type="currency" currencySymbol=""/>
-                                            </td>
-                                        </tr>
-                                    </c:if>
-
-                                <tfoot class="table-light fw-bold">
-                                    <tr>
-                                        <td colspan="3" class="text-end text-uppercase">Final Total (Estimated):</td>
-                                        <td class="text-end text-primary fs-5">
-                                            <fmt:formatNumber value="${totalSpareParts + (task.laborHours * (not empty laborRate ? laborRate : 0))}" 
-                                                              type="currency" currencySymbol=""/>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                    </tfoot>
+                                </table>
+                            </div>
 
                             <c:if test="${task.status == 'DIAGNOSIS READY'}">
-                                <div class="alert alert-warning mt-4 d-flex justify-content-between align-items-center">
-                                    <span>Do you agree to proceed with this repair?</span>
-                                    <div class="d-flex gap-2">
-                                        <form action="${pageContext.request.contextPath}/customer/maintenance" method="post">
-                                            <input type="hidden" name="action" value="customer-decision">
-                                            <input type="hidden" name="id" value="${task.id}">
-                                            <button type="submit" name="decision" value="approve" class="btn btn-success fw-bold px-4">Accept</button>
-                                            <button type="submit" name="decision" value="reject" class="btn btn-outline-danger px-4">Reject</button>
-                                        </form>
+                                <div class="alert alert-warning mt-4 p-4 shadow-sm">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                        <div>
+                                            <h6 class="fw-bold mb-1"><i class="bi bi-question-circle me-2"></i>Action Required</h6>
+                                            <span>Do you agree to proceed with this repair and quotation?</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <form action="${pageContext.request.contextPath}/customer/maintenance" method="post">
+                                                <input type="hidden" name="action" value="customer-decision">
+                                                <input type="hidden" name="id" value="${task.id}">
+                                                <button type="submit" name="decision" value="approve" class="btn btn-success fw-bold px-4 shadow-sm">
+                                                    Approve & Repair
+                                                </button>
+                                                <button type="submit" name="decision" value="reject" class="btn btn-outline-danger px-4 bg-white">
+                                                    Reject
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </c:if>
@@ -99,6 +169,7 @@
                 </div>
             </div>
         </div>
+
         <jsp:include page="/common/scripts.jsp"></jsp:include>
     </body>
 </html>

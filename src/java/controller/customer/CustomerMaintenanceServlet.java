@@ -23,23 +23,19 @@ public class CustomerMaintenanceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         MaintenanceDAO maintenanceDAO = new MaintenanceDAO();
-        //cus view diagnosis from tech
+        //xem chuan doan (detail)
         if ("view-detail".equals(action)) {
             String idStr = request.getParameter("id");
             if (idStr != null) {
-                //labor cost per hour
-                double laborRate = 100000.0;
                 int id = Integer.parseInt(idStr);
                 Maintenance task = maintenanceDAO.getMaintenanceById(id);
                 List<Map<String, Object>> items = maintenanceDAO.getMaintenanceItemsWithPrice(id);
-                request.setAttribute("laborRate", laborRate);
-
                 request.setAttribute("task", task);
                 request.setAttribute("items", items);
                 request.getRequestDispatcher("/views/CustomerView/maintenance-status-detail.jsp").forward(request, response);
             }
         } else {
-            //chuyen den req maintenance
+            //tao form
             String deviceIdStr = request.getParameter("deviceId");
             if (deviceIdStr != null) {
                 int deviceId = Integer.parseInt(deviceIdStr);
@@ -55,21 +51,18 @@ public class CustomerMaintenanceServlet extends HttpServlet {
         MaintenanceDAO maintenanceDAO = new MaintenanceDAO();
         DeviceDAO deviceDAO = new DeviceDAO();
 
-        // doi khach quyet dinh accept hay reject
+        //quyet dinh sua hay ko sua
         if ("customer-decision".equals(action)) {
             try {
                 int id = Integer.parseInt(request.getParameter("id"));
                 String decision = request.getParameter("decision");
-
-                // lay thong tin ca bao tri de xac dinh device id lien quan
-                model.Maintenance m = maintenanceDAO.getMaintenanceById(id);
+                Maintenance m = maintenanceDAO.getMaintenanceById(id);
 
                 if ("approve".equals(decision)) {
-                    ///chuyen sang trang thai sua chua
                     maintenanceDAO.updateStatus(id, "IN_PROGRESS");
                     deviceDAO.updateDeviceStatus(m.getDeviceId(), "MAINTENANCE");
                 } else {
-                    maintenanceDAO.updateStatus(id, "READY");
+                    maintenanceDAO.updateStatus(id, "READY"); 
                     deviceDAO.updateDeviceStatus(m.getDeviceId(), "BROKEN");
                 }
                 response.sendRedirect(request.getContextPath() + "/customer/devices?msg=updated");
@@ -77,36 +70,33 @@ public class CustomerMaintenanceServlet extends HttpServlet {
                 e.printStackTrace();
                 response.sendRedirect(request.getContextPath() + "/customer/devices?error=system_error");
             }
-        } //new req
+        } 
+        
+        //new req
         else {
             try {
-                String deviceIdStr = request.getParameter("deviceId");
-                if (deviceIdStr != null) {
-                    int deviceId = Integer.parseInt(deviceIdStr);
-                    String desc = request.getParameter("description");
+                int deviceId = Integer.parseInt(request.getParameter("deviceId"));
+                String desc = request.getParameter("description");
 
-                    Part part = request.getPart("image");
-                    String fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-                    String imagePath = "default.jpg";
+                Part part = request.getPart("image");
+                String fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
+                String finalFileName = null;
 
-                    if (fileName != null && !fileName.isEmpty()) {
-                        String uploadPath = getServletContext().getRealPath("/") + "assets/images/maintenance";
-                        File uploadDir = new File(uploadPath);
-                        if (!uploadDir.exists()) {
-                            uploadDir.mkdirs();
-                        }
+                if (fileName != null && !fileName.isEmpty()) {
+                    String uploadPath = getServletContext().getRealPath("/") + "assets/images/maintenance";
+                    File uploadDir = new File(uploadPath);
+                    if (!uploadDir.exists()) uploadDir.mkdirs();
 
-                        imagePath = deviceId + "_" + System.currentTimeMillis() + "_" + fileName;
-                        part.write(uploadPath + File.separator + imagePath);
-                    }
+                    // ten file: deviceId_timestamp_name
+                    finalFileName = deviceId + "_" + System.currentTimeMillis() + "_" + fileName;
+                    part.write(uploadPath + File.separator + finalFileName);
+                }
 
-                    // tao ban ghi bao tri moi
-                    if (maintenanceDAO.createMaintenanceRequest(deviceId, desc, imagePath)) {
-                        deviceDAO.updateDeviceStatus(deviceId, "MAINTENANCE");
-                        response.sendRedirect(request.getContextPath() + "/customer/devices?msg=success");
-                    } else {
-                        response.sendRedirect(request.getContextPath() + "/customer/devices?msg=error");
-                    }
+                if (maintenanceDAO.createMaintenanceRequest(deviceId, desc, finalFileName)) {
+                    deviceDAO.updateDeviceStatus(deviceId, "MAINTENANCE");
+                    response.sendRedirect(request.getContextPath() + "/customer/devices?msg=success");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/customer/devices?msg=error");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

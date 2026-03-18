@@ -4,23 +4,51 @@ import dto.MaintenanceDTO;
 import java.sql.*;
 import java.util.*;
 import model.Maintenance;
+import model.MaintenanceImage;
 import model.User;
 
 public class MaintenanceDAO extends DBContext {
 
-    public boolean createMaintenanceRequest(int deviceId, String description, String image) {
-        String sql = "INSERT INTO maintenance (device_id, description, image, status, start_date) "
-                + "VALUES (?, ?, ?, 'PENDING', NOW())";
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+    public boolean createMaintenanceRequest(int deviceId, String description, String imageUrl) {
+    String sqlMaintenance = "INSERT INTO maintenance (device_id, description, status, start_date) VALUES (?, ?, 'PENDING', NOW())";
+    String sqlImage = "INSERT INTO maintenance_image (maintenance_id, status, image_url, description) VALUES (?, 'PENDING', ?, ?)";
+    Connection con = null;
+    try {
+        con = getConnection();
+        con.setAutoCommit(false);
+        int maintenanceId = -1;
+        try (PreparedStatement ps = con.prepareStatement(sqlMaintenance, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, deviceId);
             ps.setString(2, description);
-            ps.setString(3, image);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    maintenanceId = rs.getInt(1);
+                }
+            }
         }
-        return false;
-    }
+        if (maintenanceId != -1 && imageUrl != null && !imageUrl.isEmpty()) {
+            try (PreparedStatement psImg = con.prepareStatement(sqlImage)) {
+                psImg.setInt(1, maintenanceId);
+                psImg.setString(2, imageUrl);
+                psImg.setString(3, "Customer uploaded initial fault image");
+                psImg.executeUpdate();
+            }
+        }
+        con.commit();
+        return true;
+    } catch (SQLException e) {
+        if (con != null) {
+            try {
+                con.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        e.printStackTrace();
+    } 
+    return false;
+}
 
     public int countMaintenanceRequests(String name, String status) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM maintenance m "
@@ -117,39 +145,65 @@ public class MaintenanceDAO extends DBContext {
 
     return list;
 }
-    // Admin & Customer view device status/diagnostic info
     public Maintenance getMaintenanceById(int id) {
-        String sql = "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name,d.customer_id AS customerId "
-                + "FROM maintenance m "
-                + "JOIN device d ON m.device_id = d.id "
-                + "JOIN user_profile up ON d.customer_id = up.user_id "
-                + "WHERE m.id = ?";
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
+    String sql = "SELECT m.*, d.machine_name, d.model, up.fullname AS customer_name, d.customer_id AS customerId "
+               + "FROM maintenance m "
+               + "JOIN device d ON m.device_id = d.id "
+               + "JOIN user_profile up ON d.customer_id = up.user_id "
+               + "WHERE m.id = ?";
+
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, id);
+        try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                return Maintenance.builder()
+                Maintenance m = Maintenance.builder()
                         .id(rs.getInt("id"))
                         .deviceId(rs.getInt("device_id"))
                         .customerId(rs.getInt("customerId"))
-                        .technicianId(rs.getInt("technician_id"))
+                        .technicianId(rs.getObject("technician_id") != null ? rs.getInt("technician_id") : null)
                         .description(rs.getString("description"))
                         .status(rs.getString("status"))
                         .startDate(rs.getTimestamp("start_date"))
                         .endDate(rs.getTimestamp("end_date"))
-                        .laborHours(rs.getInt("labor_hours"))
+                        .laborHours(rs.getDouble("labor_hours"))
+                        .laborCostPerHour(rs.getDouble("labor_cost_per_hour"))
                         .technicianNote(rs.getString("technician_note"))
-                        .image(rs.getString("image"))
                         .machineName(rs.getString("machine_name"))
                         .modelName(rs.getString("model"))
                         .customerName(rs.getString("customer_name"))
                         .build();
+
+                m.setImages(getMaintenanceImages(con, id));                
+                return m;
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return null;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return null;
+}
+// lay anh cua don bao tri
+private List<MaintenanceImage> getMaintenanceImages(Connection con, int maintenanceId) throws SQLException {
+    List<MaintenanceImage> images = new ArrayList<>();
+    String sql = "SELECT * FROM maintenance_image WHERE maintenance_id = ? ORDER BY created_at ASC";
+    
+    try (PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, maintenanceId);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                images.add(MaintenanceImage.builder()
+                        .id(rs.getInt("id"))
+                        .maintenanceId(rs.getInt("maintenance_id"))
+                        .status(rs.getString("status"))
+                        .imageUrl(rs.getString("image_url"))
+                        .description(rs.getString("description"))
+                        .createdAt(rs.getTimestamp("created_at"))
+                        .build());
+            }
+        }
+    }
+    return images;
+}
 
     // Update status
     public boolean updateStatus(int id, String status) {
