@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import model.Maintenance;
+import model.MaintenanceImage;
 import model.SparePart;
 import model.User;
 
@@ -167,6 +168,10 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             int id = Integer.parseInt(req.getParameter("id"));
             MaintenanceDTO m = dao.findById(id);
 
+            MaintenanceImage pendingImage = dao.getPendingImage(id);
+
+            req.setAttribute("pendingImage", pendingImage);
+
             // kiểm tra quyền technician
             if (m.getTechnicianId() != technicianId) {
                 req.getSession().setAttribute("error", "Access denied!");
@@ -229,9 +234,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             }
 
             resp.sendRedirect("maintenance?action=mytasks");
-        }
-
-        else if (action.equals("getCustomerDetailJson")) {
+        } else if (action.equals("getCustomerDetailJson")) {
 
             int cusId = Integer.parseInt(req.getParameter("id"));
 
@@ -342,13 +345,19 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
                 laborHours = Double.parseDouble(hoursStr);
             }
 
-            // lưu note + hours + image
+            // lưu note + hours 
             dao.updateTechnicianWork(
                     maintenanceId,
                     technicianNote,
-                    laborHours,
-                    fileName
+                    laborHours
             );
+
+            // lưu image status TECHNICIAN_SUBMITTED
+            if (fileName != null) {
+                System.out.println("DEBUG: Adding image " + fileName + " for maintenanceId " + maintenanceId);
+                boolean added = dao.addTechnicianImage(maintenanceId, fileName);
+                System.out.println("DEBUG: addTechnicianImage result = " + added);
+            }
 
             // Lấy danh sách spare parts được chọn - spare parts (optional)
             String[] sparePartIds = req.getParameterValues("sparePartIds");

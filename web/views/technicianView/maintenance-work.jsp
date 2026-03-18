@@ -26,19 +26,22 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
+                                
+                                
                                 <div class="col-md-4 text-center">
-                                    <c:if test="${not empty m.image}">
-                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${m.image}" 
+                                    <c:if test="${not empty pendingImage.imageUrl}">
+                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${pendingImage.imageUrl}" 
                                              class="img-fluid rounded shadow-sm"
                                              style="max-height:200px; object-fit:cover;">
                                     </c:if>
 
-                                    <c:if test="${empty m.image}">
+                                    <c:if test="${empty pendingImage.imageUrl}">
                                         <img src="${pageContext.request.contextPath}/images/default.jpg" 
                                              class="img-fluid rounded shadow-sm"
                                              style="max-height:200px; object-fit:cover;">
                                     </c:if>
                                 </div>
+
 
                                 <div class="col-md-8">
                                     <p><strong>ID:</strong> #${m.id}</p>
