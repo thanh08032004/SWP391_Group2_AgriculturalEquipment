@@ -133,18 +133,18 @@
 
                     <div class="mt-3">
 
-                        <strong>Contract File:</strong>
+                        <strong>Contract File (PDF, Image):</strong>
                         <br>
 
                         <c:choose>
                             <c:when test="${not empty contract.fileUrl}">
-                                <a href="${pageContext.request.contextPath}/assets/contracts/${contract.fileUrl}"
+                                <a href="${pageContext.request.contextPath}/${contract.fileUrl}"
                                    target="_blank"
                                    class="btn btn-primary btn-sm me-2">
                                     <i class="bi bi-eye"></i> View
                                 </a>
 
-                                <a href="${pageContext.request.contextPath}/assets/contracts/${contract.fileUrl}"
+                                <a href="${pageContext.request.contextPath}/${contract.fileUrl}"
                                    download
                                    class="btn btn-success btn-sm">
                                     <i class="bi bi-download"></i> Download

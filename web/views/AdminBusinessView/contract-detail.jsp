@@ -117,7 +117,7 @@
 
                             <div class="row mt-3">
                                 <div class="col-md-12">
-                                    <strong>Contract File:</strong>
+                                    <strong>Contract File (PDF, Image):</strong>
                                     <br>
 
                                     <c:choose>

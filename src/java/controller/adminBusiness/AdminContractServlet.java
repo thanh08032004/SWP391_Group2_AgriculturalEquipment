@@ -263,8 +263,7 @@ public class AdminContractServlet extends HttpServlet {
 
                     String fileName = filePart.getSubmittedFileName();
 
-                    String projectPath = System.getProperty("user.dir");
-                    String uploadPath = projectPath + "/web/assets/contracts";
+                    String uploadPath = getServletContext().getRealPath("/assets/contracts");
 
                     File dir = new File(uploadPath);
                     if (!dir.exists()) {
@@ -273,7 +272,7 @@ public class AdminContractServlet extends HttpServlet {
 
                     filePart.write(uploadPath + File.separator + fileName);
 
-                    fileUrl = "/assets/contracts/" + fileName;
+                    fileUrl = "assets/contracts/" + fileName;
                 }
 
                 // ===== CREATED BY =====
@@ -307,7 +306,7 @@ public class AdminContractServlet extends HttpServlet {
                 int contractId = dao.insert(c);
 
                 // ===== INSERT MULTI DEVICE =====
-                DeviceDAO deviceDAO = new DeviceDAO(); 
+                DeviceDAO deviceDAO = new DeviceDAO();
 
                 if (deviceIds != null && contractId > 0) {
                     for (String d : deviceIds) {
@@ -397,8 +396,7 @@ public class AdminContractServlet extends HttpServlet {
 
                     String fileName = filePart.getSubmittedFileName();
 
-                    String projectPath = System.getProperty("user.dir");
-                    String uploadPath = projectPath + "/web/assets/contracts";
+                    String uploadPath = getServletContext().getRealPath("/assets/contracts");
 
                     File dir = new File(uploadPath);
                     if (!dir.exists()) {
@@ -407,7 +405,7 @@ public class AdminContractServlet extends HttpServlet {
 
                     filePart.write(uploadPath + File.separator + fileName);
 
-                    fileUrl = "/assets/contracts/" + fileName;
+                    fileUrl = "assets/contracts/" + fileName;
                 }
 
                 // ===== BUILD OBJECT =====
