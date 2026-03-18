@@ -112,10 +112,13 @@
                                                    class="btn btn-sm btn-info">
                                                     <i class="bi bi-eye"></i> View
                                                 </a>
-                                                <a href="contracts?action=edit&id=${c.id}" 
-                                                   class="btn btn-sm btn-warning">
-                                                    <i class="bi bi-pencil-square"></i> Update
-                                                </a>
+
+                                                <c:if test="${c.status != 'COMPLETED'}">
+                                                    <a href="contracts?action=edit&id=${c.id}" 
+                                                       class="btn btn-sm btn-warning">
+                                                        <i class="bi bi-pencil-square"></i> Update
+                                                    </a>
+                                                </c:if>
                                             </td>
                                         </tr>
                                     </c:forEach>
