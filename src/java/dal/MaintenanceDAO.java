@@ -783,7 +783,7 @@ public class MaintenanceDAO extends DBContext {
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, maintenanceId);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) { 
+                if (rs.next()) {
                     image = MaintenanceImage.builder()
                             .id(rs.getInt("id"))
                             .maintenanceId(rs.getInt("maintenance_id"))
@@ -800,5 +800,20 @@ public class MaintenanceDAO extends DBContext {
 
         return image;
     }
+    // Trong MaintenanceDAO
+
+    public boolean addCompletionImage(int maintenanceId, String imageUrl) {
+    String sql = "INSERT INTO maintenance_image (maintenance_id, status, image_url, description) "
+               + "VALUES (?, 'DONE', ?, ?)";
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, maintenanceId);
+        ps.setString(2, imageUrl);
+        ps.setString(3, "Technician uploaded completion confirmation image");
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 
 }

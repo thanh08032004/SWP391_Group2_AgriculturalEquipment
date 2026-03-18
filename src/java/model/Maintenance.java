@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor 
 @AllArgsConstructor
 @Builder
+
 public class Maintenance {
     private int id;
     private int deviceId;
@@ -26,7 +27,7 @@ public class Maintenance {
     private String modelName;
     private String customerName;
     private int currentMaintenanceId;
-
+    
     private List<MaintenanceImage> images;
     
 }

@@ -124,7 +124,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
                 req.getSession().setAttribute("error", "Failed to accept task!");
             }
 
-            resp.sendRedirect("maintenance?action=mytasks");
+            resp.sendRedirect("maintenance?action=list");
         }
 
         if ("detail".equals(action)) {
@@ -222,19 +222,15 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
         }
 
         if ("complete".equals(action)) {
-
             int id = Integer.parseInt(req.getParameter("id"));
-
-            boolean success = dao.completeTask(id, "DONE");
-
-            if (success) {
-                req.getSession().setAttribute("success", "Task marked as DONE!");
-            } else {
-                req.getSession().setAttribute("error", "Failed to complete task!");
-            }
-
-            resp.sendRedirect("maintenance?action=mytasks");
-        } else if (action.equals("getCustomerDetailJson")) {
+            Maintenance task = dao.getMaintenanceById(id);
+            List<Map<String, Object>> items = dao.getMaintenanceItems(id);
+            req.setAttribute("task", task);
+            req.setAttribute("items", items);
+            req.setAttribute("showCompletionForm", true); // ✅ flag để JSP hiện form upload
+            req.getRequestDispatcher("/views/technicianView/maintenance-detail.jsp").forward(req, resp);
+        }
+        else if (action.equals("getCustomerDetailJson")) {
 
             int cusId = Integer.parseInt(req.getParameter("id"));
 
@@ -383,6 +379,41 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
                 req.getSession().setAttribute("success", "Work submitted to admin successfully!");
             } else {
                 req.getSession().setAttribute("error", "Failed to submit work!");
+            }
+
+            resp.sendRedirect("maintenance?action=mytasks");
+        }
+
+        // Thêm vào doPost, sau if "submitwork"
+        if ("completewithimage".equals(action)) {
+            int maintenanceId = Integer.parseInt(req.getParameter("maintenanceId"));
+
+            // Upload ảnh completion
+            Part filePart = req.getPart("completionImage");
+            String fileName = null;
+
+            if (filePart != null && filePart.getSize() > 0) {
+                fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
+                String uploadPath = getServletContext().getRealPath("/assets/images/maintenance");
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+                filePart.write(uploadPath + File.separator + fileName);
+            }
+
+            // Lưu ảnh với status DONE
+            if (fileName != null) {
+                dao.addCompletionImage(maintenanceId, fileName);
+            }
+
+            // Mark task DONE
+            boolean success = dao.completeTask(maintenanceId, "DONE");
+
+            if (success) {
+                req.getSession().setAttribute("success", "Task completed successfully!");
+            } else {
+                req.getSession().setAttribute("error", "Failed to complete task!");
             }
 
             resp.sendRedirect("maintenance?action=mytasks");

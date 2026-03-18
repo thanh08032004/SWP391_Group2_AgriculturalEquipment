@@ -78,19 +78,170 @@
                                             <fmt:formatDate value="${task.startDate}" pattern="dd/MM/yyyy HH:mm"/>
                                         </small>
                                     </div>
-                                    <div class="col-md-4 text-end">
-                                        <p class="fw-bold mb-1 small text-muted text-uppercase">Attached Image:</p>
-                                        <c:choose>
-                                            <c:when test="${not empty task.image}">
-                                                <img src="${pageContext.request.contextPath}/assets/images/maintenance/${task.image}" 
-                                                     alt="Customer Upload" class="img-thumbnail shadow-sm" style="max-width: 100%; cursor: pointer;"
-                                                     onclick="window.open(this.src)">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div class="py-4 bg-light border rounded text-muted small italic text-center">No image attached</div>
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <%-- BLOCK 1: Customer Image --%>
+                                    <%-- === IMAGES TIMELINE === --%>
+                                    <div class="card border-0 shadow-sm mb-4">
+                                        <div class="card-header bg-white fw-bold">📷 Image Timeline</div>
+                                        <div class="card-body">
+                                            <div class="row g-3">
+
+                                                <%-- Ảnh 1: Customer --%>
+                                                <div class="col-md-4">
+                                                    <p class="fw-bold small text-muted text-uppercase mb-2">
+                                                        <i class="bi bi-person"></i> Customer's Image
+                                                    </p>
+                                                    <c:set var="hasCustomerImg" value="false"/>
+                                                    <c:forEach var="img" items="${task.images}">
+                                                        <c:if test="${img.status == 'PENDING'}">
+                                                            <c:set var="hasCustomerImg" value="true"/>
+                                                            <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}"
+                                                                 class="img-thumbnail w-100" style="max-height:180px; object-fit:cover; cursor:pointer;"
+                                                                 onclick="window.open(this.src)">
+                                                        </c:if>
+                                                    </c:forEach>
+                                                    <c:if test="${hasCustomerImg == 'false'}">
+                                                        <div class="py-4 bg-light border rounded text-center text-muted small">No image</div>
+                                                    </c:if>
+                                                </div>
+
+                                                <%-- Ảnh 2: Technician Diagnosis --%>
+                                                <div class="col-md-4">
+                                                    <p class="fw-bold small text-muted text-uppercase mb-2">
+                                                        <i class="bi bi-tools"></i> Diagnosis Image
+                                                    </p>
+                                                    <c:set var="hasTechImg" value="false"/>
+                                                    <c:forEach var="img" items="${task.images}">
+                                                        <c:if test="${img.status == 'TECHNICIAN_SUBMITTED'}">
+                                                            <c:set var="hasTechImg" value="true"/>
+                                                            <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}"
+                                                                 class="img-thumbnail w-100" style="max-height:180px; object-fit:cover; cursor:pointer;"
+                                                                 onclick="window.open(this.src)">
+                                                        </c:if>
+                                                    </c:forEach>
+                                                    <c:if test="${hasTechImg == 'false'}">
+                                                        <div class="py-4 bg-light border rounded text-center text-muted small">Not uploaded yet</div>
+                                                    </c:if>
+                                                </div>
+
+                                                <%-- Ảnh 3: Completion --%>
+                                                <div class="col-md-4">
+                                                    <p class="fw-bold small text-muted text-uppercase mb-2">
+                                                        <i class="bi bi-check-circle"></i> Completion Image
+                                                    </p>
+                                                    <c:set var="hasDoneImg" value="false"/>
+                                                    <c:forEach var="img" items="${task.images}">
+                                                        <c:if test="${img.status == 'DONE'}">
+                                                            <c:set var="hasDoneImg" value="true"/>
+                                                            <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}"
+                                                                 class="img-thumbnail w-100" style="max-height:180px; object-fit:cover; cursor:pointer;"
+                                                                 onclick="window.open(this.src)">
+                                                        </c:if>
+                                                    </c:forEach>
+                                                    <c:if test="${hasDoneImg == 'false'}">
+                                                        <div class="py-4 bg-light border rounded text-center text-muted small">Not uploaded yet</div>
+                                                    </c:if>
+                                                </div>
+
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    <%-- === FORM UPLOAD COMPLETION IMAGE (chỉ hiện khi showCompletionForm == true) === --%>
+                                    <c:if test="${showCompletionForm == true}">
+                                        <div class="card border-0 shadow-sm mb-4 border-start border-success border-4">
+                                            <div class="card-header bg-white fw-bold text-success">
+                                                <i class="bi bi-check2-circle"></i> Complete Task — Upload Confirmation Image
+                                            </div>
+                                            <div class="card-body">
+                                                <form action="${pageContext.request.contextPath}/technician/maintenance"
+                                                      method="post" enctype="multipart/form-data">
+                                                    <input type="hidden" name="action" value="completewithimage">
+                                                    <input type="hidden" name="maintenanceId" value="${task.id}">
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold">Completion Image <span class="text-muted fw-normal">(optional)</span></label>
+                                                        <input type="file" name="completionImage" class="form-control" accept="image/*"
+                                                               onchange="previewCompletion(this)">
+                                                        <div class="mt-2" id="previewBox" style="display:none;">
+                                                            <img id="previewImg" src="#" class="img-thumbnail" style="max-height:200px;">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-flex gap-2">
+                                                        <button type="submit" class="btn btn-success px-4"
+                                                                onclick="return confirm('Mark this task as DONE?')">
+                                                            <i class="bi bi-check-circle"></i> Confirm Done
+                                                        </button>
+                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks"
+                                                           class="btn btn-outline-secondary">Cancel</a>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </c:if>
+
+                                    <%-- Script preview ảnh --%>
+                                    <script>
+                                        function previewCompletion(input) {
+                                            if (input.files && input.files[0]) {
+                                                var reader = new FileReader();
+                                                reader.onload = function (e) {
+                                                    document.getElementById('previewImg').src = e.target.result;
+                                                    document.getElementById('previewBox').style.display = 'block';
+                                                };
+                                                reader.readAsDataURL(input.files[0]);
+                                            }
+                                        }
+                                    </script>
+                                   
+
+                                    <%-- BLOCK 2: Technician Diagnosis Image --%>
+                                    <c:if test="${task.status != 'PENDING' && task.status != 'READY' && task.status != 'WAITING_FOR_TECHNICIAN'}">
+                                        <div class="card border-0 shadow-sm mb-3">
+                                            <div class="card-header bg-white fw-bold text-warning">
+                                                <i class="bi bi-tools"></i> Technician's Diagnosis Image
+                                            </div>
+                                            <div class="card-body">
+                                                <c:set var="found2" value="false" />
+                                                <c:forEach var="img" items="${task.images}">
+                                                    <c:if test="${img.status == 'TECHNICIAN_SUBMITTED'}">
+                                                        <c:set var="found2" value="true" />
+                                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}"
+                                                             class="img-thumbnail shadow-sm me-2 mb-2"
+                                                             style="max-height:200px; cursor:pointer;"
+                                                             onclick="window.open(this.src)">
+                                                    </c:if>
+                                                </c:forEach>
+                                                <c:if test="${found2 == 'false'}">
+                                                    <p class="text-muted small italic">No diagnosis image uploaded yet.</p>
+                                                </c:if>
+                                            </div>
+                                        </div>
+                                    </c:if>
+
+                                    <%-- BLOCK 3: Completion Image --%>
+                                    <c:if test="${task.status == 'DONE'}">
+                                        <div class="card border-0 shadow-sm mb-3">
+                                            <div class="card-header bg-white fw-bold text-success">
+                                                <i class="bi bi-check-circle"></i> Completion Image
+                                            </div>
+                                            <div class="card-body">
+                                                <c:set var="found3" value="false" />
+                                                <c:forEach var="img" items="${task.images}">
+                                                    <c:if test="${img.status == 'DONE'}">
+                                                        <c:set var="found3" value="true" />
+                                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}"
+                                                             class="img-thumbnail shadow-sm me-2 mb-2"
+                                                             style="max-height:200px; cursor:pointer;"
+                                                             onclick="window.open(this.src)">
+                                                    </c:if>
+                                                </c:forEach>
+                                                <c:if test="${found3 == 'false'}">
+                                                    <p class="text-muted small italic">No completion image uploaded yet.</p>
+                                                </c:if>
+                                            </div>
+                                        </div>
+                                    </c:if>
                                 </div>
                             </div>
                         </div>
@@ -101,7 +252,8 @@
                                 <div class="card-body">
                                     <h6 class="fw-bold small text-uppercase mb-2">Technician Notes:</h6>
                                     <p class="text-dark">
-                                        <c:out value="${not empty task.description ? task.description : 'Awaiting diagnostic report...'}" />
+
+                                        <c:out value="${not empty task.technicianNote ? task.technicianNote : 'Awaiting diagnostic report...'}" />
                                     </p>
 
                                     <h6 class="mt-4 fw-bold small text-uppercase">Proposed Spare Parts:</h6>
@@ -186,86 +338,86 @@
         </div>
         <jsp:include page="/common/scripts.jsp"></jsp:include>
             <script>
-            var CTX = '${pageContext.request.contextPath}';
+                var CTX = '${pageContext.request.contextPath}';
 
-            function esc(str) {
-                if (!str || str === 'null')
-                    return '';
-                return String(str)
-                        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-            }
+                function esc(str) {
+                    if (!str || str === 'null')
+                        return '';
+                    return String(str)
+                            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                }
 
-            function showDeviceDetail(deviceId) {
-                var modal = new bootstrap.Modal(document.getElementById('deviceDetailModal'));
-                document.getElementById('deviceDetailContent').innerHTML =
-                        '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
-                modal.show();
-                fetch(CTX + '/technician/maintenance?action=getDeviceDetailJson&id=' + deviceId)
-                        .then(function (res) {
-                            return res.json();
-                        })
-                        .then(function (dev) {
-                            var statusBadge = dev.status === 'ACTIVE'
-                                    ? '<span class="badge bg-success">Active</span>'
-                                    : dev.status === 'MAINTENANCE'
-                                    ? '<span class="badge bg-warning text-dark">Maintenance</span>'
-                                    : '<span class="badge bg-danger">Broken</span>';
-                            document.getElementById('deviceDetailContent').innerHTML =
-                                    '<div class="text-center mb-4">' +
-                                    '<img src="' + CTX + '/assets/images/devices/' + (dev.image || 'default_device.jpg') + '" ' +
-                                    'class="rounded shadow-sm border" style="max-width:250px;max-height:250px;object-fit:contain;"></div>' +
-                                    '<table class="table table-bordered">' +
-                                    '<tr><th style="width:35%">Serial Number</th><td>' + esc(dev.serial) + '</td></tr>' +
-                                    '<tr><th>Machine Name</th><td><strong>' + esc(dev.machineName) + '</strong></td></tr>' +
-                                    '<tr><th>Model</th><td>' + esc(dev.model) + '</td></tr>' +
-                                    '<tr><th>Price</th><td><strong class="text-success">' + esc(dev.price) + ' VNĐ</strong></td></tr>' +
-                                    '<tr><th>Status</th><td>' + statusBadge + '</td></tr>' +
-                                    '<tr><th>Category</th><td>' + esc(dev.categoryName) + '</td></tr>' +
-                                    '<tr><th>Brand</th><td>' + esc(dev.brandName) + '</td></tr>' +
-                                    '<tr><th>Customer</th><td>' + esc(dev.customerName) + '</td></tr>' +
-                                    '<tr><th>Purchase Date</th><td>' + esc(dev.purchaseDate) + '</td></tr>' +
-                                    '<tr><th>Warranty End Date</th><td>' + esc(dev.warrantyEndDate) + '</td></tr>' +
-                                    '</table>';
-                        })
-                        .catch(function () {
-                            document.getElementById('deviceDetailContent').innerHTML =
-                                    '<p class="text-danger text-center">Error loading device details.</p>';
-                        });
-            }
+                function showDeviceDetail(deviceId) {
+                    var modal = new bootstrap.Modal(document.getElementById('deviceDetailModal'));
+                    document.getElementById('deviceDetailContent').innerHTML =
+                            '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+                    modal.show();
+                    fetch(CTX + '/technician/maintenance?action=getDeviceDetailJson&id=' + deviceId)
+                            .then(function (res) {
+                                return res.json();
+                            })
+                            .then(function (dev) {
+                                var statusBadge = dev.status === 'ACTIVE'
+                                        ? '<span class="badge bg-success">Active</span>'
+                                        : dev.status === 'MAINTENANCE'
+                                        ? '<span class="badge bg-warning text-dark">Maintenance</span>'
+                                        : '<span class="badge bg-danger">Broken</span>';
+                                document.getElementById('deviceDetailContent').innerHTML =
+                                        '<div class="text-center mb-4">' +
+                                        '<img src="' + CTX + '/assets/images/devices/' + (dev.image || 'default_device.jpg') + '" ' +
+                                        'class="rounded shadow-sm border" style="max-width:250px;max-height:250px;object-fit:contain;"></div>' +
+                                        '<table class="table table-bordered">' +
+                                        '<tr><th style="width:35%">Serial Number</th><td>' + esc(dev.serial) + '</td></tr>' +
+                                        '<tr><th>Machine Name</th><td><strong>' + esc(dev.machineName) + '</strong></td></tr>' +
+                                        '<tr><th>Model</th><td>' + esc(dev.model) + '</td></tr>' +
+                                        '<tr><th>Price</th><td><strong class="text-success">' + esc(dev.price) + ' VNĐ</strong></td></tr>' +
+                                        '<tr><th>Status</th><td>' + statusBadge + '</td></tr>' +
+                                        '<tr><th>Category</th><td>' + esc(dev.categoryName) + '</td></tr>' +
+                                        '<tr><th>Brand</th><td>' + esc(dev.brandName) + '</td></tr>' +
+                                        '<tr><th>Customer</th><td>' + esc(dev.customerName) + '</td></tr>' +
+                                        '<tr><th>Purchase Date</th><td>' + esc(dev.purchaseDate) + '</td></tr>' +
+                                        '<tr><th>Warranty End Date</th><td>' + esc(dev.warrantyEndDate) + '</td></tr>' +
+                                        '</table>';
+                            })
+                            .catch(function () {
+                                document.getElementById('deviceDetailContent').innerHTML =
+                                        '<p class="text-danger text-center">Error loading device details.</p>';
+                            });
+                }
 
-            function showCustomerDetail(customerId) {
-                var modal = new bootstrap.Modal(document.getElementById('customerDetailModal'));
-                document.getElementById('customerDetailContent').innerHTML =
-                        '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
-                modal.show();
-                fetch(CTX + '/technician/maintenance?action=getCustomerDetailJson&id=' + customerId)
-                        .then(function (res) {
-                            return res.json();
-                        })
-                        .then(function (cus) {
-                            document.getElementById('customerDetailContent').innerHTML =
-                                    '<div class="bg-primary p-4 text-center text-white" style="border-radius:15px 15px 0 0;">' +
-                                    '<img src="' + CTX + '/assets/images/avatars/' + (cus.avatar || 'default.jpg') + '" ' +
-                                    'class="rounded-circle border border-3 border-white mb-2 shadow" ' +
-                                    'style="width:80px;height:80px;object-fit:cover;">' +
-                                    '<h5 class="mb-0">' + esc(cus.fullname) + '</h5>' +
-                                    '<small class="opacity-75">' + esc(cus.role) + '</small></div>' +
-                                    '<div class="p-4"><table class="table table-bordered mb-3">' +
-                                    '<tr><th style="width:40%">Username</th><td>' + esc(cus.username) + '</td></tr>' +
-                                    '<tr><th>Full Name</th><td>' + esc(cus.fullname) + '</td></tr>' +
-                                    '<tr><th>Email</th><td>' + esc(cus.email) + '</td></tr>' +
-                                    '<tr><th>Phone</th><td>' + esc(cus.phone) + '</td></tr>' +
-                                    '<tr><th>Gender</th><td>' + esc(cus.gender) + '</td></tr>' +
-                                    '<tr><th>Date of Birth</th><td>' + esc(cus.birthDate) + '</td></tr>' +
-                                    '<tr><th>Address</th><td>' + esc(cus.address) + '</td></tr>' +
-                                    '</table></div>';
-                        })
-                        .catch(function () {
-                            document.getElementById('customerDetailContent').innerHTML =
-                                    '<p class="text-danger text-center p-4">Error loading customer details.</p>';
-                        });
-            }
+                function showCustomerDetail(customerId) {
+                    var modal = new bootstrap.Modal(document.getElementById('customerDetailModal'));
+                    document.getElementById('customerDetailContent').innerHTML =
+                            '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+                    modal.show();
+                    fetch(CTX + '/technician/maintenance?action=getCustomerDetailJson&id=' + customerId)
+                            .then(function (res) {
+                                return res.json();
+                            })
+                            .then(function (cus) {
+                                document.getElementById('customerDetailContent').innerHTML =
+                                        '<div class="bg-primary p-4 text-center text-white" style="border-radius:15px 15px 0 0;">' +
+                                        '<img src="' + CTX + '/assets/images/avatars/' + (cus.avatar || 'default.jpg') + '" ' +
+                                        'class="rounded-circle border border-3 border-white mb-2 shadow" ' +
+                                        'style="width:80px;height:80px;object-fit:cover;">' +
+                                        '<h5 class="mb-0">' + esc(cus.fullname) + '</h5>' +
+                                        '<small class="opacity-75">' + esc(cus.role) + '</small></div>' +
+                                        '<div class="p-4"><table class="table table-bordered mb-3">' +
+                                        '<tr><th style="width:40%">Username</th><td>' + esc(cus.username) + '</td></tr>' +
+                                        '<tr><th>Full Name</th><td>' + esc(cus.fullname) + '</td></tr>' +
+                                        '<tr><th>Email</th><td>' + esc(cus.email) + '</td></tr>' +
+                                        '<tr><th>Phone</th><td>' + esc(cus.phone) + '</td></tr>' +
+                                        '<tr><th>Gender</th><td>' + esc(cus.gender) + '</td></tr>' +
+                                        '<tr><th>Date of Birth</th><td>' + esc(cus.birthDate) + '</td></tr>' +
+                                        '<tr><th>Address</th><td>' + esc(cus.address) + '</td></tr>' +
+                                        '</table></div>';
+                            })
+                            .catch(function () {
+                                document.getElementById('customerDetailContent').innerHTML =
+                                        '<p class="text-danger text-center p-4">Error loading customer details.</p>';
+                            });
+                }
         </script>
 
         <!-- Device Detail Modal -->
