@@ -1,5 +1,6 @@
 package controller.adminBusiness;
 
+import dal.ContractDAO;
 import dal.DeviceDAO;
 import dto.CategoryDTO;
 import java.util.Comparator;
@@ -108,7 +109,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 case "add": {
                     request.setAttribute("categories", deviceDAO.getAllCategories());
                     request.setAttribute("brands", deviceDAO.getAllBrands());
-                     request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown()); 
+                    request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
                     request.getRequestDispatcher("/views/AdminBusinessView/device-add.jsp")
                             .forward(request, response);
                     break;
@@ -118,7 +119,12 @@ public class AdminDeviceServlet extends HttpServlet {
                     int id = Integer.parseInt(request.getParameter("id"));
                     DeviceDTO device = deviceDAO.getDeviceById(id);
 
+                    // Kiểm tra device có trong contract COMPLETE không
+                    ContractDAO contractDAO = new ContractDAO();
+                    boolean isLocked = contractDAO.isDeviceInCompletedContract(id);
+
                     request.setAttribute("deviceEdit", device);
+                    request.setAttribute("isLocked", isLocked); // ← truyền sang JSP
                     request.setAttribute("categories", deviceDAO.getAllCategories());
                     request.setAttribute("brands", deviceDAO.getAllBrands());
                     request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
@@ -127,6 +133,7 @@ public class AdminDeviceServlet extends HttpServlet {
                             .forward(request, response);
                     break;
                 }
+
                 case "updateStatus": {
                     int id = Integer.parseInt(request.getParameter("id"));
                     String newStatus = request.getParameter("status");
@@ -241,18 +248,19 @@ public class AdminDeviceServlet extends HttpServlet {
             Integer customerId = null;
             String customerIdRaw = request.getParameter("customerId");
 
-            try {
-                customerId = Integer.parseInt(customerIdRaw);
+            if (customerIdRaw != null && !customerIdRaw.trim().isEmpty()) {
+                try {
+                    customerId = Integer.parseInt(customerIdRaw);
 
-                // check exist in DB
-                if (!deviceDAO.isCustomerExists(customerId)) {
-                    request.setAttribute("errorCustomerId", "Customer ID không tồn tại");
+                    if (!deviceDAO.isCustomerExists(customerId)) {
+                        request.setAttribute("errorCustomerId", "Customer ID không tồn tại");
+                        hasError = true;
+                    }
+
+                } catch (NumberFormatException e) {
+                    request.setAttribute("errorCustomerId", "Customer ID phải là số");
                     hasError = true;
                 }
-
-            } catch (NumberFormatException e) {
-                request.setAttribute("errorCustomerId", "Customer ID phải là số");
-                hasError = true;
             }
 
             d.setCustomerId(customerId);
@@ -319,6 +327,12 @@ public class AdminDeviceServlet extends HttpServlet {
 
         } else if ("update".equals(action)) {
 
+            int deviceId = Integer.parseInt(request.getParameter("id"));
+            ContractDAO contractDAO = new ContractDAO();
+            if (contractDAO.isDeviceInCompletedContract(deviceId)) {
+                response.sendRedirect("devices?action=edit&id=" + deviceId + "&error=locked");
+                return;
+            }
             DeviceDTO d = new DeviceDTO();
             boolean hasErrorUpdate = false;
 
@@ -332,17 +346,24 @@ public class AdminDeviceServlet extends HttpServlet {
             }
             d.setMachineName(machineName);
 
-            try {
-                int customerId = Integer.parseInt(request.getParameter("customerId"));
-                if (!deviceDAO.isCustomerExists(customerId)) {
-                    request.setAttribute("errorCustomerId", "Customer ID không tồn tại");
+            Integer customerId = null;
+            String customerIdRaw = request.getParameter("customerId");
+
+            if (customerIdRaw != null && !customerIdRaw.trim().isEmpty()) {
+                try {
+                    customerId = Integer.parseInt(customerIdRaw);
+
+                    if (!deviceDAO.isCustomerExists(customerId)) {
+                        request.setAttribute("errorCustomerId", "Customer ID không tồn tại");
+                        hasError = true;
+                    }
+
+                } catch (NumberFormatException e) {
+                    request.setAttribute("errorCustomerId", "Customer ID phải là số");
                     hasError = true;
                 }
-                d.setCustomerId(customerId);
-            } catch (NumberFormatException e) {
-                request.setAttribute("errorCustomerId", "Customer ID phải là số");
-                hasError = true;
             }
+            d.setCustomerId(customerId);
 
             d.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             d.setBrandId(Integer.parseInt(request.getParameter("brandId")));

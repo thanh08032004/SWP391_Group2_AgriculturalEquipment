@@ -211,7 +211,11 @@ public class DeviceDAO extends DBContext {
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, d.getCustomerId());
+            if (d.getCustomerId() != null) {
+                ps.setInt(1, d.getCustomerId());
+            } else {
+                ps.setNull(1, java.sql.Types.INTEGER);
+            }
             ps.setString(2, d.getSerialNumber());
             ps.setString(3, d.getMachineName());
             ps.setString(4, d.getModel());
@@ -253,7 +257,11 @@ public class DeviceDAO extends DBContext {
             ps.setString(1, d.getMachineName());
             ps.setString(2, d.getModel());
             ps.setBigDecimal(3, d.getPrice());
-            ps.setInt(4, d.getCustomerId());
+            if (d.getCustomerId() != null) {
+                ps.setInt(4, d.getCustomerId());
+            } else {
+                ps.setNull(4, java.sql.Types.INTEGER);
+            }
             ps.setInt(5, d.getCategoryId());
             ps.setInt(6, d.getBrandId());
             ps.setDate(7, d.getPurchaseDate());

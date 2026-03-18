@@ -478,5 +478,23 @@ public class ContractDAO extends DBContext {
             e.printStackTrace();
         }
     }
+    
+    public boolean isDeviceInCompletedContract(int deviceId) {
+    String sql = """
+        SELECT 1 
+        FROM contract_device cd
+        JOIN contract c ON cd.contract_id = c.id
+        WHERE cd.device_id = ?
+        AND c.status = 'COMPLETED'
+    """;
+    try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, deviceId);
+        ResultSet rs = ps.executeQuery();
+        return rs.next();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 
 }

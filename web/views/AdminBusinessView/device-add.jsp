@@ -92,7 +92,7 @@
                                            placeholder="Search customer by name...">
 
                                     <!-- Dropdown -->
-                                    <select name="customerId" id="customerSelect" class="form-select" required>
+                                    <select name="customerId" id="customerSelect" class="form-select">
                                         <option value="">-- Select Customer --</option>
                                         <c:forEach var="cus" items="${customerList}">
                                             <option value="${cus.id}"
