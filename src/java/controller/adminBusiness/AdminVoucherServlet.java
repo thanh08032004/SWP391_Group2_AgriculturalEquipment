@@ -7,6 +7,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
+import model.User;
 
 public class AdminVoucherServlet extends HttpServlet {
 
@@ -178,6 +179,7 @@ public class AdminVoucherServlet extends HttpServlet {
     private void addVoucher(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        User business = (User) req.getSession().getAttribute("user");
         Voucher v = new Voucher();
 
         String voucherType = req.getParameter("voucherType");
@@ -189,6 +191,7 @@ public class AdminVoucherServlet extends HttpServlet {
         v.setDiscountType(req.getParameter("discountType"));
         v.setVoucherType(req.getParameter("voucherType"));
         v.setActive(Boolean.parseBoolean(req.getParameter("isActive")));
+        v.setCreatedBy(business.getId());       
 
         // minServicePrice có thể rỗng
         String minStr = req.getParameter("minServicePrice");
@@ -245,13 +248,14 @@ public class AdminVoucherServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Voucher v = new Voucher();
-
+        User business = (User) req.getSession().getAttribute("user");
+        
         // gán data trước
         v.setId(Integer.parseInt(req.getParameter("id")));
         v.setCode(req.getParameter("code"));
         v.setDescription(req.getParameter("description"));
         v.setDiscountType(req.getParameter("discountType"));
-        v.setVoucherType(req.getParameter("voucherType"));
+        v.setVoucherType(req.getParameter("voucherType"));      
         v.setActive(Boolean.parseBoolean(req.getParameter("isActive")));
 
         String minStr = req.getParameter("minServicePrice");

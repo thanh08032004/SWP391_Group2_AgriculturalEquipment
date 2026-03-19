@@ -86,7 +86,7 @@ CREATE TABLE brand (
 -- =================================================
 CREATE TABLE device (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  customer_id INT NOT NULL,
+  customer_id INT,
   serial_number VARCHAR(50) NOT NULL UNIQUE,
   machine_name VARCHAR(100),
   model VARCHAR(50),
@@ -129,7 +129,12 @@ CREATE TABLE voucher (
   discount_value DECIMAL(10,2) NOT NULL,
   min_service_price DECIMAL(12,2) DEFAULT 0,
   voucher_type ENUM('GLOBAL','CUSTOMER') DEFAULT 'GLOBAL',
-  is_active BOOLEAN DEFAULT TRUE
+  created_by INT,
+  is_active BOOLEAN DEFAULT TRUE,
+  
+  CONSTRAINT fk_voucher_user  FOREIGN KEY (created_by)  REFERENCES users(id)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- =================================================
@@ -167,11 +172,22 @@ CREATE TABLE maintenance (
   labor_hours DECIMAL(5,2) DEFAULT 0,
   labor_cost_per_hour DECIMAL(10,2) DEFAULT 100000,
   status ENUM('READY', 'PENDING', 'WAITING_FOR_TECHNICIAN', 'TECHNICIAN_ACCEPTED','TECHNICIAN_SUBMITTED', 'DIAGNOSIS READY', 'IN_PROGRESS', 'DONE') DEFAULT 'READY',
-  image VARCHAR(255),
   start_date DATETIME NOT NULL,
   end_date DATETIME,
   FOREIGN KEY (device_id) REFERENCES device(id) ON DELETE CASCADE,
   FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+-- 22. MAINTENANCE_IMAGE
+CREATE TABLE maintenance_image (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  maintenance_id INT NOT NULL,
+  -- status để biết ảnh này chụp lúc nào
+  status ENUM('PENDING', 'TECHNICIAN_SUBMITTED', 'DONE') NOT NULL, 
+  image_url VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (maintenance_id) REFERENCES maintenance(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- =================================================
@@ -566,35 +582,33 @@ INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES
 
 
 INSERT INTO voucher 
-(code, description, discount_type, discount_value, min_service_price, voucher_type, is_active)
+(code, description, discount_type, discount_value, min_service_price, voucher_type, created_by, is_active)
 VALUES
 -- Percent vouchers
-('NEWYEAR10', '10% discount for New Year promotion', 'PERCENT', 10.00, 300000, 'GLOBAL', TRUE),
-('SPRING15', '15% off for spring season', 'PERCENT', 15.00, 500000, 'GLOBAL', FALSE),
-('SUMMER20', '20% summer sale voucher', 'PERCENT', 20.00, 700000, 'GLOBAL', TRUE),
-('WELCOME5', '5% discount for new customers', 'PERCENT', 5.00, 200000, 'GLOBAL', TRUE),
+('NEWYEAR10', '10% discount for New Year promotion', 'PERCENT', 10.00, 300000, 'GLOBAL', 2, TRUE),
+('SPRING15', '15% off for spring season', 'PERCENT', 15.00, 500000, 'GLOBAL', 2, FALSE),
+('SUMMER20', '20% summer sale voucher', 'PERCENT', 20.00, 700000, 'GLOBAL', 2, TRUE),
+('WELCOME5', '5% discount for new customers', 'PERCENT', 5.00, 200000, 'GLOBAL', 2, TRUE),
 
 -- Amount vouchers
-('SAVE50K', 'Save 50,000 VND on services', 'AMOUNT', 50000, 300000, 'GLOBAL', TRUE),
-('SAVE100K', 'Save 100,000 VND on orders', 'AMOUNT', 100000, 600000, 'GLOBAL', TRUE),
-('BIGSALE200K', 'Big sale 200,000 VND voucher', 'AMOUNT', 200000, 1000000, 'GLOBAL', TRUE),
+('SAVE50K', 'Save 50,000 VND on services', 'AMOUNT', 50000, 300000, 'GLOBAL', 2, TRUE),
+('SAVE100K', 'Save 100,000 VND on orders', 'AMOUNT', 100000, 600000, 'GLOBAL', 2, TRUE),
+('BIGSALE200K', 'Big sale 200,000 VND voucher', 'AMOUNT', 200000, 1000000, 'GLOBAL', 2, TRUE),
 
--- Previously expired vouchers (giờ cho còn hạn luôn nếu muốn test)
-('OLD2023', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, 'GLOBAL', TRUE),
-('FLASH30', '30% flash sale voucher', 'PERCENT', 30.00, 800000, 'GLOBAL', TRUE),
-('OKOKUHUH', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, 'GLOBAL', TRUE),
-('SUPERSALE', '30% flash sale voucher', 'PERCENT', 30.00, 800000, 'GLOBAL', TRUE),
+-- Others
+('OLD2023', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, 'GLOBAL', 2, TRUE),
+('FLASH30', '30% flash sale voucher', 'PERCENT', 30.00, 800000, 'GLOBAL', 2, TRUE),
+('OKOKUHUH', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, 'GLOBAL', 2, TRUE),
+('SUPERSALE', '30% flash sale voucher', 'PERCENT', 30.00, 800000, 'GLOBAL', 2, TRUE),
 
--- Not activated. 
-('AOLD2023333', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, 'GLOBAL', TRUE),
-('FLASHSSS30', '30% flash sale voucher', 'PERCENT', 30.00, 800000, 'GLOBAL', TRUE),
+('AOLD2023333', 'Expired voucher from 2023', 'PERCENT', 10.00, 300000, 'GLOBAL', 2, TRUE),
+('FLASHSSS30', '30% flash sale voucher', 'PERCENT', 30.00, 800000, 'GLOBAL', 2, TRUE),
 
 -- PRIVATE vouchers
-('PRIVATE_CUS4', 'Private voucher for customer 4', 'PERCENT', 10.00, 300000, 'CUSTOMER', TRUE),
-('PRIVATE_CUS7', 'Private voucher for customer 7', 'PERCENT', 15.00, 300000, 'CUSTOMER', TRUE),
-('PRIVATE_CUS8', 'Private voucher for customer 8', 'AMOUNT', 50000, 400000, 'CUSTOMER', TRUE),
-('PRIVATE_CUS9', 'Private voucher for customer 9', 'PERCENT', 20.00, 500000, 'CUSTOMER', TRUE);
-
+('PRIVATE_CUS4', 'Private voucher for customer 4', 'PERCENT', 10.00, 300000, 'CUSTOMER', 2, TRUE),
+('PRIVATE_CUS7', 'Private voucher for customer 7', 'PERCENT', 15.00, 300000, 'CUSTOMER', 2, TRUE),
+('PRIVATE_CUS8', 'Private voucher for customer 8', 'AMOUNT', 50000, 400000, 'CUSTOMER', 2, TRUE),
+('PRIVATE_CUS9', 'Private voucher for customer 9', 'PERCENT', 20.00, 500000, 'CUSTOMER', 2, TRUE);
 INSERT INTO customer_voucher 
 (customer_id, voucher_id, is_used, assigned_at)
 VALUES
@@ -712,7 +726,7 @@ INSERT INTO contract (
   'Thanh toán 50% khi ký, 50% khi bàn giao',
   'Hợp đồng mua máy cày và máy gặt',
   'ACTIVE',
-  '300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
+  'assets/contracts/300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
   2
 );
 
@@ -740,7 +754,7 @@ INSERT INTO contract (
   'Thanh toán một lần',
   'Hợp đồng mua máy phun thuốc',
   'COMPLETED',
-  '300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
+  'assets/contracts/300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
   2
 );
 
@@ -768,7 +782,7 @@ INSERT INTO contract (
   'Thanh toán theo 3 đợt',
   'Hợp đồng mua máy gặt New Holland',
   'ACTIVE',
-  '300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
+  'assets/contracts/300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
   2
 );
 
@@ -808,4 +822,38 @@ VALUES ('/customer/contract/list','Danh sách hợp đồng của chính custome
 INSERT INTO role_permission (role_id, permission_id)
 VALUES (4, 29);
 
+-- Demo device chưa có customerId, tạo hợp đồng gán --
+INSERT INTO device (
+  customer_id,
+  serial_number,
+  machine_name,
+  model,
+  price,
+  purchase_date,
+  warranty_end_date,
+  status,
+  category_id,
+  brand_id,
+  image
+) VALUES
+(NULL, 'SN-NOCUS-001', 'Máy cày demo 1', 'DEMO-T1', 500000000, '2025-01-01', '2028-01-01', 'ACTIVE', 1, 1, 'demo1.jpg'),
+(NULL, 'SN-NOCUS-002', 'Máy gặt demo 2', 'DEMO-H1', 900000000, '2025-02-01', '2028-02-01', 'ACTIVE', 2, 3, 'demo2.jpg'),
+(NULL, 'SN-NOCUS-003', 'Máy xới demo 3', 'DEMO-X1', 300000000, '2025-03-01', '2028-03-01', 'ACTIVE', 3, 2, 'demo3.jpg'),
+(NULL, 'SN-NOCUS-004', 'Máy phun demo 4', 'DEMO-P1', 150000000, '2025-04-01', '2028-04-01', 'ACTIVE', 5, 8, 'demo4.jpg'),
+(NULL, 'SN-NOCUS-005', 'Máy cắt cỏ demo 5', 'DEMO-C1', 80000000, '2025-05-01', '2028-05-01', 'ACTIVE', 7, 9, 'demo5.jpg');
+
+-- Contract 2 → customer 7
+UPDATE device 
+SET customer_id = 7
+WHERE id = 7;
+
+-- Contract 3 → customer 8
+UPDATE device 
+SET customer_id = 8
+WHERE id = 8;
+
+-- ===================================== PASSWORD RESET =========================================== --
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 28);
+-- ====================================================================================================================== --
 

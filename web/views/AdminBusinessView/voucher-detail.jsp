@@ -103,6 +103,21 @@
                                             <th class="bg-light">Min Service Price</th>
                                             <td>${voucher.minServicePrice} VND</td>
                                         </tr>
+                                        <tr>
+                                            <th class="bg-light">Created By</th>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${not empty voucher.createdBy}">
+                                                        <a href="${pageContext.request.contextPath}/admin-business/user/profile?id=${voucher.createdBy}">
+                                                            ${voucher.createdName}
+                                                        </a>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="text-muted">System</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                        </tr>                                      
                                     </table>  
 
 

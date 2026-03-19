@@ -5,11 +5,13 @@
 package model;
 
 import lombok.*;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Voucher {
+
     private int id;
     private String code;
     private String description;
@@ -17,6 +19,7 @@ public class Voucher {
     private double discountValue;
     private double minServicePrice;
     private String voucherType; //GLOBAL, CUSTOMER
+    private Integer createdBy;
+    private String createdName;
     private boolean active;
 }
-

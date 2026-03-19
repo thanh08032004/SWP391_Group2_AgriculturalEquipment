@@ -12,10 +12,13 @@ public class VoucherDAO extends DBContext {
         List<Voucher> list = new ArrayList<>();
 
         String sql = """
-            SELECT *
-            FROM voucher
-            WHERE code LIKE ?
-            ORDER BY id DESC
+            SELECT v.*,
+                COALESCE(up.fullname, 'Unknown') AS created_name         
+            FROM voucher v
+            LEFT JOIN users u ON v.created_by = u.id
+            LEFT JOIN user_profile up ON u.id = up.user_id                       
+            WHERE v.code LIKE ?
+            ORDER BY v.id DESC
             LIMIT ? OFFSET ?
         """;
 
@@ -58,7 +61,15 @@ public class VoucherDAO extends DBContext {
 
     /* Get voucher by ID (Detail) */
     public Voucher getVoucherById(int id) {
-        String sql = "SELECT * FROM voucher WHERE id = ?";
+        String sql = """
+                     SELECT v.*,
+                        COALESCE(up.fullname, 'Unknown') AS created_name                        
+                     FROM voucher v
+                     LEFT JOIN users u ON v.created_by = u.id
+                     LEFT JOIN user_profile up ON u.id = up.user_id 
+                     
+                     WHERE v.id = ?
+                     """;
 
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -91,11 +102,18 @@ public class VoucherDAO extends DBContext {
 
         v.setId(rs.getInt("id"));
         v.setCode(rs.getString("code"));
+
         v.setDescription(rs.getString("description"));
+
         v.setDiscountType(rs.getString("discount_type"));
         v.setDiscountValue(rs.getDouble("discount_value"));
         v.setMinServicePrice(rs.getDouble("min_service_price"));
+
         v.setVoucherType(rs.getString("voucher_type"));
+
+        v.setCreatedBy(rs.getInt("created_by"));     
+        v.setCreatedName(rs.getString("created_name"));
+
         v.setActive(rs.getBoolean("is_active"));
 
         return v;
@@ -105,8 +123,8 @@ public class VoucherDAO extends DBContext {
         String sql = """
         INSERT INTO voucher
         (code, description, discount_type, discount_value,
-         min_service_price, voucher_type, is_active)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+         min_service_price, voucher_type, created_by, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -117,7 +135,8 @@ public class VoucherDAO extends DBContext {
             ps.setDouble(4, v.getDiscountValue());
             ps.setDouble(5, v.getMinServicePrice());
             ps.setString(6, v.getVoucherType());
-            ps.setBoolean(7, v.isActive());
+            ps.setInt(7, v.getCreatedBy());            
+            ps.setBoolean(8, v.isActive());
 
             ps.executeUpdate();
 
@@ -136,10 +155,10 @@ public class VoucherDAO extends DBContext {
     public void updateVoucher(Voucher v) {
         String sql = """
         UPDATE voucher
-        SET code = ?, description = ?, discount_type = ?,
-            discount_value = ?, min_service_price = ?,
-            voucher_type = ?, is_active = ?
-        WHERE id = ?
+        SET code=?, description=?, discount_type=?,
+            discount_value=?, min_service_price=?,
+            voucher_type=?, is_active=?
+        WHERE id=?
     """;
 
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -150,7 +169,7 @@ public class VoucherDAO extends DBContext {
             ps.setDouble(4, v.getDiscountValue());
             ps.setDouble(5, v.getMinServicePrice());
             ps.setString(6, v.getVoucherType());
-            ps.setBoolean(7, v.isActive());           
+            ps.setBoolean(7, v.isActive());          
             ps.setInt(8, v.getId());
 
             ps.executeUpdate();
