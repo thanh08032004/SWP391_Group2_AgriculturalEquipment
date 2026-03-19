@@ -382,6 +382,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
                 req.getSession().setAttribute("error", "Failed to submit work!");
             }
 
+            //
             resp.sendRedirect("maintenance?action=mytasks");
         }
 
