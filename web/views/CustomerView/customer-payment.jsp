@@ -11,9 +11,6 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
         <style>
             body { background: #f4f6f9; font-size: 14px; }
-            .wrapper { display: flex; }
-            .sidebar { width: 250px; min-height: 100vh; background: #2c3e50; }
-            .content { flex: 1; padding: 30px; }
 
             .page-card {
                 border-radius: 12px;
@@ -42,7 +39,6 @@
             .money { font-weight: 700; color: #198754; }
             .part-table th { background: #f1e3d3; }
 
-            /* Payment method cards */
             .method-group { display: flex; gap: 16px; flex-wrap: wrap; }
             .method-card {
                 flex: 1;
@@ -87,196 +83,204 @@
             <jsp:include page="/common/header.jsp"/>
         </header>
 
-        <div class="wrapper">
-            
+        <%-- Layout giống my-devices: không sidebar, content căn giữa --%>
+        <div class="admin-layout d-flex">
+            <div class="admin-content p-4 w-100">
+                <div class="container" style="max-width: 860px;">
 
-            <div class="content">
+                    <h4 class="fw-bold mb-4">
+                        <i class="bi bi-credit-card me-2"></i>
+                        Payment — Invoice #${invoice.invoiceId}
+                    </h4>
 
-                <h4 class="fw-bold mb-4">
-                    <i class="bi bi-credit-card me-2"></i>
-                    Payment — Invoice #${invoice.invoiceId}
-                </h4>
-
-                <!-- ===== INVOICE INFO ===== -->
-                <div class="page-card">
-                    <div class="section-header">
-                        <i class="bi bi-file-earmark-text me-2"></i> Invoice Information
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Customer</div>
-                        <div>${invoice.customerName}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Technician</div>
-                        <div>${invoice.technicianName}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Device</div>
-                        <div>${invoice.machineName} (${invoice.model})</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Brand / Category</div>
-                        <div>${invoice.brandName} — ${invoice.categoryName}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Serial Number</div>
-                        <div>${invoice.serialNumber}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Voucher</div>
-                        <div>
-                            <c:choose>
-                                <c:when test="${not empty invoice.voucherCode}">
-                                    ${invoice.voucherCode}
-                                    (-<fmt:formatNumber value="${invoice.discountAmount}" type="number"/> đ)
-                                </c:when>
-                                <c:otherwise><span class="text-muted">None</span></c:otherwise>
-                            </c:choose>
+                    <!-- ===== INVOICE INFO ===== -->
+                    <div class="page-card">
+                        <div class="section-header">
+                            <i class="bi bi-file-earmark-text me-2"></i> Invoice Information
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Customer</div>
+                            <div>${invoice.customerName}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Technician</div>
+                            <div>${invoice.technicianName}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Device</div>
+                            <div>${invoice.machineName} (${invoice.model})</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Brand / Category</div>
+                            <div>${invoice.brandName} — ${invoice.categoryName}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Serial Number</div>
+                            <div>${invoice.serialNumber}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Voucher</div>
+                            <div>
+                                <c:choose>
+                                    <c:when test="${not empty invoice.voucherCode}">
+                                        ${invoice.voucherCode}
+                                        (-<fmt:formatNumber value="${invoice.discountAmount}" type="number"/> đ)
+                                    </c:when>
+                                    <c:otherwise><span class="text-muted">None</span></c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- ===== SPARE PARTS ===== -->
-                <div class="page-card">
-                    <div class="section-header">
-                        <i class="bi bi-tools me-2"></i> Spare Parts Used
-                    </div>
-                    <div class="p-3">
-                        <table class="table table-bordered text-center part-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th class="text-start">Spare Part</th>
-                                    <th>Unit Price (đ)</th>
-                                    <th>Qty</th>
-                                    <th>Subtotal (đ)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:set var="totalSpare" value="0"/>
-                                <c:forEach var="sp" items="${spareParts}" varStatus="loop">
-                                    <c:set var="sub" value="${sp.price * sp.quantity}"/>
+                    <!-- ===== SPARE PARTS ===== -->
+                    <div class="page-card">
+                        <div class="section-header">
+                            <i class="bi bi-tools me-2"></i> Spare Parts Used
+                        </div>
+                        <div class="p-3">
+                            <table class="table table-bordered text-center part-table mb-0">
+                                <thead>
                                     <tr>
-                                        <td>${loop.index + 1}</td>
-                                        <td class="text-start">${sp.spareName}</td>
-                                        <td class="money">
-                                            <fmt:formatNumber value="${sp.price}" type="number"/>
-                                        </td>
-                                        <td>${sp.quantity}</td>
-                                        <td class="money">
-                                            <fmt:formatNumber value="${sub}" type="number"/>
-                                        </td>
+                                        <th>#</th>
+                                        <th class="text-start">Spare Part</th>
+                                        <th>Unit Price (đ)</th>
+                                        <th>Qty</th>
+                                        <th>Subtotal (đ)</th>
                                     </tr>
-                                    <c:set var="totalSpare" value="${totalSpare + sub}"/>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- ===== COST SUMMARY ===== -->
-                <div class="page-card">
-                    <div class="section-header">
-                        <i class="bi bi-receipt me-2"></i> Cost Summary
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Total Spare Parts</div>
-                        <div class="money">
-                            <fmt:formatNumber value="${totalSpare}" type="number"/> đ
+                                </thead>
+                                <tbody>
+                                    <c:set var="totalSpare" value="0"/>
+                                    <c:forEach var="sp" items="${spareParts}" varStatus="loop">
+                                        <c:set var="sub" value="${sp.price * sp.quantity}"/>
+                                        <tr>
+                                            <td>${loop.index + 1}</td>
+                                            <td class="text-start">${sp.spareName}</td>
+                                            <td class="money">
+                                                <fmt:formatNumber value="${sp.price}" type="number"/>
+                                            </td>
+                                            <td>${sp.quantity}</td>
+                                            <td class="money">
+                                                <fmt:formatNumber value="${sub}" type="number"/>
+                                            </td>
+                                        </tr>
+                                        <c:set var="totalSpare" value="${totalSpare + sub}"/>
+                                    </c:forEach>
+                                    <c:if test="${empty spareParts}">
+                                        <tr>
+                                            <td colspan="5" class="text-muted text-center py-3">
+                                                No spare parts used
+                                            </td>
+                                        </tr>
+                                    </c:if>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="info-row">
-                        <div class="info-label">Labor Cost</div>
-                        <div class="money">
-                            <fmt:formatNumber value="${invoice.laborCost}" type="number"/> đ
+
+                    <!-- ===== COST SUMMARY ===== -->
+                    <div class="page-card">
+                        <div class="section-header">
+                            <i class="bi bi-receipt me-2"></i> Cost Summary
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Total Spare Parts</div>
+                            <div class="money">
+                                <fmt:formatNumber value="${totalSpare}" type="number"/> đ
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Labor Cost</div>
+                            <div class="money">
+                                <fmt:formatNumber value="${invoice.laborCost}" type="number"/> đ
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Voucher Discount</div>
+                            <div class="text-danger fw-semibold">
+                                − <fmt:formatNumber value="${invoice.discountAmount}" type="number"/> đ
+                            </div>
+                        </div>
+                        <div class="info-row" style="background:#f9f9f9; border-radius:0 0 12px 12px;">
+                            <div class="info-label fs-5 fw-bold">Grand Total</div>
+                            <div class="money fs-4">
+                                <fmt:formatNumber value="${invoice.totalAmount}" type="number"/> đ
+                            </div>
                         </div>
                     </div>
-                    <div class="info-row">
-                        <div class="info-label">Voucher Discount</div>
-                        <div class="text-danger fw-semibold">
-                            − <fmt:formatNumber value="${invoice.discountAmount}" type="number"/> đ
+
+                    <!-- ===== PAYMENT METHOD ===== -->
+                    <div class="page-card">
+                        <div class="section-header">
+                            <i class="bi bi-wallet2 me-2"></i> Select Payment Method
                         </div>
-                    </div>
-                    <div class="info-row" style="background:#f9f9f9; border-radius:0 0 12px 12px;">
-                        <div class="info-label fs-5 fw-bold">Grand Total</div>
-                        <div class="money fs-4">
-                            <fmt:formatNumber value="${invoice.totalAmount}" type="number"/> đ
-                        </div>
-                    </div>
-                </div>
+                        <div class="p-4">
+                            <form method="post"
+                                  action="${pageContext.request.contextPath}/customer/invoice/detail"
+                                  id="paymentForm">
+                                <input type="hidden" name="postAction" value="submitPayment"/>
+                                <input type="hidden" name="invoiceId" value="${invoice.invoiceId}"/>
 
-                <!-- ===== PAYMENT METHOD ===== -->
-                <div class="page-card">
-                    <div class="section-header">
-                        <i class="bi bi-wallet2 me-2"></i> Select Payment Method
-                    </div>
-                    <div class="p-4">
-                        <form method="post"
-                              action="${pageContext.request.contextPath}/customer/invoice/detail"
-                              id="paymentForm">
-                            <input type="hidden" name="postAction" value="submitPayment"/>
-                            <input type="hidden" name="invoiceId" value="${invoice.invoiceId}"/>
+                                <div class="method-group mb-4">
 
-                            <div class="method-group mb-4">
-
-                                <div class="method-card cash" id="card-CASH"
-                                     onclick="selectMethod('CASH')">
-                                    <i class="bi bi-cash-stack"></i>
-                                    <input type="radio" name="paymentMethod"
-                                           id="m-CASH" value="CASH"/>
-                                    <label for="m-CASH">Cash</label>
-                                    <div class="text-muted mt-1" style="font-size:11px">
-                                        Thanh toán tiền mặt
+                                    <div class="method-card cash" id="card-CASH"
+                                         onclick="selectMethod('CASH')">
+                                        <i class="bi bi-cash-stack"></i>
+                                        <input type="radio" name="paymentMethod"
+                                               id="m-CASH" value="CASH"/>
+                                        <label for="m-CASH">Cash</label>
+                                        <div class="text-muted mt-1" style="font-size:11px">
+                                            Thanh toán tiền mặt
+                                        </div>
                                     </div>
+
+                                    <div class="method-card bank" id="card-BANK_TRANSFER"
+                                         onclick="selectMethod('BANK_TRANSFER')">
+                                        <i class="bi bi-bank"></i>
+                                        <input type="radio" name="paymentMethod"
+                                               id="m-BANK_TRANSFER" value="BANK_TRANSFER"/>
+                                        <label for="m-BANK_TRANSFER">Bank Transfer</label>
+                                        <div class="text-muted mt-1" style="font-size:11px">
+                                            Chuyển khoản ngân hàng
+                                        </div>
+                                    </div>
+
+                                    <div class="method-card ewallet" id="card-EWALLET"
+                                         onclick="selectMethod('EWALLET')">
+                                        <i class="bi bi-phone"></i>
+                                        <input type="radio" name="paymentMethod"
+                                               id="m-EWALLET" value="EWALLET"/>
+                                        <label for="m-EWALLET">E-Wallet</label>
+                                        <div class="text-muted mt-1" style="font-size:11px">
+                                            MoMo, ZaloPay...
+                                        </div>
+                                    </div>
+
                                 </div>
 
-                                <div class="method-card bank" id="card-BANK_TRANSFER"
-                                     onclick="selectMethod('BANK_TRANSFER')">
-                                    <i class="bi bi-bank"></i>
-                                    <input type="radio" name="paymentMethod"
-                                           id="m-BANK_TRANSFER" value="BANK_TRANSFER"/>
-                                    <label for="m-BANK_TRANSFER">Bank Transfer</label>
-                                    <div class="text-muted mt-1" style="font-size:11px">
-                                        Chuyển khoản ngân hàng
-                                    </div>
+                                <div id="methodError" class="text-danger mb-3" style="display:none;">
+                                    <i class="bi bi-exclamation-circle me-1"></i>
+                                    Please select a payment method.
                                 </div>
 
-                                <div class="method-card ewallet" id="card-EWALLET"
-                                     onclick="selectMethod('EWALLET')">
-                                    <i class="bi bi-phone"></i>
-                                    <input type="radio" name="paymentMethod"
-                                           id="m-EWALLET" value="EWALLET"/>
-                                    <label for="m-EWALLET">E-Wallet</label>
-                                    <div class="text-muted mt-1" style="font-size:11px">
-                                        MoMo, ZaloPay...
-                                    </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="${pageContext.request.contextPath}/customer/invoice/detail?id=${invoice.invoiceId}"
+                                       class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left me-1"></i> Back
+                                    </a>
+                                    <button type="button" class="btn-pay" onclick="submitPayment()">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        Confirm Payment &nbsp;|&nbsp;
+                                        <fmt:formatNumber value="${invoice.totalAmount}" type="number"/> đ
+                                    </button>
                                 </div>
 
-                            </div>
-
-                            <div id="methodError" class="text-danger mb-3" style="display:none;">
-                                <i class="bi bi-exclamation-circle me-1"></i>
-                                Please select a payment method.
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="${pageContext.request.contextPath}/customer/invoice/detail?id=${invoice.invoiceId}"
-                                   class="btn btn-outline-secondary">
-                                    <i class="bi bi-arrow-left me-1"></i> Back
-                                </a>
-                                <button type="button" class="btn-pay" onclick="submitPayment()">
-                                    <i class="bi bi-check-circle me-2"></i>
-                                    Confirm Payment &nbsp;|&nbsp;
-                                    <fmt:formatNumber value="${invoice.totalAmount}" type="number"/> đ
-                                </button>
-                            </div>
-
-                        </form>
+                            </form>
+                        </div>
                     </div>
-                </div>
 
-            </div>
-        </div>
+                </div><%-- /container --%>
+            </div><%-- /admin-content --%>
+        </div><%-- /admin-layout --%>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <jsp:include page="/common/scripts.jsp"/>
