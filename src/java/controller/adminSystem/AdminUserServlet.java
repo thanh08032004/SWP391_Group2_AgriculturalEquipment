@@ -109,7 +109,7 @@ public class AdminUserServlet extends HttpServlet {
             );
 
             if (success) {
-                response.sendRedirect(request.getContextPath() + "/admin/users?action=list");
+                response.sendRedirect(request.getContextPath() + "/admin/user?action=list");
             } else {
                 request.setAttribute("error", "Update failed!");
                 doGet(request, response);
