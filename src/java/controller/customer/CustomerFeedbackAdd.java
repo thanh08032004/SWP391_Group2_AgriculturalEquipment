@@ -9,61 +9,49 @@ import model.User;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-@MultipartConfig
+@MultipartConfig(
+        maxFileSize = 10 * 1024 * 1024,  
+        maxRequestSize = 50 * 1024 * 1024
+)
 public class CustomerFeedbackAdd extends HttpServlet {
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet CustomerFeedbackServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet CustomerFeedbackServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
+    private static final String UPLOAD_DIR = "uploads";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         String maintenanceId = request.getParameter("maintenanceId");
-
         request.setAttribute("maintenanceId", maintenanceId);
 
-        request.getRequestDispatcher(
-                "/views/CustomerView/customer-feedbackadd.jsp"
-        ).forward(request, response);
+        request.getRequestDispatcher("/views/CustomerView/customer-feedbackadd.jsp")
+                .forward(request, response);
     }
-    private static final String UPLOAD_DIR = "uploads";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        User user = (User) request.getSession().getAttribute("user");
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
+        User user = (User) session.getAttribute("user");
         int customerId = user.getId();
-
         int maintenanceId = Integer.parseInt(request.getParameter("maintenanceId"));
         int rating = Integer.parseInt(request.getParameter("rating"));
         String comment = request.getParameter("comment");
 
-        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
-
+        String uploadPath = getServletContext().getRealPath("/") + UPLOAD_DIR;
         File uploadDir = new File(uploadPath);
         if (!uploadDir.exists()) {
-            uploadDir.mkdir();
+            uploadDir.mkdirs();
         }
 
         List<String> imagePaths = new ArrayList<>();
@@ -72,7 +60,12 @@ public class CustomerFeedbackAdd extends HttpServlet {
 
             if (part.getName().equals("images") && part.getSize() > 0) {
 
-                String fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
+                if (!part.getContentType().startsWith("image/")) {
+                    continue;
+                }
+
+                String originalFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
+                String fileName = System.currentTimeMillis() + "_" + originalFileName;
 
                 part.write(uploadPath + File.separator + fileName);
 
@@ -81,13 +74,11 @@ public class CustomerFeedbackAdd extends HttpServlet {
         }
 
         FeedbackDAO dao = new FeedbackDAO();
-
         int feedbackId = dao.insertFeedback(maintenanceId, customerId, rating, comment);
 
         if (!imagePaths.isEmpty()) {
             dao.insertImages(feedbackId, imagePaths);
         }
-
         response.sendRedirect(request.getContextPath() + "/customer/feedback/list");
     }
 }
