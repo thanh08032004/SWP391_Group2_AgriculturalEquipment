@@ -496,5 +496,24 @@ public class ContractDAO extends DBContext {
     }
     return false;
 }
+    
+    public Set<Integer> getLockedDeviceIds() {
+    Set<Integer> ids = new HashSet<>();
+    String sql = """
+        SELECT DISTINCT cd.device_id
+        FROM contract_device cd
+        JOIN contract c ON cd.contract_id = c.id
+        WHERE c.status = 'COMPLETED'
+    """;
+    try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            ids.add(rs.getInt("device_id"));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return ids;
+}
 
 }

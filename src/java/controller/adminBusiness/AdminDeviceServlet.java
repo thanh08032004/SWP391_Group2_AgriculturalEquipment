@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.Part;
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.Set;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024,
@@ -93,6 +94,9 @@ public class AdminDeviceServlet extends HttpServlet {
                     List<CategoryDTO> pagedCategories = sortedCategories.subList(fromIndex, toIndex);
 
                     deviceList.sort(Comparator.comparing(DeviceDTO::getCategoryName, Comparator.nullsLast(String::compareTo)));
+                    ContractDAO contractDAO = new ContractDAO();
+                    Set<Integer> lockedDeviceIds = contractDAO.getLockedDeviceIds();
+                    request.setAttribute("lockedDeviceIds", lockedDeviceIds);
 
                     request.setAttribute("deviceList", deviceList);
                     request.setAttribute("categoryList", pagedCategories);

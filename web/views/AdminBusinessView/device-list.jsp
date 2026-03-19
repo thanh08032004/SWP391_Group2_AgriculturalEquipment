@@ -1,5 +1,6 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="java.util.Set" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -185,7 +186,8 @@
                                     data-brand="${d.brandName}"
                                     data-customer="${d.customerName}"
                                     data-status="${d.status}"
-                                    data-image="${d.image}">
+                                    data-image="${d.image}"
+                                    data-locked="${lockedDeviceIds.contains(d.id)}">
                                 </tr>
                             </c:forEach>
                         </tbody>
@@ -291,7 +293,8 @@
                             brand: tr.dataset.brand,
                             customer: tr.dataset.customer,
                             status: tr.dataset.status,
-                            image: tr.dataset.image
+                            image: tr.dataset.image,
+                                    locked: tr.dataset.locked
                         });
                     });
 
@@ -345,11 +348,15 @@
                                     '<td class="status-cell">' + statusHtml + '</td>' +
                                     '<td class="text-center pe-3">' +
                                     '<a href="' + CTX + '/admin-business/devices?action=edit&id=' + d.id + '" class="btn btn-sm btn-outline-primary mx-1"><i class="bi bi-pencil"></i></a>' +
-                                    '<select class="form-select form-select-sm d-inline-block ms-1" style="width:95px" onchange="updateStatus(' + d.id + ', this)">' +
-                                    '<option value="ACTIVE"' + (d.status === 'ACTIVE' ? ' selected' : '') + '>Active</option>' +
-                                    '<option value="MAINTENANCE"' + (d.status === 'MAINTENANCE' ? ' selected' : '') + '>Maintenance</option>' +
-                                    '<option value="BROKEN"' + (d.status === 'BROKEN' ? ' selected' : '') + '>Broken</option>' +
-                                    '</select>' +
+                                    (d.locked === 'true'
+                                            ? '<select class="form-select form-select-sm d-inline-block ms-1" style="width:95px;opacity:0.5;cursor:not-allowed" disabled title="Locked: device in completed contract">'
+                                            + '<option>' + esc(d.status) + '</option>'
+                                            + '</select>'
+                                            : '<select class="form-select form-select-sm d-inline-block ms-1" style="width:95px" onchange="updateStatus(' + d.id + ', this)">'
+                                            + '<option value="ACTIVE"' + (d.status === 'ACTIVE' ? ' selected' : '') + '>Active</option>'
+                                            + '<option value="MAINTENANCE"' + (d.status === 'MAINTENANCE' ? ' selected' : '') + '>Maintenance</option>'
+                                            + '<option value="BROKEN"' + (d.status === 'BROKEN' ? ' selected' : '') + '>Broken</option>'
+                                            + '</select>') +
                                     '</td>';
                             tbody.appendChild(tr);
                         });
@@ -477,32 +484,32 @@
                 }
         </script>
         <jsp:include page="/common/scripts.jsp"></jsp:include>
-        <!-- Device Detail Modal -->
-        <div class="modal fade" id="deviceDetailModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content border-0 shadow-lg">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title"><i class="bi bi-cpu me-2"></i>Device Detail</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body p-4" id="deviceDetailContent">
-                        <div class="text-center"><div class="spinner-border text-primary"></div></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Customer Detail Modal -->
-        <div class="modal fade" id="customerDetailModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg" style="border-radius:15px;">
-                    <div class="modal-body p-0" id="customerDetailContent">
-                        <div class="text-center p-4">
-                            <div class="spinner-border text-primary"></div>
+            <!-- Device Detail Modal -->
+            <div class="modal fade" id="deviceDetailModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title"><i class="bi bi-cpu me-2"></i>Device Detail</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4" id="deviceDetailContent">
+                            <div class="text-center"><div class="spinner-border text-primary"></div></div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <!-- Customer Detail Modal -->
+            <div class="modal fade" id="customerDetailModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg" style="border-radius:15px;">
+                        <div class="modal-body p-0" id="customerDetailContent">
+                            <div class="text-center p-4">
+                                <div class="spinner-border text-primary"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         <jsp:include page="/common/scripts.jsp"></jsp:include>
 
     </body>
