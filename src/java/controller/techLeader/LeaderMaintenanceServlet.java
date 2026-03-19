@@ -83,18 +83,18 @@ public class LeaderMaintenanceServlet extends HttpServlet {
                 response.sendRedirect("maintenance?action=detail&id=" + id + "&msg=error");
             }
         } else if ("assign".equals(action)) {
-        String techIdRaw = request.getParameter("technicianId");
-        int techId = (techIdRaw == null || techIdRaw.isEmpty()) ? 0 : Integer.parseInt(techIdRaw);
-        boolean success = dao.assignTechnician(id, techId);
-                String redirectUrl = "";
-        if ("list".equals(from)) {
-            redirectUrl = "maintenance?action=list&msg=" + (success ? "assign_success" : "error");
-        } else {
-            redirectUrl = "maintenance?action=detail&id=" + id + "&msg=" + (success ? "assign_success" : "error");
+            String techIdRaw = request.getParameter("technicianId");
+            int techId = (techIdRaw == null || techIdRaw.isEmpty()) ? 0 : Integer.parseInt(techIdRaw);
+            boolean success = dao.assignTechnician(id, techId);
+            String redirectUrl = "";
+            if ("list".equals(from)) {
+                redirectUrl = "maintenance?action=list&msg=" + (success ? "assign_success" : "error");
+            } else {
+                redirectUrl = "maintenance?action=detail&id=" + id + "&msg=" + (success ? "assign_success" : "error");
+            }
+
+            response.sendRedirect(redirectUrl);
         }
-        
-        response.sendRedirect(redirectUrl);
-    }
     }
 
     private void handleGetDeviceDetail(HttpServletRequest request, HttpServletResponse response, DeviceDAO dDao) throws IOException {
@@ -133,7 +133,10 @@ public class LeaderMaintenanceServlet extends HttpServlet {
         int userId = Integer.parseInt(request.getParameter("customerId"));
         UserProfileDAO uProfileDao = new UserProfileDAO();
         UserProfile profile = uProfileDao.getUserProfileById(userId);
-
+        String avatar = profile.getAvatar();
+        if (avatar == null || avatar.trim().isEmpty()) {
+            avatar = "user.jpg";
+        }
         if (profile != null) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -143,7 +146,7 @@ public class LeaderMaintenanceServlet extends HttpServlet {
                     profile.getPhone() != null ? profile.getPhone() : "N/A",
                     profile.getEmail(),
                     profile.getAddress() != null ? profile.getAddress() : "N/A",
-                    profile.getAvatar() != null ? profile.getAvatar() : "user.jpg",
+                    avatar,
                     "CUSTOMER"
             );
             response.getWriter().write(json);

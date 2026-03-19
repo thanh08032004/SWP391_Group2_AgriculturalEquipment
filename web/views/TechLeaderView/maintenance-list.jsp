@@ -9,7 +9,7 @@
         <body class="bg-light">
         <jsp:include page="/common/header.jsp"></jsp:include>
             <div class="admin-layout d-flex">
-            <jsp:include page="/common/side-bar.jsp"></jsp:include>
+            <%--<jsp:include page="/common/side-bar.jsp"></jsp:include>--%>
                 <div class="admin-content p-4 w-100">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="fw-bold">Maintenance Requests</h2>
@@ -25,8 +25,8 @@
                                 <option value="All Status">-- All Status --</option>
                                 <option value="PENDING" ${currentStatus == 'PENDING' ? 'selected' : ''}>New Request</option>
                                 <option value="WAITING_FOR_TECHNICIAN" ${currentStatus == 'WAITING_FOR_TECHNICIAN' ? 'selected' : ''}>Awaiting Assignment</option>
-                                <option value="TECHNICIAN_ACCEPTED" ${currentStatus == 'TECHNICIAN_ACCEPTED' ? 'selected' : ''}>Staff Accepted</option>
-                                <option value="TECHNICIAN_SUBMITTED" ${currentStatus == 'TECHNICIAN_SUBMITTED' ? 'selected' : ''}>Staff Submitted</option>
+                                <option value="TECHNICIAN_ACCEPTED" ${currentStatus == 'TECHNICIAN_ACCEPTED' ? 'selected' : ''}>Technicain Accepted</option>
+                                <option value="TECHNICIAN_SUBMITTED" ${currentStatus == 'TECHNICIAN_SUBMITTED' ? 'selected' : ''}>Technician Submitted</option>
                                 <option value="DIAGNOSIS READY" ${currentStatus == 'DIAGNOSIS READY' ? 'selected' : ''}>Diagnosis Ready</option>
                                 <option value="IN_PROGRESS" ${currentStatus == 'IN_PROGRESS' ? 'selected' : ''}>Repairing</option>
                                 <option value="DONE" ${currentStatus == 'DONE' ? 'selected' : ''}>Completed</option>
@@ -103,20 +103,20 @@
                                             </c:when>
                                             <c:when test="${r.status == 'DONE'}">
 
-    <c:choose>
-        <c:when test="${r.hasFeedback}">
-            <a href="${pageContext.request.contextPath}/leader/maintenance?action=feedback-detail&id=${r.id}"
-               class="btn btn-sm btn-outline-success">
-                View Feedback
-            </a>
-        </c:when>
+                                                <c:choose>
+                                                    <c:when test="${r.hasFeedback}">
+                                                        <a href="${pageContext.request.contextPath}/leader/maintenance?action=feedback-detail&id=${r.id}"
+                                                           class="btn btn-sm btn-outline-success">
+                                                            View Feedback
+                                                        </a>
+                                                    </c:when>
 
-        <c:otherwise>
-            <span class="text-muted small">Tracking...</span>
-        </c:otherwise>
-    </c:choose>
+                                                    <c:otherwise>
+                                                        <span class="text-muted small">Tracking...</span>
+                                                    </c:otherwise>
+                                                </c:choose>
 
-</c:when>
+                                            </c:when>
                                             <c:otherwise><span class="text-muted small">Tracking...</span></c:otherwise>
                                         </c:choose>
                                     </td>
@@ -146,6 +146,7 @@
             </div>
         </div>
 
+        <!-- deviceModal -->
         <div class="modal fade" id="deviceModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg">
@@ -156,13 +157,17 @@
                     <div class="modal-body" id="deviceContent"></div>
                 </div>
             </div>
-            <div class="modal fade" id="customerModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-sm modal-dialog-centered">
-                    <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
-                        <div id="customerContent"></div>
-                    </div>
+        </div>  
+
+        <!-- customerModal -->
+        <div class="modal fade" id="customerModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                    <div id="customerContent"></div>
                 </div>
             </div>
+        </div>  
+           
 
             <jsp:include page="/common/scripts.jsp"></jsp:include>
 
@@ -173,7 +178,7 @@
                         const modalObj = new bootstrap.Modal(document.getElementById('deviceModal'));
                         modalObj.show();
 
-                        fetch('maintenance?action=getDeviceDetail&deviceId=' + id)
+                        fetch('${pageContext.request.contextPath}/leader/maintenance?action=getDeviceDetail&deviceId=' + id)
                                 .then(res => res.json())
                                 .then(dev => {
                                     document.getElementById('deviceContent').innerHTML = `
@@ -197,12 +202,12 @@
                         const modalObj = new bootstrap.Modal(document.getElementById('customerModal'));
                         modalObj.show();
 
-                        fetch('maintenance?action=getCustomerDetail&customerId=' + id)
+                        fetch('${pageContext.request.contextPath}/leader/maintenance?action=getCustomerDetail&customerId=' + id)
                                 .then(res => res.json())
                                 .then(cus => {
                                     document.getElementById('customerContent').innerHTML = `
                                     <div class="bg-primary p-4 text-center text-white" style="border-radius: 15px 15px 0 0;">
-                                        <img src="${pageContext.request.contextPath}/assets/images/avatars/\${cus.avatar}" 
+                                        <img src="${pageContext.request.contextPath}/assets/images/avatar/\${cus.avatar}" 
                                              class="rounded-circle mb-2 border border-3 border-white shadow-sm" 
                                              style="width:90px; height:90px; object-fit:cover;">
                                         <h5 class="mb-0 fw-bold">\${cus.fullname}</h5>

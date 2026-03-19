@@ -336,7 +336,7 @@
                             .then(cus => {
                                 document.getElementById('customerContent').innerHTML = `
                 <div class="bg-primary p-4 text-center text-white" style="border-radius: 15px 15px 0 0;">
-                    <img src="${pageContext.request.contextPath}/assets/images/avatars/\${cus.avatar}" 
+                    <img src="${pageContext.request.contextPath}/assets/images/avatar/\${cus.avatar}" 
                          class="rounded-circle mb-2 border border-3 border-white shadow-sm" 
                          style="width:90px; height:90px; object-fit:cover;">
                     <h5 class="mb-0 fw-bold">\${cus.fullname}</h5>
