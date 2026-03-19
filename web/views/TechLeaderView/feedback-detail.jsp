@@ -9,7 +9,6 @@
 
     <style>
         .star-rating {
-            direction: rtl;
             display: inline-flex;
             font-size: 35px;
         }
