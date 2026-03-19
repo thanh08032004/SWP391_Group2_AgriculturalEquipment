@@ -81,7 +81,7 @@ session.setAttribute("permissions", permissions);
         String ctx = request.getContextPath();
         switch (user.getRoleId()) {
             case 1 -> response.sendRedirect(ctx + "/admin/user");
-            case 2 -> response.sendRedirect(ctx + "/admin-business/devices");
+            case 2 -> response.sendRedirect(ctx + "/admin-business/reports");
             case 3 -> response.sendRedirect(ctx + "/technician/maintenance");
             case 4 -> response.sendRedirect(ctx + "/customer/home");
             case 5 -> response.sendRedirect(ctx + "/leader/maintenance");

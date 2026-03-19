@@ -10,7 +10,7 @@
             <c:set var="roleHome" value="${pageContext.request.contextPath}/admin/users" />
         </c:when>
         <c:when test="${sessionScope.userRole == 'ADMIN_BUSINESS'}">
-            <c:set var="roleHome" value="${pageContext.request.contextPath}/admin-business/devices" />
+            <c:set var="roleHome" value="${pageContext.request.contextPath}/admin-business/reports" />
         </c:when>
         <c:when test="${sessionScope.userRole == 'TECHNICIAN'}">
             <c:set var="roleHome" value="${pageContext.request.contextPath}/technician/maintenance" />
