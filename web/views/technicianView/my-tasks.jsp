@@ -148,26 +148,24 @@
                                                     <c:if test="${m.status == 'TECHNICIAN_ACCEPTED'}">
                                                         <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${m.id}"
                                                            class="btn btn-sm btn-primary mx-1">
-                                                            <i class="bi bi-tools"></i> Work
+                                                             Work
                                                         </a>
                                                         <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
                                                            class="btn btn-sm btn-info mx-1">
-                                                            <i class="bi bi-eye"></i> View
+                                                             View
                                                         </a>
                                                     </c:if>
                                                     <c:if test="${m.status == 'IN_PROGRESS'}">
 
-                                                        <!-- Nút View -->
-
-                                                        <!-- Nút Complete -->
+                                                        
                                                         <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${m.id}"
                                                            class="btn btn-sm btn-success mx-1"
-                                                           onclick="return confirm('Mark this task as DONE?');">
-                                                            <i class="bi bi-check-circle"></i> Done
+                                                           onclick="return confirm('Repair this device ?');">
+                                                             Repair
                                                         </a>
                                                         <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
                                                            class="btn btn-sm btn-info mx-1">
-                                                            <i class="bi bi-eye"></i> View
+                                                             View
                                                         </a>
 
                                                     </c:if>
@@ -175,7 +173,7 @@
 
                                                         <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
                                                            class="btn btn-sm btn-info mx-1">
-                                                            <i class="bi bi-eye"></i> View
+                                                            View
                                                         </a>
 
                                                         <%-- Nút Confirm Pay: chỉ hiện nếu có invoice và status là UNPAID hoặc PENDING --%>
@@ -191,7 +189,7 @@
                                                                         <input type="hidden" name="action"    value="confirmPay"/>
                                                                         <input type="hidden" name="invoiceId" value="${m.invoiceId}"/>
                                                                         <button type="submit" class="btn btn-sm btn-success mx-1">
-                                                                            <i class="bi bi-cash-coin"></i> Confirm Pay
+                                                                             Confirm Pay
                                                                         </button>
                                                                     </form>
                                                                 </c:when>
@@ -200,12 +198,12 @@
                                                                 <c:when test="${m.invoicePaymentStatus eq 'UNPAID'}">
                                                                     <button class="btn btn-sm btn-secondary mx-1" disabled
                                                                             title="Waiting for customer to submit payment">
-                                                                        <i class="bi bi-cash-coin"></i> Not Pay
+                                                                         Not Pay
                                                                     </button>
                                                                 </c:when>
                                                                 <c:when test="${m.invoicePaymentStatus eq 'PAID'}">
                                                                     <button class="btn btn-sm btn-success mx-1" disabled>
-                                                                        <i class="bi bi-check-circle"></i> Paid
+                                                                         Paid
                                                                     </button>
                                                                 </c:when>
                                                             </c:choose>
