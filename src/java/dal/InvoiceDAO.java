@@ -223,7 +223,7 @@ public class InvoiceDAO extends DBContext {
 
     public InvoiceDetailDTO getInvoiceDetailById(int invoiceId) {
 
-    String sql = """
+        String sql = """
         SELECT 
             i.id AS invoice_id,
             m.id AS maintenance_id,
@@ -267,53 +267,52 @@ public class InvoiceDAO extends DBContext {
         WHERE i.id = ?
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, invoiceId);
+            ps.setInt(1, invoiceId);
 
-        try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
 
-            if (rs.next()) {
+                if (rs.next()) {
 
-                InvoiceDetailDTO dto = new InvoiceDetailDTO();
+                    InvoiceDetailDTO dto = new InvoiceDetailDTO();
 
-                dto.setInvoiceId(rs.getInt("invoice_id"));
-                dto.setMaintenanceId(rs.getInt("maintenance_id"));
+                    dto.setInvoiceId(rs.getInt("invoice_id"));
+                    dto.setMaintenanceId(rs.getInt("maintenance_id"));
 
-                dto.setCustomerId(rs.getInt("customer_id"));
-                dto.setTechnicianId(rs.getInt("technician_id"));
+                    dto.setCustomerId(rs.getInt("customer_id"));
+                    dto.setTechnicianId(rs.getInt("technician_id"));
 
-                dto.setCustomerName(rs.getString("customer_name"));
-                dto.setTechnicianName(rs.getString("technician_name"));
+                    dto.setCustomerName(rs.getString("customer_name"));
+                    dto.setTechnicianName(rs.getString("technician_name"));
 
-                dto.setMachineName(rs.getString("machine_name"));
-                dto.setModel(rs.getString("model"));
-                dto.setSerialNumber(rs.getString("serial_number"));
-                dto.setBrandName(rs.getString("brand_name"));
-                dto.setCategoryName(rs.getString("category_name"));
+                    dto.setMachineName(rs.getString("machine_name"));
+                    dto.setModel(rs.getString("model"));
+                    dto.setSerialNumber(rs.getString("serial_number"));
+                    dto.setBrandName(rs.getString("brand_name"));
+                    dto.setCategoryName(rs.getString("category_name"));
 
-                dto.setVoucherCode(rs.getString("voucher_code"));
-                dto.setVoucherDiscountType(rs.getString("discount_type"));
-                dto.setVoucherDiscountValue(rs.getDouble("discount_value"));
+                    dto.setVoucherCode(rs.getString("voucher_code"));
+                    dto.setVoucherDiscountType(rs.getString("discount_type"));
+                    dto.setVoucherDiscountValue(rs.getDouble("discount_value"));
 
-                dto.setLaborCost(rs.getDouble("labor_cost"));
-                dto.setDiscountAmount(rs.getDouble("discount_amount"));
-                dto.setTotalAmount(rs.getDouble("total_amount"));
+                    dto.setLaborCost(rs.getDouble("labor_cost"));
+                    dto.setDiscountAmount(rs.getDouble("discount_amount"));
+                    dto.setTotalAmount(rs.getDouble("total_amount"));
 
-                dto.setPaymentStatus(rs.getString("payment_status"));
-                dto.setPaymentMethod(rs.getString("payment_method"));
+                    dto.setPaymentStatus(rs.getString("payment_status"));
+                    dto.setPaymentMethod(rs.getString("payment_method"));
 
-                return dto;
+                    return dto;
+                }
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return null;
     }
-
-    return null;
-}
 
     public List<SparePartDTO> getSparePartsByInvoiceId(int invoiceId) {
 
@@ -349,216 +348,217 @@ public class InvoiceDAO extends DBContext {
         }
         return list;
     }
-public List<Invoice> searchFilterInvoice(String keyword, String filter,
-        int page, int pageSize) {
 
-    List<Invoice> list = new ArrayList<>();
+    public List<Invoice> searchFilterInvoice(String keyword, String filter,
+            int page, int pageSize) {
 
-    StringBuilder sql = new StringBuilder(
-        "SELECT DISTINCT i.*, " +
-        "u.id AS customer_id, " +
-        "up.fullname AS customer_name " +
-        "FROM invoice i " +
-        "LEFT JOIN maintenance m ON i.maintenance_id = m.id " +
-        "LEFT JOIN device d ON m.device_id = d.id " +
-        "LEFT JOIN users u ON d.customer_id = u.id " +
-        "LEFT JOIN user_profile up ON u.id = up.user_id " +
-        "WHERE 1=1 "
-    );
+        List<Invoice> list = new ArrayList<>();
 
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        sql.append(" AND up.fullname LIKE ? ");
-    }
-
-    if (filter != null && !filter.isEmpty()) {
-        switch (filter) {
-            case "PAID":
-            case "PENDING":
-            case "UNPAID":
-                sql.append(" AND i.payment_status = ? ");
-                break;
-            case "PRICE_ASC":
-                sql.append(" ORDER BY i.total_amount ASC ");
-                break;
-            case "PRICE_DESC":
-                sql.append(" ORDER BY i.total_amount DESC ");
-                break;
-        }
-    } else {
-        sql.append(" ORDER BY i.issued_at DESC ");
-    }
-
-    sql.append(" LIMIT ? OFFSET ?");
-
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql.toString())) {
-
-        int i = 1;
+        StringBuilder sql = new StringBuilder(
+                "SELECT DISTINCT i.*, "
+                + "u.id AS customer_id, "
+                + "up.fullname AS customer_name "
+                + "FROM invoice i "
+                + "LEFT JOIN maintenance m ON i.maintenance_id = m.id "
+                + "LEFT JOIN device d ON m.device_id = d.id "
+                + "LEFT JOIN users u ON d.customer_id = u.id "
+                + "LEFT JOIN user_profile up ON u.id = up.user_id "
+                + "WHERE 1=1 "
+        );
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            ps.setString(i++, "%" + keyword.trim() + "%");
+            sql.append(" AND up.fullname LIKE ? ");
         }
 
-        if (filter != null &&
-            (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
-            ps.setString(i++, filter);
+        if (filter != null && !filter.isEmpty()) {
+            switch (filter) {
+                case "PAID":
+                case "PENDING":
+                case "UNPAID":
+                    sql.append(" AND i.payment_status = ? ");
+                    break;
+                case "PRICE_ASC":
+                    sql.append(" ORDER BY i.total_amount ASC ");
+                    break;
+                case "PRICE_DESC":
+                    sql.append(" ORDER BY i.total_amount DESC ");
+                    break;
+            }
+        } else {
+            sql.append(" ORDER BY i.issued_at DESC ");
         }
 
-        ps.setInt(i++, pageSize);
-        ps.setInt(i++, (page - 1) * pageSize);
+        sql.append(" LIMIT ? OFFSET ?");
 
-        ResultSet rs = ps.executeQuery();
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
-        while (rs.next()) {
+            int i = 1;
 
-            Invoice inv = new Invoice();
-
-            inv.setId(rs.getInt("id"));
-            inv.setMaintenanceId(rs.getInt("maintenance_id"));
-
-            // NEW
-            inv.setCustomerId(rs.getInt("customer_id"));
-            inv.setCustomerName(rs.getString("customer_name"));
-            inv.setTotalAmount(rs.getDouble("total_amount"));
-            inv.setPaymentStatus(rs.getString("payment_status"));
-            inv.setIssuedAt(rs.getTimestamp("issued_at"));
-            list.add(inv);
-        }
-
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-
-    return list;
-}
-public UserProfile getCustomerDetail(int id) {
-
-    String sql =
-        "SELECT up.email, up.fullname, up.phone, up.gender, up.date_of_birth, up.address, up.avatar " +
-        "FROM users u " +
-        "LEFT JOIN user_profile up ON u.id = up.user_id " +
-        "WHERE u.id = ?";
-
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-
-        ps.setInt(1, id);
-        ResultSet rs = ps.executeQuery();
-
-        if (rs.next()) {
-
-            UserProfile c = new UserProfile();
-
-            c.setUserId(id);
-            c.setFullname(rs.getString("fullname"));
-            c.setEmail(rs.getString("email"));
-            c.setPhone(rs.getString("phone"));
-            c.setGender(rs.getString("gender"));
-            c.setAddress(rs.getString("address"));
-            c.setAvatar(rs.getString("avatar"));
-
-            Date dob = rs.getDate("date_of_birth");
-            if (dob != null) {
-                c.setBirthDate(dob.toLocalDate());
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(i++, "%" + keyword.trim() + "%");
             }
 
-            return c;
+            if (filter != null
+                    && (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+                ps.setString(i++, filter);
+            }
+
+            ps.setInt(i++, pageSize);
+            ps.setInt(i++, (page - 1) * pageSize);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Invoice inv = new Invoice();
+
+                inv.setId(rs.getInt("id"));
+                inv.setMaintenanceId(rs.getInt("maintenance_id"));
+
+                // NEW
+                inv.setCustomerId(rs.getInt("customer_id"));
+                inv.setCustomerName(rs.getString("customer_name"));
+                inv.setTotalAmount(rs.getDouble("total_amount"));
+                inv.setPaymentStatus(rs.getString("payment_status"));
+                inv.setIssuedAt(rs.getTimestamp("issued_at"));
+                list.add(inv);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
 
-    return null;
-}
-public Maintenance getMaintenanceDetail(int id){
+    public UserProfile getCustomerDetail(int id) {
 
-    String sql =
-        "SELECT m.*, d.machine_name " +
-        "FROM maintenance m " +
-        "LEFT JOIN device d ON m.device_id = d.id " +
-        "WHERE m.id = ?";
+        String sql
+                = "SELECT up.email, up.fullname, up.phone, up.gender, up.date_of_birth, up.address, up.avatar "
+                + "FROM users u "
+                + "LEFT JOIN user_profile up ON u.id = up.user_id "
+                + "WHERE u.id = ?";
 
-    try(Connection con = getConnection();
-        PreparedStatement ps = con.prepareStatement(sql)){
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1,id);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
 
-        ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
 
-        if(rs.next()){
+                UserProfile c = new UserProfile();
 
-            Maintenance m = new Maintenance();
+                c.setUserId(id);
+                c.setFullname(rs.getString("fullname"));
+                c.setEmail(rs.getString("email"));
+                c.setPhone(rs.getString("phone"));
+                c.setGender(rs.getString("gender"));
+                c.setAddress(rs.getString("address"));
+                c.setAvatar(rs.getString("avatar"));
 
-            m.setId(rs.getInt("id"));
-            m.setDeviceId(rs.getInt("device_id"));
-            m.setDescription(rs.getString("description"));
-            m.setStatus(rs.getString("status"));
-            m.setStartDate(rs.getTimestamp("start_date"));
-            m.setEndDate(rs.getTimestamp("end_date"));
-            m.setMachineName(rs.getString("machine_name"));
+                Date dob = rs.getDate("date_of_birth");
+                if (dob != null) {
+                    c.setBirthDate(dob.toLocalDate());
+                }
 
-            return m;
+                return c;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    }catch(Exception e){
-        e.printStackTrace();
+        return null;
     }
 
-    return null;
-}
-public int countInvoice(String keyword, String filter) {
-    int total = 0;
+    public Maintenance getMaintenanceDetail(int id) {
 
-    StringBuilder sql = new StringBuilder(
-        "SELECT COUNT(DISTINCT i.id) " +
-        "FROM invoice i " +
-        "LEFT JOIN maintenance m ON i.maintenance_id = m.id " +
-        "LEFT JOIN device d ON m.device_id = d.id " +
-        "LEFT JOIN users u ON d.customer_id = u.id " +
-        "LEFT JOIN user_profile up ON u.id = up.user_id " +
-        "WHERE 1=1 "
-    );
+        String sql
+                = "SELECT m.*, d.machine_name "
+                + "FROM maintenance m "
+                + "LEFT JOIN device d ON m.device_id = d.id "
+                + "WHERE m.id = ?";
 
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        sql.append(" AND up.fullname LIKE ? ");
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Maintenance m = new Maintenance();
+
+                m.setId(rs.getInt("id"));
+                m.setDeviceId(rs.getInt("device_id"));
+                m.setDescription(rs.getString("description"));
+                m.setStatus(rs.getString("status"));
+                m.setStartDate(rs.getTimestamp("start_date"));
+                m.setEndDate(rs.getTimestamp("end_date"));
+                m.setMachineName(rs.getString("machine_name"));
+
+                return m;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
-    if (filter != null &&
-        (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
-        sql.append(" AND i.payment_status = ? ");
-    }
+    public int countInvoice(String keyword, String filter) {
+        int total = 0;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql.toString())) {
-
-        int i = 1;
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(DISTINCT i.id) "
+                + "FROM invoice i "
+                + "LEFT JOIN maintenance m ON i.maintenance_id = m.id "
+                + "LEFT JOIN device d ON m.device_id = d.id "
+                + "LEFT JOIN users u ON d.customer_id = u.id "
+                + "LEFT JOIN user_profile up ON u.id = up.user_id "
+                + "WHERE 1=1 "
+        );
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            ps.setString(i++, "%" + keyword.trim() + "%");
+            sql.append(" AND up.fullname LIKE ? ");
         }
 
-        if (filter != null &&
-            (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
-            ps.setString(i++, filter);
+        if (filter != null
+                && (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+            sql.append(" AND i.payment_status = ? ");
         }
 
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            total = rs.getInt(1);
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+            int i = 1;
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(i++, "%" + keyword.trim() + "%");
+            }
+
+            if (filter != null
+                    && (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+                ps.setString(i++, filter);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return total;
     }
 
-    return total;
-}
-public int countInvoiceByCustomer(int customerId, String keyword, String filter) {
+    public int countInvoiceByCustomer(int customerId, String keyword, String filter) {
 
-    int total = 0;
+        int total = 0;
 
-    StringBuilder sql = new StringBuilder("""
+        StringBuilder sql = new StringBuilder("""
         SELECT COUNT(DISTINCT i.id)
         FROM invoice i
         JOIN maintenance m ON i.maintenance_id = m.id
@@ -568,48 +568,48 @@ public int countInvoiceByCustomer(int customerId, String keyword, String filter)
         WHERE u.id = ?
     """);
 
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        sql.append(" AND up.fullname LIKE ? ");
-    }
-
-    if (filter != null &&
-        (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
-        sql.append(" AND i.payment_status = ? ");
-    }
-
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql.toString())) {
-
-        int i = 1;
-
-        ps.setInt(i++, customerId);
-
         if (keyword != null && !keyword.trim().isEmpty()) {
-            ps.setString(i++, "%" + keyword + "%");
+            sql.append(" AND up.fullname LIKE ? ");
         }
 
-        if (filter != null &&
-            (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
-            ps.setString(i++, filter);
+        if (filter != null
+                && (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+            sql.append(" AND i.payment_status = ? ");
         }
 
-        ResultSet rs = ps.executeQuery();
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
-        if (rs.next()) {
-            total = rs.getInt(1);
+            int i = 1;
+
+            ps.setInt(i++, customerId);
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(i++, "%" + keyword + "%");
+            }
+
+            if (filter != null
+                    && (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+                ps.setString(i++, filter);
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return total;
     }
 
-    return total;
-}
-public List<Invoice> getInvoicesByCustomer(int customerId, String keyword, String filter, int page, int pageSize) {
+    public List<Invoice> getInvoicesByCustomer(int customerId, String keyword, String filter, int page, int pageSize) {
 
-    List<Invoice> list = new ArrayList<>();
+        List<Invoice> list = new ArrayList<>();
 
-    StringBuilder sql = new StringBuilder("""
+        StringBuilder sql = new StringBuilder("""
         SELECT DISTINCT i.*, 
                u.id AS customer_id,
                up.fullname AS customer_name
@@ -621,73 +621,73 @@ public List<Invoice> getInvoicesByCustomer(int customerId, String keyword, Strin
         WHERE u.id = ?
     """);
 
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        sql.append(" AND up.fullname LIKE ? ");
-    }
-
-    if (filter != null && !filter.isEmpty()) {
-        switch (filter) {
-            case "PAID":
-            case "PENDING":
-            case "UNPAID":
-                sql.append(" AND i.payment_status = ? ");
-                break;
-            case "PRICE_ASC":
-                sql.append(" ORDER BY i.total_amount ASC ");
-                break;
-            case "PRICE_DESC":
-                sql.append(" ORDER BY i.total_amount DESC ");
-                break;
-        }
-    } else {
-        sql.append(" ORDER BY i.issued_at DESC ");
-    }
-
-    sql.append(" LIMIT ? OFFSET ?");
-
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql.toString())) {
-
-        int i = 1;
-        ps.setInt(i++, customerId);
-
         if (keyword != null && !keyword.trim().isEmpty()) {
-            ps.setString(i++, "%" + keyword.trim() + "%");
+            sql.append(" AND up.fullname LIKE ? ");
         }
 
-        if (filter != null &&
-            (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
-            ps.setString(i++, filter);
+        if (filter != null && !filter.isEmpty()) {
+            switch (filter) {
+                case "PAID":
+                case "PENDING":
+                case "UNPAID":
+                    sql.append(" AND i.payment_status = ? ");
+                    break;
+                case "PRICE_ASC":
+                    sql.append(" ORDER BY i.total_amount ASC ");
+                    break;
+                case "PRICE_DESC":
+                    sql.append(" ORDER BY i.total_amount DESC ");
+                    break;
+            }
+        } else {
+            sql.append(" ORDER BY i.issued_at DESC ");
         }
 
-        ps.setInt(i++, pageSize);
-        ps.setInt(i++, (page - 1) * pageSize);
+        sql.append(" LIMIT ? OFFSET ?");
 
-        ResultSet rs = ps.executeQuery();
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
-        while (rs.next()) {
+            int i = 1;
+            ps.setInt(i++, customerId);
 
-    Invoice inv = new Invoice();
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(i++, "%" + keyword.trim() + "%");
+            }
 
-    inv.setId(rs.getInt("id"));
-    inv.setMaintenanceId(rs.getInt("maintenance_id"));
-    inv.setCustomerId(rs.getInt("customer_id"));   // THÊM DÒNG NÀY
-    inv.setCustomerName(rs.getString("customer_name"));
-    inv.setTotalAmount(rs.getDouble("total_amount"));
-    inv.setPaymentStatus(rs.getString("payment_status"));
-    inv.setIssuedAt(rs.getTimestamp("issued_at"));
+            if (filter != null
+                    && (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+                ps.setString(i++, filter);
+            }
 
-    list.add(inv);
-}
-    } catch (Exception e) {
-        e.printStackTrace();
+            ps.setInt(i++, pageSize);
+            ps.setInt(i++, (page - 1) * pageSize);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Invoice inv = new Invoice();
+
+                inv.setId(rs.getInt("id"));
+                inv.setMaintenanceId(rs.getInt("maintenance_id"));
+                inv.setCustomerId(rs.getInt("customer_id"));   // THÊM DÒNG NÀY
+                inv.setCustomerName(rs.getString("customer_name"));
+                inv.setTotalAmount(rs.getDouble("total_amount"));
+                inv.setPaymentStatus(rs.getString("payment_status"));
+                inv.setIssuedAt(rs.getTimestamp("issued_at"));
+
+                list.add(inv);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
-    return list;
-}
-public InvoiceDetailDTO getInvoiceDetailByIdAndCustomer(int invoiceId, int customerId) {
+    public InvoiceDetailDTO getInvoiceDetailByIdAndCustomer(int invoiceId, int customerId) {
 
-    String sql = """
+        String sql = """
         SELECT i.*
         FROM invoice i
         JOIN maintenance m ON i.maintenance_id = m.id
@@ -695,41 +695,42 @@ public InvoiceDetailDTO getInvoiceDetailByIdAndCustomer(int invoiceId, int custo
         WHERE i.id = ? AND d.customer_id = ?
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, invoiceId);
-        ps.setInt(2, customerId);
+            ps.setInt(1, invoiceId);
+            ps.setInt(2, customerId);
 
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            return getInvoiceDetailById(invoiceId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return getInvoiceDetailById(invoiceId);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-    } catch (Exception e) {
-        e.printStackTrace();
+        return null;
     }
-    return null;
-}
-public List<VoucherDTO> getAvailableVouchersByCustomer(int customerId) {
 
+    public List<VoucherDTO> getAvailableVouchersByCustomer(int customerId) {
     List<VoucherDTO> list = new ArrayList<>();
-
     String sql = """
         SELECT v.id, v.code, v.discount_value, v.discount_type
-        FROM customer_voucher cv
-        JOIN voucher v ON cv.voucher_id = v.id
-        WHERE cv.customer_id = ?
-        AND cv.is_used = FALSE
-        AND v.is_active = TRUE
+        FROM voucher v
+        LEFT JOIN customer_voucher cv ON cv.voucher_id = v.id AND cv.customer_id = ?
+        WHERE v.is_active = TRUE
+        AND (
+            -- Voucher GLOBAL: chưa được customer này dùng (hoặc chưa từng assign)
+            (v.voucher_type = 'GLOBAL' AND (cv.is_used IS NULL OR cv.is_used = FALSE))
+            OR
+            -- Voucher CUSTOMER: phải được assign cho đúng customer và chưa dùng
+            (v.voucher_type = 'CUSTOMER' AND cv.customer_id = ? AND cv.is_used = FALSE)
+        )
     """;
-
     try (Connection con = getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
-
         ps.setInt(1, customerId);
+        ps.setInt(2, customerId);
         ResultSet rs = ps.executeQuery();
-
         while (rs.next()) {
             VoucherDTO v = new VoucherDTO();
             v.setId(rs.getInt("id"));
@@ -738,84 +739,126 @@ public List<VoucherDTO> getAvailableVouchersByCustomer(int customerId) {
             v.setDiscountType(rs.getString("discount_type"));
             list.add(v);
         }
-
     } catch (Exception e) {
         e.printStackTrace();
     }
     return list;
 }
-public void applyVoucher(int invoiceId, int voucherId, int customerId) {
 
-    String updateInvoice = """
-        UPDATE invoice i
-        JOIN voucher v ON v.id = ?
-        SET i.voucher_id = v.id,
-            i.discount_amount =
-                CASE
-                    WHEN v.discount_type = 'PERCENT'
-                    THEN i.total_amount * v.discount_value / 100
-                    ELSE v.discount_value
-                END,
-            i.total_amount =
-                i.total_amount -
-                CASE
-                    WHEN v.discount_type = 'PERCENT'
-                    THEN i.total_amount * v.discount_value / 100
-                    ELSE v.discount_value
-                END
-        WHERE i.id = ?
+    public void applyVoucher(int invoiceId, int voucherId, int customerId) {
+
+        // Lấy thông tin voucher trước
+        String getVoucher = "SELECT discount_type, discount_value, voucher_type FROM voucher WHERE id = ? AND is_active = TRUE";
+
+        // Lấy total hiện tại (spare parts + labor, chưa trừ discount)
+        String getTotal = "SELECT labor_cost + COALESCE("
+                + "  (SELECT SUM(sp.price * mi.quantity) "
+                + "   FROM maintenance_item mi "
+                + "   JOIN spare_part sp ON sp.id = mi.spare_part_id "
+                + "   WHERE mi.maintenance_id = i.maintenance_id), 0) AS base_total "
+                + "FROM invoice i WHERE i.id = ?";
+
+        String updateInvoice = """
+        UPDATE invoice
+        SET voucher_id      = ?,
+            discount_amount = ?,
+            total_amount    = ?
+        WHERE id = ?
+          AND payment_status = 'UNPAID'
     """;
 
-    String markUsed = """
+        String markUsed = """
         UPDATE customer_voucher
         SET is_used = TRUE
-        WHERE customer_id = ?
-          AND voucher_id = ?
+        WHERE customer_id = ? AND voucher_id = ?
     """;
 
-    try (Connection con = getConnection()) {
+        String insertUsed = """
+        INSERT INTO customer_voucher (customer_id, voucher_id, is_used)
+        VALUES (?, ?, TRUE)
+        ON DUPLICATE KEY UPDATE is_used = TRUE
+    """;
 
-        con.setAutoCommit(false); // transaction
+        try (Connection con = getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                // Bước 1: Lấy thông tin voucher
+                String discountType;
+                double discountValue;
+                String voucherType;
+                try (PreparedStatement ps = con.prepareStatement(getVoucher)) {
+                    ps.setInt(1, voucherId);
+                    ResultSet rs = ps.executeQuery();
+                    if (!rs.next()) {
+                        con.rollback();
+                        return;
+                    } // voucher không tồn tại
+                    discountType = rs.getString("discount_type");
+                    discountValue = rs.getDouble("discount_value");
+                    voucherType = rs.getString("voucher_type");
+                }
 
-        try (PreparedStatement ps1 = con.prepareStatement(updateInvoice);
-             PreparedStatement ps2 = con.prepareStatement(markUsed)) {
+                // Bước 2: Lấy base_total (spare parts + labor, không bị ảnh hưởng bởi discount cũ)
+                double baseTotal;
+                try (PreparedStatement ps = con.prepareStatement(getTotal)) {
+                    ps.setInt(1, invoiceId);
+                    ResultSet rs = ps.executeQuery();
+                    if (!rs.next()) {
+                        con.rollback();
+                        return;
+                    }
+                    baseTotal = rs.getDouble("base_total");
+                }
 
-            // Update invoice
-            ps1.setInt(1, voucherId);
-            ps1.setInt(2, invoiceId);
-            int rows = ps1.executeUpdate();
+                // Bước 3: Tính discount và total mới
+                double discountAmount = "PERCENT".equals(discountType)
+                        ? baseTotal * discountValue / 100
+                        : discountValue;
+                double newTotal = Math.max(0, baseTotal - discountAmount);
 
-            if (rows == 0) {
+                // Bước 4: Update invoice
+                try (PreparedStatement ps = con.prepareStatement(updateInvoice)) {
+                    ps.setInt(1, voucherId);
+                    ps.setDouble(2, discountAmount);
+                    ps.setDouble(3, newTotal);
+                    ps.setInt(4, invoiceId);
+                    int rows = ps.executeUpdate();
+                    if (rows == 0) {
+                        con.rollback();
+                        return;
+                    }
+                }
+
+                // Bước 5: Đánh dấu voucher đã dùng
+                // GLOBAL chưa có trong customer_voucher → INSERT, CUSTOMER → UPDATE
+                String useSql = "CUSTOMER".equals(voucherType) ? markUsed : insertUsed;
+                try (PreparedStatement ps = con.prepareStatement(useSql)) {
+                    ps.setInt(1, customerId);
+                    ps.setInt(2, voucherId);
+                    ps.executeUpdate();
+                }
+
+                con.commit();
+
+            } catch (Exception e) {
                 con.rollback();
-                return;
+                throw e;
             }
-
-            // Mark voucher used
-            ps2.setInt(1, customerId);
-            ps2.setInt(2, voucherId);
-            ps2.executeUpdate();
-
-            con.commit();
-
         } catch (Exception e) {
-            con.rollback();
-            throw e;
+            e.printStackTrace();
         }
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
-public List<Invoice> searchFilterInvoiceByTechnician(
-        int technicianId,
-        String keyword,
-        String filter,
-        int page,
-        int pageSize) {
 
-    List<Invoice> list = new ArrayList<>();
+    public List<Invoice> searchFilterInvoiceByTechnician(
+            int technicianId,
+            String keyword,
+            String filter,
+            int page,
+            int pageSize) {
 
-    StringBuilder sql = new StringBuilder("""
+        List<Invoice> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("""
         SELECT DISTINCT i.*, up.fullname AS customer_name
         FROM invoice i
         JOIN maintenance m ON i.maintenance_id = m.id
@@ -825,66 +868,66 @@ public List<Invoice> searchFilterInvoiceByTechnician(
         WHERE m.technician_id = ?
     """);
 
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        sql.append(" AND up.fullname LIKE ? ");
-    }
-
-    if (filter != null && !filter.isEmpty()) {
-        switch (filter) {
-            case "PAID":
-            case "PENDING":
-            case "UNPAID":
-                sql.append(" AND i.payment_status = ? ");
-                break;
-            case "PRICE_ASC":
-                sql.append(" ORDER BY i.total_amount ASC ");
-                break;
-            case "PRICE_DESC":
-                sql.append(" ORDER BY i.total_amount DESC ");
-                break;
-        }
-    } else {
-        sql.append(" ORDER BY i.issued_at DESC ");
-    }
-
-    sql.append(" LIMIT ? OFFSET ?");
-
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql.toString())) {
-
-        int i = 1;
-        ps.setInt(i++, technicianId);
-
         if (keyword != null && !keyword.trim().isEmpty()) {
-            ps.setString(i++, "%" + keyword.trim() + "%");
+            sql.append(" AND up.fullname LIKE ? ");
         }
 
-        if (filter != null &&
-            (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
-            ps.setString(i++, filter);
+        if (filter != null && !filter.isEmpty()) {
+            switch (filter) {
+                case "PAID":
+                case "PENDING":
+                case "UNPAID":
+                    sql.append(" AND i.payment_status = ? ");
+                    break;
+                case "PRICE_ASC":
+                    sql.append(" ORDER BY i.total_amount ASC ");
+                    break;
+                case "PRICE_DESC":
+                    sql.append(" ORDER BY i.total_amount DESC ");
+                    break;
+            }
+        } else {
+            sql.append(" ORDER BY i.issued_at DESC ");
         }
 
-        ps.setInt(i++, pageSize);
-        ps.setInt(i++, (page - 1) * pageSize);
+        sql.append(" LIMIT ? OFFSET ?");
 
-        ResultSet rs = ps.executeQuery();
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
-        while (rs.next()) {
-            Invoice inv = new Invoice();
-            inv.setId(rs.getInt("id"));
-            inv.setMaintenanceId(rs.getInt("maintenance_id"));
-            inv.setCustomerName(rs.getString("customer_name"));
-            inv.setTotalAmount(rs.getDouble("total_amount"));
-            inv.setPaymentStatus(rs.getString("payment_status"));
-            list.add(inv);
+            int i = 1;
+            ps.setInt(i++, technicianId);
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(i++, "%" + keyword.trim() + "%");
+            }
+
+            if (filter != null
+                    && (filter.equals("PAID") || filter.equals("PENDING") || filter.equals("UNPAID"))) {
+                ps.setString(i++, filter);
+            }
+
+            ps.setInt(i++, pageSize);
+            ps.setInt(i++, (page - 1) * pageSize);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Invoice inv = new Invoice();
+                inv.setId(rs.getInt("id"));
+                inv.setMaintenanceId(rs.getInt("maintenance_id"));
+                inv.setCustomerName(rs.getString("customer_name"));
+                inv.setTotalAmount(rs.getDouble("total_amount"));
+                inv.setPaymentStatus(rs.getString("payment_status"));
+                list.add(inv);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
 
-    return list;
-}
     public int countInvoiceByTechnician(
             int technicianId,
             String keyword,
@@ -936,11 +979,12 @@ public List<Invoice> searchFilterInvoiceByTechnician(
 
         return total;
     }
+
     public List<MaintenanceDTO> getAvailableMaintenancesByTechnician(int technicianId) {
 
-    List<MaintenanceDTO> list = new ArrayList<>();
+        List<MaintenanceDTO> list = new ArrayList<>();
 
-    String sql = """
+        String sql = """
         SELECT
             m.id,
             up.fullname AS customer_name
@@ -955,31 +999,31 @@ public List<Invoice> searchFilterInvoiceByTechnician(
         ORDER BY m.id DESC
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, technicianId);
+            ps.setInt(1, technicianId);
 
-        ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-        while (rs.next()) {
-            MaintenanceDTO dto = new MaintenanceDTO();
-            dto.setId(rs.getInt("id"));
-            dto.setCustomerName(rs.getString("customer_name"));
-            list.add(dto);
+            while (rs.next()) {
+                MaintenanceDTO dto = new MaintenanceDTO();
+                dto.setId(rs.getInt("id"));
+                dto.setCustomerName(rs.getString("customer_name"));
+                list.add(dto);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
 
-    return list;
-}
     public boolean checkMaintenanceBelongsToTechnician(
-        int maintenanceId,
-        int technicianId) {
+            int maintenanceId,
+            int technicianId) {
 
-    String sql = """
+        String sql = """
         SELECT 1
         FROM maintenance m
         LEFT JOIN invoice i ON m.id = i.maintenance_id
@@ -989,50 +1033,50 @@ public List<Invoice> searchFilterInvoiceByTechnician(
           AND i.id IS NULL
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, maintenanceId);
-        ps.setInt(2, technicianId);
+            ps.setInt(1, maintenanceId);
+            ps.setInt(2, technicianId);
 
-        ResultSet rs = ps.executeQuery();
-        return rs.next();
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
-    return false;
-}
     public void updatePaymentStatusToPaid(int invoiceId) {
 
-    String sql = """
+        String sql = """
     UPDATE invoice
     SET payment_status = 'PAID'
     WHERE id = ?
     AND payment_status <> 'PAID'
 """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, invoiceId);
-        ps.executeUpdate();
+            ps.setInt(1, invoiceId);
+            ps.executeUpdate();
 
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-}
-public List<Maintenance> getMaintenanceDone(String name, String status,
-                                            int page, int pageSize) {
-
-    List<Maintenance> list = new ArrayList<>();
-
-    if (status != null && !status.equals("DONE") && !status.equals("All Status")) {
-        return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    String sql = """
+    public List<Maintenance> getMaintenanceDone(String name, String status,
+            int page, int pageSize) {
+
+        List<Maintenance> list = new ArrayList<>();
+
+        if (status != null && !status.equals("DONE") && !status.equals("All Status")) {
+            return list;
+        }
+
+        String sql = """
         SELECT 
             m.id,
             m.status,
@@ -1061,40 +1105,40 @@ public List<Maintenance> getMaintenanceDone(String name, String status,
         LIMIT ? OFFSET ?
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setString(1, "%" + (name == null ? "" : name) + "%");
-        ps.setInt(2, pageSize);
-        ps.setInt(3, (page - 1) * pageSize);
+            ps.setString(1, "%" + (name == null ? "" : name) + "%");
+            ps.setInt(2, pageSize);
+            ps.setInt(3, (page - 1) * pageSize);
 
-        ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-        while (rs.next()) {
+            while (rs.next()) {
 
-            Maintenance m = new Maintenance();
+                Maintenance m = new Maintenance();
 
-            m.setId(rs.getInt("id"));
-            m.setStatus(rs.getString("status"));
-            m.setMachineName(rs.getString("machine_name"));
-            m.setModelName(rs.getString("model"));
+                m.setId(rs.getInt("id"));
+                m.setStatus(rs.getString("status"));
+                m.setMachineName(rs.getString("machine_name"));
+                m.setModelName(rs.getString("model"));
 
-            m.setCustomerId(rs.getInt("customer_id"));   // ⭐ QUAN TRỌNG
-            m.setTechnicianId(rs.getInt("technician_id"));
-            m.setDeviceId(rs.getInt("device_id"));
-            m.setCustomerName(rs.getString("customer_name"));
-            m.setTechnicianName(rs.getString("technician_name"));
+                m.setCustomerId(rs.getInt("customer_id"));   // ⭐ QUAN TRỌNG
+                m.setTechnicianId(rs.getInt("technician_id"));
+                m.setDeviceId(rs.getInt("device_id"));
+                m.setCustomerName(rs.getString("customer_name"));
+                m.setTechnicianName(rs.getString("technician_name"));
 
-            list.add(m);
+                list.add(m);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
 
-    return list;
-}
-public DeviceDTO getDeviceById(int id) {
+    public DeviceDTO getDeviceById(int id) {
         String sql = """
         SELECT d.id,
                d.serial_number,
@@ -1149,9 +1193,10 @@ public DeviceDTO getDeviceById(int id) {
         }
         return null;
     }
-public int countMaintenanceDone(String name, String status) {
 
-    String sql = """
+    public int countMaintenanceDone(String name, String status) {
+
+        String sql = """
         SELECT COUNT(*)
         FROM maintenance m
         JOIN device d ON m.device_id = d.id
@@ -1163,26 +1208,26 @@ public int countMaintenanceDone(String name, String status) {
         AND up.fullname LIKE ?
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setString(1, "%" + (name == null ? "" : name) + "%");
+            ps.setString(1, "%" + (name == null ? "" : name) + "%");
 
-        ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-        if (rs.next()) {
-            return rs.getInt(1);
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return 0;
     }
 
-    return 0;
-}
-public int countMaintenanceDoneByCustomer(int customerId) {
+    public int countMaintenanceDoneByCustomer(int customerId) {
 
-    String sql = """
+        String sql = """
         SELECT COUNT(*)
         FROM maintenance m
         JOIN device d ON m.device_id = d.id
@@ -1190,34 +1235,33 @@ public int countMaintenanceDoneByCustomer(int customerId) {
         AND d.customer_id = ?
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, customerId);
+            ps.setInt(1, customerId);
 
-        ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-        if (rs.next()) {
-            return rs.getInt(1);
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return 0;
     }
 
-    return 0;
-}
+    public List<Maintenance> getMaintenanceDoneByCustomer(
+            int customerId,
+            String name,
+            String status,
+            int page,
+            int pageSize) {
 
-public List<Maintenance> getMaintenanceDoneByCustomer(
-        int customerId,
-        String name,
-        String status,
-        int page,
-        int pageSize) {
+        List<Maintenance> list = new ArrayList<>();
 
-    List<Maintenance> list = new ArrayList<>();
-
-    String sql = """
+        String sql = """
         SELECT 
             m.id,
             m.status,
@@ -1238,86 +1282,86 @@ public List<Maintenance> getMaintenanceDoneByCustomer(
                  and m.status = 'DONE'
         """;
 
-    if (name != null && !name.isEmpty()) {
-        sql += " AND cus.fullname LIKE ? ";
-    }
-
-    if (status != null && !status.equals("All Status")) {
-        sql += " AND m.status = ? ";
-    }
-
-    sql += " ORDER BY m.id DESC LIMIT ? OFFSET ?";
-
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-
-        int index = 1;
-
-        ps.setInt(index++, customerId);
-
         if (name != null && !name.isEmpty()) {
-            ps.setString(index++, "%" + name + "%");
+            sql += " AND cus.fullname LIKE ? ";
         }
 
         if (status != null && !status.equals("All Status")) {
-            ps.setString(index++, status);
+            sql += " AND m.status = ? ";
         }
 
-        ps.setInt(index++, pageSize);
-        ps.setInt(index, (page - 1) * pageSize);
+        sql += " ORDER BY m.id DESC LIMIT ? OFFSET ?";
 
-        ResultSet rs = ps.executeQuery();
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        while (rs.next()) {
-            Maintenance m = new Maintenance();
+            int index = 1;
 
-            m.setId(rs.getInt("id"));
-            m.setStatus(rs.getString("status"));
-            m.setMachineName(rs.getString("machine_name"));
-            m.setModelName(rs.getString("model"));
-            m.setCustomerId(rs.getInt("customer_id"));
-            m.setTechnicianId(rs.getInt("technician_id"));
-            m.setDeviceId(rs.getInt("device_id"));
-            m.setCustomerName(rs.getString("customer_name"));
-            m.setTechnicianName(rs.getString("technician_name"));
+            ps.setInt(index++, customerId);
 
-            list.add(m);
+            if (name != null && !name.isEmpty()) {
+                ps.setString(index++, "%" + name + "%");
+            }
+
+            if (status != null && !status.equals("All Status")) {
+                ps.setString(index++, status);
+            }
+
+            ps.setInt(index++, pageSize);
+            ps.setInt(index, (page - 1) * pageSize);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Maintenance m = new Maintenance();
+
+                m.setId(rs.getInt("id"));
+                m.setStatus(rs.getString("status"));
+                m.setMachineName(rs.getString("machine_name"));
+                m.setModelName(rs.getString("model"));
+                m.setCustomerId(rs.getInt("customer_id"));
+                m.setTechnicianId(rs.getInt("technician_id"));
+                m.setDeviceId(rs.getInt("device_id"));
+                m.setCustomerName(rs.getString("customer_name"));
+                m.setTechnicianName(rs.getString("technician_name"));
+
+                list.add(m);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
 
-    return list;
-}
-public double getLaborCostByMaintenance(int maintenanceId) {
+    public double getLaborCostByMaintenance(int maintenanceId) {
 
-    String sql = """
+        String sql = """
         SELECT labor_hours * labor_cost_per_hour AS labor_cost
         FROM maintenance
         WHERE id = ?
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, maintenanceId);
+            ps.setInt(1, maintenanceId);
 
-        ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-        if (rs.next()) {
-            return rs.getDouble("labor_cost");
+            if (rs.next()) {
+                return rs.getDouble("labor_cost");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return 0;
     }
 
-    return 0;
-}
-public MaintenanceDTO getMaintenanceById(int id) {
+    public MaintenanceDTO getMaintenanceById(int id) {
 
-    String sql = """
+        String sql = """
         SELECT 
                m.id,
                
@@ -1346,48 +1390,48 @@ public MaintenanceDTO getMaintenanceById(int id) {
         WHERE m.id = ?
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, id);
+            ps.setInt(1, id);
 
-        ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-        if (rs.next()) {
+            if (rs.next()) {
 
-            MaintenanceDTO m = new MaintenanceDTO();
+                MaintenanceDTO m = new MaintenanceDTO();
 
-            m.setId(rs.getInt("id"));
+                m.setId(rs.getInt("id"));
 
-            m.setMachineName(rs.getString("machine_name"));
-            m.setModel(rs.getString("model"));
+                m.setMachineName(rs.getString("machine_name"));
+                m.setModel(rs.getString("model"));
 
-            m.setCustomerId(rs.getInt("customer_id"));
-            m.setTechnicianId(rs.getInt("technician_id"));
+                m.setCustomerId(rs.getInt("customer_id"));
+                m.setTechnicianId(rs.getInt("technician_id"));
 
-            m.setCustomerName(rs.getString("customer_name"));
-            m.setTechnicianName(rs.getString("technician_name"));
+                m.setCustomerName(rs.getString("customer_name"));
+                m.setTechnicianName(rs.getString("technician_name"));
 
-            m.setLaborHours(rs.getInt("labor_hours"));
-            m.setLaborCostPerHour(rs.getDouble("labor_cost_per_hour"));
+                m.setLaborHours(rs.getInt("labor_hours"));
+                m.setLaborCostPerHour(rs.getDouble("labor_cost_per_hour"));
 
-            return m;
+                return m;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return null;
     }
 
-    return null;
-}
     public static void main(String[] args) {
         InvoiceDAO i = new InvoiceDAO();
 
-}
-    
+    }
+
     public void updatePaymentToPending(int invoiceId, String paymentMethod) {
 
-    String sql = """
+        String sql = """
         UPDATE invoice
         SET payment_status = 'PENDING',
             payment_method = ?
@@ -1395,21 +1439,20 @@ public MaintenanceDTO getMaintenanceById(int id) {
           AND payment_status = 'UNPAID'
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setString(1, paymentMethod);
-        ps.setInt(2, invoiceId);
-        ps.executeUpdate();
+            ps.setString(1, paymentMethod);
+            ps.setInt(2, invoiceId);
+            ps.executeUpdate();
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
-    
+
     public void confirmPayment(int invoiceId) {
 
-    String sql = """
+        String sql = """
         UPDATE invoice
         SET payment_status = 'PAID',
             paid_at        = NOW()
@@ -1417,20 +1460,19 @@ public MaintenanceDTO getMaintenanceById(int id) {
           AND payment_status = 'PENDING'
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, invoiceId);
-        ps.executeUpdate();
+            ps.setInt(1, invoiceId);
+            ps.executeUpdate();
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
-    
+
     public boolean isUnderWarranty(int maintenanceId) {
 
-    String sql = """
+        String sql = """
         SELECT 1
         FROM maintenance m
         JOIN device d ON m.device_id = d.id
@@ -1438,16 +1480,15 @@ public MaintenanceDTO getMaintenanceById(int id) {
           AND m.start_date <= d.warranty_end_date
     """;
 
-    try (Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setInt(1, maintenanceId);
-        ResultSet rs = ps.executeQuery();
-        return rs.next();
+            ps.setInt(1, maintenanceId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    return false;
-}
 }
