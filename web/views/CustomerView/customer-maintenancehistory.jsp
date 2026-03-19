@@ -24,7 +24,7 @@
             <div class="admin-layout d-flex">
                 <div class="admin-content p-4 w-100">
                     <div style="margin-top: 40px" class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="fw-bold">Maintenance Done</h2>
+                        <h2 class="fw-bold">Maintenance History</h2>
                         <form action="${pageContext.request.contextPath}/customer/maintenance/done" method="get" class="d-flex gap-2">
                         <input type="text" name="customerName" class="form-control" placeholder="Enter name of Customer" value="${currentName}">
                         <select name="status" class="form-select">
@@ -91,7 +91,7 @@
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/admin-business/maintenance?action=detail&id=${r.id}" 
+                                        <a href="${pageContext.request.contextPath}/customer/maintenance/detail?action=detail&id=${r.id}"
                                            class="btn btn-sm btn-light border px-3">View</a>
                                     </td>
                                     <td>

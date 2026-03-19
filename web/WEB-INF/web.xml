@@ -24,6 +24,10 @@
         <servlet-name>CustomerMaintenanceDoneServlet</servlet-name>
         <servlet-class>controller.customer.CustomerMaintenanceDoneServlet</servlet-class>
     </servlet>
+            <servlet>
+        <servlet-name>CustomerMaintenanceDetailServlet</servlet-name>
+        <servlet-class>controller.customer.CustomerMaintenanceDetailServlet</servlet-class>
+    </servlet>
     <servlet>
         <servlet-name>AdminReportServlet</servlet-name>
         <servlet-class>controller.adminBusiness.AdminReportServlet</servlet-class>
@@ -67,6 +71,10 @@
     <servlet-mapping>
         <servlet-name>AdminReportServlet</servlet-name>
         <url-pattern>/admin-business/reports</url-pattern>
+    </servlet-mapping>
+            <servlet-mapping>
+        <servlet-name>CustomerMaintenanceDetailServlet</servlet-name>
+        <url-pattern>/customer/maintenance/detail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>LeaderMaintenanceServlet</servlet-name>
