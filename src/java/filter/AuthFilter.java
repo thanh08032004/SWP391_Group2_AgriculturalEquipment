@@ -43,7 +43,8 @@ public class AuthFilter implements Filter {
         if (uri.endsWith("/home")
                 || uri.endsWith("/login")
                 || uri.endsWith("/logout")
-                || uri.contains("/error")) {
+                || uri.contains("/error") 
+                || uri.contains("/forgot-password")) {
 
             chain.doFilter(request, response);
             return;
