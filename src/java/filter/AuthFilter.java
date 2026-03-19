@@ -39,9 +39,7 @@ public class AuthFilter implements Filter {
             return;
         }
 
-        // PUBLIC
-        if (uri.endsWith("/home")
-                || uri.endsWith("/login")
+        if (uri.endsWith("/login")
                 || uri.endsWith("/logout")
                 || uri.contains("/error") 
                 || uri.contains("/forgot-password")) {
@@ -50,7 +48,6 @@ public class AuthFilter implements Filter {
             return;
         }
 
-        // BLOCK JSP
         if (uri.endsWith(".jsp")) {
             res.sendRedirect(context + "/home");
             return;

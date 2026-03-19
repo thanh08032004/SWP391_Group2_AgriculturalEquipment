@@ -26,7 +26,6 @@
                     </a>
                 </li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/invoice/list">Invoice Management</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin-business/feedback/list">Feedback Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/maintenance">Maintenance History</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/contracts">Contract Management</a></li>
 

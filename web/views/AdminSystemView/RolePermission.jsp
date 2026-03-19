@@ -42,11 +42,9 @@
 
         <!-- ===== CONTENT ===== -->
         <div class="container mt-5 mb-5">
-               <div class="back-wrapper" style="margin-left: -50px;">
-            <a href="javascript:history.back()" class="back-btn">
-                ← Back
-            </a>
-        </div>
+            <div class="back-wrapper" style="margin-left: -50px;">
+               <a href="${pageContext.request.contextPath}/admin/role" class="back-btn">← Back</a>
+            </div>
             <h2 class="fw-bold mb-4">
                 Role: <span class="text-primary">${role.name}</span>
             </h2>
@@ -81,17 +79,19 @@
 
                 <!-- ACTION BUTTONS -->
                 <div class="mt-4">
-                    <button type="button" class="btn btn-outline-primary" id="editBtn">
-                        Edit
-                    </button>
+                    <c:if test="${role.name != 'ADMIN_SYSTEM'}">
+                        <button type="button" class="btn btn-outline-primary" id="editBtn">
+                            Edit
+                        </button>
 
-                    <button type="submit" class="btn btn-success d-none" id="saveBtn">
-                        Confirm
-                    </button>
+                        <button type="submit" class="btn btn-success d-none" id="saveBtn">
+                            Confirm
+                        </button>
 
-                    <button type="button" class="btn btn-secondary d-none" id="cancelBtn">
-                        Cancel
-                    </button>
+                        <button type="button" class="btn btn-secondary d-none" id="cancelBtn">
+                            Cancel
+                        </button>
+                    </c:if>
                 </div>
             </form>
         </div>
@@ -170,22 +170,22 @@
         <script src="./assets/js/bootstrap.bundle.min.js"></script>
 
         <script>
-                       const editBtn = document.getElementById("editBtn");
-                       const saveBtn = document.getElementById("saveBtn");
-                       const cancelBtn = document.getElementById("cancelBtn");
-                       const checkboxes = document.querySelectorAll(".perm-checkbox");
+                                                   const editBtn = document.getElementById("editBtn");
+                                                   const saveBtn = document.getElementById("saveBtn");
+                                                   const cancelBtn = document.getElementById("cancelBtn");
+                                                   const checkboxes = document.querySelectorAll(".perm-checkbox");
 
-                       editBtn.onclick = () => {
-                           checkboxes.forEach(cb => cb.onclick = null);
-                           editBtn.classList.add("d-none");
-                           saveBtn.classList.remove("d-none");
-                           cancelBtn.classList.remove("d-none");
-                       };
+                                                   editBtn.onclick = () => {
+                                                       checkboxes.forEach(cb => cb.onclick = null);
+                                                       editBtn.classList.add("d-none");
+                                                       saveBtn.classList.remove("d-none");
+                                                       cancelBtn.classList.remove("d-none");
+                                                   };
 
-                       cancelBtn.onclick = () => {
-                           window.location.reload();
-                       };
+                                                   cancelBtn.onclick = () => {
+                                                       window.location.reload();
+                                                   };
         </script>
-        
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
     </body>
 </html>

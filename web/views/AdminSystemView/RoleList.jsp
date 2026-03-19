@@ -23,11 +23,6 @@
             <jsp:include page="/common/side-bar.jsp"></jsp:include>
             <div class="admin-content">
             <div class="container mt-5 mb-5">
-                <div class="back-wrapper">
-            <a href="javascript:history.back()" class="back-btn">
-                ← Back
-            </a>
-        </div>
                 <h2 class="mb-4 fw-bold role-title">
                     Role Management
                 </h2>
