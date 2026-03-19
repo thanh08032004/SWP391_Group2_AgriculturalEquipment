@@ -88,7 +88,7 @@
                                                 <%-- Ảnh 1: Customer --%>
                                                 <div class="col-md-4">
                                                     <p class="fw-bold small text-muted text-uppercase mb-2">
-                                                        <i class="bi bi-person"></i> Customer's Image
+                                                        <i class="bi bi-person"></i> Initial
                                                     </p>
                                                     <c:set var="hasCustomerImg" value="false"/>
                                                     <c:forEach var="img" items="${task.images}">
@@ -107,7 +107,7 @@
                                                 <%-- Ảnh 2: Technician Diagnosis --%>
                                                 <div class="col-md-4">
                                                     <p class="fw-bold small text-muted text-uppercase mb-2">
-                                                        <i class="bi bi-tools"></i> Diagnosis Image
+                                                        <i class="bi bi-tools"></i> Diagnosis
                                                     </p>
                                                     <c:set var="hasTechImg" value="false"/>
                                                     <c:forEach var="img" items="${task.images}">
@@ -126,7 +126,7 @@
                                                 <%-- Ảnh 3: Completion --%>
                                                 <div class="col-md-4">
                                                     <p class="fw-bold small text-muted text-uppercase mb-2">
-                                                        <i class="bi bi-check-circle"></i> Completion Image
+                                                        <i class="bi bi-check-circle"></i> Result
                                                     </p>
                                                     <c:set var="hasDoneImg" value="false"/>
                                                     <c:forEach var="img" items="${task.images}">
@@ -163,53 +163,9 @@
                                     </script>
 
 
-                                    <%-- BLOCK 2: Technician Diagnosis Image --%>
-                                    <c:if test="${task.status != 'PENDING' && task.status != 'READY' && task.status != 'WAITING_FOR_TECHNICIAN'}">
-                                        <div class="card border-0 shadow-sm mb-3">
-                                            <div class="card-header bg-white fw-bold text-warning">
-                                                <i class="bi bi-tools"></i> Technician's Diagnosis Image
-                                            </div>
-                                            <div class="card-body">
-                                                <c:set var="found2" value="false" />
-                                                <c:forEach var="img" items="${task.images}">
-                                                    <c:if test="${img.status == 'TECHNICIAN_SUBMITTED'}">
-                                                        <c:set var="found2" value="true" />
-                                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}"
-                                                             class="img-thumbnail shadow-sm me-2 mb-2"
-                                                             style="max-height:200px; cursor:pointer;"
-                                                             onclick="window.open(this.src)">
-                                                    </c:if>
-                                                </c:forEach>
-                                                <c:if test="${found2 == 'false'}">
-                                                    <p class="text-muted small italic">No diagnosis image uploaded yet.</p>
-                                                </c:if>
-                                            </div>
-                                        </div>
-                                    </c:if>
+                                   
 
-                                    <%-- BLOCK 3: Completion Image --%>
-                                    <c:if test="${task.status == 'DONE'}">
-                                        <div class="card border-0 shadow-sm mb-3">
-                                            <div class="card-header bg-white fw-bold text-success">
-                                                <i class="bi bi-check-circle"></i> Completion Image
-                                            </div>
-                                            <div class="card-body">
-                                                <c:set var="found3" value="false" />
-                                                <c:forEach var="img" items="${task.images}">
-                                                    <c:if test="${img.status == 'DONE'}">
-                                                        <c:set var="found3" value="true" />
-                                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}"
-                                                             class="img-thumbnail shadow-sm me-2 mb-2"
-                                                             style="max-height:200px; cursor:pointer;"
-                                                             onclick="window.open(this.src)">
-                                                    </c:if>
-                                                </c:forEach>
-                                                <c:if test="${found3 == 'false'}">
-                                                    <p class="text-muted small italic">No completion image uploaded yet.</p>
-                                                </c:if>
-                                            </div>
-                                        </div>
-                                    </c:if>
+                                    
                                 </div>
                             </div>
                         </div>

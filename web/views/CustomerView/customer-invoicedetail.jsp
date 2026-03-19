@@ -253,11 +253,31 @@
                     </div>
                 </div>
             </div>
-            <div class="text-end mt-3">
+            <div class="d-flex justify-content-between align-items-center mt-3">
+
                 <a href="${pageContext.request.contextPath}/customer/invoice/list"
-                   class="btn btn-secondary">
+                   class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>
                     Back to Invoice List
                 </a>
+
+                <%-- Nút Pay chỉ hiện khi UNPAID --%>
+                <c:if test="${invoice.paymentStatus eq 'UNPAID'}">
+                    <a href="${pageContext.request.contextPath}/customer/invoice/detail?action=pay&id=${invoice.invoiceId}"
+                       class="btn btn-success px-4">
+                        <i class="bi bi-credit-card me-1"></i>
+                        Pay Now
+                    </a>
+                </c:if>
+
+                <%-- Badge chờ xác nhận khi PENDING --%>
+                <c:if test="${invoice.paymentStatus eq 'PENDING'}">
+                    <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                        <i class="bi bi-hourglass-split me-1"></i>
+                        Awaiting Confirmation
+                    </span>
+                </c:if>
+
             </div>
         </div>
         <jsp:include page="/common/scripts.jsp"></jsp:include>

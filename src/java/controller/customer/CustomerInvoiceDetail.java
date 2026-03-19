@@ -89,6 +89,30 @@ public class CustomerInvoiceDetail extends HttpServlet {
             return;
         }
 
+        if ("pay".equals(action)) {
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("user") == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+            User user = (User) session.getAttribute("user");
+            int customerId = user.getId();
+            int invoiceId = Integer.parseInt(request.getParameter("id"));
+
+            InvoiceDetailDTO invoice = dao.getInvoiceDetailByIdAndCustomer(invoiceId, customerId);
+            if (invoice == null || !"UNPAID".equals(invoice.getPaymentStatus())) {
+                response.sendRedirect(request.getContextPath() + "/customer/invoice/detail?id=" + invoiceId);
+                return;
+            }
+
+            List<SparePartDTO> spareParts = dao.getSparePartsByInvoiceId(invoiceId);
+            request.setAttribute("invoice", invoice);
+            request.setAttribute("spareParts", spareParts);
+            request.getRequestDispatcher("/views/CustomerView/customer-payment.jsp")
+                    .forward(request, response);
+            return;
+        }
+
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -125,6 +149,7 @@ public class CustomerInvoiceDetail extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
+        InvoiceDAO dao = new InvoiceDAO();
 
         // check login
         if (session == null || session.getAttribute("user") == null) {
@@ -134,7 +159,32 @@ public class CustomerInvoiceDetail extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         int customerId = user.getId();
+        String postAction = request.getParameter("postAction");
 
+        // ===== SUBMIT PAYMENT =====
+        if ("submitPayment".equals(postAction)) {
+            String invoiceRaw = request.getParameter("invoiceId");
+            String paymentMethod = request.getParameter("paymentMethod");
+
+            if (invoiceRaw == null || paymentMethod == null || paymentMethod.isBlank()) {
+                response.sendRedirect(request.getContextPath() + "/customer/invoice/list");
+                return;
+            }
+
+            int invoiceId = Integer.parseInt(invoiceRaw);
+
+            InvoiceDetailDTO invoice = dao.getInvoiceDetailByIdAndCustomer(invoiceId, customerId);
+            if (invoice == null || !"UNPAID".equals(invoice.getPaymentStatus())) {
+                response.sendRedirect(request.getContextPath() + "/customer/invoice/detail?id=" + invoiceId);
+                return;
+            }
+
+            dao.updatePaymentToPending(invoiceId, paymentMethod);
+            response.sendRedirect(
+                    request.getContextPath() + "/customer/invoice/detail?id=" + invoiceId
+            );
+            return;
+        }
         String invoiceRaw = request.getParameter("invoiceId");
         String voucherRaw = request.getParameter("voucherId");
 
@@ -146,7 +196,6 @@ public class CustomerInvoiceDetail extends HttpServlet {
         int invoiceId = Integer.parseInt(invoiceRaw);
         int voucherId = Integer.parseInt(voucherRaw);
 
-        InvoiceDAO dao = new InvoiceDAO();
         dao.applyVoucher(invoiceId, voucherId, customerId);
 
         response.sendRedirect(

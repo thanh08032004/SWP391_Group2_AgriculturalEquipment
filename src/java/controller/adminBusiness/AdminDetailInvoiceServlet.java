@@ -103,8 +103,24 @@ public class AdminDetailInvoiceServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+        
+        
+        String postAction = request.getParameter("postAction");
+
+        // ===== CONFIRM PAYMENT =====
+        if ("confirmPayment".equals(postAction)) {
+            int invoiceId = Integer.parseInt(request.getParameter("invoiceId"));
+            InvoiceDAO dao = new InvoiceDAO();
+            dao.confirmPayment(invoiceId);
+            response.sendRedirect(
+                    request.getContextPath() + "/admin-business/invoice/list"
+            );
+            return;
+        }
+
+        response.sendRedirect(request.getContextPath() + "/admin-business/invoice/list");
     }
+    
 
     @Override
     public String getServletInfo() {

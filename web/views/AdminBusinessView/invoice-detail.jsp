@@ -267,17 +267,35 @@
                         </div>
                     </div>
                 </div>
-                <div class="text-end mt-3">
+                <div class="d-flex justify-content-between align-items-center mt-3">
 
                     <a href="${pageContext.request.contextPath}/admin-business/invoice/list"
                        class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>
                         Back to Invoice List
                     </a>
+
+                    <%-- Nút Confirm Payment chỉ hiện khi status = PENDING --%>
+                    <c:if test="${invoice.paymentStatus eq 'PENDING' 
+                                  and (invoice.paymentMethod eq 'BANK_TRANSFER' 
+                                  or invoice.paymentMethod eq 'EWALLET')}">
+                          <form method="post"
+                                action="${pageContext.request.contextPath}/admin-business/invoice/detail"
+                                onsubmit="return confirm('Confirm payment for Invoice #${invoice.invoiceId}?')">
+                              <input type="hidden" name="postAction"  value="confirmPayment"/>
+                              <input type="hidden" name="invoiceId"   value="${invoice.invoiceId}"/>
+                              <button type="submit" class="btn btn-success px-4">
+                                  <i class="bi bi-check-circle me-1"></i>
+                                  Confirm Payment
+                              </button>
+                          </form>
+                    </c:if>
+
                 </div>
             </div>
         </div>
-                       <jsp:include page="/common/scripts.jsp"></jsp:include>
-       <script>
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
+            <script>
 
                 var CTX = '${pageContext.request.contextPath}';
                 function showMaintenanceDetail(id) {

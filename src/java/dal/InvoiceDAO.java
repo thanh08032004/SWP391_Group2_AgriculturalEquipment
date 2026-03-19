@@ -1384,4 +1384,47 @@ public MaintenanceDTO getMaintenanceById(int id) {
         InvoiceDAO i = new InvoiceDAO();
 
 }
+    
+    public void updatePaymentToPending(int invoiceId, String paymentMethod) {
+
+    String sql = """
+        UPDATE invoice
+        SET payment_status = 'PENDING',
+            payment_method = ?
+        WHERE id = ?
+          AND payment_status = 'UNPAID'
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setString(1, paymentMethod);
+        ps.setInt(2, invoiceId);
+        ps.executeUpdate();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+    
+    public void confirmPayment(int invoiceId) {
+
+    String sql = """
+        UPDATE invoice
+        SET payment_status = 'PAID',
+            paid_at        = NOW()
+        WHERE id = ?
+          AND payment_status = 'PENDING'
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, invoiceId);
+        ps.executeUpdate();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 }
