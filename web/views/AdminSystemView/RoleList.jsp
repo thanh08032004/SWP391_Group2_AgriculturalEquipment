@@ -63,7 +63,7 @@
                                 </c:choose>
                             </td>
                             <td>
-                    <a href="${pageContext.request.contextPath}/admin/role/detail?viewRole=${r.id}"
+                    <a href="${pageContext.request.contextPath}/admin/role/detail?action=view&roleId=${r.id}"
                        class="btn btn-sm btn-outline-success">
                         View
                     </a>

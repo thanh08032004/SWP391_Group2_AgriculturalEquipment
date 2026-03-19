@@ -3,11 +3,7 @@ package controller;
 import dal.RoleDAO;
 import dal.UserDAO;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 import model.User;
@@ -18,7 +14,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        // Lấy cookie "remember me"
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie c : cookies) {
@@ -38,9 +34,10 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         String remember = request.getParameter("rememberMe");
 
-        UserDAO dao = new UserDAO();
-        User user = dao.findByUsername(username);
+        UserDAO userDAO = new UserDAO();
+        User user = userDAO.findByUsername(username);
 
+        // Kiểm tra user tồn tại và mật khẩu
         if (user == null || !BCrypt.checkpw(password, user.getPassword())) {
             request.setAttribute("error", "Sai tài khoản hoặc mật khẩu");
             request.setAttribute("username", username);
@@ -48,15 +45,24 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-HttpSession session = request.getSession();
+        // Kiểm tra role active
+        RoleDAO roleDAO = new RoleDAO();
+        if (!roleDAO.isRoleActive(user.getRoleId())) {
+            request.setAttribute("error", "Role của bạn đã bị vô hiệu hóa");
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+            return;
+        }
 
-session.setAttribute("user", user);
+        // Tạo session và lưu user
+        HttpSession session = request.getSession();
+        session.setAttribute("user", user);
 
-RoleDAO roleDAO = new RoleDAO();
-List<String> permissions = roleDAO.getPermissionCodesByRole(user.getRoleId());
+        // Lấy permission của user theo role
+        List<String> permissions = roleDAO.getPermissionCodesByRole(user.getRoleId());
+        session.setAttribute("permissions", permissions);
 
-session.setAttribute("permissions", permissions);
-        // Save role
+        // Lưu role dạng text để dễ sử dụng
         switch (user.getRoleId()) {
             case 1 -> session.setAttribute("userRole", "ADMIN_SYSTEM");
             case 2 -> session.setAttribute("userRole", "ADMIN_BUSINESS");
@@ -65,10 +71,10 @@ session.setAttribute("permissions", permissions);
             case 5 -> session.setAttribute("userRole", "TECHLEADER");
         }
 
-        //Remember Me
+        // Remember Me
         if (remember != null) {
             Cookie c = new Cookie("remember_username", username);
-            c.setMaxAge(7 * 24 * 60 * 60);
+            c.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
             c.setPath(request.getContextPath());
             response.addCookie(c);
         } else {
@@ -78,6 +84,7 @@ session.setAttribute("permissions", permissions);
             response.addCookie(c);
         }
 
+        // Redirect theo role
         String ctx = request.getContextPath();
         switch (user.getRoleId()) {
             case 1 -> response.sendRedirect(ctx + "/admin/user");

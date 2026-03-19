@@ -175,7 +175,20 @@ public class RoleDAO extends DBContext {
         }
         return false;
     }
-
+public boolean isRoleActive(int roleId) {
+    String sql = "SELECT active FROM role WHERE id = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, roleId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getBoolean("active");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
     public Role getRoleByUserEmail(String email) {
         String sql = """
         SELECT r.id, r.name, r.description, r.active
