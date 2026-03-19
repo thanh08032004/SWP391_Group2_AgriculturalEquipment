@@ -89,7 +89,9 @@
                             <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Select Spare Parts Needed (Optional)</h5>
                         </div>
                         <div class="card-body">
-                            <form method="get" action="${pageContext.request.contextPath}/technician/maintenance" class="mb-3">
+                            <form method="get" action="${pageContext.request.contextPath}/technician/maintenance" 
+                                  class="mb-3"
+                                  onsubmit="clearMaintenanceSessionGet()">
 
                                 <input type="hidden" name="action" value="work"/>
                                 <input type="hidden" name="id" value="${m.id}"/>
@@ -108,7 +110,7 @@
                             </form>
 
                             <form method="post" action="${pageContext.request.contextPath}/technician/maintenance" 
-                                  enctype="multipart/form-data" onsubmit="clearMaintenanceSession()">
+                                  enctype="multipart/form-data" onsubmit="clearMaintenanceSessionPost()">
                                 <input type="hidden" name="action" value="submitwork"/>
                                 <input type="hidden" name="maintenanceId" value="${m.id}"/>
 
@@ -206,6 +208,7 @@
                                                     <li class="page-item ${i == currentPage ? 'active' : ''}">
 
                                                         <a class="page-link"
+                                                           onclick="clearMaintenanceSessionGet()"
                                                            href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${m.id}&keyword=${keyword}&page=${i}">
                                                             ${i}
                                                         </a>
@@ -300,7 +303,7 @@
 
                 modal.show();
 
-                fetch(CTX + '/technician/maintenance?action=getCustomerDetail&id=' + customerId)
+                fetch(CTX + '/technician/maintenance?action=getCustomerDetailJson&id=' + customerId)
                         .then(res => res.json())
                         .then(cus => {
 
@@ -491,10 +494,15 @@
                 }
             }
 
-            function clearMaintenanceSession() {
+            function clearMaintenanceSessionPost() {
                 sessionStorage.removeItem("technicianNote");
                 sessionStorage.removeItem("workHours");
                 sessionStorage.removeItem("selectedSpareParts");
+                sessionStorage.removeItem("openDeviceModal");
+                sessionStorage.removeItem("openCustomerModal");
+            }
+            
+            function clearMaintenanceSessionGet() {
                 sessionStorage.removeItem("openDeviceModal");
                 sessionStorage.removeItem("openCustomerModal");
             }
