@@ -5,30 +5,30 @@
 <html lang="en">
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
-        <title>Maintenance Diagnostic - Agri CMS</title>
-        <style>
-            .img-thumbnail-custom {
-                width: 100%;
-                height: 120px;
-                object-fit: cover;
-                cursor: pointer;
-                transition: transform 0.2s;
-            }
-            .img-thumbnail-custom:hover {
-                transform: scale(1.05);
-            }
-            .section-title {
-                font-size: 0.75rem;
-                letter-spacing: 0.05rem;
-            }
-        </style>
-    </head>
-    <body class="bg-light">
-        <header><jsp:include page="/common/header.jsp"></jsp:include></header>
-        
-        <div class="container py-5">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="fw-bold">Diagnostic Report #${task.id}</h2>
+            <title>Maintenance Diagnostic - Agri CMS</title>
+            <style>
+                .img-thumbnail-custom {
+                    width: 100%;
+                    height: 120px;
+                    object-fit: cover;
+                    cursor: pointer;
+                    transition: transform 0.2s;
+                }
+                .img-thumbnail-custom:hover {
+                    transform: scale(1.05);
+                }
+                .section-title {
+                    font-size: 0.75rem;
+                    letter-spacing: 0.05rem;
+                }
+            </style>
+        </head>
+        <body class="bg-light">
+            <header><jsp:include page="/common/header.jsp"></jsp:include></header>
+
+            <div class="container py-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold">Diagnostic Report #${task.id}</h2>
                 <a href="${pageContext.request.contextPath}/customer/devices" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-1"></i>Back to My Devices
                 </a>
@@ -46,41 +46,55 @@
 
                     <div class="card border-0 shadow-sm p-3">
                         <h6 class="fw-bold text-secondary border-bottom pb-2 mb-3">Service Photos</h6>
-                        
+
+                        <%-- Initial Request Photo --%>
                         <p class="section-title fw-bold mb-2 text-muted text-uppercase">Initial Request:</p>
                         <div class="row g-2 mb-4">
-                            <c:set var="hasReadyImg" value="false" />
+                            <c:set var="imgPending" value="" />
                             <c:forEach items="${task.images}" var="img">
-                                <c:if test="${img.status == 'READY'}">
-                                    <div class="col-6">
-                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}" 
-                                             class="img-fluid rounded border img-thumbnail-custom" 
-                                             onclick="window.open(this.src)" title="Click to enlarge">
-                                    </div>
-                                    <c:set var="hasReadyImg" value="true" />
+                                <c:if test="${img.status == 'PENDING'}">
+                                    <c:set var="imgPending" value="${img.imageUrl}" />
                                 </c:if>
                             </c:forEach>
-                            <c:if test="${!hasReadyImg}">
-                                <div class="col-12"><small class="text-muted fst-italic">No initial photos available.</small></div>
-                            </c:if>
-                        </div>
-
-                        <p class="section-title fw-bold mb-2 text-muted text-uppercase">Diagnostic Photos:</p>
-                        <div class="row g-2">
-                            <c:set var="hasTechImg" value="false" />
-                            <c:forEach items="${task.images}" var="img">
-                                <c:if test="${img.status == 'TECHNICIAN_SUBMITTED'}">
-                                    <div class="col-6">
-                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${img.imageUrl}" 
+                            <c:choose>
+                                <c:when test="${not empty imgPending}">
+                                    <div class="col-12">
+                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${imgPending}"
                                              class="img-fluid rounded border img-thumbnail-custom"
                                              onclick="window.open(this.src)" title="Click to enlarge">
                                     </div>
-                                    <c:set var="hasTechImg" value="true" />
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="col-12">
+                                        <small class="text-muted fst-italic">No initial photos available.</small>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+
+                        <%-- Diagnostic Photos --%>
+                        <p class="section-title fw-bold mb-2 text-muted text-uppercase">Diagnostic Photos:</p>
+                        <div class="row g-2">
+                            <c:set var="imgTech" value="" />
+                            <c:forEach items="${task.images}" var="img">
+                                <c:if test="${img.status == 'TECHNICIAN_SUBMITTED'}">
+                                    <c:set var="imgTech" value="${img.imageUrl}" />
                                 </c:if>
                             </c:forEach>
-                            <c:if test="${!hasTechImg}">
-                                <div class="col-12"><small class="text-muted fst-italic">Waiting for technical photos...</small></div>
-                            </c:if>
+                            <c:choose>
+                                <c:when test="${not empty imgTech}">
+                                    <div class="col-12">
+                                        <img src="${pageContext.request.contextPath}/assets/images/maintenance/${imgTech}"
+                                             class="img-fluid rounded border img-thumbnail-custom"
+                                             onclick="window.open(this.src)" title="Click to enlarge">
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="col-12">
+                                        <small class="text-muted fst-italic">Waiting for technical photos...</small>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </div>

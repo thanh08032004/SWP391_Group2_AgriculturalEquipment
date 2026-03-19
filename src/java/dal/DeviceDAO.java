@@ -518,6 +518,8 @@ public class DeviceDAO extends DBContext {
                 map.put("image", rs.getString("image"));
                 map.put("currentMaintenanceId", rs.getInt("current_maintenance_id"));
                 map.put("maintenanceStatus", rs.getString("maintenanceStatus"));
+               map.put("purchaseDate", rs.getDate("purchase_date"));
+map.put("warrantyEndDate", rs.getDate("warranty_end_date"));
                 list.add(map);
             }
         } catch (SQLException e) {
