@@ -85,7 +85,7 @@
                                 <c:forEach var="p" items="${partList}">
                                     <tr>
                                         <td class="ps-4">
-                                            <img src="${pageContext.request.contextPath}/assets/images/parts/${p.imageUrl}" 
+                                            <img src="${pageContext.request.contextPath}/assets/images/spare-parts/${p.imageUrl}" 
                                                  alt="${p.name}" class="rounded border shadow-sm" 
                                                  style="width: 55px; height: 55px; object-fit: cover;">
                                         </td>

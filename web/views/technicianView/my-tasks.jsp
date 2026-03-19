@@ -160,7 +160,7 @@
                                                         
                                                         <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${m.id}"
                                                            class="btn btn-sm btn-success mx-1"
-                                                           onclick="return confirm('Repair this device ?');">
+                                                          >
                                                              Repair
                                                         </a>
                                                         <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"

@@ -15,6 +15,15 @@ import model.SparePart;
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 10)
 public class AdminSparePartServlet extends HttpServlet {
 
+    private String getUploadPath(String subFolder) {
+        String deployPath = getServletContext().getRealPath("/");
+        File srcWebapp = new File(new File(deployPath).getParentFile().getParentFile(), "web");
+        if (srcWebapp.exists()) {
+            return srcWebapp.getAbsolutePath() + "/" + subFolder + "/";
+        }
+        return deployPath + subFolder + "/";
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
@@ -127,7 +136,11 @@ public class AdminSparePartServlet extends HttpServlet {
         String fileName = request.getParameter("currentImage");
         int quantity = Integer.parseInt(request.getParameter("quantity"));
         if (filePart != null && filePart.getSize() > 0) {
-            String uploadPath = getServletContext().getRealPath("/assets/images/parts/");
+            String uploadPath = getUploadPath("assets/images/spare-parts");
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
             fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
             filePart.write(uploadPath + File.separator + fileName);
         }
