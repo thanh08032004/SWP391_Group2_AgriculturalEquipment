@@ -164,185 +164,193 @@
                                     type="number"/> đ
                             </div>
                         </div>
+                        
                     </div>
-            <!-- Spare Part Table -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    Spare Parts Used
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Part Name</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach items="${itemList}" var="i">
-                                <tr>
-                                    <td>${i.spareName}</td>
-                                    <td>${i.quantity}</td>
-                                    <td>
-                                        <fmt:formatNumber
-                                            value="${i.price}"
-                                            type="number"/> đ
-                                    </td>
-                                    <td class="money">
+                    <!-- Spare Part Table -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            Spare Parts Used
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Part Name</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${itemList}" var="i">
+                                        <tr>
+                                            <td>${i.spareName}</td>
+                                            <td>${i.quantity}</td>
+                                            <td>
+                                                <fmt:formatNumber
+                                                    value="${i.price}"
+                                                    type="number"/> đ
+                                            </td>
+                                            <td class="money">
 
-                                        <fmt:formatNumber
-                                            value="${i.total}"
-                                            type="number"/> đ
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
-                    <div class="text-end">
-                        <b>Spare Parts Total: </b>
-                        <span class="money">
-                            <fmt:formatNumber
-                                value="${spareTotal}"
-                                type="number"/> đ
-                        </span>
+                                                <fmt:formatNumber
+                                                    value="${i.total}"
+                                                    type="number"/> đ
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                            <div class="text-end">
+                                <b>Spare Parts Total: </b>
+                                <span class="money">
+                                    <fmt:formatNumber
+                                        value="${spareTotal}"
+                                        type="number"/> đ
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                    <!-- Invoice Summary -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            Invoice Summary
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row">
+                                <div class="info-label">
+                                    Labor Cost
+                                </div>
+                                <div class="info-value money">
+                                    <fmt:formatNumber
+                                        value="${maintenance.laborHours * maintenance.laborCostPerHour}"
+                                        type="number"/> đ
+                                </div>
+                            </div>
+                            <div class="info-row">
+
+                                <div class="info-label">
+                                    Spare Parts
+                                </div>
+                                <div class="info-value money">
+
+                                    <fmt:formatNumber
+                                        value="${spareTotal}"
+                                        type="number"/> đ
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">
+                                    Total
+                                </div>
+                                <div class="info-value money">
+                                    <fmt:formatNumber
+                                        value="${maintenance.laborHours * maintenance.laborCostPerHour + spareTotal}"
+                                        type="number"/> đ
+                                </div>
+                            </div>
+                                <c:if test="${isUnderWarranty}">
+                            <div class="alert alert-success mx-3 mt-3">
+                                <i class="bi bi-shield-check me-2"></i>
+                                <strong>Under Warranty!</strong> — 
+                                This device is still under warranty. Invoice total will be <strong>0 đ</strong>.
+                            </div>
+                        </c:if>
+                        </div>
+                    </div>
+                    <div class="text-end mt-3">
+                        <button class="btn btn-success">
+                            Create Invoice
+                        </button>
+                        <a href="${pageContext.request.contextPath}/admin-business/invoice/list"
+                           class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
             </div>
-            <!-- Invoice Summary -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    Invoice Summary
-                </div>
-                <div class="card-body">
-                    <div class="info-row">
-                        <div class="info-label">
-                            Labor Cost
-                        </div>
-                        <div class="info-value money">
-                            <fmt:formatNumber
-                                value="${maintenance.laborHours * maintenance.laborCostPerHour}"
-                                type="number"/> đ
-                        </div>
-                    </div>
-                    <div class="info-row">
-
-                        <div class="info-label">
-                            Spare Parts
-                        </div>
-                        <div class="info-value money">
-
-                            <fmt:formatNumber
-                                value="${spareTotal}"
-                                type="number"/> đ
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">
-                            Total
-                        </div>
-                        <div class="info-value money">
-                            <fmt:formatNumber
-                                value="${maintenance.laborHours * maintenance.laborCostPerHour + spareTotal}"
-                                type="number"/> đ
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="text-end mt-3">
-                <button class="btn btn-success">
-                    Create Invoice
-                </button>
-                <a href="${pageContext.request.contextPath}/admin-business/invoice/list"
-                   class="btn btn-secondary">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
-<jsp:include page="/common/scripts.jsp"></jsp:include>
-    <script>
-
-        var CTX = '${pageContext.request.contextPath}';
-        function showMaintenanceDetail(id) {
-            var modal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
-            document.getElementById('maintenanceContent').innerHTML =
-                    '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
-            modal.show();
-            fetch(CTX + '/admin-business/invoice/add?action=getMaintenanceDetail&id=' + id)
-                    .then(res => res.json())
-                    .then(m => {
-                        document.getElementById('maintenanceContent').innerHTML =
-                                '<table class="table table-bordered">' +
-                                '<tr><th>ID</th><td>' + m.id + '</td></tr>' +
-                                '<tr><th>Device</th><td>' + m.machineName + '</td></tr>' +
-                                '<tr><th>Problem</th><td>' + m.problem + '</td></tr>' +
-                                '<tr><th>Status</th><td>' + m.status + '</td></tr>' +
-                                '<tr><th>Start Date</th><td>' + m.startDate + '</td></tr>' +
-                                '<tr><th>Finish Date</th><td>' + m.finishDate + '</td></tr>' +
-                                '</table>';
-                    })
-        }
-        function showCustomerDetail(id) {
-
-            var modal = new bootstrap.Modal(document.getElementById('customerModal'));
-
-            document.getElementById('customerContent').innerHTML =
-                    '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
-
-            modal.show();
-
-            fetch(CTX + '/admin-business/invoice/add?action=getCustomerDetail&id=' + id)
-
-                    .then(res => res.json())
-
-                    .then(c => {
-
-                        document.getElementById('customerContent').innerHTML =
-                                '<div class="text-center mb-3">' +
-                                '<img src="' + CTX + '/assets/images/avatars/' + (c.avatar || 'default.jpg') + '" class="rounded-circle border" style="width:80px;height:80px;object-fit:cover">' +
-                                '<h5>' + c.fullname + '</h5>' +
-                                '</div>' +
-                                '<table class="table table-bordered">' +
-                                '<tr><th>Email</th><td>' + c.email + '</td></tr>' +
-                                '<tr><th>Phone</th><td>' + c.phone + '</td></tr>' +
-                                '<tr><th>Gender</th><td>' + c.gender + '</td></tr>' +
-                                '<tr><th>Date of Birth</th><td>' + c.birthDate + '</td></tr>' +
-                                '<tr><th>Address</th><td>' + c.address + '</td></tr>' +
-                                '</table>';
-
-                    })
-        }
-</script>
-<!-- Maintenance Modal -->
-<div class="modal fade" id="maintenanceModal">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">
-                    Maintenance Detail
-                </h5>
-                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="maintenanceContent"></div>
         </div>
-    </div>
-</div>
-<!-- Customer Modal -->
-<div class="modal fade" id="customerModal">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">
-                    Customer Detail
-                </h5>
-                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
+            <script>
+
+                var CTX = '${pageContext.request.contextPath}';
+                function showMaintenanceDetail(id) {
+                    var modal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
+                    document.getElementById('maintenanceContent').innerHTML =
+                            '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+                    modal.show();
+                    fetch(CTX + '/admin-business/invoice/add?action=getMaintenanceDetail&id=' + id)
+                            .then(res => res.json())
+                            .then(m => {
+                                document.getElementById('maintenanceContent').innerHTML =
+                                        '<table class="table table-bordered">' +
+                                        '<tr><th>ID</th><td>' + m.id + '</td></tr>' +
+                                        '<tr><th>Device</th><td>' + m.machineName + '</td></tr>' +
+                                        '<tr><th>Problem</th><td>' + m.problem + '</td></tr>' +
+                                        '<tr><th>Status</th><td>' + m.status + '</td></tr>' +
+                                        '<tr><th>Start Date</th><td>' + m.startDate + '</td></tr>' +
+                                        '<tr><th>Finish Date</th><td>' + m.finishDate + '</td></tr>' +
+                                        '</table>';
+                            })
+                }
+                function showCustomerDetail(id) {
+
+                    var modal = new bootstrap.Modal(document.getElementById('customerModal'));
+
+                    document.getElementById('customerContent').innerHTML =
+                            '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+
+                    modal.show();
+
+                    fetch(CTX + '/admin-business/invoice/add?action=getCustomerDetail&id=' + id)
+
+                            .then(res => res.json())
+
+                            .then(c => {
+
+                                document.getElementById('customerContent').innerHTML =
+                                        '<div class="text-center mb-3">' +
+                                        '<img src="' + CTX + '/assets/images/avatars/' + (c.avatar || 'default.jpg') + '" class="rounded-circle border" style="width:80px;height:80px;object-fit:cover">' +
+                                        '<h5>' + c.fullname + '</h5>' +
+                                        '</div>' +
+                                        '<table class="table table-bordered">' +
+                                        '<tr><th>Email</th><td>' + c.email + '</td></tr>' +
+                                        '<tr><th>Phone</th><td>' + c.phone + '</td></tr>' +
+                                        '<tr><th>Gender</th><td>' + c.gender + '</td></tr>' +
+                                        '<tr><th>Date of Birth</th><td>' + c.birthDate + '</td></tr>' +
+                                        '<tr><th>Address</th><td>' + c.address + '</td></tr>' +
+                                        '</table>';
+
+                            })
+                }
+        </script>
+        <!-- Maintenance Modal -->
+        <div class="modal fade" id="maintenanceModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            Maintenance Detail
+                        </h5>
+                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="maintenanceContent"></div>
+                </div>
             </div>
-            <div class="modal-body" id="customerContent"></div>
         </div>
-    </div>
-</div>
-</body>
+        <!-- Customer Modal -->
+        <div class="modal fade" id="customerModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            Customer Detail
+                        </h5>
+                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="customerContent"></div>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>

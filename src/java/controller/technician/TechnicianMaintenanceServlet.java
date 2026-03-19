@@ -377,7 +377,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             boolean success = dao.submitTaskToAdmin(maintenanceId, technicianId);
 
             if (success) {
-                req.getSession().setAttribute("success", "Work submitted to admin successfully!");
+                req.getSession().setAttribute("success", "Work submitted to technician leader successfully!");
             } else {
                 req.getSession().setAttribute("error", "Failed to submit work!");
             }

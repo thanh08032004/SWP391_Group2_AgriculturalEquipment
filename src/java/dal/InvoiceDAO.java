@@ -1427,4 +1427,27 @@ public MaintenanceDTO getMaintenanceById(int id) {
         e.printStackTrace();
     }
 }
+    
+    public boolean isUnderWarranty(int maintenanceId) {
+
+    String sql = """
+        SELECT 1
+        FROM maintenance m
+        JOIN device d ON m.device_id = d.id
+        WHERE m.id = ?
+          AND m.start_date <= d.warranty_end_date
+    """;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, maintenanceId);
+        ResultSet rs = ps.executeQuery();
+        return rs.next();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 }

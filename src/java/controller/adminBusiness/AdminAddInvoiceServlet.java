@@ -18,54 +18,54 @@ public class AdminAddInvoiceServlet extends HttpServlet {
             throws ServletException, IOException {
 
         InvoiceDAO dao = new InvoiceDAO();
-    String action = request.getParameter("action");
+        String action = request.getParameter("action");
 
-    // ===== CUSTOMER DETAIL =====
-    if ("getCustomerDetail".equals(action)) {
+        // ===== CUSTOMER DETAIL =====
+        if ("getCustomerDetail".equals(action)) {
 
-        int id = Integer.parseInt(request.getParameter("id"));
-        UserProfile c = dao.getCustomerDetail(id);
+            int id = Integer.parseInt(request.getParameter("id"));
+            UserProfile c = dao.getCustomerDetail(id);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter out = response.getWriter();
 
-        if (c != null) {
-            out.print("{");
-            out.print("\"fullname\":\"" + c.getFullname() + "\",");
-            out.print("\"email\":\"" + c.getEmail() + "\",");
-            out.print("\"phone\":\"" + c.getPhone() + "\",");
-            out.print("\"gender\":\"" + c.getGender() + "\",");
-            out.print("\"birthDate\":\"" + c.getBirthDate() + "\",");
-            out.print("\"address\":\"" + c.getAddress() + "\",");
-            out.print("\"avatar\":\"" + c.getAvatar() + "\"");
-            out.print("}");
+            if (c != null) {
+                out.print("{");
+                out.print("\"fullname\":\"" + c.getFullname() + "\",");
+                out.print("\"email\":\"" + c.getEmail() + "\",");
+                out.print("\"phone\":\"" + c.getPhone() + "\",");
+                out.print("\"gender\":\"" + c.getGender() + "\",");
+                out.print("\"birthDate\":\"" + c.getBirthDate() + "\",");
+                out.print("\"address\":\"" + c.getAddress() + "\",");
+                out.print("\"avatar\":\"" + c.getAvatar() + "\"");
+                out.print("}");
+            }
+            return;
         }
-        return;
-    }
 
-    // ===== MAINTENANCE DETAIL =====
-    if ("getMaintenanceDetail".equals(action)) {
+        // ===== MAINTENANCE DETAIL =====
+        if ("getMaintenanceDetail".equals(action)) {
 
-        int id = Integer.parseInt(request.getParameter("id"));
-        Maintenance m = dao.getMaintenanceDetail(id);
+            int id = Integer.parseInt(request.getParameter("id"));
+            Maintenance m = dao.getMaintenanceDetail(id);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter out = response.getWriter();
 
-        if (m != null) {
-            out.print("{");
-            out.print("\"id\":" + m.getId() + ",");
-            out.print("\"machineName\":\"" + m.getMachineName() + "\",");
-            out.print("\"problem\":\"" + m.getDescription() + "\",");
-            out.print("\"status\":\"" + m.getStatus() + "\",");
-            out.print("\"startDate\":\"" + m.getStartDate() + "\",");
-            out.print("\"finishDate\":\"" + m.getEndDate() + "\"");
-            out.print("}");
+            if (m != null) {
+                out.print("{");
+                out.print("\"id\":" + m.getId() + ",");
+                out.print("\"machineName\":\"" + m.getMachineName() + "\",");
+                out.print("\"problem\":\"" + m.getDescription() + "\",");
+                out.print("\"status\":\"" + m.getStatus() + "\",");
+                out.print("\"startDate\":\"" + m.getStartDate() + "\",");
+                out.print("\"finishDate\":\"" + m.getEndDate() + "\"");
+                out.print("}");
+            }
+            return;
         }
-        return;
-    }
 
         String midRaw = request.getParameter("maintenanceId");
 
@@ -75,13 +75,15 @@ public class AdminAddInvoiceServlet extends HttpServlet {
 
             MaintenanceDTO maintenance = dao.getMaintenanceById(maintenanceId);
 
-            List<SparePartDTO> itemList =
-                    dao.getSparePartsByMaintenance(maintenanceId);
+            List<SparePartDTO> itemList
+                    = dao.getSparePartsByMaintenance(maintenanceId);
 
             double spareTotal = itemList.stream()
                     .mapToDouble(i -> i.getTotal().doubleValue())
                     .sum();
 
+            boolean isUnderWarranty = dao.isUnderWarranty(maintenanceId);
+            request.setAttribute("isUnderWarranty", isUnderWarranty);
             request.setAttribute("maintenance", maintenance);
             request.setAttribute("itemList", itemList);
             request.setAttribute("spareTotal", spareTotal);
@@ -98,8 +100,8 @@ public class AdminAddInvoiceServlet extends HttpServlet {
 
         InvoiceDAO dao = new InvoiceDAO();
 
-        int maintenanceId =
-                Integer.parseInt(request.getParameter("maintenanceId"));
+        int maintenanceId
+                = Integer.parseInt(request.getParameter("maintenanceId"));
 
         String description = request.getParameter("description");
 
@@ -110,12 +112,21 @@ public class AdminAddInvoiceServlet extends HttpServlet {
         if (voucherRaw != null && !voucherRaw.isEmpty()) {
             voucherId = Integer.parseInt(voucherRaw);
         }
-        double laborCost = dao.getLaborCostByMaintenance(maintenanceId);
+        double laborCost;
+        double spareTotal;
+        double totalAmount;
 
-        double spareTotal =
-                dao.getTotalSpareCostByMaintenance(maintenanceId);
-
-        double totalAmount = laborCost + spareTotal;
+// Nếu còn trong thời hạn bảo hành → miễn phí toàn bộ
+        if (dao.isUnderWarranty(maintenanceId)) {
+            laborCost = 0;
+            spareTotal = 0;
+            totalAmount = 0;
+            voucherId = null; // không cần voucher nếu đã free
+        } else {
+            laborCost = dao.getLaborCostByMaintenance(maintenanceId);
+            spareTotal = dao.getTotalSpareCostByMaintenance(maintenanceId);
+            totalAmount = laborCost + spareTotal;
+        }
 
         dao.insertInvoice(
                 maintenanceId,
