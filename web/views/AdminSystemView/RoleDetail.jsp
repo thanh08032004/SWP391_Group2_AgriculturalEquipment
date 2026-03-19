@@ -20,7 +20,7 @@
         </header>
             <div class="container mt-5 mb-3 d-flex align-items-center">
                 <div class="back-wrapper" style="margin-right: 50px;">
-            <a href="javascript:history.back()" class="back-btn">
+            <a href="${pageContext.request.contextPath}/admin/role" class="back-btn">
                 ← Back
             </a>
         </div>
@@ -110,93 +110,6 @@
         btnCancel.classList.remove("d-none");
     };
 </script>
-
-
-
-              <!-- footer Section -->
-        <footer class="mt-0">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-4 mb-4 mb-md-0">
-                        <div class="row">
-                            <div class="col-12 col-md-6 col-lg-12">
-                                <div class="footer_logo">
-                                    <img loading="lazy" src="./assets/images/logo.png" class="logo" alt="easy shop">
-                                </div>
-                                <div class="mt-4">
-                                    <p>Widgetify Inc,  456 Gadget Avenue, <br> Techtown, TX 67890, <br>  United States of America</p> 
-                                    <h3 class="h5 fw-bold">(987) 654-3210</h3>
-                                    <p>info@example.com</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 mb-3 mb-md-0">
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="footer_menu">
-                                    <h4 class="footer_title">My Account</h4>
-                                    <ul class="m-0 p-0 list-unstyled">
-                                        <li><a href="#">Orders</a></li>
-                                        <li><a href="#">Wishlist</a></li>
-                                        <li><a href="#">Track Order</a></li>
-                                        <li><a href="#">Manage Account</a></li>
-                                    </ul>
-
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="footer_menu">
-                                    <h4 class="footer_title">Information</h4>
-                                    <ul class="m-0 p-0 list-unstyled">
-                                        <li><a href="#">About Us</a></li>
-                                        <li><a href="#">Return Policy</a></li>
-                                        <li><a href="#">Privacy Policy</a></li>
-                                        <li><a href="#">FAQ</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="footer_menu">
-                                    <h4 class="footer_title">Useful Links</h4>
-                                    <ul class="m-0 p-0 list-unstyled">
-                                        <li><a href="#">Orders</a></li>
-                                        <li><a href="#">Wishlist</a></li>
-                                        <li><a href="#">Track Order</a></li>
-                                        <li><a href="#">Manage Account</a></li>
-                                    </ul>
-
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="footer_menu">
-                                    <h4 class="footer_title">Categories</h4>
-                                    <ul class="m-0 p-0 list-unstyled">
-                                        <li><a href="#">About Us</a></li>
-                                        <li><a href="#">Return Policy</a></li>
-                                        <li><a href="#">Privacy Policy</a></li>
-                                        <li><a href="#">FAQ</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center py-3 mt-4 text-white px-3 copyright" >
-                <span>Copyright © 2024. All Rights Reserved. Themes By TemplateRise</span>
-            </div>
-        </footer>
-        <script src="./assets/js/jquery-3.6.0.min.js"></script>
-        <script src="./assets/js/bootstrap.bundle.min.js"></script>
-        <script src="./assets/plugin/nice-select/jquery.nice-select.min.js"></script>
-        <script src="./assets/plugin/OwlCarousel2-2.3.4/dist/owl.carousel.min.js"></script>
-        <script src="./assets/plugin/nouislider/nouislider.min.js"></script>
-        <script src="./assets/plugin/slick/slick.min.js"></script>
-        <script src="./assets/js/main.js"></script>
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
     </body>
 </html>
