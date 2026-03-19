@@ -25,6 +25,14 @@ import java.util.Set;
 
 public class AdminDeviceServlet extends HttpServlet {
 
+    private String getUploadPath(String subFolder) {
+    String deployPath = getServletContext().getRealPath("/");
+    File srcWebapp = new File(new File(deployPath).getParentFile().getParentFile(), "web");
+    if (srcWebapp.exists()) {
+        return srcWebapp.getAbsolutePath() + "/" + subFolder + "/";
+    }
+    return deployPath + subFolder + "/";
+}
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -213,6 +221,7 @@ public class AdminDeviceServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
 
         String action = request.getParameter("action");
         DeviceDAO deviceDAO = new DeviceDAO();
@@ -290,16 +299,12 @@ public class AdminDeviceServlet extends HttpServlet {
             }
 
             d.setStatus("ACTIVE");
+            // THAY BẰNG:
             Part filePart = request.getPart("image");
             String fileName = "default_device.jpg";
-
-// store image
-            String uploadPath = getServletContext().getRealPath("/assets/images/devices/");
+            String uploadPath = getUploadPath("assets/images/devices");
             File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-
+            if (!uploadDir.exists()) uploadDir.mkdirs();
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
                 filePart.write(uploadPath + File.separator + fileName);
@@ -404,15 +409,12 @@ public class AdminDeviceServlet extends HttpServlet {
                 hasError = true;
             }
             d.setPrice(price);
+            // THAY BẰNG:
             Part filePart = request.getPart("image");
             String fileName = request.getParameter("oldImage");
-
-            String uploadPath = getServletContext().getRealPath("/assets/images/devices/");
+            String uploadPath = getUploadPath("assets/images/devices");
             File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-
+            if (!uploadDir.exists()) uploadDir.mkdirs();
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
                 filePart.write(uploadPath + File.separator + fileName);
@@ -441,7 +443,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.getRequestDispatcher("/views/AdminBusinessView/device-edit.jsp")
                         .forward(request, response);
             }
-        }
+        } 
 
     }
 }
