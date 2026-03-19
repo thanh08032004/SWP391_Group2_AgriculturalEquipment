@@ -609,9 +609,10 @@ public class MaintenanceDAO extends DBContext {
         List<MaintenanceDTO> list = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder("""
-        SELECT m.*, u.fullname AS customerName, d.machine_name AS machineName, d.customer_id AS customerId
+        SELECT m.*, u.fullname AS customerName, d.machine_name AS machineName, d.customer_id AS customerId,i.id AS invoice_id, i.payment_status AS invoice_payment_status
         FROM maintenance m
         JOIN device d ON m.device_id = d.id
+        LEFT JOIN invoice i ON m.id = i.maintenance_id
         JOIN user_profile u ON d.customer_id = u.user_id
         WHERE m.technician_id = ?
     """);
@@ -662,6 +663,8 @@ public class MaintenanceDAO extends DBContext {
                 m.setCustomerName(rs.getString("customerName"));
                 m.setMachineName(rs.getString("machineName"));
                 m.setCustomerId(rs.getInt("customerId"));
+                m.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
+ m.setInvoicePaymentStatus(rs.getString("invoice_payment_status"));
 
                 list.add(m);
             }
@@ -803,17 +806,17 @@ public class MaintenanceDAO extends DBContext {
     // Trong MaintenanceDAO
 
     public boolean addCompletionImage(int maintenanceId, String imageUrl) {
-    String sql = "INSERT INTO maintenance_image (maintenance_id, status, image_url, description) "
-               + "VALUES (?, 'DONE', ?, ?)";
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, maintenanceId);
-        ps.setString(2, imageUrl);
-        ps.setString(3, "Technician uploaded completion confirmation image");
-        return ps.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
+        String sql = "INSERT INTO maintenance_image (maintenance_id, status, image_url, description) "
+                + "VALUES (?, 'DONE', ?, ?)";
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, maintenanceId);
+            ps.setString(2, imageUrl);
+            ps.setString(3, "Technician uploaded completion confirmation image");
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    return false;
-}
 
 }

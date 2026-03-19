@@ -32,4 +32,6 @@ public class MaintenanceDTO {
     private String machineName;
     private String serialNumber;
     private int customerId;
+    private String invoicePaymentStatus; // UNPAID, PENDING, PAID, hoặc null nếu chưa có invoice
+private Integer invoiceId;
 }

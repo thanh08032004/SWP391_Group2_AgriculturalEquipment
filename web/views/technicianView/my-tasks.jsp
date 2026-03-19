@@ -138,60 +138,93 @@
                                                 </c:choose>
                                             </td>
                                             <td>
-                                    <fmt:formatDate value="${m.startDate}" pattern="dd/MM/yyyy HH:mm"/>
-                                    </td>
-                                    <td>
-                                    <fmt:formatDate value="${m.endDate}" pattern="dd/MM/yyyy HH:mm"/>
-                                    </td>
-                                    <td class="text-center pe-4">
-                                        <div class="d-flex justify-content-center align-items-center flex-nowrap gap-1">
-                                            <c:if test="${m.status == 'TECHNICIAN_ACCEPTED'}">
-                                                <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${m.id}"
-                                                   class="btn btn-sm btn-primary mx-1">
-                                                    <i class="bi bi-tools"></i> Work
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
-                                                   class="btn btn-sm btn-info mx-1">
-                                                    <i class="bi bi-eye"></i> View
-                                                </a>
-                                            </c:if>
-                                            <c:if test="${m.status == 'IN_PROGRESS'}">
+                                                <fmt:formatDate value="${m.startDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                            </td>
+                                            <td>
+                                                <fmt:formatDate value="${m.endDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                            </td>
+                                            <td class="text-center pe-4">
+                                                <div class="d-flex justify-content-center align-items-center flex-nowrap gap-1">
+                                                    <c:if test="${m.status == 'TECHNICIAN_ACCEPTED'}">
+                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=work&id=${m.id}"
+                                                           class="btn btn-sm btn-primary mx-1">
+                                                            <i class="bi bi-tools"></i> Work
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
+                                                           class="btn btn-sm btn-info mx-1">
+                                                            <i class="bi bi-eye"></i> View
+                                                        </a>
+                                                    </c:if>
+                                                    <c:if test="${m.status == 'IN_PROGRESS'}">
 
-                                                <!-- Nút View -->
+                                                        <!-- Nút View -->
 
-                                                <!-- Nút Complete -->
-                                                <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${m.id}"
-                                                   class="btn btn-sm btn-success mx-1"
-                                                   onclick="return confirm('Mark this task as DONE?');">
-                                                    <i class="bi bi-check-circle"></i> Done
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
-                                                   class="btn btn-sm btn-info mx-1">
-                                                    <i class="bi bi-eye"></i> View
-                                                </a>
+                                                        <!-- Nút Complete -->
+                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=complete&id=${m.id}"
+                                                           class="btn btn-sm btn-success mx-1"
+                                                           onclick="return confirm('Mark this task as DONE?');">
+                                                            <i class="bi bi-check-circle"></i> Done
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
+                                                           class="btn btn-sm btn-info mx-1">
+                                                            <i class="bi bi-eye"></i> View
+                                                        </a>
 
-                                            </c:if>
-                                                <c:if test="${m.status == 'DONE'}">
+                                                    </c:if>
+                                                    <c:if test="${m.status == 'DONE'}">
 
-                                          
-                                                <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
-                                                   class="btn btn-sm btn-info mx-1">
-                                                    <i class="bi bi-eye"></i> View
-                                                </a>
+                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
+                                                           class="btn btn-sm btn-info mx-1">
+                                                            <i class="bi bi-eye"></i> View
+                                                        </a>
 
-                                            </c:if>
-                                        </div>
-                                    </td>
+                                                        <%-- Nút Confirm Pay: chỉ hiện nếu có invoice và status là UNPAID hoặc PENDING --%>
+                                                        <c:if test="${not empty m.invoicePaymentStatus}">
 
-                                    </tr>
-                                </c:forEach>
-                                <c:if test="${empty list}">
-                                    <tr>
-                                        <td colspan="8" class="text-center text-muted py-4">
-                                            No tasks found
-                                        </td>
-                                    </tr>
-                                </c:if>
+                                                            <c:choose>
+                                                                <%-- PENDING: bấm được --%>
+                                                                <c:when test="${m.invoicePaymentStatus eq 'PENDING'}">
+                                                                    <form method="post"
+                                                                          action="${pageContext.request.contextPath}/technician/maintenance"
+                                                                          style="display:inline;"
+                                                                          onsubmit="return confirm('Confirm payment for this invoice?')">
+                                                                        <input type="hidden" name="action"    value="confirmPay"/>
+                                                                        <input type="hidden" name="invoiceId" value="${m.invoiceId}"/>
+                                                                        <button type="submit" class="btn btn-sm btn-success mx-1">
+                                                                            <i class="bi bi-cash-coin"></i> Confirm Pay
+                                                                        </button>
+                                                                    </form>
+                                                                </c:when>
+
+                                                                <%-- UNPAID: xám, disabled --%>
+                                                                <c:when test="${m.invoicePaymentStatus eq 'UNPAID'}">
+                                                                    <button class="btn btn-sm btn-secondary mx-1" disabled
+                                                                            title="Waiting for customer to submit payment">
+                                                                        <i class="bi bi-cash-coin"></i> Not Pay
+                                                                    </button>
+                                                                </c:when>
+                                                                <c:when test="${m.invoicePaymentStatus eq 'PAID'}">
+                                                                    <button class="btn btn-sm btn-success mx-1" disabled>
+                                                                        <i class="bi bi-check-circle"></i> Paid
+                                                                    </button>
+                                                                </c:when>
+                                                            </c:choose>
+
+                                                        </c:if>
+
+                                                    </c:if>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                    </c:forEach>
+                                    <c:if test="${empty list}">
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4">
+                                                No tasks found
+                                            </td>
+                                        </tr>
+                                    </c:if>
                                 </tbody>
                             </table>
                             <nav aria-label="Page navigation">
@@ -354,5 +387,5 @@
             </div>
         </div>
     </body>
-   
+
 </html>

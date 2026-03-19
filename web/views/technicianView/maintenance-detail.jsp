@@ -247,7 +247,8 @@
                                         <%-- IN PROGRESS → Hiện form upload thay cho nút Done --%>
                                         <c:when test="${task.status == 'IN_PROGRESS'}">
                                             <form action="${pageContext.request.contextPath}/technician/maintenance"
-                                                  method="post" enctype="multipart/form-data" class="text-start">
+                                                  method="post" enctype="multipart/form-data" class="text-start"
+                                                  onsubmit="return confirm('Confirm done for this request?')">
                                                 <input type="hidden" name="action" value="completewithimage">
                                                 <input type="hidden" name="maintenanceId" value="${task.id}">
 

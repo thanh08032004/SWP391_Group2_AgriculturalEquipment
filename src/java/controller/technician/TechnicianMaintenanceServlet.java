@@ -5,6 +5,7 @@
 package controller.technician;
 
 import dal.DeviceDAO;
+import dal.InvoiceDAO;
 import dal.MaintenanceDAO;
 import dal.SparePartDAO;
 import dto.DeviceDTO;
@@ -229,8 +230,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             req.setAttribute("items", items);
             req.setAttribute("showCompletionForm", true); // ✅ flag để JSP hiện form upload
             req.getRequestDispatcher("/views/technicianView/maintenance-detail.jsp").forward(req, resp);
-        }
-        else if (action.equals("getCustomerDetailJson")) {
+        } else if (action.equals("getCustomerDetailJson")) {
 
             int cusId = Integer.parseInt(req.getParameter("id"));
 
@@ -306,6 +306,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             throws IOException, ServletException {
 
         User user = (User) req.getSession().getAttribute("user");
+        InvoiceDAO invoiceDAO = new InvoiceDAO();
         int technicianId = user.getId();
 
         String action = req.getParameter("action");
@@ -400,7 +401,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
                     uploadDir.mkdirs();
                 }
                 filePart.write(uploadPath + File.separator + fileName);
-                
+
             }
 
             // Lưu ảnh với status DONE
@@ -418,6 +419,15 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             }
 
             resp.sendRedirect("maintenance?action=mytasks");
+        }
+        // Thêm vào doPost:
+        if ("confirmPay".equals(action)) {
+            int invoiceId = Integer.parseInt(req.getParameter("invoiceId"));
+            
+            invoiceDAO.confirmPayment(invoiceId);
+            req.getSession().setAttribute("success", "Payment confirmed successfully!");
+            resp.sendRedirect(req.getContextPath() + "/technician/maintenance?action=mytasks");
+            return;
         }
 
     }
