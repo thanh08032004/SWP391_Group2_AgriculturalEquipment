@@ -271,11 +271,19 @@
                                         </c:if>
                                     </div>
 
-                                    <c:if test="${task.status == 'DONE'}">
-                                        <button class="btn btn-success px-4 shadow-sm">
-                                            <i class="bi bi-file-earmark-medical"></i> View Invoice
-                                        </button>
-                                    </c:if>
+<c:choose>
+    <c:when test="${not empty task.invoiceId && task.invoiceId != 0}">
+        <a href="${pageContext.request.contextPath}/customer/invoice/detail?id=${task.invoiceId}" 
+           class="btn btn-success px-4 shadow-sm">
+            <i class="bi bi-file-earmark-medical"></i> View Invoice
+        </a>
+    </c:when>
+    <c:otherwise>
+        <button class="btn btn-secondary px-4 shadow-sm" disabled>
+            <i class="bi bi-file-earmark-medical"></i> Chưa có invoice
+        </button>
+    </c:otherwise>
+</c:choose>
                                 </div>
                             </div>
                         </div>
