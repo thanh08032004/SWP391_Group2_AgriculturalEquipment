@@ -42,7 +42,8 @@ public class AuthFilter implements Filter {
         if (uri.endsWith("/login")
                 || uri.endsWith("/logout")
                 || uri.contains("/error") 
-                || uri.contains("/forgot-password")) {
+                || uri.contains("/forgot-password")
+                || uri.endsWith("/home")) {
 
             chain.doFilter(request, response);
             return;
@@ -55,7 +56,7 @@ public class AuthFilter implements Filter {
 
         // CHECK LOGIN
         if (user == null) {
-            res.sendRedirect(context + "/login");
+            res.sendRedirect(context + "/home");
             return;
         }
 
