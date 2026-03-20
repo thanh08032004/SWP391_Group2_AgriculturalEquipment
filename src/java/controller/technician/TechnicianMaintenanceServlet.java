@@ -228,7 +228,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             List<Map<String, Object>> items = dao.getMaintenanceItems(id);
             req.setAttribute("task", task);
             req.setAttribute("items", items);
-            req.setAttribute("showCompletionForm", true); // ✅ flag để JSP hiện form upload
+            req.setAttribute("showCompletionForm", true);
             req.getRequestDispatcher("/views/technicianView/maintenance-detail.jsp").forward(req, resp);
         } else if (action.equals("getCustomerDetailJson")) {
 
@@ -413,6 +413,12 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             // Mark task DONE
             boolean success = dao.completeTask(maintenanceId, "DONE");
 
+            // giảm số lượng spare_part trong inventory
+            if (success) {
+                // Gọi thêm hàm giảm số lượng linh kiện ở đây
+                dao.deductInventory(maintenanceId);
+            }
+
             if (success) {
                 req.getSession().setAttribute("success", "Task completed successfully!");
             } else {
@@ -424,7 +430,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
         // Thêm vào doPost:
         if ("confirmPay".equals(action)) {
             int invoiceId = Integer.parseInt(req.getParameter("invoiceId"));
-            
+
             invoiceDAO.confirmPayment(invoiceId);
             req.getSession().setAttribute("success", "Payment confirmed successfully!");
             resp.sendRedirect(req.getContextPath() + "/technician/maintenance?action=mytasks");
