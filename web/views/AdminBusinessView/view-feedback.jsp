@@ -81,7 +81,7 @@
 
     <!-- Back button -->
     <div>
-        <a href="${pageContext.request.contextPath}/leader/maintenance"
+        <a href="${pageContext.request.contextPath}/admin-business/maintenance"
            class="btn btn-secondary">
             ← Back
         </a>

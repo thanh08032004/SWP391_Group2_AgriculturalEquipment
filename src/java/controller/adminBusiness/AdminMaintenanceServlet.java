@@ -116,7 +116,7 @@ private void handleFeedbackDetailPage(HttpServletRequest request, HttpServletRes
 
     request.setAttribute("feedback", f);
 
-    request.getRequestDispatcher("/views/TechLeaderView/feedback-detail.jsp")
+    request.getRequestDispatcher("/views/AdminBusinessView/view-feedback.jsp")
            .forward(request, response);
 }
     @Override
