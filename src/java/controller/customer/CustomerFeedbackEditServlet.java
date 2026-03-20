@@ -1,14 +1,17 @@
 package controller.customer;
 
 import dal.FeedbackDAO;
+import dal.InvoiceDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import model.Maintenance;
 import model.MaintenanceFeedback;
 import model.User;
 
@@ -25,7 +28,32 @@ public class CustomerFeedbackEditServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+String action = request.getParameter("action");
 
+if ("getMaintenanceDetail".equals(action)) {
+    int id = Integer.parseInt(request.getParameter("id"));
+
+    InvoiceDAO dao1 = new InvoiceDAO();
+    Maintenance m = dao1.getMaintenanceDetail(id);
+
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+
+    PrintWriter out = response.getWriter();
+
+    if (m != null) {
+        out.print("{");
+        out.print("\"id\":" + m.getId() + ",");
+        out.print("\"machineName\":\"" + m.getMachineName() + "\",");
+        out.print("\"problem\":\"" + m.getDescription() + "\",");
+        out.print("\"status\":\"" + m.getStatus() + "\",");
+        out.print("\"startDate\":\"" + m.getStartDate() + "\",");
+        out.print("\"finishDate\":\"" + m.getEndDate() + "\"");
+        out.print("}");
+    }
+
+    return;
+}
         User user = (User) session.getAttribute("user");
 
         if (user.getRoleId() != 4) {
