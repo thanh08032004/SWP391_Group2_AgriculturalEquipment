@@ -518,8 +518,8 @@ public class DeviceDAO extends DBContext {
                 map.put("image", rs.getString("image"));
                 map.put("currentMaintenanceId", rs.getInt("current_maintenance_id"));
                 map.put("maintenanceStatus", rs.getString("maintenanceStatus"));
-               map.put("purchaseDate", rs.getDate("purchase_date"));
-map.put("warrantyEndDate", rs.getDate("warranty_end_date"));
+                map.put("purchaseDate", rs.getDate("purchase_date"));
+                map.put("warrantyEndDate", rs.getDate("warranty_end_date"));
                 list.add(map);
             }
         } catch (SQLException e) {
@@ -581,14 +581,22 @@ map.put("warrantyEndDate", rs.getDate("warranty_end_date"));
 
             while (rs.next()) {
                 DeviceDTO d = new DeviceDTO();
+
                 d.setId(rs.getInt("id"));
                 d.setSerialNumber(rs.getString("serial_number"));
                 d.setMachineName(rs.getString("machine_name"));
                 d.setModel(rs.getString("model"));
                 d.setPrice(rs.getBigDecimal("price"));
                 d.setStatus(rs.getString("status"));
+
+                d.setCategoryId(rs.getInt("category_id"));
+                d.setBrandId(rs.getInt("brand_id"));
+                d.setSubcategoryId(rs.getInt("subcategory_id"));
+
+                // optional
                 d.setCategoryName(rs.getString("category_name"));
                 d.setBrandName(rs.getString("brand_name"));
+
                 list.add(d);
             }
 
@@ -623,8 +631,15 @@ map.put("warrantyEndDate", rs.getDate("warranty_end_date"));
                 d.setModel(rs.getString("model"));
                 d.setPrice(rs.getBigDecimal("price"));
                 d.setStatus(rs.getString("status"));
+
+                d.setCategoryId(rs.getInt("category_id"));
+                d.setBrandId(rs.getInt("brand_id"));
+                d.setSubcategoryId(rs.getInt("subcategory_id"));
+
+                // optional
                 d.setCategoryName(rs.getString("category_name"));
                 d.setBrandName(rs.getString("brand_name"));
+                
                 list.add(d);
             }
 

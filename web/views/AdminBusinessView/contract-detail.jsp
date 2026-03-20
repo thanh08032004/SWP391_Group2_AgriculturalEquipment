@@ -63,6 +63,15 @@
 
                             <div class="row mb-2">
                                 <div class="col-md-6">
+                                    <strong>Customer Company:</strong> ${contract.customerCompany}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Tax Code Customer:</strong> ${contract.customerTaxCode}
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-6">
                                     <strong>Signed Date:</strong> ${contract.signedAt}
                                 </div>
                                 <div class="col-md-6">
@@ -151,190 +160,224 @@
                         </div>
                     </div>
 
-                    <!-- DEVICE LIST -->
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-secondary text-white">
-                            Device List In This Contract
-                        </div>
-
+                    <!-- DEVICE SUMMARY BY SUBCATEGORY -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-secondary text-white">Device Summary By Subcategory</div>
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>Device ID</th>
-                                        <th>Device Name</th>
-                                        <th>Price</th>
-                                        <th>Delivery Date</th>
+                                        <th>Subcategory</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total Price</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-
                                     <c:choose>
-                                        <c:when test="${empty deviceList}">
+                                        <c:when test="${empty subcategoryList}">
                                             <tr>
-                                                <td colspan="4" class="text-center text-muted">
-                                                    No devices found in this contract.
-                                                </td>
+                                                <td colspan="3" class="text-center text-muted">No data found.</td>
                                             </tr>
                                         </c:when>
-
                                         <c:otherwise>
-                                            <c:forEach var="d" items="${deviceList}">
-                                                <tr>
-                                                    <td>${d.deviceId}</td>
+                                            <c:forEach var="s" items="${subcategoryList}">
+                                                <tr onclick="showDevicesBySub(${s.subcategoryId})" style="cursor:pointer">
+                                                    <td class="fw-semibold text-primary">${s.subcategoryName}</td>
+                                                    <td>${s.quantity}</td>
                                                     <td>
-                                                        <span onclick="showDeviceDetail(${d.deviceId})"
-                                                              style="cursor:pointer;color:#0d6efd;font-weight:600;"
-                                                              onmouseover="this.style.textDecoration = 'underline'"
-                                                              onmouseout="this.style.textDecoration = 'none'">
-                                                            ${d.deviceName}
-                                                        </span>
+                                                        <fmt:formatNumber value="${s.unitPrice}" type="number" groupingUsed="true"/> VNĐ
                                                     </td>
                                                     <td>
-                                                        <fmt:formatNumber value="${d.price}" type="number" groupingUsed="true"/> VNĐ
+                                                        <fmt:formatNumber value="${s.totalPrice}" type="number" groupingUsed="true"/> VNĐ
                                                     </td>
-                                                    <td>${d.deliveryDate}</td>
                                                 </tr>
                                             </c:forEach>
                                         </c:otherwise>
                                     </c:choose>
-
                                 </tbody>
-                            </table>  
+                            </table>
                         </div>
                     </div>
 
-                    <!-- BACK BUTTON -->
-                    <div class="mt-4">
-                        <a href="${pageContext.request.contextPath}/admin-business/contracts?action=list" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> Back to list
-                        </a>
-                    </div>
-
                 </div>
-            </div>
 
+                <!-- BACK BUTTON -->
+                <div class="mt-4">
+                    <a href="${pageContext.request.contextPath}/admin-business/contracts?action=list" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to list
+                    </a>
+                </div>
+
+            </div>
         </div>
 
-        <jsp:include page="/common/scripts.jsp"/>
+    </div>
 
-        <script>
+    <jsp:include page="/common/scripts.jsp"/>
 
-            var CTX = '${pageContext.request.contextPath}';
+    <script>
 
-            function esc(str) {
-                if (!str)
-                    return "";
-                return String(str)
-                        .replace(/&/g, "&amp;")
-                        .replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/"/g, "&quot;");
+        var CTX = '${pageContext.request.contextPath}';
+
+        function esc(str) {
+            if (!str)
+                return "";
+            return String(str)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;");
+        }
+
+        /* DEVICE POPUP */
+        function showDeviceDetail(deviceId) {
+            // Ẩn modal subDeviceModal nếu đang mở
+            var subModalEl = document.getElementById('subDeviceModal');
+            if (subModalEl.classList.contains('show')) {
+                var subModal = bootstrap.Modal.getInstance(subModalEl);
+                subModal.hide();
             }
 
-            /* DEVICE POPUP */
-            function showDeviceDetail(deviceId) {
+            var modal = new bootstrap.Modal(document.getElementById('deviceDetailModal'));
+            document.getElementById('deviceDetailContent').innerHTML =
+                    '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+            modal.show();
 
-                var modal = new bootstrap.Modal(document.getElementById('deviceDetailModal'));
+            fetch(CTX + '/admin-business/contracts?action=getDeviceDetailJson&id=' + deviceId)
+                    .then(res => res.json())
+                    .then(dev => {
+                        let html = '<table class="table table-bordered">';
+                        html += '<tr><th>Serial</th><td>' + esc(dev.serial) + '</td></tr>';
+                        html += '<tr><th>Machine Name</th><td>' + esc(dev.machineName) + '</td></tr>';
+                        html += '<tr><th>Model</th><td>' + esc(dev.model) + '</td></tr>';
+                        html += '<tr><th>Price</th><td>' + esc(dev.price) + ' VNĐ</td></tr>';
+                        html += '<tr><th>Status</th><td>' + esc(dev.status) + '</td></tr>';
+                        html += '<tr><th>Category</th><td>' + esc(dev.categoryName) + '</td></tr>';
+                        html += '<tr><th>Brand</th><td>' + esc(dev.brandName) + '</td></tr>';
+                        html += '<tr><th>Customer</th><td>' + esc(dev.customerName) + '</td></tr>';
+                        html += '</table>';
 
-                document.getElementById('deviceDetailContent').innerHTML =
-                        '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+                        document.getElementById('deviceDetailContent').innerHTML = html;
+                    })
+                    .catch(() => {
+                        document.getElementById('deviceDetailContent').innerHTML =
+                                '<p class="text-danger text-center">Error loading device details.</p>';
+                    });
+        }
 
-                modal.show();
+        /* CUSTOMER POPUP */
+        function showCustomerDetail(customerId) {
 
-                fetch(CTX + '/admin-business/contracts?action=getDeviceDetailJson&id=' + deviceId)
+            var modal = new bootstrap.Modal(document.getElementById('customerDetailModal'));
 
-                        .then(res => res.json())
+            document.getElementById('customerDetailContent').innerHTML =
+                    '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
 
-                        .then(dev => {
+            modal.show();
 
-                            document.getElementById('deviceDetailContent').innerHTML =
-                                    '<div class="text-center mb-4">' +
-                                    '<img src="' + CTX + '/assets/images/devices/' + (dev.image || 'default_device.jpg') + '" ' +
-                                    'class="rounded shadow-sm border" style="max-width:250px;max-height:250px;">' +
-                                    '</div>' +
-                                    '<table class="table table-bordered">' +
-                                    '<tr><th>Serial</th><td>' + esc(dev.serial) + '</td></tr>' +
-                                    '<tr><th>Machine Name</th><td><strong>' + esc(dev.machineName) + '</strong></td></tr>' +
-                                    '<tr><th>Model</th><td>' + esc(dev.model) + '</td></tr>' +
-                                    '<tr><th>Price</th><td>' + esc(dev.price) + ' VNĐ</td></tr>' +
-                                    '<tr><th>Status</th><td>' + esc(dev.status) + '</td></tr>' +
-                                    '<tr><th>Category</th><td>' + esc(dev.categoryName) + '</td></tr>' +
-                                    '<tr><th>Brand</th><td>' + esc(dev.brandName) + '</td></tr>' +
-                                    '<tr><th>Customer</th><td>' + esc(dev.customerName) + '</td></tr>' +
-                                    '</table>';
-                        })
+            fetch(CTX + '/admin-business/contracts?action=getCustomerDetail&id=' + customerId)
 
-                        .catch(() => {
-                            document.getElementById('deviceDetailContent').innerHTML =
-                                    '<p class="text-danger text-center">Error loading device details.</p>';
+                    .then(res => res.json())
+
+                    .then(cus => {
+
+                        document.getElementById('customerDetailContent').innerHTML =
+                                '<div class="bg-primary p-4 text-center text-white" style="border-radius:15px 15px 0 0;">' +
+                                '<img src="' + CTX + '/assets/images/avatars/' + (cus.avatar || 'default.jpg') + '" ' +
+                                'class="rounded-circle border border-3 border-white mb-2 shadow" ' +
+                                'style="width:80px;height:80px;object-fit:cover;">' +
+                                '<h5 class="mb-0">' + esc(cus.fullname) + '</h5>' +
+                                '<small class="opacity-75">' + esc(cus.role) + '</small>' +
+                                '</div>' +
+                                '<div class="p-4">' +
+                                '<table class="table table-bordered mb-3">' +
+                                '<tr><th>Username</th><td>' + esc(cus.username) + '</td></tr>' +
+                                '<tr><th>Email</th><td>' + esc(cus.email) + '</td></tr>' +
+                                '<tr><th>Phone</th><td>' + esc(cus.phone) + '</td></tr>' +
+                                '<tr><th>Gender</th><td>' + esc(cus.gender) + '</td></tr>' +
+                                '<tr><th>Date of Birth</th><td>' + esc(cus.birthDate) + '</td></tr>' +
+                                '<tr><th>Address</th><td>' + esc(cus.address) + '</td></tr>' +
+                                '</table>' +
+                                '</div>';
+                    });
+
+        }
+
+        function showDevicesBySub(subId) {
+            var modal = new bootstrap.Modal(document.getElementById('subDeviceModal'));
+
+            // Chỉ cập nhật modal, không chạm bảng chính
+            document.getElementById('subDeviceContent').innerHTML =
+                    '<div class="text-center my-4"><div class="spinner-border text-primary"></div></div>';
+
+            modal.show();
+
+            fetch(CTX + '/admin-business/contracts?action=getDevicesBySub&subId=' + subId + '&contractId=${contract.id}')
+                    .then(res => res.json())
+                    .then(list => {
+                        let html = '<table class="table table-bordered">';
+                        html += '<tr><th>ID</th><th>Name</th><th>Price</th><th>Action</th></tr>';
+
+                        list.forEach(d => {
+                            html += '<tr>'
+                                    + '<td>' + d.id + '</td>'
+                                    + '<td>' + esc(d.machineName) + '</td>'
+                                    + '<td>' + esc(d.price) + ' VNĐ</td>'
+                                    + '<td><button class="btn btn-primary btn-sm" onclick="showDeviceDetail(' + d.id + ')">'
+                                    + '<i class="bi bi-eye"></i> View</button></td>'
+                                    + '</tr>';
                         });
 
-            }
+                        html += '</table>';
 
-            /* CUSTOMER POPUP */
-            function showCustomerDetail(customerId) {
+                        document.getElementById('subDeviceContent').innerHTML = html;
+                    })
+                    .catch(() => {
+                        document.getElementById('subDeviceContent').innerHTML =
+                                '<p class="text-danger text-center">Error loading devices.</p>';
+                    });
+        }
 
-                var modal = new bootstrap.Modal(document.getElementById('customerDetailModal'));
+    </script>
 
-                document.getElementById('customerDetailContent').innerHTML =
-                        '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
-
-                modal.show();
-
-                fetch(CTX + '/admin-business/contracts?action=getCustomerDetail&id=' + customerId)
-
-                        .then(res => res.json())
-
-                        .then(cus => {
-
-                            document.getElementById('customerDetailContent').innerHTML =
-                                    '<div class="bg-primary p-4 text-center text-white" style="border-radius:15px 15px 0 0;">' +
-                                    '<img src="' + CTX + '/assets/images/avatars/' + (cus.avatar || 'default.jpg') + '" ' +
-                                    'class="rounded-circle border border-3 border-white mb-2 shadow" ' +
-                                    'style="width:80px;height:80px;object-fit:cover;">' +
-                                    '<h5 class="mb-0">' + esc(cus.fullname) + '</h5>' +
-                                    '<small class="opacity-75">' + esc(cus.role) + '</small>' +
-                                    '</div>' +
-                                    '<div class="p-4">' +
-                                    '<table class="table table-bordered mb-3">' +
-                                    '<tr><th>Username</th><td>' + esc(cus.username) + '</td></tr>' +
-                                    '<tr><th>Email</th><td>' + esc(cus.email) + '</td></tr>' +
-                                    '<tr><th>Phone</th><td>' + esc(cus.phone) + '</td></tr>' +
-                                    '<tr><th>Gender</th><td>' + esc(cus.gender) + '</td></tr>' +
-                                    '<tr><th>Date of Birth</th><td>' + esc(cus.birthDate) + '</td></tr>' +
-                                    '<tr><th>Address</th><td>' + esc(cus.address) + '</td></tr>' +
-                                    '</table>' +
-                                    '</div>';
-                        });
-
-            }
-
-        </script>
-
-        <!-- Device Detail Modal -->
-        <div class="modal fade" id="deviceDetailModal">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Device Detail</h5>
-                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body" id="deviceDetailContent">
-                        <div class="text-center"><div class="spinner-border"></div></div>
-                    </div>
+    <!-- Device Detail Modal -->
+    <div class="modal fade" id="deviceDetailModal">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Device Detail</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="deviceDetailContent">
+                    <div class="text-center"><div class="spinner-border"></div></div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Customer Detail Modal -->
-        <div class="modal fade" id="customerDetailModal">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg">
-                    <div class="modal-body p-0" id="customerDetailContent"></div>
+    <!-- Customer Detail Modal -->
+    <div class="modal fade" id="customerDetailModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-body p-0" id="customerDetailContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="subDeviceModal">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">Devices In Subcategory</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="subDeviceContent">
+                    <!-- Bảng thiết bị sẽ được inject ở đây -->
                 </div>
             </div>
         </div>
+    </div>
 
-    </body>
+</body>
 </html>

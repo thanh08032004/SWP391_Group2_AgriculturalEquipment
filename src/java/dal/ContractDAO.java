@@ -9,6 +9,7 @@ package dal;
  * @author Acer
  */
 import dto.DeviceDTO;
+import dto.SubcategorySummaryDTO;
 import model.Contract;
 import java.sql.*;
 import java.util.*;
@@ -55,6 +56,8 @@ public class ContractDAO extends DBContext {
                 c.setCreatedBy(rs.getInt("created_by"));
                 c.setStatus(rs.getString("status"));
                 c.setCreatedAt(rs.getTimestamp("created_at"));
+                c.setCustomerCompany(rs.getString("customer_company"));
+                c.setCustomerTaxCode(rs.getString("customer_tax_code"));
 
                 return c;
             }
@@ -298,8 +301,9 @@ public class ContractDAO extends DBContext {
             (contract_code, customer_id, party_a,
              signed_at, effective_date, expiry_date,
              total_value, payment_terms, description,
-             status, file_url, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             status, file_url, created_by,
+             customer_company, customer_tax_code)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         try (PreparedStatement ps = getConnection()
@@ -334,6 +338,8 @@ public class ContractDAO extends DBContext {
             ps.setString(10, c.getStatus());
             ps.setString(11, c.getFileUrl());
             ps.setInt(12, c.getCreatedBy());
+            ps.setString(13, c.getCustomerCompany());
+            ps.setString(14, c.getCustomerTaxCode());
 
             ps.executeUpdate();
 
@@ -349,7 +355,7 @@ public class ContractDAO extends DBContext {
         return -1;
     }
 
-    public void addDeviceToContract(int contractId, int deviceId) {
+    public void addDeviceToContract(int contractId, int deviceId, Integer subCategoryId) {
 
         DeviceDAO deviceDAO = new DeviceDAO();
         DeviceDTO d = deviceDAO.getDeviceById(deviceId);
@@ -360,8 +366,8 @@ public class ContractDAO extends DBContext {
 
         String sql = """
             INSERT INTO contract_device
-            (contract_id, device_id, price, delivery_date)
-            VALUES (?, ?, ?, ?)
+            (contract_id, device_id, subcategory_id, price, delivery_date)
+            VALUES (?, ?, ?, ?, ?)
         """;
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
@@ -369,18 +375,25 @@ public class ContractDAO extends DBContext {
             ps.setInt(1, contractId);
             ps.setInt(2, deviceId);
 
+            // subcategory
+            if (subCategoryId != null) {
+                ps.setInt(3, subCategoryId);
+            } else {
+                ps.setNull(3, Types.INTEGER);
+            }
+
             // price
             if (d.getPrice() != null) {
-                ps.setBigDecimal(3, d.getPrice());
+                ps.setBigDecimal(4, d.getPrice());
             } else {
-                ps.setNull(3, Types.DECIMAL);
+                ps.setNull(4, Types.DECIMAL);
             }
 
             // delivery_date
             if (d.getPurchaseDate() != null) {
-                ps.setDate(4, new java.sql.Date(d.getPurchaseDate().getTime()));
+                ps.setDate(5, new java.sql.Date(d.getPurchaseDate().getTime()));
             } else {
-                ps.setNull(4, Types.DATE);
+                ps.setNull(5, Types.DATE);
             }
 
             ps.executeUpdate();
@@ -404,7 +417,9 @@ public class ContractDAO extends DBContext {
                 payment_terms = ?,
                 description = ?,
                 status = ?,
-                file_url = ?
+                file_url = ?,
+                customer_company = ?,
+                customer_tax_code = ?,
             WHERE id = ?
         """;
 
@@ -437,7 +452,9 @@ public class ContractDAO extends DBContext {
             ps.setString(9, c.getDescription());
             ps.setString(10, c.getStatus());
             ps.setString(11, c.getFileUrl());
-            ps.setInt(12, c.getId());
+            ps.setString(12, c.getCustomerCompany());
+            ps.setString(13, c.getCustomerTaxCode());
+            ps.setInt(14, c.getId());
 
             ps.executeUpdate();
 
@@ -478,42 +495,108 @@ public class ContractDAO extends DBContext {
             e.printStackTrace();
         }
     }
-    
+
     public boolean isDeviceInCompletedContract(int deviceId) {
-    String sql = """
+        String sql = """
         SELECT 1 
         FROM contract_device cd
         JOIN contract c ON cd.contract_id = c.id
         WHERE cd.device_id = ?
         AND c.status = 'COMPLETED'
     """;
-    try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, deviceId);
-        ResultSet rs = ps.executeQuery();
-        return rs.next();
-    } catch (Exception e) {
-        e.printStackTrace();
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, deviceId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    return false;
-}
-    
+
     public Set<Integer> getLockedDeviceIds() {
-    Set<Integer> ids = new HashSet<>();
-    String sql = """
+        Set<Integer> ids = new HashSet<>();
+        String sql = """
         SELECT DISTINCT cd.device_id
         FROM contract_device cd
         JOIN contract c ON cd.contract_id = c.id
         WHERE c.status = 'COMPLETED'
     """;
-    try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            ids.add(rs.getInt("device_id"));
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ids.add(rs.getInt("device_id"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return ids;
     }
-    return ids;
-}
+
+    public List<SubcategorySummaryDTO> getDeviceSummaryByContract(int contractId) {
+        List<SubcategorySummaryDTO> list = new ArrayList<>();
+        String sql = """
+        SELECT sc.id, sc.name,
+               COUNT(cd.device_id) AS quantity,
+               SUM(d.price) AS total_price,
+               AVG(d.price) AS unit_price
+        FROM contract_device cd
+        JOIN device d ON cd.device_id = d.id
+        JOIN subcategory sc ON d.subcategory_id = sc.id
+        WHERE cd.contract_id = ?
+        GROUP BY sc.id, sc.name
+    """;
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, contractId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                SubcategorySummaryDTO s = new SubcategorySummaryDTO();
+                s.setSubcategoryId(rs.getInt("id"));
+                s.setSubcategoryName(rs.getString("name"));
+                s.setQuantity(rs.getInt("quantity"));
+                s.setTotalPrice(rs.getBigDecimal("total_price"));
+                s.setUnitPrice(rs.getBigDecimal("unit_price")); // thêm đơn giá
+                list.add(s);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<DeviceDTO> getDevicesByContractAndSub(int contractId, int subId) {
+        List<DeviceDTO> list = new ArrayList<>();
+
+        String sql = """
+            SELECT d.id, d.machine_name, d.price
+            FROM contract_device cd
+            JOIN device d ON cd.device_id = d.id
+            WHERE cd.contract_id = ? AND d.subcategory_id = ?
+        """;
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, contractId);
+            ps.setInt(2, subId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                DeviceDTO d = new DeviceDTO();
+                d.setId(rs.getInt("id"));
+                d.setMachineName(rs.getString("machine_name"));
+                d.setPrice(rs.getBigDecimal("price"));
+                list.add(d);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 
 }

@@ -22,6 +22,7 @@ public class Device {
     private String status; // ACTIVE, MAINTENANCE, BROKEN
     private int categoryId;
     private int brandId;
+    private int subcategoryId;
     private String image;
 }
 

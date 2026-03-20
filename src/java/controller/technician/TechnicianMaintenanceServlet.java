@@ -364,15 +364,18 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
                 List<Integer> partIds = new ArrayList<>();
                 List<Integer> qtys = new ArrayList<>();
 
+                List<Boolean> paids = new ArrayList<>();
+
                 for (String spIdStr : sparePartIds) {
                     int spId = Integer.parseInt(spIdStr);
                     int qty = Integer.parseInt(req.getParameter("quantity_" + spId));
-
+                    boolean paid = Boolean.parseBoolean(req.getParameter("paid_" + spId)); // đây
                     partIds.add(spId);
                     qtys.add(qty);
+                    paids.add(paid);
                 }
 
-                dao.saveMaintenanceItems(maintenanceId, partIds, qtys);
+                dao.saveMaintenanceItems(maintenanceId, partIds, qtys, paids);
             }
 
             // Submit to admin

@@ -17,8 +17,10 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 import dal.ContractDAO;
 import dal.DeviceDAO;
+import dal.SubCategoryDAO;
 import dal.UserDAO;
 import dto.DeviceDTO;
+import dto.SubcategorySummaryDTO;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.*;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 import model.Contract;
 import model.ContractDevice;
+import model.SubCategory;
 import model.User;
 
 @MultipartConfig
@@ -55,10 +58,10 @@ public class AdminContractServlet extends HttpServlet {
             int id = Integer.parseInt(request.getParameter("id"));
 
             Contract contract = dao.getById(id);
-            List<ContractDevice> deviceList = dao.getDevicesByContractId(id);
-
             request.setAttribute("contract", contract);
-            request.setAttribute("deviceList", deviceList);
+
+            List<SubcategorySummaryDTO> subList = dao.getDeviceSummaryByContract(id);
+            request.setAttribute("subcategoryList", subList);
 
             request.getRequestDispatcher("/views/AdminBusinessView/contract-detail.jsp")
                     .forward(request, response);
@@ -157,58 +160,92 @@ public class AdminContractServlet extends HttpServlet {
             return;
         } else if (action.equals("create")) {
 
-            // lấy list customer
             UserDAO userDAO = new UserDAO();
             List<User> userList = userDAO.getAllCustomers();
 
-            // lấy device chưa gán
             DeviceDAO deviceDAO = new DeviceDAO();
             List<DeviceDTO> deviceList = deviceDAO.getDevicesWithoutCustomer();
 
-            // set sang JSP
+            SubCategoryDAO subDAO = new SubCategoryDAO();
+            List<SubCategory> subCategoryList = subDAO.getSubHasDevice();
+
             request.setAttribute("userList", userList);
             request.setAttribute("deviceList", deviceList);
+            request.setAttribute("subCategoryList", subCategoryList);
 
             request.getRequestDispatcher("/views/AdminBusinessView/contract-add.jsp")
                     .forward(request, response);
-
         } else if (action.equals("edit")) {
 
             int id = Integer.parseInt(request.getParameter("id"));
             Contract contract = dao.getById(id);
+
             UserDAO userDAO = new UserDAO();
             DeviceDAO deviceDAO = new DeviceDAO();
+            SubCategoryDAO subDAO = new SubCategoryDAO();
 
-            // ===== DEVICE =====
             int customerId = contract.getCustomerId();
+
             List<DeviceDTO> list1 = deviceDAO.getDevicesWithoutCustomer();
             List<DeviceDTO> list2 = deviceDAO.getDevicesByCustomerId(customerId);
 
-            // ===== LIST =====
             Set<Integer> existed = new HashSet<>();
             Set<Integer> selectedDeviceIds = new HashSet<>();
             List<DeviceDTO> deviceList = new ArrayList<>();
 
+            System.out.println("====================LIST 1========================");
             for (DeviceDTO d : list1) {
                 deviceList.add(d);
                 existed.add(d.getId());
             }
+            System.out.println("==================================================");
 
+            System.out.println("====================LIST 2========================");
             for (DeviceDTO d : list2) {
                 if (!existed.contains(d.getId())) {
                     deviceList.add(d);
                 }
                 selectedDeviceIds.add(d.getId());
             }
+            System.out.println("==================================================");
 
-            // ===== SET DATA =====
             request.setAttribute("selectedDeviceIds", selectedDeviceIds);
             request.setAttribute("contract", contract);
             request.setAttribute("userList", userDAO.getAllCustomers());
             request.setAttribute("deviceList", deviceList);
+            request.setAttribute("subCategoryList", subDAO.getSubHasDevice());
 
             request.getRequestDispatcher("/views/AdminBusinessView/contract-edit.jsp")
                     .forward(request, response);
+        } else if (action.equals("getDevicesBySub")) {
+
+            int contractId = Integer.parseInt(request.getParameter("contractId"));
+            int subId = Integer.parseInt(request.getParameter("subId"));
+
+            List<DeviceDTO> list = dao.getDevicesByContractAndSub(contractId, subId);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            StringBuilder json = new StringBuilder("[");
+            for (int i = 0; i < list.size(); i++) {
+                DeviceDTO d = list.get(i);
+
+                json.append(String.format(
+                        "{\"id\":%d,\"machineName\":\"%s\",\"price\":\"%s\"}",
+                        d.getId(),
+                        d.getMachineName(),
+                        d.getPrice() != null ? d.getPrice().toPlainString() : "0"
+                ));
+
+                if (i < list.size() - 1) {
+                    json.append(",");
+                }
+            }
+            json.append("]");
+
+            response.getWriter().write(json.toString());
+            return;
         }
     }
 
@@ -225,9 +262,6 @@ public class AdminContractServlet extends HttpServlet {
                 String contractCode = request.getParameter("contractCode");
                 int customerId = Integer.parseInt(request.getParameter("customerId"));
                 String partyA = request.getParameter("partyA");
-
-                // ===== MULTI DEVICE =====
-                String[] deviceIds = request.getParameterValues("deviceIds");
 
                 // ===== DATE =====
                 java.sql.Date signedAt = java.sql.Date.valueOf(request.getParameter("signedAt"));
@@ -254,6 +288,8 @@ public class AdminContractServlet extends HttpServlet {
                 String status = request.getParameter("status");
                 String paymentTerms = request.getParameter("paymentTerms");
                 String description = request.getParameter("description");
+                String customerCompany = request.getParameter("customerCompany");
+                String customerTaxCode = request.getParameter("customerTaxCode");
 
                 // ===== FILE =====
                 Part filePart = request.getPart("file");
@@ -301,21 +337,24 @@ public class AdminContractServlet extends HttpServlet {
                 c.setStatus(status);
                 c.setFileUrl(fileUrl);
                 c.setCreatedBy(createdBy);
+                c.setCustomerCompany(customerCompany);
+                c.setCustomerTaxCode(customerTaxCode);
 
                 // ===== INSERT CONTRACT =====
                 int contractId = dao.insert(c);
 
                 // ===== INSERT MULTI DEVICE =====
                 DeviceDAO deviceDAO = new DeviceDAO();
+                String[] deviceData = request.getParameterValues("deviceData");
 
-                if (deviceIds != null && contractId > 0) {
-                    for (String d : deviceIds) {
-                        if (d != null && !d.isEmpty()) {
-                            int deviceId = Integer.parseInt(d);
+                if (deviceData != null) {
+                    for (String item : deviceData) {
+                        String[] parts = item.split("-");
+                        int deviceId = Integer.parseInt(parts[0]);
+                        int subId = Integer.parseInt(parts[1]);
 
-                            dao.addDeviceToContract(contractId, deviceId);
-                            deviceDAO.updateCustomerForDevice(deviceId, customerId);
-                        }
+                        dao.addDeviceToContract(contractId, deviceId, subId);
+                        deviceDAO.updateCustomerForDevice(deviceId, customerId);
                     }
                 }
 
@@ -342,22 +381,12 @@ public class AdminContractServlet extends HttpServlet {
         if ("update".equals(action)) {
 
             try {
-                // ===== ID =====
                 int id = Integer.parseInt(request.getParameter("id"));
 
-                // ===== BASIC =====
                 String contractCode = request.getParameter("contractCode");
 
-                String customerRaw = request.getParameter("customerId");
-                if (customerRaw == null || customerRaw.isEmpty()) {
-                    throw new IllegalArgumentException("Customer is required");
-                }
-                int customerId = Integer.parseInt(customerRaw);
-
+                int customerId = Integer.parseInt(request.getParameter("customerId"));
                 String partyA = request.getParameter("partyA");
-
-                // ===== DEVICE =====
-                String[] deviceIds = request.getParameterValues("deviceIds");
 
                 // ===== DATE =====
                 java.sql.Date signedAt = java.sql.Date.valueOf(request.getParameter("signedAt"));
@@ -374,7 +403,6 @@ public class AdminContractServlet extends HttpServlet {
                     expiryDate = java.sql.Date.valueOf(request.getParameter("expiryDate"));
                 }
 
-                // ===== VALUE =====
                 BigDecimal totalValue = null;
                 if (request.getParameter("totalValue") != null
                         && !request.getParameter("totalValue").isEmpty()) {
@@ -385,17 +413,15 @@ public class AdminContractServlet extends HttpServlet {
                 String paymentTerms = request.getParameter("paymentTerms");
                 String description = request.getParameter("description");
 
-                // ===== GET OLD CONTRACT =====
                 Contract old = dao.getById(id);
 
                 // ===== FILE =====
                 Part filePart = request.getPart("file");
-                String fileUrl = old.getFileUrl(); // giữ file cũ
+                String fileUrl = old.getFileUrl();
 
                 if (filePart != null && filePart.getSize() > 0) {
 
                     String fileName = filePart.getSubmittedFileName();
-
                     String uploadPath = getServletContext().getRealPath("/assets/contracts");
 
                     File dir = new File(uploadPath);
@@ -404,105 +430,69 @@ public class AdminContractServlet extends HttpServlet {
                     }
 
                     filePart.write(uploadPath + File.separator + fileName);
-
                     fileUrl = "assets/contracts/" + fileName;
                 }
 
-                // ===== BUILD OBJECT =====
+                // ===== UPDATE CONTRACT =====
                 Contract c = new Contract();
                 c.setId(id);
                 c.setContractCode(contractCode);
                 c.setCustomerId(customerId);
                 c.setPartyA(partyA);
-
                 c.setSignedAt(new java.util.Date(signedAt.getTime()));
-
-                c.setEffectiveDate(effectiveDate != null
-                        ? new java.util.Date(effectiveDate.getTime())
-                        : null);
-
-                c.setExpiryDate(expiryDate != null
-                        ? new java.util.Date(expiryDate.getTime())
-                        : null);
-
+                c.setEffectiveDate(effectiveDate != null ? new Date(effectiveDate.getTime()) : null);
+                c.setExpiryDate(expiryDate != null ? new Date(expiryDate.getTime()) : null);
                 c.setTotalValue(totalValue);
                 c.setPaymentTerms(paymentTerms);
                 c.setDescription(description);
                 c.setStatus(status);
                 c.setFileUrl(fileUrl);
+                c.setCustomerCompany(request.getParameter("customerCompany"));
+                c.setCustomerTaxCode(request.getParameter("customerTaxCode"));
 
-                // ===== UPDATE CONTRACT =====
                 dao.update(c);
 
-                // ===== CURRENT DEVICES IN DB =====
+                // ===== CURRENT DEVICES =====
                 List<Integer> currentDevices = dao.getDeviceIdsByContract(id);
+                Set<Integer> currentSet = new HashSet<>(currentDevices);
 
                 // ===== NEW DEVICES FROM FORM =====
+                String[] deviceData = request.getParameterValues("deviceData");
+
                 Set<Integer> newDevices = new HashSet<>();
-                if (deviceIds != null) {
-                    for (String d : deviceIds) {
-                        if (d != null && !d.isEmpty()) {
-                            newDevices.add(Integer.parseInt(d));
+
+                DeviceDAO deviceDAO = new DeviceDAO();
+
+                if (deviceData != null) {
+                    for (String item : deviceData) {
+
+                        String[] parts = item.split("-");
+                        int deviceId = Integer.parseInt(parts[0]);
+                        int subId = Integer.parseInt(parts[1]);
+
+                        newDevices.add(deviceId);
+
+                        // ADD nếu chưa có
+                        if (!currentSet.contains(deviceId)) {
+                            dao.addDeviceToContract(id, deviceId, subId);
+                            deviceDAO.updateCustomerForDevice(deviceId, customerId);
                         }
                     }
                 }
 
-                // ===== CURRENT SET =====
-                Set<Integer> currentSet = new HashSet<>(currentDevices);
-
-                // ===== FIND TO ADD =====
-                for (Integer deviceId : newDevices) {
-                    if (!currentSet.contains(deviceId)) {
-                        dao.addDeviceToContract(id, deviceId);
-                    }
-                }
-
-                // ===== FIND TO REMOVE =====
+                // ===== REMOVE =====
                 for (Integer deviceId : currentSet) {
                     if (!newDevices.contains(deviceId)) {
                         dao.removeDeviceFromContract(id, deviceId);
                     }
                 }
 
-                // ===== REDIRECT =====
                 response.sendRedirect(request.getContextPath()
                         + "/admin-business/contracts?action=list");
 
             } catch (Exception e) {
                 e.printStackTrace();
-
                 request.setAttribute("error", "Update contract failed!");
-
-                int id = Integer.parseInt(request.getParameter("id"));
-                Contract contract = dao.getById(id);
-
-                UserDAO userDAO = new UserDAO();
-                DeviceDAO deviceDAO = new DeviceDAO();
-
-                int customerId = contract.getCustomerId();
-
-                List<DeviceDTO> list1 = deviceDAO.getDevicesWithoutCustomer();
-                List<DeviceDTO> list2 = deviceDAO.getDevicesByCustomerId(customerId);
-
-                // gộp
-                Set<Integer> existed = new HashSet<>();
-                List<DeviceDTO> deviceList = new ArrayList<>();
-
-                for (DeviceDTO d : list1) {
-                    deviceList.add(d);
-                    existed.add(d.getId());
-                }
-
-                for (DeviceDTO d : list2) {
-                    if (!existed.contains(d.getId())) {
-                        deviceList.add(d);
-                    }
-                }
-
-                // set lại
-                request.setAttribute("contract", contract);
-                request.setAttribute("userList", userDAO.getAllCustomers());
-                request.setAttribute("deviceList", deviceList);
             }
         }
     }

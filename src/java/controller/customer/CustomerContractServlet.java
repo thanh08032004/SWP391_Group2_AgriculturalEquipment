@@ -7,6 +7,7 @@ package controller.customer;
 import dal.ContractDAO;
 import dal.DeviceDAO;
 import dto.DeviceDTO;
+import dto.SubcategorySummaryDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -71,47 +72,27 @@ public class CustomerContractServlet extends HttpServlet {
 
             request.getRequestDispatcher("/views/CustomerView/contract-list.jsp")
                     .forward(request, response);
-        } /* ================= DETAIL ================= */ else if (action.equals("detail")) {
+        } else if (action.equals("detail")) {
 
-            int id;
+            int id = Integer.parseInt(request.getParameter("id"));
 
-            try {
-                id = Integer.parseInt(request.getParameter("id"));
-            } catch (Exception e) {
-
-                request.getRequestDispatcher("/views/errors/500.jsp")
-                        .forward(request, response);
-                return;
-            }
-
-            /* SECURITY CHECK */
-            Contract contract = dao.getByIdAndCustomer(id, customerId);
-
-            if (contract == null) {
-
-                request.getRequestDispatcher("/views/errors/500.jsp").forward(request, response);
-                return;
-            }
-
-            List<ContractDevice> deviceList = dao.getDevicesByContractId(id);
-
+            Contract contract = dao.getById(id);
             request.setAttribute("contract", contract);
-            request.setAttribute("deviceList", deviceList);
+
+            List<SubcategorySummaryDTO> subList = dao.getDeviceSummaryByContract(id);
+            request.setAttribute("subcategoryList", subList);
 
             request.getRequestDispatcher("/views/CustomerView/contract-detail.jsp")
                     .forward(request, response);
+
         } else if (action.equals("getDeviceDetailJson")) {
 
             int deviceId = Integer.parseInt(request.getParameter("id"));
 
             DeviceDAO deviceDAO = new DeviceDAO();
-            DeviceDTO dev = deviceDAO.getDeviceByIdAndCustomer(deviceId, customerId);
+            DeviceDTO dev = deviceDAO.getDeviceById(deviceId);
 
-            if (dev == null) {
-                request.getRequestDispatcher("/views/errors/500.jsp")
-                        .forward(request, response);
-                return;
-            } else {
+            if (dev != null) {
 
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
@@ -138,6 +119,36 @@ public class CustomerContractServlet extends HttpServlet {
                 response.getWriter().write(json);
             }
 
+            return;
+
+        } else if (action.equals("getDevicesBySub")) {
+
+            int contractId = Integer.parseInt(request.getParameter("contractId"));
+            int subId = Integer.parseInt(request.getParameter("subId"));
+
+            List<DeviceDTO> list = dao.getDevicesByContractAndSub(contractId, subId);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            StringBuilder json = new StringBuilder("[");
+            for (int i = 0; i < list.size(); i++) {
+                DeviceDTO d = list.get(i);
+
+                json.append(String.format(
+                        "{\"id\":%d,\"machineName\":\"%s\",\"price\":\"%s\"}",
+                        d.getId(),
+                        d.getMachineName(),
+                        d.getPrice() != null ? d.getPrice().toPlainString() : "0"
+                ));
+
+                if (i < list.size() - 1) {
+                    json.append(",");
+                }
+            }
+            json.append("]");
+
+            response.getWriter().write(json.toString());
             return;
         }
     }

@@ -4,8 +4,6 @@
  */
 package model;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,14 +17,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ContractDevice {
+public class SubCategory {
     private int id;
-    private int contractId;
-    private int deviceId;
-    private String deviceName; 
-    private String serialNumber;      
-    private int subcategoryId;        
-    private String subcategoryName;   
-    private BigDecimal price;
-    private Date deliveryDate;
+    private int categoryId;
+    private String name;
+    private String description;
+    private String status;
 }

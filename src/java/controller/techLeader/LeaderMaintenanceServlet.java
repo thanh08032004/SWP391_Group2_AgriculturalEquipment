@@ -77,7 +77,7 @@ public class LeaderMaintenanceServlet extends HttpServlet {
             response.sendRedirect("maintenance?msg=" + (success ? "sent_success" : "error"));
         } else if ("reject-diagnosis".equals(action)) {
             boolean updateStatus = dao.updateStatus(id, "TECHNICIAN_ACCEPTED");
-            boolean clearItems = dao.saveMaintenanceItems(id, new ArrayList<>(), new ArrayList<>());
+            boolean clearItems = dao.saveMaintenanceItems(id, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 
             if (updateStatus && clearItems) {
                 response.sendRedirect("maintenance?action=detail&id=" + id + "&msg=rejected_and_cleared");

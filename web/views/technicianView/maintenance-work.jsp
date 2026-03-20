@@ -26,8 +26,8 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                
-                                
+
+
                                 <div class="col-md-4 text-center">
                                     <c:if test="${not empty pendingImage.imageUrl}">
                                         <img src="${pageContext.request.contextPath}/assets/images/maintenance/${pendingImage.imageUrl}" 
@@ -116,40 +116,6 @@
                                 <input type="hidden" name="action" value="submitwork"/>
                                 <input type="hidden" name="maintenanceId" value="${m.id}"/>
 
-                                <div class="mb-3">
-                                    <label class="form-label">Technician Note</label>
-                                    <textarea name="technicianNote" 
-                                              class="form-control" 
-                                              rows="4"
-                                              required
-                                              placeholder="Describe maintenance work..."></textarea>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Work Hours</label>
-                                    <input type="number"
-                                           name="workHours"
-                                           class="form-control"
-                                           min="0.5"
-                                           step="0.5"
-                                           required
-                                           placeholder="Enter number of hours">
-                                </div>
-
-
-                                <div class="mb-3">
-                                    <label class="form-label">Diagnostic Image</label>
-
-                                    <input type="file"
-                                           name="diagnosticImage"
-                                           class="form-control"
-                                           accept="image/*">
-
-                                    <small class="text-muted">
-                                        Upload image of device problem (optional)
-                                    </small>
-                                </div>
-
                                 <div class="table-responsive"> 
 
                                     <table class="table table-bordered mt-3">
@@ -161,7 +127,7 @@
                                                 <th width="15%">Price</th>
                                                 <th width="15%">Quantity</th>
                                                 <th width="15%">Stock</th>
-
+                                                <th width="15%">Paid</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -190,6 +156,10 @@
                                                                disabled/>
                                                     </td>
                                                     <td class="text-muted small">Còn: ${sp.stock}</td>
+                                                    <td class="text-center">
+                                                        <input type="hidden" name="paid_${sp.id}" value="false"/>
+                                                        <input type="checkbox" name="paid_${sp.id}" value="true"/>
+                                                    </td>
                                                 </tr>
                                             </c:forEach>
                                             <c:if test="${empty spareParts}">
@@ -222,6 +192,41 @@
                                             </ul>
                                         </nav>
                                     </c:if>
+                                </div>
+
+
+                                <div class="mb-3">
+                                    <label class="form-label">Technician Note</label>
+                                    <textarea name="technicianNote" 
+                                              class="form-control" 
+                                              rows="4"
+                                              required
+                                              placeholder="Describe maintenance work..."></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Work Hours</label>
+                                    <input type="number"
+                                           name="workHours"
+                                           class="form-control"
+                                           min="0.5"
+                                           step="0.5"
+                                           required
+                                           placeholder="Enter number of hours">
+                                </div>
+
+
+                                <div class="mb-3">
+                                    <label class="form-label">Diagnostic Image</label>
+
+                                    <input type="file"
+                                           name="diagnosticImage"
+                                           class="form-control"
+                                           accept="image/*">
+
+                                    <small class="text-muted">
+                                        Upload image of device problem (optional)
+                                    </small>
                                 </div>
 
                                 <div class="mt-3">
@@ -503,7 +508,7 @@
                 sessionStorage.removeItem("openDeviceModal");
                 sessionStorage.removeItem("openCustomerModal");
             }
-            
+
             function clearMaintenanceSessionGet() {
                 sessionStorage.removeItem("openDeviceModal");
                 sessionStorage.removeItem("openCustomerModal");

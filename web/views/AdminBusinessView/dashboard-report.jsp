@@ -64,36 +64,42 @@
                     <div class="row">
 
                         <div class="col-md-4">
-                            <div class="card text-white bg-primary mb-3 shadow">
-                                <div class="card-body text-center">
-                                    <h5>Active Machines</h5>
-                                    <h2>${report.activeMachines}</h2>
+                            <a href="${pageContext.request.contextPath}/admin-business/devices" style="text-decoration: none;">
+                                <div class="card text-white bg-primary mb-3 shadow">
+                                    <div class="card-body text-center">
+                                        <h5>Active Machines</h5>
+                                        <h2>${report.activeMachines}</h2>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
                         <div class="col-md-4">
-                            <div class="card text-dark bg-warning mb-3 shadow">
-                                <div class="card-body text-center">
-                                    <h5>Maintenance Tickets</h5>
-                                    <h2>${report.totalMaintenance}</h2>
+                            <a href="${pageContext.request.contextPath}/admin-business/maintenance" style="text-decoration: none;">
+                                <div class="card text-dark bg-warning mb-3 shadow">
+                                    <div class="card-body text-center">
+                                        <h5>Maintenance Tickets</h5>
+                                        <h2>${report.totalMaintenance}</h2>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
                         <div class="col-md-4">
-                            <div class="card text-white bg-success mb-3 shadow">
-                                <div class="card-body text-center">
-                                    <h5>Total Revenue</h5>
-                                    <h2>
-                                        <fmt:formatNumber 
-                                            value="${report.totalRevenue}" 
-                                            type="number" 
-                                            groupingUsed="true"/>
-                                        VNĐ
-                                    </h2>
+                            <a href="${pageContext.request.contextPath}/admin-business/invoice/list" style="text-decoration: none;">
+                                <div class="card text-white bg-success mb-3 shadow">
+                                    <div class="card-body text-center">
+                                        <h5>Total Revenue</h5>
+                                        <h2>
+                                            <fmt:formatNumber 
+                                                value="${report.totalRevenue}" 
+                                                type="number" 
+                                                groupingUsed="true"/>
+                                            VNĐ
+                                        </h2>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
                     </div>

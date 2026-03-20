@@ -23,7 +23,8 @@ public class DeviceDTO {
     private String categoryName;
     private String brandName;
     private String customerName;
-     private Integer customerId;
+    private Integer customerId;
     private int categoryId;
     private int brandId;
+    private int subcategoryId;
 }

@@ -4,326 +4,333 @@
 
 <!DOCTYPE html>
 <html>
-
     <head>
         <jsp:include page="/common/head.jsp"/>
-        <title>Contract Detail</title>
+        <title>Contract Detail - AgriCMS</title>
     </head>
 
-    <body>
+    <body class="bg-light">
 
         <header>
             <jsp:include page="/common/header.jsp"/>
         </header>
 
-        <div class="container mt-5 mb-5">
+        <div class="admin-layout">
 
-            <!-- TITLE -->
-            <h2 class="fw-bold mb-4">
-                <i class="bi bi-file-earmark-text"></i> Contract Detail
-            </h2>
+            <div class="admin-content">
+                <div class="container my-5">
 
-            <!-- CONTRACT CARD -->
-            <div class="card shadow-sm mb-4">
-
-                <div class="card-body">
-
-                    <div class="row mb-3">
-
-                        <div class="col-md-6">
-                            <strong>ID:</strong> ${contract.id}
-                        </div>
-
-                        <div class="col-md-6">
-                            <strong>Contract Code:</strong>
-                            <span class="text-primary fw-bold">${contract.contractCode}</span>
-                        </div>
-
+                    <!-- TITLE -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold">
+                            <i class="bi bi-file-earmark-text"></i> Contract Detail
+                        </h2>
                     </div>
 
-
-                    <div class="row mb-3">
-
-                        <div class="col-md-6">
-                            <strong>Customer:</strong>
-                            <span>
-                                ${contract.customerName}
-                            </span>
+                    <!-- CONTRACT INFO -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-dark text-white">
+                            Contract Information
                         </div>
 
-                        <div class="col-md-6">
-                            <strong>Party A:</strong> ${contract.partyA}
-                        </div>
+                        <div class="card-body">
 
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <strong>ID:</strong> ${contract.id}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Contract Code:</strong> ${contract.contractCode}
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <strong>Customer:</strong>
+                                    <span onclick="showCustomerDetail(${contract.customerId})"
+                                          style="cursor:pointer;color:#0d6efd;font-weight:600;"
+                                          onmouseover="this.style.textDecoration = 'underline'"
+                                          onmouseout="this.style.textDecoration = 'none'">
+                                        ${contract.customerName}
+                                    </span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Party A:</strong> ${contract.partyA}
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <strong>Customer Company:</strong> ${contract.customerCompany}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Tax Code Customer:</strong> ${contract.customerTaxCode}
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <strong>Signed Date:</strong> ${contract.signedAt}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Effective Date:</strong> ${contract.effectiveDate}
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <strong>Expiry Date:</strong> ${contract.expiryDate}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Total Value:</strong>
+                                    <fmt:formatNumber value="${contract.totalValue}" type="number" groupingUsed="true"/> VNĐ
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <strong>Payment Terms:</strong> ${contract.paymentTerms}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Status:</strong>
+
+                                    <c:choose>
+                                        <c:when test="${contract.status == 'ACTIVE'}">
+                                            <span class="badge bg-success">ACTIVE</span>
+                                        </c:when>
+
+                                        <c:when test="${contract.status == 'DRAFT'}">
+                                            <span class="badge bg-warning text-dark">DRAFT</span>
+                                        </c:when>
+
+                                        <c:when test="${contract.status == 'COMPLETED' || contract.status == 'CANCELED'}">
+                                            <span class="badge bg-danger">${contract.status}</span>
+                                        </c:when>
+
+                                        <c:otherwise>
+                                            <span class="badge bg-secondary">${contract.status}</span>
+                                        </c:otherwise>
+                                    </c:choose>
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <strong>Description:</strong>
+                                    <p class="mb-0">${contract.description}</p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <strong>Contract File (PDF, Image):</strong>
+                                    <br>
+
+                                    <c:choose>
+
+                                        <c:when test="${not empty contract.fileUrl}">
+
+                                            <!-- Preview -->
+                                            <a href="${pageContext.request.contextPath}/${contract.fileUrl}" 
+                                               target="_blank"
+                                               class="btn btn-primary btn-sm me-2">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+
+                                            <!-- Download -->
+                                            <a href="${pageContext.request.contextPath}/${contract.fileUrl}" 
+                                               download
+                                               class="btn btn-success btn-sm">
+                                                <i class="bi bi-download"></i> Download
+                                            </a>
+
+                                        </c:when>
+
+                                        <c:otherwise>
+                                            <span class="text-muted">No file attached</span>
+                                        </c:otherwise>
+
+                                    </c:choose>
+                                </div>
+                            </div>    
+
+                        </div>
                     </div>
 
-
-                    <div class="row mb-3">
-
-                        <div class="col-md-6">
-                            <strong>Signed Date:</strong>
-                            <fmt:formatDate value="${contract.signedAt}" pattern="dd/MM/yyyy"/>
-                        </div>
-
-                        <div class="col-md-6">
-                            <strong>Effective Date:</strong>
-                            <fmt:formatDate value="${contract.effectiveDate}" pattern="dd/MM/yyyy"/>
-                        </div>
-
-                    </div>
-
-
-                    <div class="row mb-3">
-
-                        <div class="col-md-6">
-                            <strong>Expiry Date:</strong>
-                            <fmt:formatDate value="${contract.expiryDate}" pattern="dd/MM/yyyy"/>
-                        </div>
-
-                        <div class="col-md-6">
-                            <strong>Total Value:</strong>
-                            <span class="fw-bold text-success">
-                                <fmt:formatNumber value="${contract.totalValue}" type="number" groupingUsed="true"/>
-                                VNĐ
-                            </span>
-                        </div>
-                    </div>
-
-
-                    <div class="row mb-3">
-
-                        <div class="col-md-6">
-                            <strong>Payment Terms:</strong> ${contract.paymentTerms}
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <strong>Status:</strong>
-
-                            <c:choose>
-                                <c:when test="${contract.status eq 'ACTIVE'}">
-                                    <span class="badge bg-success">ACTIVE</span>
-                                </c:when>
-
-                                <c:when test="${contract.status eq 'DRAFT'}">
-                                    <span class="badge bg-warning text-dark">DRAFT</span>
-                                </c:when>
-
-                                <c:when test="${contract.status eq 'COMPLETED' || contract.status eq 'CANCELED'}">
-                                    <span class="badge bg-danger">${contract.status}</span>
-                                </c:when>
-
-                                <c:otherwise>
-                                    <span class="badge bg-secondary">${contract.status}</span>
-                                </c:otherwise>
-                            </c:choose>
-
-                        </div>
-                    </div>
-
-
-                    <div class="mb-3">
-                        <strong>Description:</strong>
-                        <p class="mb-0 mt-1">
-                            ${contract.description}
-                        </p>
-                    </div>
-
-                    <!-- CONTRACT FILE -->
-
-                    <div class="mt-3">
-
-                        <strong>Contract File (PDF, Image):</strong>
-                        <br>
-
-                        <c:choose>
-                            <c:when test="${not empty contract.fileUrl}">
-                                <a href="${pageContext.request.contextPath}/${contract.fileUrl}"
-                                   target="_blank"
-                                   class="btn btn-primary btn-sm me-2">
-                                    <i class="bi bi-eye"></i> View
-                                </a>
-
-                                <a href="${pageContext.request.contextPath}/${contract.fileUrl}"
-                                   download
-                                   class="btn btn-success btn-sm">
-                                    <i class="bi bi-download"></i> Download
-                                </a>
-                            </c:when>
-
-
-                            <c:otherwise>
-                                <span class="text-muted">No file attached</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-
-                </div>
-            </div>
-
-
-
-            <!-- DEVICE LIST -->
-
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white fw-bold">
-                    Devices In This Contract
-                </div>
-
-
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Device Name</th>
-                                <th>Price</th>
-                                <th>Delivery Date</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            <c:choose>
-                                <c:when test="${empty deviceList}">
+                    <!-- DEVICE SUMMARY BY SUBCATEGORY -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-secondary text-white">Device Summary By Subcategory</div>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-dark">
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted">
-                                            No devices in this contract.
-                                        </td>
+                                        <th>Subcategory</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total Price</th>
                                     </tr>
-                                </c:when>
-
-                                <c:otherwise>
-                                    <c:forEach items="${deviceList}" var="d">
-                                        <tr>
-                                            <td>${d.deviceId}</td>
-                                            <td>
-                                                <span onclick="showDeviceDetail(${d.deviceId})"
-                                                      style="cursor:pointer;color:#0d6efd;font-weight:600;"
-                                                      onmouseover="this.style.textDecoration = 'underline'"
-                                                      onmouseout="this.style.textDecoration = 'none'">
-                                                    ${d.deviceName}
-                                                </span>
-                                            </td>
-
-                                            <td>
-                                                <fmt:formatNumber value="${d.price}" type="number" groupingUsed="true"/>
-                                                VNĐ
-                                            </td>
-                                            <td>
-                                                <fmt:formatDate value="${d.deliveryDate}" pattern="dd/MM/yyyy"/>
-                                            </td>
-                                        </tr>
-
-                                    </c:forEach>
-
-                                </c:otherwise>
-
-                            </c:choose>
-
-                        </tbody>
-
-                    </table>
+                                </thead>
+                                <tbody>
+                                    <c:choose>
+                                        <c:when test="${empty subcategoryList}">
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted">No data found.</td>
+                                            </tr>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach var="s" items="${subcategoryList}">
+                                                <tr onclick="showDevicesBySub(${s.subcategoryId})" style="cursor:pointer">
+                                                    <td class="fw-semibold text-primary">${s.subcategoryName}</td>
+                                                    <td>${s.quantity}</td>
+                                                    <td>
+                                                        <fmt:formatNumber value="${s.unitPrice}" type="number" groupingUsed="true"/> VNĐ
+                                                    </td>
+                                                    <td>
+                                                        <fmt:formatNumber value="${s.totalPrice}" type="number" groupingUsed="true"/> VNĐ
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
                 </div>
 
-            </div>
-
-
-
-            <!-- BACK BUTTON -->
-
-            <div class="mt-4">
-
-                <a href="${pageContext.request.contextPath}/customer/contract/list?action=list"
-                   class="btn btn-secondary">
-
-                    <i class="bi bi-arrow-left"></i> Back to Contracts
-
-                </a>
+                <!-- BACK BUTTON -->
+                <div class="mt-4">
+                    <a href="${pageContext.request.contextPath}/customer/contract/list?action=list" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to list
+                    </a>
+                </div>
 
             </div>
-
         </div>
 
-        <jsp:include page="/common/scripts.jsp"/>
+    </div>
 
-        <script>
+    <jsp:include page="/common/scripts.jsp"/>
 
-            var CTX = '${pageContext.request.contextPath}';
+    <script>
 
-            function esc(str) {
-                if (!str)
-                    return "";
-                return String(str)
-                        .replace(/&/g, "&amp;")
-                        .replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/"/g, "&quot;");
+        var CTX = '${pageContext.request.contextPath}';
+
+        function esc(str) {
+            if (!str)
+                return "";
+            return String(str)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;");
+        }
+
+        /* DEVICE POPUP */
+        function showDeviceDetail(deviceId) {
+            // Ẩn modal subDeviceModal nếu đang mở
+            var subModalEl = document.getElementById('subDeviceModal');
+            if (subModalEl.classList.contains('show')) {
+                var subModal = bootstrap.Modal.getInstance(subModalEl);
+                subModal.hide();
             }
 
-            function showDeviceDetail(deviceId) {
+            var modal = new bootstrap.Modal(document.getElementById('deviceDetailModal'));
+            document.getElementById('deviceDetailContent').innerHTML =
+                    '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+            modal.show();
 
-                var modal = new bootstrap.Modal(document.getElementById('deviceDetailModal'));
+            fetch(CTX + '/customer/contract/list?action=getDeviceDetailJson&id=' + deviceId)
+                    .then(res => res.json())
+                    .then(dev => {
+                        let html = '<table class="table table-bordered">';
+                        html += '<tr><th>Serial</th><td>' + esc(dev.serial) + '</td></tr>';
+                        html += '<tr><th>Machine Name</th><td>' + esc(dev.machineName) + '</td></tr>';
+                        html += '<tr><th>Model</th><td>' + esc(dev.model) + '</td></tr>';
+                        html += '<tr><th>Price</th><td>' + esc(dev.price) + ' VNĐ</td></tr>';
+                        html += '<tr><th>Status</th><td>' + esc(dev.status) + '</td></tr>';
+                        html += '<tr><th>Category</th><td>' + esc(dev.categoryName) + '</td></tr>';
+                        html += '<tr><th>Brand</th><td>' + esc(dev.brandName) + '</td></tr>';
+                        html += '<tr><th>Customer</th><td>' + esc(dev.customerName) + '</td></tr>';
+                        html += '</table>';
 
-                document.getElementById('deviceDetailContent').innerHTML =
-                        '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+                        document.getElementById('deviceDetailContent').innerHTML = html;
+                    })
+                    .catch(() => {
+                        document.getElementById('deviceDetailContent').innerHTML =
+                                '<p class="text-danger text-center">Error loading device details.</p>';
+                    });
+        }
 
-                modal.show();
 
-                fetch(CTX + '/customer/contract/list?action=getDeviceDetailJson&id=' + deviceId)
 
-                        .then(res => res.json())
+        function showDevicesBySub(subId) {
+            var modal = new bootstrap.Modal(document.getElementById('subDeviceModal'));
 
-                        .then(dev => {
+            // Chỉ cập nhật modal, không chạm bảng chính
+            document.getElementById('subDeviceContent').innerHTML =
+                    '<div class="text-center my-4"><div class="spinner-border text-primary"></div></div>';
 
-                            document.getElementById('deviceDetailContent').innerHTML =
-                                    '<div class="text-center mb-4">' +
-                                    '<img src="' + CTX + '/assets/images/devices/' + (dev.image || 'default_device.jpg') + '" ' +
-                                    'class="rounded shadow-sm border" style="max-width:250px;max-height:250px;">' +
-                                    '</div>' +
-                                    '<table class="table table-bordered">' +
-                                    '<tr><th>Serial</th><td>' + esc(dev.serial) + '</td></tr>' +
-                                    '<tr><th>Machine Name</th><td><strong>' + esc(dev.machineName) + '</strong></td></tr>' +
-                                    '<tr><th>Model</th><td>' + esc(dev.model) + '</td></tr>' +
-                                    '<tr><th>Price</th><td>' + esc(dev.price) + ' VNĐ</td></tr>' +
-                                    '<tr><th>Status</th><td>' + esc(dev.status) + '</td></tr>' +
-                                    '<tr><th>Category</th><td>' + esc(dev.categoryName) + '</td></tr>' +
-                                    '<tr><th>Brand</th><td>' + esc(dev.brandName) + '</td></tr>' +
-                                    '<tr><th>Customer</th><td>' + esc(dev.customerName) + '</td></tr>' +
-                                    '<tr><th>Purchase Date</th><td>' + esc(dev.purchaseDate) + '</td></tr>' +
-                                    '<tr><th>Warranty End</th><td>' + esc(dev.warrantyEndDate) + '</td></tr>' +
-                                    '</table>';
+            modal.show();
 
-                        })
+            fetch(CTX + '/customer/contract/list?action=getDevicesBySub&subId=' + subId + '&contractId=${contract.id}')
+                    .then(res => res.json())
+                    .then(list => {
+                        let html = '<table class="table table-bordered">';
+                        html += '<tr><th>ID</th><th>Name</th><th>Price</th><th>Action</th></tr>';
 
-                        .catch(() => {
-                            document.getElementById('deviceDetailContent').innerHTML =
-                                    '<p class="text-danger text-center">Error loading device detail.</p>';
+                        list.forEach(d => {
+                            html += '<tr>'
+                                    + '<td>' + d.id + '</td>'
+                                    + '<td>' + esc(d.machineName) + '</td>'
+                                    + '<td>' + esc(d.price) + ' VNĐ</td>'
+                                    + '<td><button class="btn btn-primary btn-sm" onclick="showDeviceDetail(' + d.id + ')">'
+                                    + '<i class="bi bi-eye"></i> View</button></td>'
+                                    + '</tr>';
                         });
 
-            }
+                        html += '</table>';
 
-        </script>
+                        document.getElementById('subDeviceContent').innerHTML = html;
+                    })
+                    .catch(() => {
+                        document.getElementById('subDeviceContent').innerHTML =
+                                '<p class="text-danger text-center">Error loading devices.</p>';
+                    });
+        }
 
-        <div class="modal fade" id="deviceDetailModal">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg">
+    </script>
 
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Device Detail</h5>
-                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div class="modal-body" id="deviceDetailContent">
-                        <div class="text-center">
-                            <div class="spinner-border"></div>
-                        </div>
-                    </div>
-
+    <!-- Device Detail Modal -->
+    <div class="modal fade" id="deviceDetailModal">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Device Detail</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="deviceDetailContent">
+                    <div class="text-center"><div class="spinner-border"></div></div>
                 </div>
             </div>
         </div>
+    </div>
 
-    </body>
+    <div class="modal fade" id="subDeviceModal">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">Devices In Subcategory</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="subDeviceContent">
+                    <!-- Bảng thiết bị sẽ được inject ở đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
 </html>

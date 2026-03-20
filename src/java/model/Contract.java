@@ -58,4 +58,7 @@ public class Contract {
     private int createdBy;
 
     private Timestamp createdAt;
+    
+    private String customerCompany;
+    private String customerTaxCode;
 }

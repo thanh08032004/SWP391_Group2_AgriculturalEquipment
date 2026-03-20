@@ -2,10 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package model;
+package dto;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,14 +18,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ContractDevice {
-    private int id;
-    private int contractId;
-    private int deviceId;
-    private String deviceName; 
-    private String serialNumber;      
-    private int subcategoryId;        
-    private String subcategoryName;   
-    private BigDecimal price;
-    private Date deliveryDate;
+public class SubcategorySummaryDTO {
+    private int subcategoryId;
+    private String subcategoryName;
+    private int quantity;
+    private BigDecimal totalPrice;
+    private BigDecimal unitPrice;
 }

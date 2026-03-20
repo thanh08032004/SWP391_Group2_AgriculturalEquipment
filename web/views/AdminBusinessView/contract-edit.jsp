@@ -70,6 +70,30 @@
                                             </div>
                                         </div>
 
+                                        <div class="row">
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label small fw-bold text-muted">
+                                                    Customer Company
+                                                </label>
+                                                <input type="text"
+                                                       name="customerCompany"
+                                                       class="form-control"
+                                                       value="${contract.customerCompany}">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label small fw-bold text-muted">
+                                                    Tax Code Customer
+                                                </label>
+                                                <input type="text"
+                                                       name="customerTaxCode"
+                                                       class="form-control"
+                                                       value="${contract.customerTaxCode}">
+                                            </div>
+
+                                        </div>
+
                                         <div class="mb-3">
                                             <label class="form-label small fw-bold text-muted">Party A</label>
                                             <input type="text" name="partyA"
@@ -84,21 +108,52 @@
 
                                         <div class="mb-3" style="max-height:200px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:5px;">
 
-                                            <c:forEach var="d" items="${deviceList}">
-                                                <div class="form-check">
-                                                    <input class="form-check-input device-checkbox"
-                                                           type="checkbox"
-                                                           name="deviceIds"
-                                                           value="${d.id}"
-                                                           data-price="${d.price}"
-                                                           id="device_${d.id}"
-                                                           <c:if test="${selectedDeviceIds.contains(d.id)}">checked</c:if> />
+                                            <div class="accordion">
 
-                                                           <label class="form-check-label" for="device_${d.id}">
-                                                        ${d.machineName} - ${d.serialNumber} (${d.brandName})
-                                                    </label>
-                                                </div>
-                                            </c:forEach>
+                                                <c:forEach var="sub" items="${subCategoryList}">
+                                                    <div class="accordion-item">
+
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button collapsed"
+                                                                    type="button"
+                                                                    data-bs-toggle="collapse"
+                                                                    data-bs-target="#sub_${sub.id}">
+                                                                ${sub.name}
+                                                            </button>
+                                                        </h2>
+
+                                                        <div id="sub_${sub.id}" class="accordion-collapse collapse">
+                                                            <div class="accordion-body">
+
+                                                                <c:forEach var="d" items="${deviceList}">
+                                                                    <c:if test="${d.subcategoryId == sub.id}">
+
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input device-checkbox"
+                                                                                   type="checkbox"
+                                                                                   name="deviceData"
+                                                                                   value="${d.id}-${sub.id}"
+                                                                                   data-price="${d.price}"
+                                                                                   <c:if test="${selectedDeviceIds.contains(d.id)}">checked</c:if> />
+
+                                                                                   <!-- IMPORTANT -->
+                                                                                   <input type="hidden" name="subCategoryIds" value="${sub.id}" />
+
+                                                                            <label>
+                                                                                ${d.machineName} - ${d.serialNumber}
+                                                                            </label>
+                                                                        </div>
+
+                                                                    </c:if>
+                                                                </c:forEach>
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </c:forEach>
+
+                                            </div>
 
                                         </div>
 

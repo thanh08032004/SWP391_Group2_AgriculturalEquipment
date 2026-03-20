@@ -1,5 +1,7 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html>
 <html>
@@ -77,6 +79,30 @@
 
                                         </div>
 
+                                        <div class="row">
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label small fw-bold text-muted">
+                                                    Customer Company
+                                                </label>
+                                                <input type="text"
+                                                       name="customerCompany"
+                                                       class="form-control"
+                                                       value="${contract.customerCompany}">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label small fw-bold text-muted">
+                                                    Tax Code Customer
+                                                </label>
+                                                <input type="text"
+                                                       name="customerTaxCode"
+                                                       class="form-control"
+                                                       value="${contract.customerTaxCode}">
+                                            </div>
+
+                                        </div>
+
                                         <div class="mb-3">
                                             <label class="form-label small fw-bold text-muted">
                                                 Party A (Company)
@@ -84,7 +110,8 @@
                                             <input type="text"
                                                    name="partyA"
                                                    class="form-control"
-                                                   value="${contract.partyA}">
+                                                   value="AgriCulture CMS Company"
+                                                   readonly>
                                         </div>
 
                                         <hr class="my-4">
@@ -92,25 +119,46 @@
                                         <h6 class="fw-bold text-primary mb-3">Assign Device</h6>
 
                                         <div class="mb-3">
-                                            <label class="form-label small fw-bold text-muted">
-                                                Select Device
-                                            </label>
+                                            <h6 class="fw-bold text-primary mb-3">Select Devices (By Serial)</h6>
 
-                                            <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-                                                <c:forEach var="d" items="${deviceList}">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input"
-                                                               type="checkbox"
-                                                               name="deviceIds"
-                                                               value="${d.id}"
-                                                               data-price="${d.price}"
-                                                               id="device_${d.id}">
+                                            <div class="accordion" id="subCategoryAccordion">
 
-                                                        <label class="form-check-label small" for="device_${d.id}">
-                                                            ${d.machineName} - ${d.serialNumber} (${d.brandName})
-                                                        </label>
+                                                <c:forEach var="sub" items="${subCategoryList}">
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button collapsed"
+                                                                    type="button"
+                                                                    data-bs-toggle="collapse"
+                                                                    data-bs-target="#sub_${sub.id}">
+                                                                ${sub.name}
+                                                            </button>
+                                                        </h2>
+                                                        <div id="sub_${sub.id}" class="accordion-collapse collapse">
+                                                            <div class="accordion-body">
+
+                                                                <c:forEach var="d" items="${deviceList}">
+                                                                    <c:if test="${d.subcategoryId == sub.id}">
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input device-checkbox"
+                                                                                   type="checkbox"
+                                                                                   name="deviceData"
+                                                                                   value="${d.id}-${sub.id}"
+                                                                                   data-price="${d.price}">
+                                                                            <label>
+                                                                                <strong>${d.machineName}</strong> - ${d.serialNumber} - ${d.brandName}
+                                                                            </label>
+                                                                        </div>
+                                                                    </c:if>
+                                                                </c:forEach>
+
+                                                                <!-- ADD HIDDEN INPUT -->
+                                                                <input type="hidden" name="subCategoryIds" value="${sub.id}" />
+
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </c:forEach>
+
                                             </div>
                                         </div>
 
@@ -219,7 +267,7 @@
                                                 Cancel
                                             </a>
 
-                                            <button type="submit"
+                                            <button type="submit" onclick="attachSubcategory()"
                                                     class="btn btn-primary fw-bold">
                                                 <i class="bi bi-check-circle me-1"></i>
                                                 Add Contract
@@ -241,10 +289,25 @@
         <jsp:include page="/common/scripts.jsp"/>
 
         <script>
+
+            function attachSubcategory() {
+                document.querySelectorAll('.device-checkbox:checked').forEach(cb => {
+
+                    let subId = cb.getAttribute("data-sub");
+
+                    let hidden = document.createElement("input");
+                    hidden.type = "hidden";
+                    hidden.name = "subCategoryIds";
+                    hidden.value = subId;
+
+                    cb.closest("form").appendChild(hidden);
+                });
+            }
+
             function calculateTotal() {
                 let total = 0;
 
-                document.querySelectorAll('input[name="deviceIds"]:checked').forEach(cb => {
+                document.querySelectorAll('.device-checkbox:checked').forEach(cb => {
                     let price = parseFloat(cb.getAttribute("data-price")) || 0;
                     total += price;
                 });
@@ -252,12 +315,10 @@
                 document.getElementById("totalValue").value = total;
             }
 
-            // chạy khi tick checkbox
-            document.querySelectorAll('input[name="deviceIds"]').forEach(cb => {
+            document.querySelectorAll('.device-checkbox').forEach(cb => {
                 cb.addEventListener("change", calculateTotal);
             });
 
-            // chạy khi load (nếu có sẵn selected)
             window.addEventListener("load", calculateTotal);
         </script>
 

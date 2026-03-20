@@ -405,13 +405,10 @@ public class MaintenanceDAO extends DBContext {
         return list;
     }
 
-// save selected spare part to maintenance
-    public boolean saveMaintenanceItems(int maintenanceId, List<Integer> sparePartIds, List<Integer> quantities) {
+    // save selected spare part to maintenance
+    public boolean saveMaintenanceItems(int maintenanceId, List<Integer> sparePartIds, List<Integer> quantities, List<Boolean> paids) {
         String deleteSql = "DELETE FROM maintenance_item WHERE maintenance_id = ?";
-        String insertSql = """
-            INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity)
-            VALUES (?, ?, ?)
-        """;
+        String insertSql = "INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity, paid) VALUES (?, ?, ?, ?)";
 
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
@@ -426,6 +423,7 @@ public class MaintenanceDAO extends DBContext {
                     ps.setInt(1, maintenanceId);
                     ps.setInt(2, sparePartIds.get(i));
                     ps.setInt(3, quantities.get(i));
+                    ps.setBoolean(4, paids.get(i));
                     ps.addBatch();
                 }
                 ps.executeBatch();
