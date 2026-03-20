@@ -433,6 +433,7 @@ INSERT INTO permission (code, name, description) VALUES
 ('/admin-business/devices','Quản lý thiết bị business','Business quản lý thiết bị'),
 ('/admin-business/categories','Quản lý category','Quản lý loại thiết bị'),
 ('/admin-business/brands','Quản lý brand','Quản lý hãng thiết bị'),
+('/admin-business/feedback','Xem feedback','Xem tất cả phản hồi về bảo trì'),
 ('/admin-business/vouchers','Quản lý voucher','Quản lý voucher'),
 ('/admin-business/spare-parts','Quản lý linh kiện','Quản lý spare part'),
 ('/admin-business/contracts','Quản lý hợp đồng','Quản lý contract'),
@@ -539,9 +540,6 @@ INSERT INTO device (
 ) VALUES
 (4, 'SN-JD-001', 'Máy cày John Deere', 'JD-5050', 850000000, '2023-06-01', '2026-06-01', 'MAINTENANCE', 1, 1, 'jd_tractor.jpg'),
 (4, 'SN-KB-002', 'Máy cày Kubota', 'KB-L3408', 620000000, '2022-03-15', '2025-03-15', 'MAINTENANCE', 1, 2, 'kubota_tractor.jpg'),
-(4, 'SN-YM-003', 'Máy gặt Yanmar', 'YM-AW70', 1200000000, '2021-09-10', '2024-09-10', 'MAINTENANCE', 2, 4, 'yanmar_harvester.jpg'),
-(4, 'SN-HD-004', 'Máy cắt cỏ Honda', 'HONDA-HRX', 45000000, '2024-01-20', '2027-01-20', 'MAINTENANCE', 7, 9, 'honda_mower.jpg'),
-(4, 'SN-HQ-005', 'Máy phun thuốc Husqvarna', 'HQ-SPR200', 38000000, '2023-11-05', '2026-11-05', 'ACTIVE', 5, 8, 'husqvarna_sprayer.jpg'),
 (4, 'SN-HQ-006', 'Máy phun thuốc Husqvarna', 'HQ-SPR201', 38000000, '2023-11-05', '2026-11-05', 'ACTIVE', 5, 8, 'husqvarna_sprayer.jpg'),
 (4, 'SN-HQ-007', 'Máy phun thuốc Husqvarna', 'HQ-SPR202', 38000000, '2023-11-05', '2026-11-05', 'MAINTENANCE', 5, 8, 'husqvarna_sprayer.jpg'),
 (4, 'SN-NEW-008', 'Máy cày Kubota X', 'KB-X500', 700000000, '2024-01-01', '2027-01-01', 'ACTIVE', 1, 2, 'kubota_x.jpg'),
@@ -552,11 +550,8 @@ INSERT INTO device (
 INSERT INTO maintenance (device_id, technician_id, description, status, start_date, end_date) VALUES  
 (1, 3, 'Kỹ thuật viên báo: Hỏng vòng bi và cần thay dầu máy.', 'TECHNICIAN_SUBMITTED', '2026-02-23', null),
 (2, 3, 'Kỹ thuật viên báo: Lọc gió quá bẩn, cần thay thế để tránh hỏng động cơ.', 'DIAGNOSIS READY', '2026-02-24', null),
-(3, 3, 'Repaired transmission system', 'TECHNICIAN_ACCEPTED', '2025-02-20', NULL),
-(4, null, 'Scheduled service - check oil and spark plugs', 'PENDING', '2025-03-01', NULL),
-(5, 3,'Troubleshooting spray nozzles' ,'READY', '2025-03-02', '2025-03-05'),
 (6, 3, 'Thay lọc dầu và bugi', 'DONE', '2025-03-10', '2025-03-11'),
-(7, 3, 'Sửa hệ thống thu hoạch', 'IN_PROGRESS', '2025-03-15', NULL);
+(6, 3, 'Sửa hệ thống thu hoạch', 'IN_PROGRESS', '2025-03-15', NULL);
 
 
 
@@ -574,10 +569,10 @@ INSERT INTO inventory (spare_part_id, quantity) VALUES
 INSERT INTO maintenance_item (maintenance_id, spare_part_id, quantity) VALUES 
 (1, 1, 1),(1, 2, 2),(1, 3, 1),
 (2, 4, 1),(2, 1, 1),
-(5, 2, 1),(5, 4, 1),
-(6, 1, 1),
-(6, 3, 2),
-(7, 2, 1);
+(3, 2, 1),(3, 4, 1),
+(3, 1, 1),
+(4, 3, 2),
+(4, 2, 1);
 
 
 
@@ -639,7 +634,7 @@ INSERT INTO invoice (
   issued_at,
   paid_at
 ) VALUES (
-  6,
+  4,
   4,
   150000,
   20000,
@@ -652,7 +647,7 @@ INSERT INTO invoice (
 );
 
 INSERT INTO invoice (  maintenance_id,  voucher_id,  labor_cost,  discount_amount,  total_amount,  description,  payment_status,  payment_method,  issued_at
-) VALUES (  7,  NULL,  300000,  0,  500000,  'Hóa đơn sửa chữa – Customer 3',  'UNPAID',  'CASH',  NOW());
+) VALUES (  3,  NULL,  300000,  0,  500000,  'Hóa đơn sửa chữa – Customer 3',  'UNPAID',  'CASH',  NOW());
 
 -- Thêm đánh giá
 INSERT INTO maintenance_rating (  maintenance_id,  customer_id,  rating,  comment) VALUES (  3,  4,  5,  'Kỹ thuật viên sửa rất nhanh và chuyên nghiệp');
@@ -669,7 +664,7 @@ INSERT INTO maintenance_rating (
   rating,
   comment
 ) VALUES (
-  5,
+  2,
   4,
   4,
   'Sửa tốt nhưng hơi lâu'
@@ -696,10 +691,10 @@ WHERE maintenance_id IN (3, 4, 5);
 
 INSERT INTO device_spare_part (device_id, spare_part_id)
 VALUES
-(3 ,1),(3, 2),(3, 3),(3,4),
-(4 ,1),(4, 2),(4, 3),(4,4),
-(5 ,1),(5, 2),(5, 3),(5,4),
-(9 ,1),(9, 2),(9, 3),(9,4);
+(1 ,1),(1, 2),(1, 3),(1,4),
+(2 ,1),(2, 2),(2, 3),(2,4),
+(6 ,1),(6, 2),(6, 3),(6,4),
+(5 ,1),(5, 2),(5, 3),(5,4);
 
 -- ========================================================================== --
 INSERT INTO contract (
@@ -802,7 +797,7 @@ INSERT INTO contract_device (
   price,
   delivery_date
 ) VALUES
-(2, 7, 700000000.00, '2026-02-20');
+(2, 5, 700000000.00, '2026-02-20');
 
 -- Contract 3 – Customer 7 mua 1 máy --
 INSERT INTO contract_device (
@@ -811,7 +806,7 @@ INSERT INTO contract_device (
   price,
   delivery_date
 ) VALUES
-(3, 8, 1500000000.00, '2026-02-25');
+(3, 3, 1500000000.00, '2026-02-25');
 INSERT INTO permission (code, name, description)
 VALUES ('/admin/password-reset','Reset mật khẩu user','Admin reset mật khẩu');
 
@@ -836,24 +831,42 @@ INSERT INTO device (
   brand_id,
   image
 ) VALUES
-(NULL, 'SN-NOCUS-001', 'Máy cày demo 1', 'DEMO-T1', 500000000, '2025-01-01', '2028-01-01', 'ACTIVE', 1, 1, 'demo1.jpg'),
-(NULL, 'SN-NOCUS-002', 'Máy gặt demo 2', 'DEMO-H1', 900000000, '2025-02-01', '2028-02-01', 'ACTIVE', 2, 3, 'demo2.jpg'),
-(NULL, 'SN-NOCUS-003', 'Máy xới demo 3', 'DEMO-X1', 300000000, '2025-03-01', '2028-03-01', 'ACTIVE', 3, 2, 'demo3.jpg'),
-(NULL, 'SN-NOCUS-004', 'Máy phun demo 4', 'DEMO-P1', 150000000, '2025-04-01', '2028-04-01', 'ACTIVE', 5, 8, 'demo4.jpg'),
-(NULL, 'SN-NOCUS-005', 'Máy cắt cỏ demo 5', 'DEMO-C1', 80000000, '2025-05-01', '2028-05-01', 'ACTIVE', 7, 9, 'demo5.jpg');
+(NULL, 'SN-NOCUS-001', 'Máy cày demo 1', 'DEMO-T1', 500000000, '2025-01-01', '2028-01-01', 'ACTIVE', 1, 1, 'newholland.jpg'),
+(NULL, 'SN-NOCUS-002', 'Máy gặt demo 2', 'DEMO-H1', 900000000, '2025-02-01', '2028-02-01', 'ACTIVE', 2, 3, 'newholland.jpg'),
+(NULL, 'SN-NOCUS-003', 'Máy xới demo 3', 'DEMO-X1', 300000000, '2025-03-01', '2028-03-01', 'ACTIVE', 3, 2, 'newholland.jpg'),
+(NULL, 'SN-NOCUS-004', 'Máy phun demo 4', 'DEMO-P1', 150000000, '2025-04-01', '2028-04-01', 'ACTIVE', 5, 8, 'newholland.jpg'),
+(NULL, 'SN-NOCUS-005', 'Máy cắt cỏ demo 5', 'DEMO-C1', 80000000, '2025-05-01', '2028-05-01', 'ACTIVE', 7, 9, 'newholland.jpg');
 
 -- Contract 2 → customer 7
 UPDATE device 
 SET customer_id = 7
-WHERE id = 7;
+WHERE id = 5;
 
 -- Contract 3 → customer 8
 UPDATE device 
 SET customer_id = 8
-WHERE id = 8;
+WHERE id = 3;
 
 -- ===================================== PASSWORD RESET =========================================== --
 INSERT INTO role_permission (role_id, permission_id)
-VALUES (1, 28);
+VALUES (1, 29);
+
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (4, 30);
 -- ====================================================================================================================== --
+
+-- ====================================== PROFILE ================================================================== --
+INSERT INTO permission (code, name, description)
+VALUES ('/profile','Cập nhật thông tin cá nhân','Chỉnh sửa chi tiết thông tin cá nhân');
+
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 31);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (2, 31);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (3, 31);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (4, 31);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (5, 31);
 
