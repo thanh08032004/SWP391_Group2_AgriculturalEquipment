@@ -228,7 +228,9 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
             List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
             req.setAttribute("task", task);
             req.setAttribute("items", items);
+
             req.setAttribute("showCompletionForm", true);
+
             req.getRequestDispatcher("/views/technicianView/maintenance-detail.jsp").forward(req, resp);
         } else if (action.equals("getCustomerDetailJson")) {
 
