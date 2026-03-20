@@ -89,8 +89,10 @@
                             <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Select Spare Parts Needed (Optional)</h5>
                         </div>
                         <div class="card-body">
+
                             <form method="get" action="${pageContext.request.contextPath}/technician/maintenance" 
                                   class="mb-3"
+
                                   onsubmit="clearMaintenanceSessionGet()">
 
                                 <input type="hidden" name="action" value="work"/>
