@@ -225,7 +225,7 @@ public class TechnicianMaintenanceServlet extends HttpServlet {
         if ("complete".equals(action)) {
             int id = Integer.parseInt(req.getParameter("id"));
             Maintenance task = dao.getMaintenanceById(id);
-            List<Map<String, Object>> items = dao.getMaintenanceItems(id);
+            List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
             req.setAttribute("task", task);
             req.setAttribute("items", items);
             req.setAttribute("showCompletionForm", true);
