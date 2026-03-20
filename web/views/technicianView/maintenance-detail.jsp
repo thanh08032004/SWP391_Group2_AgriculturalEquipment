@@ -146,7 +146,7 @@
                                         </div>
                                     </div>
 
-                                   
+
 
                                     <%-- Script preview ảnh --%>
                                     <script>
@@ -163,9 +163,9 @@
                                     </script>
 
 
-                                   
 
-                                    
+
+
                                 </div>
                             </div>
                         </div>
@@ -182,24 +182,39 @@
 
                                     <h6 class="mt-4 fw-bold small text-uppercase">Proposed Spare Parts:</h6>
                                     <table class="table table-sm table-bordered mt-2">
-                                        <thead class="table-light">
+                                        <thead class="table-light text-center">
                                             <tr>
-                                                <th>Part Name</th>
-                                                <th class="text-center">Quantity</th>
+                                                <th class="text-start">Part Name</th>
+                                                <th>Quantity</th>
+                                                <th>Unit</th>
+                                                <th class="text-end">Price</th>
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            <c:set var="totalSpareParts" value="0" />
                                             <c:forEach var="item" items="${items}">
                                                 <tr>
-                                                    <%-- Khớp với key 'name' trong Map của MaintenanceDAO --%>
                                                     <td>${item.name}</td>
-                                                    <td class="text-center">x${item.quantity}</td>
+                                                    <td class="text-center">${item.quantity}</td>
+                                                    <td class="text-center">${item.unit}</td>
+                                                    <td class="text-end">
+                                                        <fmt:formatNumber value="${item.price}" type="currency" currencySymbol=""/>
+                                                    </td>
                                                 </tr>
+                                                <c:set var="totalSpareParts" value="${totalSpareParts + (item.price * item.quantity)}" />
                                             </c:forEach>
                                             <c:if test="${empty items}">
-                                                <tr><td colspan="2" class="text-center text-muted italic py-3">No spare parts suggested by technician.</td></tr>
+                                                <tr><td colspan="4" class="text-center text-muted italic py-3">No spare parts suggested by technician.</td></tr>
                                             </c:if>
                                         </tbody>
+                                        <tfoot class="table-light fw-bold">
+                                            <tr>
+                                                <td colspan="3" class="text-end text-uppercase">Total (Estimated):</td>
+                                                <td class="text-end text-primary">
+                                                    <fmt:formatNumber value="${totalSpareParts}" type="currency" currencySymbol=""/>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                     <%-- Đã loại bỏ khung Decision Required (Approve/Reject) tại đây --%>
                                 </div>
@@ -268,7 +283,7 @@
                                                     <button type="submit" class="btn btn-success px-4">
                                                         <i class="bi bi-check-circle"></i> Confirm Done
                                                     </button>
-                                                    
+
                                                 </div>
                                             </form>
                                         </c:when>
@@ -343,7 +358,7 @@
                             .then(function (cus) {
                                 document.getElementById('customerDetailContent').innerHTML =
                                         '<div class="bg-primary p-4 text-center text-white" style="border-radius:15px 15px 0 0;">' +
-                                        '<img src="' + CTX + '/assets/images/avatars/' + (cus.avatar || 'default.jpg') + '" ' +
+                                        '<img src="' + CTX + '/assets/images/avatar/' + (cus.avatar || 'default.jpg') + '" ' +
                                         'class="rounded-circle border border-3 border-white mb-2 shadow" ' +
                                         'style="width:80px;height:80px;object-fit:cover;">' +
                                         '<h5 class="mb-0">' + esc(cus.fullname) + '</h5>' +
