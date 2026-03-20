@@ -125,20 +125,13 @@
                                                 </c:choose>
                                             </td>
                                             <td class="text-center">
-                                                <a href="${pageContext.request.contextPath}/admin-business/user/profile?id=${v.createdBy}">
+                                                <a href="${pageContext.request.contextPath}/admin-business/profile?id=${v.createdBy}">
                                                     ${v.createdName}
                                                 </a>
                                             </td>
 
                                             <td class="text-center d-flex align-items-center" >
-                                                <!-- Detail -->
-                                                <a class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center"
-                                                   title="View detail"
-                                                   href="${pageContext.request.contextPath}/admin-business/vouchers?action=detail&id=${v.id}" style="width: 30px;  height: 30px; line-height: 30px; padding: 0; margin: 3px">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-
-                                                <!-- Edit -->
+                                                 <!-- Edit -->
                                                 <a class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center"
                                                    title="Edit"
                                                    href="${pageContext.request.contextPath}/admin-business/vouchers?action=edit&id=${v.id}&page=${currentPage}&keyword=${keyword}" 

@@ -132,16 +132,7 @@
                                                 Voucher Type
                                             </label>
 
-                                            <td>
-                                                <c:choose>
-                                                    <c:when test="${voucher.voucherType == 'CUSTOMER'}">
-                                                        Specific Customer
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        Global (All Customers)
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </td>
+                                     
                                         </div>
 
                                         <!-- Customer ID -->
