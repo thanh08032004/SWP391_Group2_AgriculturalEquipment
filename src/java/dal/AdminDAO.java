@@ -6,6 +6,101 @@ import java.util.List;
 import model.User;
 
 public class AdminDAO extends DBContext {
+public int countAllUsers() {
+    String sql = "SELECT COUNT(*) FROM users u JOIN user_profile up ON u.id = up.user_id";
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) return rs.getInt(1);
+    } catch (SQLException e) { e.printStackTrace(); }
+    return 0;
+}
+
+public List<User> getUsersByPage(int page, int pageSize) {
+    List<User> list = new ArrayList<>();
+    String sql = """
+        SELECT u.id, u.username, u.active, u.created_at, u.role_id,
+               r.name AS role_name, up.fullname, up.email
+        FROM users u
+        JOIN role r ON u.role_id = r.id
+        JOIN user_profile up ON u.id = up.user_id
+        ORDER BY u.id DESC
+        LIMIT ? OFFSET ?
+    """;
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, pageSize);
+        ps.setInt(2, (page - 1) * pageSize);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(User.builder()
+                        .id(rs.getInt("id"))
+                        .username(rs.getString("username"))
+                        .roleId(rs.getInt("role_id"))
+                        .roleName(rs.getString("role_name"))
+                        .fullname(rs.getString("fullname"))
+                        .email(rs.getString("email"))
+                        .active(rs.getBoolean("active"))
+                        .createdAt(rs.getTimestamp("created_at"))
+                        .build());
+            }
+        }
+    } catch (SQLException e) { e.printStackTrace(); }
+    return list;
+}
+
+public int countSearchUsers(String txtSearch) {
+    String sql = """
+        SELECT COUNT(*) FROM users u
+        JOIN user_profile up ON u.id = up.user_id
+        WHERE up.fullname LIKE ? OR u.username LIKE ?
+    """;
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, "%" + txtSearch + "%");
+        ps.setString(2, "%" + txtSearch + "%");
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        }
+    } catch (SQLException e) { e.printStackTrace(); }
+    return 0;
+}
+
+public List<User> searchUsersByPage(String txtSearch, int page, int pageSize) {
+    List<User> list = new ArrayList<>();
+    String sql = """
+        SELECT u.id, u.username, u.active, u.created_at, u.role_id,
+               r.name AS role_name, up.fullname, up.email
+        FROM users u
+        JOIN role r ON u.role_id = r.id
+        JOIN user_profile up ON u.id = up.user_id
+        WHERE up.fullname LIKE ? OR u.username LIKE ?
+        ORDER BY u.id DESC
+        LIMIT ? OFFSET ?
+    """;
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, "%" + txtSearch + "%");
+        ps.setString(2, "%" + txtSearch + "%");
+        ps.setInt(3, pageSize);
+        ps.setInt(4, (page - 1) * pageSize);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(User.builder()
+                        .id(rs.getInt("id"))
+                        .username(rs.getString("username"))
+                        .roleId(rs.getInt("role_id"))
+                        .roleName(rs.getString("role_name"))
+                        .fullname(rs.getString("fullname"))
+                        .email(rs.getString("email"))
+                        .active(rs.getBoolean("active"))
+                        .createdAt(rs.getTimestamp("created_at"))
+                        .build());
+            }
+        }
+    } catch (SQLException e) { e.printStackTrace(); }
+    return list;
+}
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
         String sql = """

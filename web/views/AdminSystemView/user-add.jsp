@@ -46,10 +46,12 @@
                                     <select name="roleId" class="form-select" required>
                                         <option value="">-- Select Role --</option>
                                         <c:forEach var="role" items="${roles}">
-                                            <option value="${role[0]}" 
-                                                    <c:if test="${role[0] == roleId}">selected</c:if>>
-                                                ${role[1]}
-                                            </option>
+                                            <c:if test="${role[1] != 'ADMIN_SYSTEM'}">
+                                                <option value="${role[0]}" 
+                                                        <c:if test="${role[0] == roleId}">selected</c:if>>
+                                                    ${role[1]}
+                                                </option>
+                                            </c:if>
                                         </c:forEach>
                                     </select>
                                 </div>

@@ -2,71 +2,81 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
-<head>
-    <jsp:include page="/common/head.jsp"></jsp:include>
-    <title>Edit User - AgriCMS</title>
-</head>
-<body class="bg-light">
-    <jsp:include page="/common/header.jsp"></jsp:include>
+    <head>
+        <jsp:include page="/common/head.jsp"></jsp:include>
+            <title>Edit User - AgriCMS</title>
+        </head>
+        <body class="bg-light">
+        <jsp:include page="/common/header.jsp"></jsp:include>
 
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-warning text-dark py-3">
-                        <h5 class="mb-0 fw-bold">Edit User Information</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <c:if test="${userEdit.id == sessionScope.user.id}">
-                            <div class="alert alert-info py-2 small">
-                                <i class="bi bi-info-circle me-2"></i>
-                                Bạn đang chỉnh sửa tài khoản của chính mình. Quyền hạn (Role) không thể thay đổi.
+            <div class="container my-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-warning text-dark py-3">
+                                <h5 class="mb-0 fw-bold">Edit User Information</h5>
                             </div>
-                        </c:if>
-                        <form action="${pageContext.request.contextPath}/admin/user?action=update" method="post">
-                            <input type="hidden" name="id" value="${userEdit.id}">
+                            <div class="card-body p-4">
+                            <c:if test="${userEdit.id == sessionScope.user.id}">
+                                <div class="alert alert-info py-2 small">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    Bạn đang chỉnh sửa tài khoản của chính mình. Quyền hạn (Role) không thể thay đổi.
+                                </div>
+                            </c:if>
+                            <form action="${pageContext.request.contextPath}/admin/user?action=update" method="post">
+                                <input type="hidden" name="id" value="${userEdit.id}">
 
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">USERNAME</label>
-                                <input type="text" class="form-control bg-light" value="${userEdit.username}" readonly>
-                            </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">USERNAME</label>
+                                    <input type="text" class="form-control bg-light" value="${userEdit.username}" readonly>
+                                </div>
 
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">ROLE</label>
-                                <select name="roleId" class="form-select ${userEdit.id == sessionScope.user.id ? 'bg-light' : ''}" 
-                                        ${userEdit.id == sessionScope.user.id ? 'disabled' : ''}>
-                                    <c:forEach var="role" items="${roles}">
-                                        <option value="${role[0]}" ${userEdit.roleId == role[0] ? 'selected' : ''}>
-                                            ${role[1]}
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                                <c:if test="${userEdit.id == sessionScope.user.id}">
-                                    <input type="hidden" name="roleId" value="${userEdit.roleId}">
-                                </c:if>
-                            </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">ROLE</label>
+                                    <select name="roleId" 
+                                            class="form-select ${(userEdit.id == sessionScope.user.id || userEdit.roleId == 1) ? 'bg-light' : ''}" 
+                                            ${(userEdit.id == sessionScope.user.id || userEdit.roleId == 1) ? 'disabled' : ''}>
+                                        <c:forEach var="role" items="${roles}">
+                                            <c:if test="${role[1] != 'ADMIN_SYSTEM'}">
+                                                <option value="${role[0]}" ${userEdit.roleId == role[0] ? 'selected' : ''}>
+                                                    ${role[1]}
+                                                </option>
+                                            </c:if>
+                                        </c:forEach>
+                                        <%-- giu lai option ADMIN_SYSTEM de hien thi neu user dang la ADMIN_SYSTEM --%>
+                                        <c:if test="${userEdit.roleId == 1}">
+                                            <option value="1" selected>ADMIN_SYSTEM</option>
+                                        </c:if>
+                                    </select>
 
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">FULL NAME</label>
-                                <input type="text" name="fullname" class="form-control" value="${userEdit.fullname}" required>
-                            </div>
+                                    <%-- giu roleId khi disabled --%>
+                                    <c:if test="${userEdit.id == sessionScope.user.id || userEdit.roleId == 1}">
+                                        <input type="hidden" name="roleId" value="${userEdit.roleId}">
+                                    </c:if>
+                                  
+                                </div>
 
-                            <div class="mb-4">
-                                <label class="form-label small fw-bold text-muted">EMAIL ADDRESS</label>
-                                <input type="email" name="email" class="form-control" value="${userEdit.email}" required>
-                            </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">FULL NAME</label>
+                                    <input type="text" name="fullname" class="form-control" value="${userEdit.fullname}" required>
+                                </div>
 
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-warning fw-bold">Update Changes</button>
-                                <a href="${pageContext.request.contextPath}/admin/user?action=list" class="btn btn-outline-secondary">Cancel</a>
-                            </div>
-                        </form>
+                                <div class="mb-4">
+                                    <label class="form-label small fw-bold text-muted">EMAIL ADDRESS</label>
+                                    <input type="email" name="email" class="form-control" value="${userEdit.email}" required>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-warning fw-bold">Update Changes</button>
+                                    <a href="${pageContext.request.contextPath}/admin/user?action=list" class="btn btn-outline-secondary">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <jsp:include page="/common/footer.jsp"></jsp:include>
-    <jsp:include page="/common/scripts.jsp"></jsp:include>
-</body>
+        <jsp:include page="/common/footer.jsp"></jsp:include>
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
+    </body>
 </html>

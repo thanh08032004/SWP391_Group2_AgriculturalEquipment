@@ -99,7 +99,43 @@
                                     </c:forEach>
                                 </tbody>
                             </table>
+
                         </div>
+                        <c:if test="${totalPages > 1}">
+                            <div class="d-flex justify-content-center mt-4">
+                                <nav>
+                                    <ul class="pagination shadow-sm">
+
+                                        <%-- Prev --%>
+                                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                            <a class="page-link" 
+                                               href="${pageContext.request.contextPath}/admin/user?action=${not empty searchValue ? 'search' : 'list'}${not empty searchValue ? '&txt='.concat(searchValue) : ''}&page=${currentPage - 1}">
+                                                &laquo;
+                                            </a>
+                                        </li>
+
+                                        <%-- Page numbers --%>
+                                        <c:forEach begin="1" end="${totalPages}" var="i">
+                                            <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                                <a class="page-link"
+                                                   href="${pageContext.request.contextPath}/admin/user?action=${not empty searchValue ? 'search' : 'list'}${not empty searchValue ? '&txt='.concat(searchValue) : ''}&page=${i}">
+                                                    ${i}
+                                                </a>
+                                            </li>
+                                        </c:forEach>
+
+                                        <%-- Next --%>
+                                        <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                            <a class="page-link"
+                                               href="${pageContext.request.contextPath}/admin/user?action=${not empty searchValue ? 'search' : 'list'}${not empty searchValue ? '&txt='.concat(searchValue) : ''}&page=${currentPage + 1}">
+                                                &raquo;
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </nav>
+                            </div>
+                        </c:if>
                     </div>
                 </div>
             </div>

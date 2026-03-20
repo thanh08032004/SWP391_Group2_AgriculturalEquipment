@@ -36,7 +36,6 @@
             
             </header>
                         <div class="admin-layout">
-            
             <div class="container text-center" style="padding: 100px 0;">
                 <div class="error-content">
                     <h1 class="display-1 fw-bold text-danger">403</h1>

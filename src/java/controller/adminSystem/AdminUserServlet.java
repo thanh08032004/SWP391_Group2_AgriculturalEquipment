@@ -23,10 +23,18 @@ public class AdminUserServlet extends HttpServlet {
 
         try {
             switch (action) {
-                case "list":
-                    request.setAttribute("userList", userList);
+                case "list": {
+                    int PAGE_SIZE = 5;
+                    int page = getCurrentPage(request);
+                    int total = adminDAO.countAllUsers();
+                    int totalPages = (int) Math.ceil((double) total / PAGE_SIZE);
+
+                    request.setAttribute("userList", adminDAO.getUsersByPage(page, PAGE_SIZE));
+                    request.setAttribute("currentPage", page);
+                    request.setAttribute("totalPages", totalPages);
                     request.getRequestDispatcher("/views/AdminSystemView/user-list.jsp").forward(request, response);
                     break;
+                }
 
                 case "add":
                     List<String[]> rolesAdd = adminDAO.getAllRoles();
@@ -54,14 +62,20 @@ public class AdminUserServlet extends HttpServlet {
                     adminDAO.toggleUserStatus(toggleId, status);
                     response.sendRedirect(request.getContextPath() + "/admin/user?action=list");
                     break;
-                case "search":
+                case "search": {
+                     int PAGE_SIZE = 5;
                     String txtSearch = request.getParameter("txt");
-                    List<User> searchResult = adminDAO.searchUsersByName(txtSearch);
+                    int page = getCurrentPage(request);
+                    int total = adminDAO.countSearchUsers(txtSearch);
+                    int totalPages = (int) Math.ceil((double) total / PAGE_SIZE);
 
-                    request.setAttribute("userList", searchResult);
+                    request.setAttribute("userList", adminDAO.searchUsersByPage(txtSearch, page, PAGE_SIZE));
                     request.setAttribute("searchValue", txtSearch);
+                    request.setAttribute("currentPage", page);
+                    request.setAttribute("totalPages", totalPages);
                     request.getRequestDispatcher("/views/AdminSystemView/user-list.jsp").forward(request, response);
                     break;
+                }
                 default:
                     request.setAttribute("userList", userList);
                     request.getRequestDispatcher("/views/AdminSystemView/user-list.jsp").forward(request, response);
@@ -114,6 +128,16 @@ public class AdminUserServlet extends HttpServlet {
                 request.setAttribute("error", "Update failed!");
                 doGet(request, response);
             }
+        }
+    }
+
+  
+    private int getCurrentPage(HttpServletRequest request) {
+        try {
+            int p = Integer.parseInt(request.getParameter("page"));
+            return p < 1 ? 1 : p;
+        } catch (Exception e) {
+            return 1;
         }
     }
 }
