@@ -36,9 +36,7 @@
             
             </header>
                         <div class="admin-layout">
-            <c:if test="${sessionScope.userRole != 'CUSTOMER'}">
-    <jsp:include page="/common/side-bar.jsp"></jsp:include>
-</c:if>
+            
             <div class="container text-center" style="padding: 100px 0;">
                 <div class="error-content">
                     <h1 class="display-1 fw-bold text-danger">403</h1>
