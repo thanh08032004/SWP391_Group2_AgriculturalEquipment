@@ -358,12 +358,12 @@ public class DeviceDAO extends DBContext {
         List<DeviceDTO> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
             SELECT d.id, d.serial_number, d.machine_name, d.model, d.status,
-                   d.purchase_date, d.warranty_end_date, d.image, d.price,d.customer_id,
-                   c.name AS categoryName, b.name AS brandName, up.fullname AS customerName
+                   d.purchase_date, d.warranty_end_date, d.image, d.price,d.customer_id,d.subcategory_id,
+                   c.name AS categoryName, b.name AS brandName, up.fullname AS customerName,sc.name AS subcategoryName
             FROM device d
             JOIN category c ON d.category_id = c.id
             JOIN brand b ON d.brand_id = b.id
-            -- FK trong device là customer_id trỏ tới users.id
+            LEFT JOIN subcategory sc ON d.subcategory_id = sc.id
             LEFT JOIN users u ON d.customer_id = u.id 
             LEFT JOIN user_profile up ON u.id = up.user_id
             WHERE 1 = 1
@@ -415,10 +415,12 @@ public class DeviceDAO extends DBContext {
                 d.setStatus(rs.getString("status"));
                 d.setPurchaseDate(rs.getDate("purchase_date"));
                 d.setWarrantyEndDate(rs.getDate("warranty_end_date"));
-                d.setImage(rs.getString("image")); // Khớp cột 'image'
+                d.setImage(rs.getString("image"));
+                d.setSubcategoryId(rs.getInt("subcategory_id"));
                 d.setCategoryName(rs.getString("categoryName"));
                 d.setBrandName(rs.getString("brandName"));
                 d.setCustomerName(rs.getString("customerName"));
+                d.setSubcategoryName(rs.getString("subcategoryName"));
                 list.add(d);
             }
         } catch (Exception e) {
@@ -639,7 +641,7 @@ public class DeviceDAO extends DBContext {
                 // optional
                 d.setCategoryName(rs.getString("category_name"));
                 d.setBrandName(rs.getString("brand_name"));
-                
+
                 list.add(d);
             }
 
@@ -670,6 +672,29 @@ public class DeviceDAO extends DBContext {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public List<dto.SubcategoryDTO> getAllSubcategories() {
+        List<dto.SubcategoryDTO> list = new java.util.ArrayList<>();
+        String sql = """
+        SELECT id, category_id, name, description
+        FROM subcategory
+        WHERE status = 'ACTIVE'
+        ORDER BY category_id, name
+    """;
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                dto.SubcategoryDTO s = new dto.SubcategoryDTO();
+                s.setId(rs.getInt("id"));
+                s.setCategoryId(rs.getInt("category_id"));
+                s.setName(rs.getString("name"));
+                s.setDescription(rs.getString("description"));
+                list.add(s);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
 }

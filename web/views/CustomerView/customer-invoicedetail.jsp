@@ -263,11 +263,27 @@
 
                 <%-- Nút Pay chỉ hiện khi UNPAID --%>
                 <c:if test="${invoice.paymentStatus eq 'UNPAID'}">
-                    <a href="${pageContext.request.contextPath}/customer/invoice/detail?action=pay&id=${invoice.invoiceId}"
-                       class="btn btn-success px-4">
-                        <i class="bi bi-credit-card me-1"></i>
-                        Pay Now
-                    </a>
+                    <c:choose>
+                        <c:when test="${invoice.totalAmount == 0}">
+                            <%-- Miễn phí (bảo hành): thanh toán thẳng, không qua trang payment --%>
+                            <form method="post"
+                                  action="${pageContext.request.contextPath}/customer/invoice/detail">
+                                <input type="hidden" name="postAction" value="payFree"/>
+                                <input type="hidden" name="invoiceId" value="${invoice.invoiceId}"/>
+                                <button type="submit" class="btn btn-success px-4">
+                                    <i class="bi bi-shield-check me-1"></i>
+                                    Confirm (Free — Under Warranty)
+                                </button>
+                            </form>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="${pageContext.request.contextPath}/customer/invoice/detail?action=pay&id=${invoice.invoiceId}"
+                               class="btn btn-success px-4">
+                                <i class="bi bi-credit-card me-1"></i>
+                                Pay Now
+                            </a>
+                        </c:otherwise>
+                    </c:choose>
                 </c:if>
 
                 <%-- Badge chờ xác nhận khi PENDING --%>

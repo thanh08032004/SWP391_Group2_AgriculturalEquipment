@@ -163,10 +163,7 @@
                                                           >
                                                              Repair
                                                         </a>
-                                                        <a href="${pageContext.request.contextPath}/technician/maintenance?action=detail&id=${m.id}"
-                                                           class="btn btn-sm btn-info mx-1">
-                                                             View
-                                                        </a>
+                                                        
 
                                                     </c:if>
                                                     <c:if test="${m.status == 'DONE'}">

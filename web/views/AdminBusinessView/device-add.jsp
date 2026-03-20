@@ -37,7 +37,7 @@
                                 <!-- SERIAL -->
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">
-                                        SERIAL NUMBER
+                                        SERIAL NUMBER <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" name="serialNumber"
                                            class="form-control"
@@ -50,7 +50,7 @@
                                 <!-- MACHINE NAME -->
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">
-                                        MACHINE NAME
+                                        MACHINE NAME <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" name="machineName"
                                            class="form-control"
@@ -60,7 +60,7 @@
                                 <!-- MODEL -->
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">
-                                        MODEL
+                                        MODEL <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" name="model"
                                            class="form-control"
@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">
-                                        PRICE (VNĐ)
+                                        PRICE (VNĐ) <span class="text-danger">*</span>
                                     </label>
                                     <input type="number" 
                                            name="price"
@@ -131,7 +131,7 @@
                                 <!-- CATEGORY -->
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">
-                                        CATEGORY
+                                        CATEGORY <span class="text-danger">*</span>
                                     </label>
                                     <select name="categoryId" class="form-select" required>
                                         <c:forEach var="cat" items="${categories}">
@@ -146,7 +146,7 @@
                                 <!-- BRAND -->
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">
-                                        BRAND
+                                        BRAND <span class="text-danger">*</span>
                                     </label>
                                     <select name="brandId" class="form-select" required>
                                         <c:forEach var="b" items="${brands}">
@@ -161,7 +161,7 @@
                                 <!-- PURCHASE DATE -->
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">
-                                        PURCHASE DATE
+                                        PURCHASE DATE <span class="text-danger">*</span>
                                     </label>
                                     <input type="date" name="purchaseDate"
                                            class="form-control"
@@ -174,7 +174,7 @@
                                 <!-- WARRANTY END -->
                                 <div class="mb-4">
                                     <label class="form-label small fw-bold text-muted">
-                                        WARRANTY END DATE
+                                        WARRANTY END DATE <span class="text-danger">*</span>
                                     </label>
                                     <input type="date" name="warrantyEndDate"
                                            class="form-control"

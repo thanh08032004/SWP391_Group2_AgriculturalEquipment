@@ -55,14 +55,14 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">SERIAL NUMBER</label>
+                                <label class="form-label small fw-bold text-muted">SERIAL NUMBER <span class="text-danger">*</span></label>
                                 <input type="text" name="serialNumber" class="form-control bg-light"
                                        value="${deviceEdit.serialNumber}"
                                        ${isLocked ? 'disabled' : ''}>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">MACHINE NAME</label>
+                                <label class="form-label small fw-bold text-muted">MACHINE NAME <span class="text-danger">*</span> </label>
                                 <input type="text" name="machineName" class="form-control"
                                        value="${deviceEdit.machineName}"
                                        ${isLocked ? 'disabled' : 'required'}>
@@ -72,14 +72,14 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">MODEL</label>
+                                <label class="form-label small fw-bold text-muted">MODEL<span class="text-danger">*</span></label>
                                 <input type="text" name="model" class="form-control"
                                        value="${deviceEdit.model}"
                                        ${isLocked ? 'disabled' : ''}>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">PRICE (VNĐ)</label>
+                                <label class="form-label small fw-bold text-muted">PRICE (VNĐ)<span class="text-danger">*</span></label>
                                 <input type="number" name="price" class="form-control"
                                        value="${deviceEdit.price}" step="0.01" min="0" placeholder="0.00"
                                        ${isLocked ? 'disabled' : ''}>
@@ -110,7 +110,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">CATEGORY</label>
+                                <label class="form-label small fw-bold text-muted">CATEGORY<span class="text-danger">*</span></label>
                                 <select name="categoryId" class="form-select"
                                         ${isLocked ? 'disabled' : ''}>
                                     <c:forEach var="cat" items="${categories}">
@@ -122,7 +122,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">BRAND</label>
+                                <label class="form-label small fw-bold text-muted">BRAND<span class="text-danger">*</span></label>
                                 <select name="brandId" class="form-select"
                                         ${isLocked ? 'disabled' : ''}>
                                     <c:forEach var="b" items="${brands}">
@@ -134,14 +134,14 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">PURCHASE DATE</label>
+                                <label class="form-label small fw-bold text-muted">PURCHASE DATE<span class="text-danger">*</span></label>
                                 <input type="date" name="purchaseDate" class="form-control"
                                        value="${deviceEdit.purchaseDate}"
                                        ${isLocked ? 'disabled' : ''}>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted">WARRANTY END DATE</label>
+                                <label class="form-label small fw-bold text-muted">WARRANTY END DATE<span class="text-danger">*</span></label>
                                 <input type="date" name="warrantyEndDate" class="form-control"
                                        value="${deviceEdit.warrantyEndDate}"
                                        ${isLocked ? 'disabled' : ''}>
@@ -151,7 +151,7 @@
                             </div>
 
                             <div class="mb-4">
-                                <label class="form-label small fw-bold text-muted">STATUS</label>
+                                <label class="form-label small fw-bold text-muted">STATUS<span class="text-danger">*</span></label>
                                 <select name="status" class="form-select"
                                         ${isLocked ? 'disabled' : ''}>
                                     <option value="ACTIVE"    ${deviceEdit.status == 'ACTIVE'       ? 'selected' : ''}>ACTIVE</option>

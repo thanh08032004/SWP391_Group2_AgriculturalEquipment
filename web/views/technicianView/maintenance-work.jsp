@@ -316,7 +316,7 @@
 
                             document.getElementById('customerDetailContent').innerHTML =
                                     '<div class="bg-primary p-4 text-center text-white" style="border-radius:15px 15px 0 0;">' +
-                                    '<img src="' + CTX + '/assets/images/avatars/' + (cus.avatar || 'default.jpg') + '" ' +
+                                    '<img src="' + CTX + '/assets/images/avatar/' + (cus.avatar || 'default.jpg') + '" ' +
                                     'class="rounded-circle border border-3 border-white mb-2 shadow" ' +
                                     'style="width:80px;height:80px;object-fit:cover;">' +
                                     '<h5 class="mb-0">' + esc(cus.fullname) + '</h5>' +

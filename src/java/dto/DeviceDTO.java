@@ -27,4 +27,5 @@ public class DeviceDTO {
     private int categoryId;
     private int brandId;
     private int subcategoryId;
+    private String subcategoryName;
 }

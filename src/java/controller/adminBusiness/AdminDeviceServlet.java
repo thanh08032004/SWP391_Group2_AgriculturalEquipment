@@ -26,13 +26,14 @@ import java.util.Set;
 public class AdminDeviceServlet extends HttpServlet {
 
     private String getUploadPath(String subFolder) {
-    String deployPath = getServletContext().getRealPath("/");
-    File srcWebapp = new File(new File(deployPath).getParentFile().getParentFile(), "web");
-    if (srcWebapp.exists()) {
-        return srcWebapp.getAbsolutePath() + "/" + subFolder + "/";
+        String deployPath = getServletContext().getRealPath("/");
+        File srcWebapp = new File(new File(deployPath).getParentFile().getParentFile(), "web");
+        if (srcWebapp.exists()) {
+            return srcWebapp.getAbsolutePath() + "/" + subFolder + "/";
+        }
+        return deployPath + subFolder + "/";
     }
-    return deployPath + subFolder + "/";
-}
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -112,6 +113,7 @@ public class AdminDeviceServlet extends HttpServlet {
                     request.setAttribute("brandList", deviceDAO.getAllBrands());
                     request.setAttribute("currentPage", catPageIndex);
                     request.setAttribute("totalPage", totalCategoryPage);
+                    request.setAttribute("subcategoryList", deviceDAO.getAllSubcategories());
 
                     request.getRequestDispatcher("/views/AdminBusinessView/device-list.jsp")
                             .forward(request, response);
@@ -167,11 +169,18 @@ public class AdminDeviceServlet extends HttpServlet {
                         String json = String.format(
                                 "{\"id\":%d,\"serial\":\"%s\",\"machineName\":\"%s\",\"model\":\"%s\","
                                 + "\"price\":\"%s\",\"status\":\"%s\",\"categoryName\":\"%s\","
+                                + "\"subcategoryName\":\"%s\","
                                 + "\"brandName\":\"%s\",\"customerName\":\"%s\","
                                 + "\"purchaseDate\":\"%s\",\"warrantyEndDate\":\"%s\",\"image\":\"%s\"}",
-                                dev.getId(), dev.getSerialNumber(), dev.getMachineName(), dev.getModel(),
+                                dev.getId(),
+                                dev.getSerialNumber(),
+                                dev.getMachineName(),
+                                dev.getModel(),
                                 dev.getPrice() != null ? dev.getPrice().toPlainString() : "N/A",
-                                dev.getStatus(), dev.getCategoryName(), dev.getBrandName(),
+                                dev.getStatus(),
+                                dev.getCategoryName(),
+                                dev.getSubcategoryName() != null ? dev.getSubcategoryName() : "N/A",
+                                dev.getBrandName(),
                                 dev.getCustomerName(),
                                 dev.getPurchaseDate() != null ? dev.getPurchaseDate().toString() : "N/A",
                                 dev.getWarrantyEndDate() != null ? dev.getWarrantyEndDate().toString() : "N/A",
@@ -221,7 +230,6 @@ public class AdminDeviceServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
 
         String action = request.getParameter("action");
         DeviceDAO deviceDAO = new DeviceDAO();
@@ -304,7 +312,9 @@ public class AdminDeviceServlet extends HttpServlet {
             String fileName = "default_device.jpg";
             String uploadPath = getUploadPath("assets/images/devices");
             File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
                 filePart.write(uploadPath + File.separator + fileName);
@@ -414,7 +424,9 @@ public class AdminDeviceServlet extends HttpServlet {
             String fileName = request.getParameter("oldImage");
             String uploadPath = getUploadPath("assets/images/devices");
             File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
                 filePart.write(uploadPath + File.separator + fileName);
@@ -443,7 +455,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.getRequestDispatcher("/views/AdminBusinessView/device-edit.jsp")
                         .forward(request, response);
             }
-        } 
+        }
 
     }
 }
