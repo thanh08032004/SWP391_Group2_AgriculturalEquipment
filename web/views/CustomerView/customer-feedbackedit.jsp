@@ -82,16 +82,17 @@
 
                 <!-- Maintenance -->
 
-                <div class="mb-3">
+ <div class="mb-3">
+    <label class="form-label fw-bold">Maintenance: </label>
 
-                    <label class="form-label fw-bold">Maintenance</label>
+    <span class="invoice-link"
+          onclick="showMaintenanceDetail(${feedback.maintenanceID})"
+          style="cursor:pointer; color:#0d6efd; font-weight:600;">
+        #${feedback.maintenanceID}
+    </span>
 
-                    <input type="text"
-                           class="form-control"
-                           value="Maintenance #${feedback.maintenanceID}"
-                           disabled>
-
-                </div>
+    <input type="hidden" name="maintenanceId" value="${feedback.maintenanceID}">
+</div>
 
                 <!-- Rating -->
 
@@ -233,5 +234,42 @@
         btn.disabled = true;
     }
 </script>
+<script>
+
+            var CTX = '${pageContext.request.contextPath}';
+            function showMaintenanceDetail(id) {
+                var modal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
+                document.getElementById('maintenanceContent').innerHTML =
+                        '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+                modal.show();
+               fetch(CTX + '/customer/feedback/edit?action=getMaintenanceDetail&id=' + id)
+                        .then(res => res.json())
+                        .then(m => {
+                            document.getElementById('maintenanceContent').innerHTML =
+                                    '<table class="table table-bordered">' +
+                                    '<tr><th>ID</th><td>' + m.id + '</td></tr>' +
+                                    '<tr><th>Device</th><td>' + m.machineName + '</td></tr>' +
+                                    '<tr><th>Problem</th><td>' + m.problem + '</td></tr>' +
+                                    '<tr><th>Status</th><td>' + m.status + '</td></tr>' +
+                                    '<tr><th>Start Date</th><td>' + m.startDate + '</td></tr>' +
+                                    '<tr><th>Finish Date</th><td>' + m.finishDate + '</td></tr>' +
+                                    '</table>';
+                        })
+            }
+        </script>
+        <!-- Maintenance Modal -->
+        <div class="modal fade" id="maintenanceModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            Maintenance Detail
+                        </h5>
+                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="maintenanceContent"></div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

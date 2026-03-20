@@ -2,12 +2,14 @@ package controller.adminBusiness;
 
 import dal.DeviceDAO;
 import dal.FeedbackDAO;
+import dal.InvoiceDAO;
 import dal.MaintenanceDAO;
 import dal.UserProfileDAO;
 import dto.DeviceDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -112,10 +114,34 @@ private void handleFeedbackDetailPage(HttpServletRequest request, HttpServletRes
    int id = Integer.parseInt(request.getParameter("id"));
 
     FeedbackDAO fDao = new FeedbackDAO();
+String subAction = request.getParameter("subAction");
+
+if ("getMaintenanceDetail".equals(subAction)) {
+    InvoiceDAO dao = new InvoiceDAO();
+    Maintenance m = dao.getMaintenanceDetail(id);
+
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+
+    PrintWriter out = response.getWriter();
+
+    if (m != null) {
+        out.print("{");
+        out.print("\"id\":" + m.getId() + ",");
+        out.print("\"machineName\":\"" + m.getMachineName() + "\",");
+        out.print("\"problem\":\"" + m.getDescription() + "\",");
+        out.print("\"status\":\"" + m.getStatus() + "\",");
+        out.print("\"startDate\":\"" + m.getStartDate() + "\",");
+        out.print("\"finishDate\":\"" + m.getEndDate() + "\"");
+        out.print("}");
+    }
+
+    return;
+}
     MaintenanceFeedback f = fDao.getFeedbackByMaintenanceId(id);
 
     request.setAttribute("feedback", f);
-
+request.setAttribute("maintenanceID", id);
     request.getRequestDispatcher("/views/AdminBusinessView/view-feedback.jsp")
            .forward(request, response);
 }
