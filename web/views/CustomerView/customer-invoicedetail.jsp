@@ -211,7 +211,7 @@
                         </div>
                     </div>
                     <!-- Apply Voucher -->
-                    <c:if test="${invoice.paymentStatus eq 'UNPAID'}">
+                    <c:if test="${invoice.paymentStatus eq 'UNPAID' and invoice.totalAmount > 0}">
                         <form method="post"
                               action="${pageContext.request.contextPath}/customer/invoice/detail">
                             <input type="hidden"
