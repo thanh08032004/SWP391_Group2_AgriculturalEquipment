@@ -33,13 +33,18 @@ public class AdminSubcategoryServlet extends HttpServlet {
                     break;
                 }
 
+                case "add": {
+                    request.setAttribute("categories", deviceDAO.getAllCategories());
+                    request.getRequestDispatcher("/views/AdminBusinessView/subcategory-add.jsp")
+                            .forward(request, response);
+                    break;
+                }
+
                 case "edit": {
                     int id = Integer.parseInt(request.getParameter("id"));
                     request.setAttribute("subcategoryEdit", dao.getDTOById(id));
                     request.setAttribute("categories", deviceDAO.getAllCategories());
-                    request.setAttribute("selectedCategoryId", Integer.parseInt(request.getParameter("categoryId")));
-                    request.setAttribute("subcategoryList", dao.getAllByCategoryId(Integer.parseInt(request.getParameter("categoryId"))));
-                    request.getRequestDispatcher("/views/AdminBusinessView/subcategory-list.jsp")
+                    request.getRequestDispatcher("/views/AdminBusinessView/subcategory-edit.jsp")
                             .forward(request, response);
                     break;
                 }
@@ -49,12 +54,12 @@ public class AdminSubcategoryServlet extends HttpServlet {
                     String currentStatus = request.getParameter("currentStatus");
                     String newStatus = "ACTIVE".equals(currentStatus) ? "INACTIVE" : "ACTIVE";
                     dao.toggleStatus(id, newStatus);
-                    response.sendRedirect("subcategories?action=list");
+                    response.sendRedirect("subcategory?action=list");
                     break;
                 }
 
                 default:
-                    response.sendRedirect("subcategories?action=list");
+                    response.sendRedirect("subcategory?action=list");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,15 +85,17 @@ public class AdminSubcategoryServlet extends HttpServlet {
             if (s.getName() == null || s.getName().trim().isEmpty()) {
                 request.setAttribute("errorName", "Tên subcategory không được để trống");
                 request.setAttribute("categories", deviceDAO.getAllCategories());
-                request.setAttribute("subcategoryList", dao.getAllByCategoryId(Integer.parseInt(categoryId)));
-                request.setAttribute("selectedCategoryId", Integer.parseInt(categoryId));
-                request.getRequestDispatcher("/views/AdminBusinessView/subcategory-list.jsp")
+                request.setAttribute("name", request.getParameter("name"));
+                request.setAttribute("description", request.getParameter("description"));
+                request.setAttribute("categoryId", request.getParameter("categoryId"));
+                request.getRequestDispatcher("/views/AdminBusinessView/subcategory-add.jsp")
                         .forward(request, response);
+
                 return;
             }
 
             dao.create(s);
-            response.sendRedirect("subcategories?action=list&categoryId=" + categoryId);
+            response.sendRedirect("subcategory?action=list");
 
         } else if ("update".equals(action)) {
             SubcategoryDTO s = new SubcategoryDTO();
@@ -101,15 +108,13 @@ public class AdminSubcategoryServlet extends HttpServlet {
                 request.setAttribute("errorName", "Tên subcategory không được để trống");
                 request.setAttribute("subcategoryEdit", s);
                 request.setAttribute("categories", deviceDAO.getAllCategories());
-                request.setAttribute("subcategoryList", dao.getAllByCategoryId(Integer.parseInt(categoryId)));
-                request.setAttribute("selectedCategoryId", Integer.parseInt(categoryId));
-                request.getRequestDispatcher("/views/AdminBusinessView/subcategory-list.jsp")
+                request.getRequestDispatcher("/views/AdminBusinessView/subcategory-edit.jsp")
                         .forward(request, response);
                 return;
             }
 
             dao.update(s);
-            response.sendRedirect("subcategories?action=list&categoryId=" + categoryId);
+            response.sendRedirect("subcategory?action=list");
         }
     }
 }
