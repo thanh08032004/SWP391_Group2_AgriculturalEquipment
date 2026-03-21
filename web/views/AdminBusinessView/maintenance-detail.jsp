@@ -142,19 +142,7 @@
                                         </small>
                                     </div>
                                     <div class="col-md-4 text-end">
-                                        <p class="fw-bold mb-1 small text-muted text-uppercase">Attached Image:</p>
-                                        <c:choose>
-                                            <c:when test="${not empty task.images}">
-                                                <img src="${pageContext.request.contextPath}/assets/images/maintenance/${task.images[0].imageUrl}"
-                                                     alt="Customer Upload"
-                                                     class="img-thumbnail shadow-sm"
-                                                     style="max-width: 100%; cursor: pointer;"
-                                                     onclick="window.open(this.src)">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div class="py-4 bg-light border rounded text-muted small italic text-center">No image attached</div>
-                                            </c:otherwise>
-                                        </c:choose>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -195,13 +183,19 @@
                                                     </c:choose>
                                                 </div>
                                             </div>
-                                            <h6 class="mt-4 fw-bold small text-uppercase">Proposed Spare Parts:</h6>
+                                            <h6 class="mt-4 fw-bold small text-uppercase d-flex align-items-center gap-2">
+                                                Proposed Spare Parts:
+                                                <span class="badge bg-success fw-normal text-lowercase" style="font-size:.72rem;">
+                                                    <i class="bi bi-check-circle me-1"></i>paid items only
+                                                </span>
+                                            </h6>
                                             <table class="table table-sm table-bordered mt-2">
                                                 <thead class="table-light text-center">
                                                     <tr>
                                                         <th>Part Name</th>
                                                         <th>Quantity</th>
                                                         <th>Unit</th>
+                                                        <th class="text-center">Paid</th>
                                                         <th class="text-end">Price</th>
 
                                                     </tr>
@@ -213,27 +207,46 @@
                                                             <td>${item.name}</td>
                                                             <td class="text-center">${item.quantity}</td>
                                                             <td class="text-center">${item.unit}</td>
+                                                            <td class="text-center">
+                                                                <c:choose>
+                                                                    <c:when test="${item.paid}">
+                                                                        <span class="badge bg-danger">Charged</span>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="badge bg-success">Free</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </td>
                                                             <td class="text-end">
-                                                                <fmt:formatNumber value="${item.price}" type="currency" currencySymbol=""/>
+                                                                <c:choose>
+                                                                    <c:when test="${item.paid}">
+                                                                        <fmt:formatNumber value="${item.price * item.quantity}" 
+                                                                                          type="currency" currencySymbol=""/>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="text-success fw-bold">Free</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
                                                             </td>
                                                         </tr>
-                                                        <c:set var="totalSpareParts" value="${totalSpareParts + (item.price * item.quantity)}" />
+                                                        <c:if test="${item.paid}">
+                                                            <c:set var="totalSpareParts" 
+                                                                   value="${totalSpareParts + (item.price * item.quantity)}" />
+                                                        </c:if>
                                                     </c:forEach>
 
-                                                    <%-- KHỐI HIỆN THỊ TIỀN CÔNG --%>
                                                     <c:if test="${not empty task.laborHours}">
                                                         <c:set var="laborCost" value="${task.laborHours * laborRate}" />
                                                         <tr class="table-info">
                                                             <td class="fw-bold">Labor Cost</td>
                                                             <td class="text-center">${task.laborHours}</td>
                                                             <td class="text-center">Hours</td>
-                                                            <td class="text-end fw-bold">
+                                                            <td class="text-center fw-bold">
                                                                 <fmt:formatNumber value="${laborCost}" type="currency" currencySymbol=""/>
                                                             </td>
                                                         </tr>
                                                     </c:if>
 
-                                                    <%-- TỔNG CỘNG CUỐI CÙNG --%>
                                                 <tfoot class="table-light fw-bold">
                                                     <tr>
                                                         <td colspan="3" class="text-end text-uppercase">Final Total (Estimated):</td>
@@ -272,7 +285,7 @@
                                         </c:if>
                                     </div>
 
-                                    
+
                                 </div>
                             </div>
                         </div>

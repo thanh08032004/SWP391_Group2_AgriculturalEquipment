@@ -35,7 +35,7 @@
             <div class="col-lg-7">
                 <nav class="navbar navbar-expand-lg">
                     <ul class="navbar-nav mx-auto">
-                        <c:if test="${empty sessionScope.userRole || sessionScope.userRole == 'CUSTOMER'}">
+                        <c:if test="${sessionScope.userRole == 'CUSTOMER'}">
                             <li class="nav-item"><a class="nav-link" href="${navHome}">Home</a></li>
                             <c:if test="${sessionScope.userRole == 'CUSTOMER'}">
                                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/devices">My Devices</a></li>

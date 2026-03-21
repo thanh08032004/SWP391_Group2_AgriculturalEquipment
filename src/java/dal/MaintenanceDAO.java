@@ -225,29 +225,28 @@ public class MaintenanceDAO extends DBContext {
 
     // Get a list of components along with their prices to display a quotation for the customer.
     public List<Map<String, Object>> getMaintenanceItemsWithPrice(int maintenanceId) {
-        List<Map<String, Object>> list = new ArrayList<>();
-        String sql = "SELECT mi.quantity, sp.name, sp.price, sp.unit "
-                + "FROM maintenance_item mi "
-                + "JOIN spare_part sp ON mi.spare_part_id = sp.id "
-                + "WHERE mi.maintenance_id = ?";
-        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, maintenanceId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("name", rs.getString("name"));
-                map.put("quantity", rs.getInt("quantity"));
-                map.put("price", rs.getBigDecimal("price"));
-                map.put("unit", rs.getString("unit"));
-                list.add(map);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    List<Map<String, Object>> list = new ArrayList<>();
+    String sql = "SELECT mi.quantity, mi.paid, sp.name, sp.price, sp.unit "
+               + "FROM maintenance_item mi "
+               + "JOIN spare_part sp ON mi.spare_part_id = sp.id "
+               + "WHERE mi.maintenance_id = ?";
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, maintenanceId);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name",     rs.getString("name"));
+            map.put("quantity", rs.getInt("quantity"));
+            map.put("price",    rs.getBigDecimal("price"));
+            map.put("unit",     rs.getString("unit"));
+            map.put("paid",     rs.getBoolean("paid")); 
+            list.add(map);
         }
-        return list;
-
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
-
+    return list;
+}
     public List<Map<String, Object>> getMaintenanceItems(int maintenanceId) {
         List<Map<String, Object>> list = new ArrayList<>();
         String sql = "SELECT mi.*, sp.name AS spare_part_name FROM maintenance_item mi "

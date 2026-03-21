@@ -113,10 +113,11 @@
                                 <table class="table table-hover table-bordered">
                                     <thead class="table-light text-center">
                                         <tr>
-                                            <th>Part Name</th>
+                                            <th class="text-start ps-3">Part Name</th>
                                             <th>Quantity</th>
                                             <th>Unit</th>
-                                            <th class="text-end">Unit Price</th>
+                                            <th>Status</th>
+                                            <th class="text-end pe-3">Line Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -126,30 +127,61 @@
                                                 <td class="ps-3">${item.name}</td>
                                                 <td class="text-center">${item.quantity}</td>
                                                 <td class="text-center">${item.unit}</td>
+                                                <td class="text-center">
+                                                    <c:choose>
+                                                        <c:when test="${item.paid}">
+                                                            <span class="badge bg-danger">Charged</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="badge bg-success">Free</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
                                                 <td class="text-end pe-3">
-                                                    <fmt:formatNumber value="${item.price}" type="currency" currencySymbol="₫"/>
+                                                    <c:choose>
+                                                        <c:when test="${item.paid}">
+                                                            <fmt:formatNumber value="${item.price * item.quantity}"
+                                                                              type="currency" currencySymbol=""/>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-success fw-bold">Free</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </td>
                                             </tr>
-                                            <c:set var="totalSpareParts" value="${totalSpareParts + (item.price * item.quantity)}" />
+                                            <c:if test="${item.paid}">
+                                                <c:set var="totalSpareParts"
+                                                       value="${totalSpareParts + (item.price * item.quantity)}" />
+                                            </c:if>
                                         </c:forEach>
 
                                         <c:if test="${task.laborHours > 0}">
                                             <c:set var="laborCost" value="${task.laborHours * task.laborCostPerHour}" />
                                             <tr class="table-info">
-                                                <td class="fw-bold ps-3">Labor Cost (${task.laborHours} Hours)</td>
-                                                <td colspan="2" class="text-center text-muted small">Rate: <fmt:formatNumber value="${task.laborCostPerHour}" type="currency" currencySymbol="₫"/>/hr</td>
+                                                <td class="fw-bold ps-3">Labor Cost (${task.laborHours} hrs)</td>
+                                                <td colspan="2" class="text-center text-muted small">
+                                                    Rate: <fmt:formatNumber value="${task.laborCostPerHour}"
+                                                                      type="currency" currencySymbol=""/>/hr
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-danger">Charged</span>
+                                                </td>
                                                 <td class="text-end pe-3 fw-bold">
-                                                    <fmt:formatNumber value="${laborCost}" type="currency" currencySymbol="₫"/>
+                                                    <fmt:formatNumber value="${laborCost}"
+                                                                      type="currency" currencySymbol=""/>
                                                 </td>
                                             </tr>
                                         </c:if>
                                     </tbody>
                                     <tfoot class="table-light fw-bold">
                                         <tr>
-                                            <td colspan="3" class="text-end text-uppercase py-3">Final Total (Estimated):</td>
+                                            <td colspan="4" class="text-end text-uppercase py-3">
+                                                Final Total (Estimated):
+                                            </td>
                                             <td class="text-end text-primary fs-5 pe-3 py-3">
-                                                <fmt:formatNumber value="${totalSpareParts + (task.laborHours * task.laborCostPerHour)}" 
-                                                                  type="currency" currencySymbol="₫"/>
+                                                <fmt:formatNumber
+                                                    value="${totalSpareParts + (task.laborHours > 0 ? task.laborHours * task.laborCostPerHour : 0)}"
+                                                    type="currency" currencySymbol=""/>
                                             </td>
                                         </tr>
                                     </tfoot>
