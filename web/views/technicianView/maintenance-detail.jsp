@@ -180,13 +180,20 @@
                                         <c:out value="${not empty task.technicianNote ? task.technicianNote : 'Awaiting diagnostic report...'}" />
                                     </p>
 
-                                    <h6 class="mt-4 fw-bold small text-uppercase">Proposed Spare Parts:</h6>
+
+                                    <h6 class="mt-4 fw-bold small text-uppercase d-flex align-items-center gap-2">
+                                        Proposed Spare Parts:
+                                        <span class="badge bg-success fw-normal text-lowercase" style="font-size:.72rem;">
+                                            <i class="bi bi-check-circle me-1"></i>paid items only
+                                        </span>
+                                    </h6>
                                     <table class="table table-sm table-bordered mt-2">
                                         <thead class="table-light text-center">
                                             <tr>
                                                 <th class="text-start">Part Name</th>
                                                 <th>Quantity</th>
                                                 <th>Unit</th>
+                                                <th class="text-center">Paid</th>
                                                 <th class="text-end">Price</th>
                                             </tr>
                                         </thead>
@@ -197,21 +204,66 @@
                                                     <td>${item.name}</td>
                                                     <td class="text-center">${item.quantity}</td>
                                                     <td class="text-center">${item.unit}</td>
+                                                    <td class="text-center">
+                                                        <c:choose>
+                                                            <c:when test="${item.paid}">
+                                                                <span class="badge bg-danger">Charged</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="badge bg-success">Free</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
                                                     <td class="text-end">
-                                                        <fmt:formatNumber value="${item.price}" type="currency" currencySymbol=""/>
+                                                        <c:choose>
+                                                            <c:when test="${item.paid}">
+                                                                <fmt:formatNumber value="${item.price * item.quantity}" 
+                                                                                  type="currency" currencySymbol=""/>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="text-success fw-bold">Free</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </td>
                                                 </tr>
-                                                <c:set var="totalSpareParts" value="${totalSpareParts + (item.price * item.quantity)}" />
+                                                <c:if test="${item.paid}">
+                                                    <c:set var="totalSpareParts" 
+                                                           value="${totalSpareParts + (item.price * item.quantity)}" />
+                                                </c:if>
                                             </c:forEach>
                                             <c:if test="${empty items}">
-                                                <tr><td colspan="4" class="text-center text-muted italic py-3">No spare parts suggested by technician.</td></tr>
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted fst-italic py-3">
+                                                        No spare parts suggested by technician.
+                                                    </td>
+                                                </tr>
+                                            </c:if>
+
+                                            <%-- Labor Cost row --%>
+                                            <c:if test="${not empty task.laborHours && task.laborHours > 0}">
+                                                <c:set var="laborCost" value="${task.laborHours * laborRate}" />
+                                                <tr class="table-info">
+                                                    <td class="fw-bold">
+                                                        <i class="bi bi-clock me-1"></i>Labor Cost
+                                                    </td>
+                                                    <td class="text-center">${task.laborHours}</td>
+                                                    <td class="text-center">Hours</td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-danger">Charged</span>
+                                                    </td>
+                                                    <td class="text-end fw-bold">
+                                                        <fmt:formatNumber value="${laborCost}" type="currency" currencySymbol=""/>
+                                                    </td>
+                                                </tr>
                                             </c:if>
                                         </tbody>
                                         <tfoot class="table-light fw-bold">
                                             <tr>
-                                                <td colspan="3" class="text-end text-uppercase">Total (Estimated):</td>
-                                                <td class="text-end text-primary">
-                                                    <fmt:formatNumber value="${totalSpareParts}" type="currency" currencySymbol=""/>
+                                                <td colspan="4" class="text-end text-uppercase">Total (Charged only):</td>
+                                                <td class="text-end text-primary fs-6">
+                                                    <fmt:formatNumber 
+                                                        value="${totalSpareParts + (not empty task.laborHours ? task.laborHours * (not empty laborRate ? laborRate : 0) : 0)}" 
+                                                        type="currency" currencySymbol=""/>
                                                 </td>
                                             </tr>
                                         </tfoot>
