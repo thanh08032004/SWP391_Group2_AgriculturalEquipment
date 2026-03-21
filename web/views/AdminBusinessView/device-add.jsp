@@ -133,7 +133,7 @@
                                     <label class="form-label small fw-bold text-muted">
                                         CATEGORY <span class="text-danger">*</span>
                                     </label>
-                                    <select name="categoryId" class="form-select" required>
+                                    <select name="categoryId" id="categorySelect" class="form-select" required>
                                         <c:forEach var="cat" items="${categories}">
                                             <option value="${cat.id}"
                                                     <c:if test="${cat.id == categoryId}">selected</c:if>>
@@ -141,6 +141,23 @@
                                             </option>
                                         </c:forEach>
                                     </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">
+                                        SUBCATEGORY <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="subcategoryId" id="subcategorySelect" class="form-select" required>
+                                        <option value="">-- Select Subcategory --</option>
+                                        <c:forEach var="sc" items="${subcategoryList}">
+                                            <option value="${sc.id}"
+                                                    data-catid="${sc.categoryId}"
+                                                    <c:if test="${sc.id == subcategoryId}">selected</c:if>>
+                                                ${sc.name}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+
                                 </div>
 
                                 <!-- BRAND -->
@@ -195,4 +212,28 @@
                             </form>
                         </div>
                         <jsp:include page="/common/scripts.jsp"></jsp:include>
+
+                        <script>
+                            var categorySelect = document.getElementById('categorySelect');
+                            var subcategorySelect = document.getElementById('subcategorySelect');
+
+                            filterSubcategories();
+                            categorySelect.addEventListener('change', filterSubcategories);
+
+                            function filterSubcategories() {
+                                var catId = categorySelect.value;
+                                subcategorySelect.querySelectorAll('option').forEach(function (opt) {
+                                    if (!opt.value)
+                                        return; // giữ placeholder
+                                    opt.hidden = opt.dataset.catid !== catId;
+                                });
+                                // Reset nếu option đang chọn không thuộc category mới
+                                var selected = subcategorySelect.options[subcategorySelect.selectedIndex];
+                                if (selected && selected.dataset.catid !== catId) {
+                                    subcategorySelect.value = '';
+                                }
+                            }
+                        </script>
+                        </body>
+                        </html>
 

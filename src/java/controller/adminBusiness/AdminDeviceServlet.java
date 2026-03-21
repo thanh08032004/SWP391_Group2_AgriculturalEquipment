@@ -124,6 +124,7 @@ public class AdminDeviceServlet extends HttpServlet {
                     request.setAttribute("categories", deviceDAO.getAllCategories());
                     request.setAttribute("brands", deviceDAO.getAllBrands());
                     request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
+                    request.setAttribute("subcategoryList", deviceDAO.getAllSubcategories());
                     request.getRequestDispatcher("/views/AdminBusinessView/device-add.jsp")
                             .forward(request, response);
                     break;
@@ -142,6 +143,7 @@ public class AdminDeviceServlet extends HttpServlet {
                     request.setAttribute("categories", deviceDAO.getAllCategories());
                     request.setAttribute("brands", deviceDAO.getAllBrands());
                     request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
+                    request.setAttribute("subcategoryList", deviceDAO.getAllSubcategories());
 
                     request.getRequestDispatcher("/views/AdminBusinessView/device-edit.jsp")
                             .forward(request, response);
@@ -287,6 +289,8 @@ public class AdminDeviceServlet extends HttpServlet {
             d.setCustomerId(customerId);
             d.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             d.setBrandId(Integer.parseInt(request.getParameter("brandId")));
+            d.setSubcategoryId(Integer.parseInt(request.getParameter("subcategoryId")));
+            
 
             try {
                 Date purchaseDate = Date.valueOf(request.getParameter("purchaseDate"));
@@ -386,6 +390,7 @@ public class AdminDeviceServlet extends HttpServlet {
 
             d.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             d.setBrandId(Integer.parseInt(request.getParameter("brandId")));
+            d.setSubcategoryId(Integer.parseInt(request.getParameter("subcategoryId")));
             try {
                 Date purchaseDate = Date.valueOf(request.getParameter("purchaseDate"));
                 Date warrantyDate = Date.valueOf(request.getParameter("warrantyEndDate"));

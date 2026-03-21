@@ -132,14 +132,17 @@ public class DeviceDAO extends DBContext {
                d.category_id,     
                d.brand_id,
                d.image,
+               d.subcategory_id,
                c.name AS category_name,
                b.name AS brand_name,
-               up.fullname AS customer_name
+               up.fullname AS customer_name,
+                     sc.name AS subcategory_name
         FROM device d
         LEFT JOIN category c ON d.category_id = c.id
         LEFT JOIN brand b ON d.brand_id = b.id
         LEFT JOIN users u ON d.customer_id = u.id
         LEFT JOIN user_profile up ON u.id = up.user_id
+        LEFT JOIN subcategory sc ON d.subcategory_id = sc.id
         WHERE d.id = ?
     """;
 
@@ -163,9 +166,11 @@ public class DeviceDAO extends DBContext {
                         .purchaseDate(rs.getDate("purchase_date"))
                         .warrantyEndDate(rs.getDate("warranty_end_date"))
                         .image(rs.getString("image"))
+                       .subcategoryId(rs.getInt("subcategory_id"))
                         .categoryName(rs.getString("category_name"))
                         .brandName(rs.getString("brand_name"))
                         .customerName(rs.getString("customer_name"))
+                        .subcategoryName(rs.getString("subcategory_name"))
                         .build();
             }
         } catch (Exception e) {
@@ -205,8 +210,8 @@ public class DeviceDAO extends DBContext {
         INSERT INTO device
         (customer_id, serial_number, machine_name, model,price,
          purchase_date, warranty_end_date, status,
-         category_id, brand_id, image)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+         category_id, brand_id, image, subcategory_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
     """;
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -226,6 +231,7 @@ public class DeviceDAO extends DBContext {
             ps.setInt(9, d.getCategoryId());
             ps.setInt(10, d.getBrandId());
             ps.setString(11, d.getImage());
+            ps.setInt(12, d.getSubcategoryId());
 
             int rows = ps.executeUpdate();
             return rows > 0;
@@ -248,7 +254,8 @@ public class DeviceDAO extends DBContext {
             purchase_date = ?,
             warranty_end_date = ?,
             status = ?,
-            image = ?
+            image = ?,
+                     subcategory_id = ?
         WHERE id = ?
     """;
 
@@ -268,7 +275,8 @@ public class DeviceDAO extends DBContext {
             ps.setDate(8, d.getWarrantyEndDate());
             ps.setString(9, d.getStatus());
             ps.setString(10, d.getImage());
-            ps.setInt(11, d.getId());
+            ps.setInt(11, d.getSubcategoryId());
+            ps.setInt(12, d.getId());
 
             return ps.executeUpdate() > 0;
 
