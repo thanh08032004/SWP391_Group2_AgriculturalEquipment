@@ -5,12 +5,15 @@
 
 package controller.customer;
 
+import dal.FeedbackDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+import model.MaintenanceFeedback;
 
 /**
  *
@@ -51,11 +54,16 @@ public class HomeServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        request.getRequestDispatcher("/views/CustomerView/homeCustomer.jsp").forward(request, response);
-    } 
+ 
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
+    FeedbackDAO dao = new FeedbackDAO();
+    List<MaintenanceFeedback> list = dao.getAllFeedback();
+
+    request.setAttribute("feedbackList", list);
+    request.getRequestDispatcher("/views/CustomerView/homeCustomer.jsp").forward(request, response);
+}
     /** 
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request

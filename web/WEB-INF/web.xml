@@ -33,6 +33,10 @@
         <servlet-class>controller.adminBusiness.AdminReportServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>TopDeviceServlet</servlet-name>
+        <servlet-class>controller.customer.TopDeviceServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>LeaderMaintenanceServlet</servlet-name>
         <servlet-class>controller.techLeader.LeaderMaintenanceServlet</servlet-class>
     </servlet>
@@ -71,6 +75,10 @@
     <servlet-mapping>
         <servlet-name>CustomerMaintenanceDoneServlet</servlet-name>
         <url-pattern>/customer/maintenance/done</url-pattern>
+    </servlet-mapping>
+        <servlet-mapping>
+        <servlet-name>TopDeviceServlet</servlet-name>
+        <url-pattern>/customer/home/topdevice</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminReportServlet</servlet-name>

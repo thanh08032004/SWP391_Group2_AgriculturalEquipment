@@ -24,5 +24,7 @@ public class Device {
     private int brandId;
     private int subcategoryId;
     private String image;
+    private String categoryName;
+private String brandName;
 }
 

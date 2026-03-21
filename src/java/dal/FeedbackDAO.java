@@ -2,7 +2,10 @@ package dal;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import model.Device;
 import model.MaintenanceFeedback;
 import model.MaintenanceFeedbackImage;
 
@@ -75,6 +78,87 @@ public class FeedbackDAO extends DBContext {
 
         return list;
     }
+
+    public List<MaintenanceFeedback> getAllFeedback() {
+        List<MaintenanceFeedback> list = new ArrayList<>();
+
+        String sql = """
+            SELECT 
+                mr.id AS rating_id,
+                mr.maintenance_id,
+                mr.rating,
+                mr.comment,
+                mr.created_at,
+
+                up.fullname,
+                up.avatar,
+
+                d.machine_name,
+
+                mri.id AS image_id,
+                mri.image_url
+
+            FROM maintenance_rating mr
+            JOIN user_profile up ON mr.customer_id = up.user_id
+            JOIN maintenance m ON mr.maintenance_id = m.id
+            JOIN device d ON m.device_id = d.id
+
+            LEFT JOIN maintenance_rating_image mri 
+                ON mr.id = mri.rating_id
+
+            ORDER BY mr.created_at DESC
+        """;
+
+        try { Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            // tránh duplicate feedback khi có nhiều ảnh
+            Map<Integer, MaintenanceFeedback> map = new LinkedHashMap<>();
+
+            while (rs.next()) {
+                int ratingId = rs.getInt("rating_id");
+
+                MaintenanceFeedback fb = map.get(ratingId);
+
+                if (fb == null) {
+                    fb = MaintenanceFeedback.builder()
+                            .id(ratingId)
+                            .maintenanceID(rs.getInt("maintenance_id"))
+                            .rating(rs.getInt("rating"))
+                            .comment(rs.getString("comment"))
+                            .createdDate(rs.getTimestamp("created_at"))
+                            .customerName(rs.getString("fullname"))
+                            .avatarUrl(rs.getString("avatar"))
+                            .deviceName(rs.getString("machine_name"))
+                            .images(new ArrayList<>())
+                            .build();
+
+                    map.put(ratingId, fb);
+                }
+
+                // thêm ảnh nếu có
+                int imgId = rs.getInt("image_id");
+                if (imgId != 0) {
+                    MaintenanceFeedbackImage img = MaintenanceFeedbackImage.builder()
+                            .id(imgId)
+                            .feedbackId(ratingId)
+                            .imageUrl(rs.getString("image_url"))
+                            .build();
+
+                    fb.getImages().add(img);
+                }
+            }
+
+            list.addAll(map.values());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 public boolean hasFeedbackByMaintenance(int maintenanceId) {
     String sql = """
         SELECT 1 FROM maintenance_rating 
@@ -344,7 +428,53 @@ public MaintenanceFeedback getFeedbackByMaintenanceId(int maintenanceId) {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-    
+public List<Device> getTop6BestSellingDevices() {
+    List<Device> list = new ArrayList<>();
+
+    String sql = """
+        SELECT 
+            d.*,
+            c.name AS category_name,
+            b.name AS brand_name
+        FROM device d
+        Left JOIN contract_device cd ON d.id = cd.device_id
+        JOIN category c ON d.category_id = c.id
+        JOIN brand b ON d.brand_id = b.id
+        GROUP BY d.id
+        ORDER BY COUNT(cd.device_id) DESC
+        LIMIT 6
+    """;
+
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            Device d = Device.builder()
+                    .id(rs.getInt("id"))
+                    .customerId(rs.getInt("customer_id"))
+                    .serialNumber(rs.getString("serial_number"))
+                    .machineName(rs.getString("machine_name"))
+                    .model(rs.getString("model"))
+                    .purchaseDate(rs.getDate("purchase_date"))
+                    .warrantyEndDate(rs.getDate("warranty_end_date"))
+                    .status(rs.getString("status"))
+                    .categoryId(rs.getInt("category_id"))
+                    .brandId(rs.getInt("brand_id"))
+                    .image(rs.getString("image"))
+                    .categoryName(rs.getString("category_name")) 
+                    .brandName(rs.getString("brand_name"))     
+                    .build();
+
+            list.add(d);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+
 }
