@@ -6,6 +6,7 @@
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <!DOCTYPE html>
 <html>
@@ -43,15 +44,13 @@
         <!-- ===== CONTENT ===== -->
         <div class="container mt-5 mb-5">
             <div class="back-wrapper" style="margin-left: -50px;">
-               <a href="${pageContext.request.contextPath}/admin/role" class="back-btn">← Back</a>
+                <a href="${pageContext.request.contextPath}/admin/role" class="back-btn">← Back</a>
             </div>
             <h2 class="fw-bold mb-4">
                 Role: <span class="text-primary">${role.name}</span>
             </h2>
 
             <form action="${pageContext.request.contextPath}/admin/role/permissionupdate" method="post" id="roleForm">
-
-                <!-- hidden roleId -->
                 <input type="hidden" name="roleId" value="${role.id}"/>
 
                 <div class="permission-box shadow-sm">
@@ -61,14 +60,22 @@
                         <c:forEach items="${ListP}" var="p">
                             <div class="col-md-4 mb-3">
                                 <label class="permission-item">
+                                    <c:set var="isDefault"
+                                           value="${p.code == '/technician/maintenance' 
+                                                    or p.code == '/leader/maintenance' 
+                                                    or p.code == '/admin-business/reports'}"/>
                                     <input type="checkbox"
                                            class="perm-checkbox"
                                            name="permissions"
                                            value="${p.id}"
-                                           <c:if test="${p.checked}">checked</c:if>
-                                               onclick="return false;">
+                                    <c:if test="${p.checked or isDefault}">checked</c:if>
+                                    <c:if test="${isDefault}">disabled</c:if>
+                                        />
+                                    <c:if test="${isDefault}">
+                                        <input type="hidden" name="permissions" value="${p.id}"/>
+                                    </c:if>
 
-                                           <span class="fw-semibold">${p.name}</span><br>
+                                    <span class="fw-semibold">${p.name}</span><br>
                                     <small class="text-muted">${p.code}</small>
                                 </label>
                             </div>
@@ -96,21 +103,25 @@
             </form>
         </div>
         <script>
-                                                   const editBtn = document.getElementById("editBtn");
-                                                   const saveBtn = document.getElementById("saveBtn");
-                                                   const cancelBtn = document.getElementById("cancelBtn");
-                                                   const checkboxes = document.querySelectorAll(".perm-checkbox");
+            const editBtn = document.getElementById("editBtn");
+            const saveBtn = document.getElementById("saveBtn");
+            const cancelBtn = document.getElementById("cancelBtn");
+            const checkboxes = document.querySelectorAll(".perm-checkbox");
 
-                                                   editBtn.onclick = () => {
-                                                       checkboxes.forEach(cb => cb.onclick = null);
-                                                       editBtn.classList.add("d-none");
-                                                       saveBtn.classList.remove("d-none");
-                                                       cancelBtn.classList.remove("d-none");
-                                                   };
+            editBtn.onclick = () => {
+                checkboxes.forEach(cb => {
+                    if (!cb.disabled) {
+                        cb.onclick = null;
+                    }
+                });
+                editBtn.classList.add("d-none");
+                saveBtn.classList.remove("d-none");
+                cancelBtn.classList.remove("d-none");
+            };
 
-                                                   cancelBtn.onclick = () => {
-                                                       window.location.reload();
-                                                   };
+            cancelBtn.onclick = () => {
+                window.location.reload();
+            };
         </script>
         <jsp:include page="/common/scripts.jsp"></jsp:include>
     </body>
