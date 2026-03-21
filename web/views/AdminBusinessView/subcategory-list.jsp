@@ -167,79 +167,9 @@
             </div>
         </div>
 
-        <%-- Modal Thêm --%>
-        <div class="modal fade" id="addModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title fw-bold">Add New Subcategory</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <form action="${pageContext.request.contextPath}/admin-business/subcategory?action=create" method="post">
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Category <span class="text-danger">*</span></label>
-                                <select name="categoryId" class="form-select" required>
-                                    <option value="">-- Select Category --</option>
-                                    <c:forEach var="cat" items="${categories}">
-                                        <option value="${cat.id}">${cat.name}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control" placeholder="Subcategory name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Description</label>
-                                <input type="text" name="description" class="form-control" placeholder="Optional description">
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+       
 
-        <%-- Modal Sửa --%>
-        <div class="modal fade" id="editModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-warning text-dark">
-                        <h5 class="modal-title fw-bold">Edit Subcategory</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <form action="${pageContext.request.contextPath}/admin-business/subcategory?action=update" method="post">
-                        <input type="hidden" name="id" id="editId">
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Category <span class="text-danger">*</span></label>
-                                <select name="categoryId" id="editCategoryId" class="form-select" required>
-                                    <c:forEach var="cat" items="${categories}">
-                                        <option value="${cat.id}">${cat.name}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" id="editName" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Description</label>
-                                <input type="text" name="description" id="editDescription" class="form-control">
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-warning fw-bold">Update</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+      
 
         <script>
             function toggleCat(idx) {
@@ -249,13 +179,7 @@
                 chev.classList.toggle('open');
             }
 
-            function openEditModal(id, name, description, categoryId) {
-                document.getElementById('editId').value = id;
-                document.getElementById('editName').value = name;
-                document.getElementById('editDescription').value = description;
-                document.getElementById('editCategoryId').value = categoryId;
-                new bootstrap.Modal(document.getElementById('editModal')).show();
-            }
+            
         </script>
 
         <jsp:include page="/common/footer.jsp"/>
