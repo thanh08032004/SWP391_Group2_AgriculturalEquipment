@@ -165,15 +165,7 @@
                                     </c:if>
                                 </div>
 
-                                <div class="mb-4">
-                                    <label class="form-label small fw-bold text-muted">STATUS<span class="text-danger">*</span></label>
-                                    <select name="status" class="form-select"
-                                            ${isLocked ? 'disabled' : ''}>
-                                        <option value="ACTIVE"    ${deviceEdit.status == 'ACTIVE'       ? 'selected' : ''}>ACTIVE</option>
-                                        <option value="MAINTENANCE" ${deviceEdit.status == 'MAINTENANCE' ? 'selected' : ''}>MAINTENANCE</option>
-                                        <option value="BROKEN"    ${deviceEdit.status == 'BROKEN'       ? 'selected' : ''}>BROKEN</option>
-                                    </select>
-                                </div>
+                                
 
                                 <%-- Chỉ hiện nút Update khi KHÔNG bị lock --%>
                                 <div class="d-grid gap-2">

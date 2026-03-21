@@ -361,13 +361,7 @@
                                 '<td class="status-cell">' + statusHtml + '</td>' +
                                 '<td class="text-center pe-3">' +
                                     '<a href="' + CTX + '/admin-business/devices?action=edit&id=' + d.id + '" class="btn btn-sm btn-outline-primary mx-1"><i class="bi bi-pencil"></i></a>' +
-                                    (d.locked === 'true'
-                                        ? '<select class="form-select form-select-sm d-inline-block ms-1" style="width:95px;opacity:.5;cursor:not-allowed" disabled><option>' + esc(d.status) + '</option></select>'
-                                        : '<select class="form-select form-select-sm d-inline-block ms-1" style="width:95px" onchange="updateStatus(' + d.id + ', this)">' +
-                                          '<option value="ACTIVE"'      + (d.status === 'ACTIVE'      ? ' selected' : '') + '>Active</option>' +
-                                          '<option value="MAINTENANCE"' + (d.status === 'MAINTENANCE' ? ' selected' : '') + '>Maintenance</option>' +
-                                          '<option value="BROKEN"'      + (d.status === 'BROKEN'      ? ' selected' : '') + '>Broken</option>' +
-                                          '</select>') +
+                                    
                                 '</td>';
                             tbody.appendChild(tr);
                         });
@@ -397,22 +391,6 @@
                 return String(str)
                     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-            }
-
-            function updateStatus(deviceId, selectEl) {
-                var newStatus = selectEl.value;
-                fetch(CTX + '/admin-business/devices?action=updateStatus&id=' + deviceId + '&status=' + newStatus)
-                    .then(function(res) {
-                        if (!res.ok) throw new Error('Failed');
-                        var row = selectEl.closest('tr');
-                        var statusCell = row.querySelector('.status-cell');
-                        var badgeHtml;
-                        if      (newStatus === 'ACTIVE')      badgeHtml = '<span class="status-badge s-active">Active</span>';
-                        else if (newStatus === 'MAINTENANCE') badgeHtml = '<span class="status-badge s-maintenance">Maintenance</span>';
-                        else                                  badgeHtml = '<span class="status-badge s-broken">Broken</span>';
-                        statusCell.innerHTML = badgeHtml;
-                    })
-                    .catch(function() { alert('Cập nhật thất bại!'); location.reload(); });
             }
 
             function showDeviceDetail(deviceId) {
