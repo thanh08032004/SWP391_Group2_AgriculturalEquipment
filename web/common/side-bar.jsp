@@ -28,15 +28,17 @@
                 <li><a href="${pageContext.request.contextPath}/admin-business/invoice/list">Invoice Management</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/maintenance">Maintenance History</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin-business/contracts">Contract Management</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin-business/subcategory">Subcategory Management</a></li>
+
 
             </c:when>
             <c:when test="${sessionScope.userRole == 'TECHNICIAN'}">
                 <li><a href="${pageContext.request.contextPath}/technician/maintenance">Maintenance List</a></li>
                 <li><a href="${pageContext.request.contextPath}/technician/maintenance?action=mytasks">My Task</a></li>
-            </c:when>
-            <c:when test="${sessionScope.userRole == 'TECHLEADER'}">
+                </c:when>
+                <c:when test="${sessionScope.userRole == 'TECHLEADER'}">
                 <li><a href="${pageContext.request.contextPath}/leader/maintenance">Maintenance List</a></li>
-            </c:when>
+                </c:when>
 
         </c:choose>
     </ul>

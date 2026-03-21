@@ -20,4 +20,5 @@ public class SubcategoryDTO {
     private String name;
     private String description;
     private String status;
+    private String categoryName;
 }

@@ -24,7 +24,7 @@
         <servlet-name>CustomerMaintenanceDoneServlet</servlet-name>
         <servlet-class>controller.customer.CustomerMaintenanceDoneServlet</servlet-class>
     </servlet>
-            <servlet>
+    <servlet>
         <servlet-name>CustomerMaintenanceDetailServlet</servlet-name>
         <servlet-class>controller.customer.CustomerMaintenanceDetailServlet</servlet-class>
     </servlet>
@@ -47,6 +47,10 @@
     <servlet>
         <servlet-name>CustomerFeedbackEditServlet</servlet-name>
         <servlet-class>controller.customer.CustomerFeedbackEditServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminSubcategoryServlet</servlet-name>
+        <servlet-class>controller.adminBusiness.AdminSubcategoryServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>CustomerInvoiceDetail</servlet-name>
@@ -72,7 +76,7 @@
         <servlet-name>AdminReportServlet</servlet-name>
         <url-pattern>/admin-business/reports</url-pattern>
     </servlet-mapping>
-            <servlet-mapping>
+    <servlet-mapping>
         <servlet-name>CustomerMaintenanceDetailServlet</servlet-name>
         <url-pattern>/customer/maintenance/detail</url-pattern>
     </servlet-mapping>
@@ -92,9 +96,13 @@
         <servlet-name>CustomerFeedbackEditServlet</servlet-name>
         <url-pattern>/customer/feedback/edit</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminSubcategoryServlet</servlet-name>
+        <url-pattern>/admin-business/subcategory</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
-       <welcome-file>index.jsp</welcome-file>-->
-<!--                <welcome-file>/home</welcome-file>-->-->
+       <welcome-file>index.jsp</welcome-file>--&gt;
+<!--                <welcome-file>/home</welcome-file>-->--&gt;
     </welcome-file-list>
     <!-- SERVLETS -->
     <servlet>
