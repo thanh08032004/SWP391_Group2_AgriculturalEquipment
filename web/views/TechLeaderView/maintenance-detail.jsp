@@ -349,11 +349,7 @@
                                         </c:if>
                                     </div>
 
-                                    <c:if test="${task.status == 'DONE'}">
-                                        <button class="btn btn-success px-4 shadow-sm">
-                                            <i class="bi bi-file-earmark-medical"></i> View Invoice
-                                        </button>
-                                    </c:if>
+                                   
                                 </div>
                             </div>
                         </div>
