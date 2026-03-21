@@ -82,6 +82,26 @@
                         </a>
                     </div>
 
+                    <form method="get"
+                          action="${pageContext.request.contextPath}/admin-business/subcategory"
+                          class="row g-2 mb-4">
+                        <input type="hidden" name="action" value="list"/>
+                        <div class="col-md-4">
+                            <input type="text" name="keyword" 
+                                   value="<c:out value='${keyword}'/>"
+                                   class="form-control" placeholder="Search by subcategory name...">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                            <a href="${pageContext.request.contextPath}/admin-business/subcategory?action=list"
+                               class="btn btn-secondary ms-1">
+                                <i class="bi bi-arrow-counterclockwise"></i> Reset
+                            </a>
+                        </div>
+                    </form>
+
                     <%-- Accordion theo category --%>
                     <c:forEach var="cat" items="${categories}" varStatus="vs">
                         <%-- đếm số subcategory thuộc category này --%>
@@ -106,7 +126,7 @@
                                 </span>
                             </div>
 
-                            <div class="category-body" id="body-${vs.index}">
+                            <div class="category-body ${not empty keyword ? 'open' : ''}" id="body-${vs.index}">
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="table-light">
                                         <tr>
@@ -163,13 +183,45 @@
                         </div>
                     </c:forEach>
 
+                    <%-- Pagination --%>
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <c:if test="${currentPage > 1}">
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="subcategory?action=list&page=${currentPage - 1}&keyword=${keyword}">
+                                        &laquo;
+                                    </a>
+                                </li>
+                            </c:if>
+
+                            <c:forEach var="i" begin="1" end="${totalPage}">
+                                <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                    <a class="page-link"
+                                       href="subcategory?action=list&page=${i}&keyword=${keyword}">
+                                        ${i}
+                                    </a>
+                                </li>
+                            </c:forEach>
+
+                            <c:if test="${currentPage < totalPage}">
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="subcategory?action=list&page=${currentPage + 1}&keyword=${keyword}">
+                                        &raquo;
+                                    </a>
+                                </li>
+                            </c:if>
+                        </ul>
+                    </nav>
+
                 </div>
             </div>
         </div>
 
-       
 
-      
+
+
 
         <script>
             function toggleCat(idx) {
@@ -179,7 +231,19 @@
                 chev.classList.toggle('open');
             }
 
-            
+            window.onload = function () {
+                var keyword = '${not empty keyword ? keyword : ""}';
+                if (keyword.trim() !== '') {
+                    document.querySelectorAll('.category-body').forEach(function (body) {
+                        body.classList.add('open');
+                    });
+                    document.querySelectorAll('.chevron').forEach(function (chev) {
+                        chev.classList.add('open');
+                    });
+                }
+            };
+
+
         </script>
 
         <jsp:include page="/common/footer.jsp"/>

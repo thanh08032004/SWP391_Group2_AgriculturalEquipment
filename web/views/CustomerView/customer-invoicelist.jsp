@@ -6,7 +6,7 @@
 <html>
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
-            <title>Invoice Management</title>
+            <title>My Invoice</title>
             <style>
 
                 body{
@@ -99,7 +99,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h2 class="fw-bold">
                                 <i class="bi bi-receipt me-2"></i>
-                                Invoice Management
+                                My Invoice
                             </h2>
                         </div>
                         <div class="card border-0 shadow-sm rounded-3">
@@ -285,7 +285,7 @@
 
                                 document.getElementById('customerContent').innerHTML =
                                         '<div class="text-center mb-3">' +
-                                        '<img src="' + CTX + '/assets/images/avatars/' + (c.avatar || 'default.jpg') + '" class="rounded-circle border" style="width:80px;height:80px;object-fit:cover">' +
+                                        '<img src="' + CTX + '/assets/images/avatar/' + (c.avatar || 'default.jpg') + '" class="rounded-circle border" style="width:80px;height:80px;object-fit:cover">' +
                                         '<h5>' + c.fullname + '</h5>' +
                                         '</div>' +
                                         '<table class="table table-bordered">' +

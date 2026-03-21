@@ -334,7 +334,7 @@
 
                                 document.getElementById('customerContent').innerHTML =
                                         '<div class="text-center mb-3">' +
-                                        '<img src="' + CTX + '/assets/images/avatars/' + (c.avatar || 'default.jpg') + '" class="rounded-circle border" style="width:80px;height:80px;object-fit:cover">' +
+                                        '<img src="' + CTX + '/assets/images/avatar/' + (c.avatar || 'default.jpg') + '" class="rounded-circle border" style="width:80px;height:80px;object-fit:cover">' +
                                         '<h5>' + c.fullname + '</h5>' +
                                         '</div>' +
                                         '<table class="table table-bordered">' +
