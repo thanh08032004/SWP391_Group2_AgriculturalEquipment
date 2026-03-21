@@ -21,8 +21,6 @@
                     position: relative;
                     z-index: 1;
                 }
-
-                /* mỗi card */
                 .feedback-card {
                     flex: 0 0 calc(100% / 3);
                     max-width: calc(100% / 3);
@@ -30,8 +28,6 @@
                     /* cho phép click card */
                     pointer-events: auto;
                 }
-
-                /* card style */
                 .blog-wraper {
                     background: #fff;
                     border-radius: 12px;
@@ -39,22 +35,17 @@
                     overflow: hidden;
                     height: 100%;
                 }
-
-                /* ảnh */
                 .feedback-main-img {
                     width: 100%;
                     height: 140px;
                     object-fit: cover;
                 }
-
-                /* avatar */
                 .avatar {
                     width: 30px;
                     height: 30px;
                     border-radius: 50%;
                 }
 
-                /* zoom nhẹ */
                 .img-zoom img {
                     transition: transform 0.3s;
                 }
@@ -63,7 +54,6 @@
                     transform: scale(1.05);
                 }
 
-                /* NÚT */
                 .nav-btn {
                     position: absolute;
                     top: 50%;
@@ -75,11 +65,7 @@
                     padding: 10px 14px;
                     cursor: pointer;
                     border-radius: 50%;
-
-                    /* đảm bảo nổi lên trên */
                     z-index: 9999999;
-
-                    /* đảm bảo click được */
                     pointer-events: auto;
                 }
 
@@ -94,9 +80,6 @@
                 /* hover cho đẹp */
                 .nav-btn:hover {
                     background: #0056b3;
-                }
-                .nav-btn {
-                    background: red !important;
                 }
             </style>
         </head>
@@ -316,7 +299,7 @@
                                     <div class="img-zoom">
                                         <c:forEach var="img" items="${fb.images}" varStatus="loop">
                                             <c:if test="${loop.first}">
-                                                <img src="${pageContext.request.contextPath}/${img.imageUrl}" 
+                                                <img src="${pageContext.request.contextPath}/assets/images/${img.imageUrl}" 
                                                      class="feedback-main-img"/>
                                             </c:if>
                                         </c:forEach>

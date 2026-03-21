@@ -89,23 +89,11 @@
                         </div>
 
                         <div class="device-meta">
-                            Serial: ${d.serialNumber}
-                        </div>
-
-                        <div class="device-meta">
                             Category: ${d.categoryName}
                         </div>
 
                         <div class="device-meta">
                             Brand: ${d.brandName}
-                        </div>
-
-                        <div class="device-meta">
-                            Purchase: ${d.purchaseDate}
-                        </div>
-
-                        <div class="device-meta">
-                            Warranty: ${d.warrantyEndDate}
                         </div>
 
                     </div>
