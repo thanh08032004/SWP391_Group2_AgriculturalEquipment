@@ -157,8 +157,7 @@
                                                     </td>
                                                     <td class="text-muted small">Còn: ${sp.stock}</td>
                                                     <td class="text-center">
-                                                        <input type="hidden" name="paid_${sp.id}" value="false"/>
-                                                        <input type="checkbox" name="paid_${sp.id}" value="true"/>
+                                                        <input type="checkbox" name="paid_${sp.id}" value="true" checked/>
                                                     </td>
                                                 </tr>
                                             </c:forEach>
