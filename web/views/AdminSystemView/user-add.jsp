@@ -27,22 +27,22 @@
                             </c:if>
                             <form action="${pageContext.request.contextPath}/admin/user?action=create" method="post">
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold text-muted">USERNAME</label>
+                                    <label class="form-label small fw-bold text-muted">USERNAME <span class="text-danger">*</span></label>
                                     <input type="text" name="username" class="form-control" 
                                            value="<c:out value='${username}'/>" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold text-muted">FULL NAME</label>
+                                    <label class="form-label small fw-bold text-muted">FULL NAME <span class="text-danger">*</span></label>
                                     <input type="text" name="fullname" class="form-control" 
                                            value="<c:out value='${fullname}'/>" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold text-muted">EMAIL</label>
+                                    <label class="form-label small fw-bold text-muted">EMAIL <span class="text-danger">*</span></label>
                                     <input type="email" name="email" class="form-control" 
                                            value="<c:out value='${email}'/>" required>
                                 </div>
                                 <div class="mb-4">
-                                    <label class="form-label small fw-bold text-muted">ROLE</label>
+                                    <label class="form-label small fw-bold text-muted">ROLE <span class="text-danger">*</span></label>
                                     <select name="roleId" class="form-select" required>
                                         <option value="">-- Select Role --</option>
                                         <c:forEach var="role" items="${roles}">

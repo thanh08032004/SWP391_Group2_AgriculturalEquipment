@@ -124,7 +124,7 @@ public class AdminDeviceServlet extends HttpServlet {
                     request.setAttribute("brands", deviceDAO.getAllBrands());
                     request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
                     request.setAttribute("subcategoryList", deviceDAO.getAllSubcategories());
-                    request.setAttribute("sparePartList", deviceDAO.getAllSparePartsForDropdown()); // ← thêm
+                    request.setAttribute("sparePartList", deviceDAO.getAllSparePartsForDropdown());
                     request.getRequestDispatcher("/views/AdminBusinessView/device-add.jsp")
                             .forward(request, response);
                     break;
@@ -329,6 +329,10 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.setAttribute("customerId", request.getParameter("customerId"));
                 request.setAttribute("price", request.getParameter("price"));
                 request.setAttribute("categoryId", request.getParameter("categoryId"));
+                request.setAttribute("subcategoryList", deviceDAO.getAllSubcategories());
+                request.setAttribute("subcategoryId", request.getParameter("subcategoryId"));
+                request.setAttribute("sparePartList", deviceDAO.getAllSparePartsForDropdown());
+//                request.setAttribute("sparePartIds",request.getParameter("sparePartIds"));
                 request.setAttribute("brandId", request.getParameter("brandId"));
                 request.setAttribute("purchaseDate", request.getParameter("purchaseDate"));
                 request.setAttribute("warrantyEndDate", request.getParameter("warrantyEndDate"));
@@ -340,7 +344,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 return;
             }
 
-            int newDeviceId = deviceDAO.createDevice(d); // trả int (RETURN_GENERATED_KEYS)
+            int newDeviceId = deviceDAO.createDevice(d);
             if (newDeviceId > 0) {
                 List<Integer> spIds = new ArrayList<>();
                 String[] spRaw = request.getParameterValues("sparePartIds");

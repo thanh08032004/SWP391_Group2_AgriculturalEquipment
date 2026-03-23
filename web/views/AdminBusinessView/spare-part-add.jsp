@@ -18,16 +18,16 @@
                                 <div class="row">
                                     <div class="col-md-7 border-end">
                                         <div class="mb-3">
-                                            <label class="fw-bold">Code</label>
+                                            <label class="fw-bold">Code <span class="text-danger">*</span></label>
                                             <input type="text" name="partCode" class="form-control" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="fw-bold">Name</label>
+                                            <label class="fw-bold">Name <span class="text-danger">*</span></label>
                                             <input type="text" name="name" class="form-control" required>
                                         </div>
                                         <div class="row">
                                             <div class="col-6 mb-3">
-                                                <label class="fw-bold">Price</label>
+                                                <label class="fw-bold">Price <span class="text-danger">*</span></label>
                                                 <input type="number" 
                                                        name="price" 
                                                        class="form-control" 
@@ -38,11 +38,11 @@
                                                        required>
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label class="fw-bold">Quantity In Stock</label>
+                                                <label class="fw-bold">Quantity In Stock <span class="text-danger">*</span></label>
                                                 <input type="number" name="quantity" class="form-control" min="0" value="0" required>
                                             </div>                                            
                                             <div class="col-6 mb-3">
-                                                <label class="fw-bold">Unit</label>
+                                                <label class="fw-bold">Unit <span class="text-danger">*</span></label>
                                                 <select name="unit" class="form-select" required>
                                                     <option value="" disabled selected>-- Select Unit --</option>
                                                 <c:forEach var="u" items="${unitTypes}">
@@ -52,7 +52,7 @@
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="fw-bold text-primary">Compatible Devices (Hold Ctrl to select)</label>
+                                        <label class="fw-bold text-primary">Compatible Devices (Hold Ctrl to select) <span class="text-danger">*</span></label>
                                         <select name="compatibleDeviceIds" class="form-select" multiple style="height: 150px;" required>
                                             <c:forEach var="d" items="${devices}">
                                                 <option value="${d.id}">${d.machineName} - ${d.model}</option>

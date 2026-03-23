@@ -19,14 +19,11 @@
                             <input type="hidden" name="currentImage" value="${part.imageUrl}">
                             <div class="row">
                                 <div class="col-md-7 border-end">
-                                    <div class="mb-3"><label class="fw-bold">Name</label><input type="text" name="name" class="form-control" value="${part.name}" required></div>
-                                    <!--                                    <div class="row">
-                                                                            <div class="col-6 mb-3"><label class="fw-bold">Price (vnđ)</label><input type="number" name="price" class="form-control" value="${part.price}" required></div>
-                                                                            <div class="col-6 mb-3"><label class="fw-bold">Unit</label><input type="text" name="unit" class="form-control" value="${part.unit}" required></div>
-                                                                        </div>-->
+                                    <div class="mb-3"><label class="fw-bold">Name <span class="text-danger">*</span></label><input type="text" name="name" class="form-control" value="${part.name}" required></div>
+                                
                                     <div class="row">
                                         <div class="col-6 mb-3">
-                                            <label class="fw-bold">Price</label>
+                                            <label class="fw-bold">Price <span class="text-danger">*</span></label>
                                             <input type="number" 
                                                    name="price" 
                                                    class="form-control" 
@@ -38,12 +35,12 @@
                                                    required>
                                         </div>                                          
                                         <div class="col-6 mb-3">
-                                            <label class="fw-bold">Current Stock Quantity</label>
+                                            <label class="fw-bold">Current Stock Quantity <span class="text-danger">*</span></label>
                                             <input type="number" name="quantity" class="form-control" 
                                                    value="${part.quantity}" min="0" required>
                                         </div>         
                                         <div class="col-6 mb-3">
-                                            <label class="fw-bold">Unit</label>
+                                            <label class="fw-bold">Unit <span class="text-danger">*</span></label>
                                             <select name="unit" class="form-select" required>
                                                 <option value="" disabled>-- Select Unit --</option>
                                                 <c:forEach var="u" items="${unitTypes}">
@@ -55,8 +52,8 @@
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="fw-bold text-primary">Compatible Devices</label>
-                                        <select name="compatibleDeviceIds" class="form-select" multiple style="height: 150px;">
+                                        <label class="fw-bold text-primary">Compatible Devices <span class="text-danger">*</span></label>
+                                        <select name="compatibleDeviceIds" class="form-select" multiple style="height: 150px;" required>
                                             <c:forEach var="d" items="${devices}">
                                                 <c:set var="selected" value="false" />
                                                 <c:forEach var="compId" items="${part.compatibleDeviceIds}">

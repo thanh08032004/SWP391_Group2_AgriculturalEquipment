@@ -57,12 +57,12 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold text-muted">FULL NAME</label>
+                                    <label class="form-label small fw-bold text-muted">FULL NAME <span class="text-danger">*</span></label>
                                     <input type="text" name="fullname" class="form-control" value="${userEdit.fullname}" required>
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="form-label small fw-bold text-muted">EMAIL ADDRESS</label>
+                                    <label class="form-label small fw-bold text-muted">EMAIL ADDRESS <span class="text-danger">*</span></label>
                                     <input type="email" name="email" class="form-control" value="${userEdit.email}" required>
                                 </div>
 
