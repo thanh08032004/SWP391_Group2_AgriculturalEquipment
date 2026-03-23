@@ -205,42 +205,45 @@ public class DeviceDAO extends DBContext {
         return list;
     }
 
-    public boolean createDevice(DeviceDTO d) {
-        String sql = """
+    public int createDevice(DeviceDTO d) {
+    String sql = """
         INSERT INTO device
-        (customer_id, serial_number, machine_name, model,price,
+        (customer_id, serial_number, machine_name, model, price,
          purchase_date, warranty_end_date, status,
          category_id, brand_id, image, subcategory_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            if (d.getCustomerId() != null) {
-                ps.setInt(1, d.getCustomerId());
-            } else {
-                ps.setNull(1, java.sql.Types.INTEGER);
-            }
-            ps.setString(2, d.getSerialNumber());
-            ps.setString(3, d.getMachineName());
-            ps.setString(4, d.getModel());
-            ps.setBigDecimal(5, d.getPrice());
-            ps.setDate(6, d.getPurchaseDate());
-            ps.setDate(7, d.getWarrantyEndDate());
-            ps.setString(8, d.getStatus());
-            ps.setInt(9, d.getCategoryId());
-            ps.setInt(10, d.getBrandId());
-            ps.setString(11, d.getImage());
-            ps.setInt(12, d.getSubcategoryId());
-
-            int rows = ps.executeUpdate();
-            return rows > 0;
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (d.getCustomerId() != null) {
+            ps.setInt(1, d.getCustomerId());
+        } else {
+            ps.setNull(1, java.sql.Types.INTEGER);
         }
-        return false;
+        ps.setString(2, d.getSerialNumber());
+        ps.setString(3, d.getMachineName());
+        ps.setString(4, d.getModel());
+        ps.setBigDecimal(5, d.getPrice());
+        ps.setDate(6, d.getPurchaseDate());
+        ps.setDate(7, d.getWarrantyEndDate());
+        ps.setString(8, d.getStatus());
+        ps.setInt(9, d.getCategoryId());
+        ps.setInt(10, d.getBrandId());
+        ps.setString(11, d.getImage());
+        ps.setInt(12, d.getSubcategoryId());
+
+        ps.executeUpdate();
+
+        ResultSet rs = ps.getGeneratedKeys();
+        if (rs.next()) return rs.getInt(1);
+
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    return -1;
+}
 
     public boolean updateDevice(DeviceDTO d) {
         String sql = """
@@ -750,5 +753,71 @@ public List<Map<String, Object>> getDistinctCategoriesByCustomerPaging(
         }
         return list;
     }
+    
+    // lay tat ca spare parts (de hien thi multi-select)
+public List<Map<String, Object>> getAllSparePartsForDropdown() {
+    List<Map<String, Object>> list = new ArrayList<>();
+    String sql = """
+        SELECT sp.id, sp.name, sp.part_code, i.quantity
+        FROM spare_part sp
+        LEFT JOIN inventory i ON sp.id = i.spare_part_id
+        WHERE sp.active = TRUE
+        ORDER BY sp.name ASC
+    """;
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id",        rs.getInt("id"));
+            map.put("name",      rs.getString("name"));
+            map.put("partCode",  rs.getString("part_code"));
+            map.put("quantity",  rs.getInt("quantity"));
+            list.add(map);
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+    return list;
+}
+
+// lay danh sach spare_part_id da lien ket voi device
+public List<Integer> getLinkedSparePartIds(int deviceId) {
+    List<Integer> ids = new ArrayList<>();
+    String sql = "SELECT spare_part_id FROM device_spare_part WHERE device_id = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, deviceId);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) ids.add(rs.getInt(1));
+    } catch (Exception e) { e.printStackTrace(); }
+    return ids;
+}
+
+// luu lai spare parts lien ket voi device (xoa cu, insert moi)
+public boolean saveSparePartLinks(int deviceId, List<Integer> sparePartIds) {
+    String deleteSql = "DELETE FROM device_spare_part WHERE device_id = ?";
+    String insertSql = "INSERT INTO device_spare_part (device_id, spare_part_id) VALUES (?, ?)";
+    try (Connection conn = getConnection()) {
+        conn.setAutoCommit(false);
+        try (PreparedStatement psDel = conn.prepareStatement(deleteSql)) {
+            psDel.setInt(1, deviceId);
+            psDel.executeUpdate();
+        }
+        if (sparePartIds != null && !sparePartIds.isEmpty()) {
+            try (PreparedStatement psIns = conn.prepareStatement(insertSql)) {
+                for (Integer spId : sparePartIds) {
+                    psIns.setInt(1, deviceId);
+                    psIns.setInt(2, spId);
+                    psIns.addBatch();
+                }
+                psIns.executeBatch();
+            }
+        }
+        conn.commit();
+        return true;
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 
 }

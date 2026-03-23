@@ -148,6 +148,28 @@
                                     </select>
                                 </div>
 
+                                <%-- COMPATIBLE SPARE PARTS --%>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">
+                                        COMPATIBLE SPARE PARTS
+                                        <span class="text-muted fw-normal">(Hold Ctrl to select multiple)</span>
+                                    </label>
+                                    <select name="sparePartIds" class="form-select" multiple style="height: 160px;"
+                                            ${isLocked ? 'disabled' : ''}>
+                                        <c:forEach var="sp" items="${sparePartList}">
+                                            <c:set var="isLinked" value="false" />
+                                            <c:forEach var="linkedId" items="${linkedSparePartIds}">
+                                                <c:if test="${linkedId == sp.id}">
+                                                    <c:set var="isLinked" value="true" />
+                                                </c:if>
+                                            </c:forEach>
+                                            <option value="${sp.id}" ${isLinked ? 'selected' : ''}>
+                                                [${sp.partCode}] ${sp.name} – Stock: ${sp.quantity}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">PURCHASE DATE<span class="text-danger">*</span></label>
                                     <input type="date" name="purchaseDate" class="form-control"
@@ -207,25 +229,26 @@
                 });
             </script>
             <script>
-        var categorySelect    = document.getElementById('categorySelect');
-        var subcategorySelect = document.getElementById('subcategorySelect');
+                var categorySelect = document.getElementById('categorySelect');
+                var subcategorySelect = document.getElementById('subcategorySelect');
 
-        filterSubcategories();
-        categorySelect.addEventListener('change', filterSubcategories);
+                filterSubcategories();
+                categorySelect.addEventListener('change', filterSubcategories);
 
-        function filterSubcategories() {
-            var catId = categorySelect.value;
-            subcategorySelect.querySelectorAll('option').forEach(function(opt) {
-                if (!opt.value) return;
-                opt.hidden = opt.dataset.catid !== catId;
-            });
-            var selected = subcategorySelect.options[subcategorySelect.selectedIndex];
-            if (selected && selected.dataset.catid !== catId) {
-                subcategorySelect.value = '';
-            }
-        }
-    </script>
-            
+                function filterSubcategories() {
+                    var catId = categorySelect.value;
+                    subcategorySelect.querySelectorAll('option').forEach(function (opt) {
+                        if (!opt.value)
+                            return;
+                        opt.hidden = opt.dataset.catid !== catId;
+                    });
+                    var selected = subcategorySelect.options[subcategorySelect.selectedIndex];
+                    if (selected && selected.dataset.catid !== catId) {
+                        subcategorySelect.value = '';
+                    }
+                }
+            </script>
+
         </c:if>
 
         <jsp:include page="/common/footer.jsp"></jsp:include>

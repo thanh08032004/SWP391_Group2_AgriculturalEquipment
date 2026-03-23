@@ -175,6 +175,20 @@
                                     </select>
                                 </div>
 
+                                <%-- COMPATIBLE SPARE PARTS --%>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">
+                                        COMPATIBLE SPARE PARTS
+                                        <span class="text-muted fw-normal">(Hold Ctrl to select multiple)</span>
+                                    </label>
+                                    <select name="sparePartIds" class="form-select" multiple style="height: 160px;">
+                                        <c:forEach var="sp" items="${sparePartList}">
+                                            <option value="${sp.id}">
+                                                [${sp.partCode}] ${sp.name} – Stock: ${sp.quantity}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
                                 <!-- PURCHASE DATE -->
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">

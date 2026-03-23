@@ -3,18 +3,17 @@ package controller.adminBusiness;
 import dal.ContractDAO;
 import dal.DeviceDAO;
 import dto.CategoryDTO;
-import java.util.Comparator;
-
 import dto.DeviceDTO;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
-import java.io.IOException;
-import java.sql.Date;
-import java.util.List;
 import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.http.Part;
+import jakarta.servlet.http.*;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 @MultipartConfig(
@@ -125,6 +124,7 @@ public class AdminDeviceServlet extends HttpServlet {
                     request.setAttribute("brands", deviceDAO.getAllBrands());
                     request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
                     request.setAttribute("subcategoryList", deviceDAO.getAllSubcategories());
+                    request.setAttribute("sparePartList", deviceDAO.getAllSparePartsForDropdown()); // ← thêm
                     request.getRequestDispatcher("/views/AdminBusinessView/device-add.jsp")
                             .forward(request, response);
                     break;
@@ -133,18 +133,17 @@ public class AdminDeviceServlet extends HttpServlet {
                 case "edit": {
                     int id = Integer.parseInt(request.getParameter("id"));
                     DeviceDTO device = deviceDAO.getDeviceById(id);
-
-                    // Kiểm tra device có trong contract COMPLETE không
                     ContractDAO contractDAO = new ContractDAO();
                     boolean isLocked = contractDAO.isDeviceInCompletedContract(id);
 
                     request.setAttribute("deviceEdit", device);
-                    request.setAttribute("isLocked", isLocked); // ← truyền sang JSP
+                    request.setAttribute("isLocked", isLocked);
                     request.setAttribute("categories", deviceDAO.getAllCategories());
                     request.setAttribute("brands", deviceDAO.getAllBrands());
                     request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
                     request.setAttribute("subcategoryList", deviceDAO.getAllSubcategories());
-
+                    request.setAttribute("sparePartList", deviceDAO.getAllSparePartsForDropdown()); // ← thêm
+                    request.setAttribute("linkedSparePartIds", deviceDAO.getLinkedSparePartIds(id)); // ← thêm
                     request.getRequestDispatcher("/views/AdminBusinessView/device-edit.jsp")
                             .forward(request, response);
                     break;
@@ -290,7 +289,6 @@ public class AdminDeviceServlet extends HttpServlet {
             d.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             d.setBrandId(Integer.parseInt(request.getParameter("brandId")));
             d.setSubcategoryId(Integer.parseInt(request.getParameter("subcategoryId")));
-            
 
             try {
                 Date purchaseDate = Date.valueOf(request.getParameter("purchaseDate"));
@@ -342,12 +340,14 @@ public class AdminDeviceServlet extends HttpServlet {
                 return;
             }
 
-            boolean success = deviceDAO.createDevice(d);
-
-            if (success) {
+            int newDeviceId = deviceDAO.createDevice(d); // trả int (RETURN_GENERATED_KEYS)
+            if (newDeviceId > 0) {
+                List<Integer> spIds = new ArrayList<>();
+                String[] spRaw = request.getParameterValues("sparePartIds");
+                if (spRaw != null) for (String s : spRaw) spIds.add(Integer.parseInt(s));
+                deviceDAO.saveSparePartLinks(newDeviceId, spIds);
                 response.sendRedirect("devices?action=list");
             }
-
         } else if ("update".equals(action)) {
 
             int deviceId = Integer.parseInt(request.getParameter("id"));
@@ -451,6 +451,14 @@ public class AdminDeviceServlet extends HttpServlet {
             boolean success = deviceDAO.updateDevice(d);
 
             if (success) {
+                String[] spRaw = request.getParameterValues("sparePartIds");
+                List<Integer> spIds = new ArrayList<>();
+                if (spRaw != null) {
+                    for (String s : spRaw) {
+                        spIds.add(Integer.parseInt(s));
+                    }
+                }
+                deviceDAO.saveSparePartLinks(deviceId, spIds); 
                 response.sendRedirect("devices?action=list");
             } else {
                 request.setAttribute("error", "Update device failed!");
