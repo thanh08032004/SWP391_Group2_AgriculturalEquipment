@@ -1,5 +1,7 @@
 package controller.adminBusiness;
 
+import dal.UserDAO;
+import dal.UserProfileDAO;
 import dal.VoucherCustomerDAO;
 import dal.VoucherDAO;
 import model.Voucher;
@@ -8,6 +10,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
 import model.User;
+import model.UserProfile;
 
 public class AdminVoucherServlet extends HttpServlet {
 
@@ -34,6 +37,9 @@ public class AdminVoucherServlet extends HttpServlet {
                 break;
             case "delete":
                 deleteVoucher(req, resp);
+                break;
+            case "user-info":   // 👈 thêm dòng này
+                getUserInfo(req, resp);
                 break;
             default:
                 listVouchers(req, resp);
@@ -76,6 +82,10 @@ public class AdminVoucherServlet extends HttpServlet {
     /* ================= ADD ================= */
     private void showAddForm(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        UserDAO userDao = new UserDAO();
+        List<User> customers = userDao.getAllCustomers();
+
+        req.setAttribute("customers", customers);
         req.setAttribute("activeMenu", "voucher");
         req.getRequestDispatcher(
                 "/views/AdminBusinessView/voucher-add.jsp"
@@ -110,6 +120,10 @@ public class AdminVoucherServlet extends HttpServlet {
         req.setAttribute("activeMenu", "voucher");
         int id = Integer.parseInt(req.getParameter("id"));
 
+        UserDAO userDao = new UserDAO();
+        List<User> customers = userDao.getAllCustomers();
+
+        req.setAttribute("customers", customers);
         VoucherDAO dao = new VoucherDAO();
         Voucher voucher = dao.getVoucherById(id);
         String page = req.getParameter("page");
@@ -158,6 +172,34 @@ public class AdminVoucherServlet extends HttpServlet {
         );
     }
 
+    //get info
+    private void getUserInfo(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        int id = Integer.parseInt(req.getParameter("id"));
+
+        UserProfileDAO dao = new UserProfileDAO();
+        UserProfile p = dao.getUserProfileById(id);
+
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        if (p == null) {
+            resp.getWriter().write("{}");
+            return;
+        }
+
+        String json = String.format(
+                "{\"name\":\"%s\",\"phone\":\"%s\",\"email\":\"%s\",\"address\":\"%s\"}",
+                p.getFullname(),
+                p.getPhone(),
+                p.getEmail(),
+                p.getAddress()
+        );
+
+        resp.getWriter().write(json);
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -191,7 +233,7 @@ public class AdminVoucherServlet extends HttpServlet {
         v.setDiscountType(req.getParameter("discountType"));
         v.setVoucherType(req.getParameter("voucherType"));
         v.setActive(Boolean.parseBoolean(req.getParameter("isActive")));
-        v.setCreatedBy(business.getId());       
+        v.setCreatedBy(business.getId());
 
         // minServicePrice có thể rỗng
         String minStr = req.getParameter("minServicePrice");
@@ -249,13 +291,13 @@ public class AdminVoucherServlet extends HttpServlet {
 
         Voucher v = new Voucher();
         User business = (User) req.getSession().getAttribute("user");
-        
+
         // gán data trước
         v.setId(Integer.parseInt(req.getParameter("id")));
         v.setCode(req.getParameter("code"));
         v.setDescription(req.getParameter("description"));
         v.setDiscountType(req.getParameter("discountType"));
-        v.setVoucherType(req.getParameter("voucherType"));      
+        v.setVoucherType(req.getParameter("voucherType"));
         v.setActive(Boolean.parseBoolean(req.getParameter("isActive")));
 
         String minStr = req.getParameter("minServicePrice");

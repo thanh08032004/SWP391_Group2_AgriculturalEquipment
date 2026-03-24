@@ -7,7 +7,8 @@
             <title>Edit Voucher - AgriCMS</title>
         </head>
         <body class="bg-light">
-
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
         <jsp:include page="/common/header.jsp"></jsp:include>
 
             <div class="admin-layout">
@@ -166,21 +167,28 @@
                                             </div>
 
                                             <!-- Customer ID -->
+
+
                                             <div class="col-md-6 mb-3" id="customerIdField" style="display:none;">
                                                 <label class="form-label small fw-bold text-muted">
-                                                    Customer ID
+                                                    Customer
                                                 </label>
 
-                                                <input type="number"
-                                                       name="customerId"
-                                                       class="form-control"
-                                                       placeholder="Enter customer ID">
+                                                <select name="customerId" id="customerSelect" class="form-select">
+                                                    <option value="">-- Select Customer --</option>
+
+                                                    <c:forEach var="c" items="${customers}">
+                                                        <option value="${c.id}">
+                                                            ${c.id} - ${c.fullname} (${c.email})
+                                                        </option>
+                                                    </c:forEach>
+                                                </select>
                                             </div>
+
 
                                         </div>
                                         <script>
                                             function onVoucherTypeChange(select) {
-
                                                 const customerField = document.getElementById("customerIdField");
 
                                                 if (select.value === "CUSTOMER") {
@@ -188,8 +196,24 @@
                                                 } else {
                                                     customerField.style.display = "none";
                                                 }
-
                                             }
+
+// khi load trang (edit)
+                                            window.addEventListener("DOMContentLoaded", function () {
+                                                const select = document.querySelector("select[name='voucherType']");
+                                                if (select) {
+                                                    onVoucherTypeChange(select);
+                                                }
+                                            });
+                                        </script>
+                                        <script>
+                                            $(document).ready(function () {
+                                                $('#customerSelect').select2({
+                                                    placeholder: "Search customer...",
+                                                    allowClear: true,
+                                                    width: '100%'
+                                                });
+                                            });
                                         </script>
                                         <hr class="my-4">
 
@@ -225,7 +249,7 @@
                 </div>
             </div>
         </div>
-
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
         <jsp:include page="/common/scripts.jsp"></jsp:include>
     </body>
 </html>

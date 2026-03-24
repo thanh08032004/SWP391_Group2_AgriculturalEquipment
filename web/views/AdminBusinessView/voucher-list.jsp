@@ -125,10 +125,13 @@
                                                 </c:choose>
                                             </td>
                                             <td class="text-center">
-                                                <a href="${pageContext.request.contextPath}/admin-business/profile?id=${v.createdBy}">
-                                                    ${v.createdName}
-                                                </a>
-                                            </td>
+    <a href="javascript:void(0);"
+   class="view-user"
+   data-id="${v.createdBy}"
+   style="text-decoration: underline; color: #0d6efd; cursor: pointer;">
+    ${v.createdName}
+</a>
+</td>
 
                                             <td class="text-center d-flex align-items-center" >
                                                  <!-- Edit -->
@@ -192,8 +195,66 @@
             </main>
         </div>
 
+             <!-- USER MODAL -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+
+            <!-- HEADER -->
+            <div class="text-center p-4 text-white"
+                 style="background:#8B5A3C; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                     class="rounded-circle mb-2"
+                     width="80">
+                <h5 id="userName"></h5>
+                <small>CUSTOMER</small>
+            </div>
+
+            <!-- BODY -->
+            <div class="p-3">
+                <p><i class="bi bi-telephone"></i> <b>Phone:</b> <span id="userPhone"></span></p>
+                <p><i class="bi bi-envelope"></i> <b>Email:</b> <span id="userEmail"></span></p>
+                <p><i class="bi bi-geo-alt"></i> <b>Address:</b> <span id="userAddress"></span></p>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="text-center p-3">
+                <button class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>                           
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll(".view-user").forEach(btn => {
+        btn.addEventListener("click", function () {
+
+            let userId = this.getAttribute("data-id");
+
+            fetch(`admin-business/vouchers?action=user-info&id=${userId}`)
+                .then(res => res.json())
+                .then(data => {
+
+                    console.log(data); // 👈 debug
+
+                    document.getElementById("userName").innerText = data.name;
+                    document.getElementById("userPhone").innerText = data.phone;
+                    document.getElementById("userEmail").innerText = data.email;
+                    document.getElementById("userAddress").innerText = data.address;
+
+                    let modal = new bootstrap.Modal(document.getElementById("userModal"));
+                    modal.show();
+                })
+                .catch(err => console.error(err));
+        });
+    });
+
+});
+</script>                                      
         <!-- SCRIPT -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>       
     </body>
 </html>
 
