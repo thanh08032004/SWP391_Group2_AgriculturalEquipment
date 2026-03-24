@@ -18,8 +18,8 @@ import java.util.Set;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024,
-        maxFileSize = 1024 * 1024 * 5,
-        maxRequestSize = 1024 * 1024 * 10
+        maxFileSize = 1024 * 1024 * 20,
+        maxRequestSize = 1024 * 1024 * 25
 )
 
 public class AdminDeviceServlet extends HttpServlet {
@@ -319,7 +319,28 @@ public class AdminDeviceServlet extends HttpServlet {
             }
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-                filePart.write(uploadPath + File.separator + fileName);
+
+                // Lưu vào thư mục deploy (Tomcat đang chạy từ đây) → hiện ngay
+                String deployFolder = getServletContext().getRealPath("/")
+                        + "assets/images/devices/";
+                File deployDir = new File(deployFolder);
+                if (!deployDir.exists()) {
+                    deployDir.mkdirs();
+                }
+                filePart.write(deployFolder + File.separator + fileName);
+
+                // Lưu vào source (để không mất sau khi rebuild)
+                File srcDir = new File(uploadPath);
+                if (!srcDir.exists()) {
+                    srcDir.mkdirs();
+                }
+                // Copy file từ deploy sang source
+                File srcFile = new File(uploadPath + File.separator + fileName);
+                java.nio.file.Files.copy(
+                        new File(deployFolder + File.separator + fileName).toPath(),
+                        srcFile.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                );
             }
             d.setImage(fileName);
             if (hasError) {
@@ -348,7 +369,11 @@ public class AdminDeviceServlet extends HttpServlet {
             if (newDeviceId > 0) {
                 List<Integer> spIds = new ArrayList<>();
                 String[] spRaw = request.getParameterValues("sparePartIds");
-                if (spRaw != null) for (String s : spRaw) spIds.add(Integer.parseInt(s));
+                if (spRaw != null) {
+                    for (String s : spRaw) {
+                        spIds.add(Integer.parseInt(s));
+                    }
+                }
                 deviceDAO.saveSparePartLinks(newDeviceId, spIds);
                 response.sendRedirect("devices?action=list");
             }
@@ -408,7 +433,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.setAttribute("errorDate", "Ngày không hợp lệ");
                 hasError = true;
             }
-            d.setStatus(request.getParameter("status")); // ACTIVE / MAINTENANCE / BROKEN
+            
             d.setModel(request.getParameter("model"));
             String priceStr = request.getParameter("price");
             BigDecimal price = new BigDecimal("0.00");
@@ -438,7 +463,28 @@ public class AdminDeviceServlet extends HttpServlet {
             }
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-                filePart.write(uploadPath + File.separator + fileName);
+
+                // Lưu vào thư mục deploy (Tomcat đang chạy từ đây) → hiện ngay
+                String deployFolder = getServletContext().getRealPath("/")
+                        + "assets/images/devices/";
+                File deployDir = new File(deployFolder);
+                if (!deployDir.exists()) {
+                    deployDir.mkdirs();
+                }
+                filePart.write(deployFolder + File.separator + fileName);
+
+                // Lưu vào source (để không mất sau khi rebuild)
+                File srcDir = new File(uploadPath);
+                if (!srcDir.exists()) {
+                    srcDir.mkdirs();
+                }
+                // Copy file từ deploy sang source
+                File srcFile = new File(uploadPath + File.separator + fileName);
+                java.nio.file.Files.copy(
+                        new File(deployFolder + File.separator + fileName).toPath(),
+                        srcFile.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                );
             }
 
             d.setImage(fileName);
@@ -462,7 +508,7 @@ public class AdminDeviceServlet extends HttpServlet {
                         spIds.add(Integer.parseInt(s));
                     }
                 }
-                deviceDAO.saveSparePartLinks(deviceId, spIds); 
+                deviceDAO.saveSparePartLinks(deviceId, spIds);
                 response.sendRedirect("devices?action=list");
             } else {
                 request.setAttribute("error", "Update device failed!");

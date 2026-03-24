@@ -166,7 +166,7 @@ public class DeviceDAO extends DBContext {
                         .purchaseDate(rs.getDate("purchase_date"))
                         .warrantyEndDate(rs.getDate("warranty_end_date"))
                         .image(rs.getString("image"))
-                       .subcategoryId(rs.getInt("subcategory_id"))
+                        .subcategoryId(rs.getInt("subcategory_id"))
                         .categoryName(rs.getString("category_name"))
                         .brandName(rs.getString("brand_name"))
                         .customerName(rs.getString("customer_name"))
@@ -206,7 +206,7 @@ public class DeviceDAO extends DBContext {
     }
 
     public int createDevice(DeviceDTO d) {
-    String sql = """
+        String sql = """
         INSERT INTO device
         (customer_id, serial_number, machine_name, model, price,
          purchase_date, warranty_end_date, status,
@@ -214,36 +214,41 @@ public class DeviceDAO extends DBContext {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-        if (d.getCustomerId() != null) {
-            ps.setInt(1, d.getCustomerId());
-        } else {
-            ps.setNull(1, java.sql.Types.INTEGER);
+            if (d.getCustomerId() != null) {
+                ps.setInt(1, d.getCustomerId());
+            } else {
+                ps.setNull(1, java.sql.Types.INTEGER);
+            }
+            ps.setString(2, d.getSerialNumber());
+            ps.setString(3, d.getMachineName());
+            ps.setString(4, d.getModel());
+            ps.setBigDecimal(5, d.getPrice());
+            ps.setDate(6, d.getPurchaseDate());
+            ps.setDate(7, d.getWarrantyEndDate());
+            ps.setString(8, d.getStatus());
+            ps.setInt(9, d.getCategoryId());
+            ps.setInt(10, d.getBrandId());
+            ps.setString(11, d.getImage());
+            if (d.getSubcategoryId() != null && d.getSubcategoryId() > 0) {
+                ps.setInt(12, d.getSubcategoryId());
+            } else {
+                ps.setNull(12, java.sql.Types.INTEGER);
+            }
+
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        ps.setString(2, d.getSerialNumber());
-        ps.setString(3, d.getMachineName());
-        ps.setString(4, d.getModel());
-        ps.setBigDecimal(5, d.getPrice());
-        ps.setDate(6, d.getPurchaseDate());
-        ps.setDate(7, d.getWarrantyEndDate());
-        ps.setString(8, d.getStatus());
-        ps.setInt(9, d.getCategoryId());
-        ps.setInt(10, d.getBrandId());
-        ps.setString(11, d.getImage());
-        ps.setInt(12, d.getSubcategoryId());
-
-        ps.executeUpdate();
-
-        ResultSet rs = ps.getGeneratedKeys();
-        if (rs.next()) return rs.getInt(1);
-
-    } catch (Exception e) {
-        e.printStackTrace();
+        return -1;
     }
-    return -1;
-}
 
     public boolean updateDevice(DeviceDTO d) {
         String sql = """
@@ -256,7 +261,7 @@ public class DeviceDAO extends DBContext {
             brand_id = ?,
             purchase_date = ?,
             warranty_end_date = ?,
-            status = ?,
+            
             image = ?,
                      subcategory_id = ?
         WHERE id = ?
@@ -276,10 +281,14 @@ public class DeviceDAO extends DBContext {
             ps.setInt(6, d.getBrandId());
             ps.setDate(7, d.getPurchaseDate());
             ps.setDate(8, d.getWarrantyEndDate());
-            ps.setString(9, d.getStatus());
-            ps.setString(10, d.getImage());
-            ps.setInt(11, d.getSubcategoryId());
-            ps.setInt(12, d.getId());
+            
+            ps.setString(9, d.getImage());
+            if (d.getSubcategoryId() != null && d.getSubcategoryId() > 0) {
+                ps.setInt(10, d.getSubcategoryId());
+            } else {
+                ps.setNull(10, java.sql.Types.INTEGER);
+            }
+            ps.setInt(11, d.getId());
 
             return ps.executeUpdate() > 0;
 
@@ -503,9 +512,9 @@ public class DeviceDAO extends DBContext {
     }
 
     //1
-   public List<Map<String, Object>> getDevicesByCustomerFull(int customerId, String keyword) {
-    List<Map<String, Object>> list = new ArrayList<>();
-    String sql = """
+    public List<Map<String, Object>> getDevicesByCustomerFull(int customerId, String keyword) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = """
         SELECT d.id, d.serial_number, d.machine_name, d.model,
                d.status, d.image, d.purchase_date, d.warranty_end_date,
                d.category_id, d.subcategory_id,
@@ -528,57 +537,61 @@ public class DeviceDAO extends DBContext {
         AND d.machine_name LIKE ?
         ORDER BY c.name ASC, sc.name ASC, d.id DESC
     """;
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, customerId);
-        ps.setString(2, "%" + keyword + "%");
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id",                   rs.getInt("id"));
-            map.put("serialNumber",         rs.getString("serial_number"));
-            map.put("machineName",          rs.getString("machine_name"));
-            map.put("model",                rs.getString("model"));
-            map.put("status",               rs.getString("status"));
-            map.put("image",                rs.getString("image"));
-            map.put("purchaseDate",         rs.getDate("purchase_date"));
-            map.put("warrantyEndDate",      rs.getDate("warranty_end_date"));
-            map.put("categoryId",           rs.getInt("category_id"));
-            map.put("subcategoryId",        rs.getInt("subcategory_id"));
-            map.put("categoryName",         rs.getString("category_name"));
-            map.put("subcategoryName",      rs.getString("subcategory_name"));
-            map.put("brandName",            rs.getString("brand_name"));
-            map.put("currentMaintenanceId", rs.getInt("current_maintenance_id"));
-            map.put("maintenanceStatus",    rs.getString("maintenance_status"));
-            list.add(map);
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setString(2, "%" + keyword + "%");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", rs.getInt("id"));
+                map.put("serialNumber", rs.getString("serial_number"));
+                map.put("machineName", rs.getString("machine_name"));
+                map.put("model", rs.getString("model"));
+                map.put("status", rs.getString("status"));
+                map.put("image", rs.getString("image"));
+                map.put("purchaseDate", rs.getDate("purchase_date"));
+                map.put("warrantyEndDate", rs.getDate("warranty_end_date"));
+                map.put("categoryId", rs.getInt("category_id"));
+                map.put("subcategoryId", rs.getInt("subcategory_id"));
+                map.put("categoryName", rs.getString("category_name"));
+                map.put("subcategoryName", rs.getString("subcategory_name"));
+                map.put("brandName", rs.getString("brand_name"));
+                map.put("currentMaintenanceId", rs.getInt("current_maintenance_id"));
+                map.put("maintenanceStatus", rs.getString("maintenance_status"));
+                list.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
 
-   //2
-public int countDistinctCategoriesByCustomer(int customerId, String keyword) {
-    String sql = """
+    //2
+    public int countDistinctCategoriesByCustomer(int customerId, String keyword) {
+        String sql = """
         SELECT COUNT(DISTINCT d.category_id)
         FROM device d
         WHERE d.customer_id = ?
         AND d.machine_name LIKE ?
     """;
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, customerId);
-        ps.setString(2, "%" + keyword + "%");
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) return rs.getInt(1);
-    } catch (Exception e) { e.printStackTrace(); }
-    return 0;
-}
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setString(2, "%" + keyword + "%");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
 //3
-public List<Map<String, Object>> getDistinctCategoriesByCustomerPaging(
-        int customerId, String keyword, int page, int pageSize) {
-    List<Map<String, Object>> list = new ArrayList<>();
-    String sql = """
+    public List<Map<String, Object>> getDistinctCategoriesByCustomerPaging(
+            int customerId, String keyword, int page, int pageSize) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = """
         SELECT DISTINCT d.category_id, c.name AS category_name
         FROM device d
         JOIN category c ON d.category_id = c.id
@@ -587,21 +600,24 @@ public List<Map<String, Object>> getDistinctCategoriesByCustomerPaging(
         ORDER BY c.name ASC
         LIMIT ? OFFSET ?
     """;
-    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, customerId);
-        ps.setString(2, "%" + keyword + "%");
-        ps.setInt(3, pageSize);
-        ps.setInt(4, (page - 1) * pageSize);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("categoryId",   rs.getInt("category_id"));
-            map.put("categoryName", rs.getString("category_name"));
-            list.add(map);
+        try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setString(2, "%" + keyword + "%");
+            ps.setInt(3, pageSize);
+            ps.setInt(4, (page - 1) * pageSize);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("categoryId", rs.getInt("category_id"));
+                map.put("categoryName", rs.getString("category_name"));
+                list.add(map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) { e.printStackTrace(); }
-    return list;
-}
+        return list;
+    }
+
     public List<Map<String, Object>> getAllCustomersForDropdown() {
         List<Map<String, Object>> list = new ArrayList<>();
         String sql = """
@@ -753,71 +769,74 @@ public List<Map<String, Object>> getDistinctCategoriesByCustomerPaging(
         }
         return list;
     }
-    
+
     // lay tat ca spare parts (de hien thi multi-select)
-public List<Map<String, Object>> getAllSparePartsForDropdown() {
-    List<Map<String, Object>> list = new ArrayList<>();
-    String sql = """
+    public List<Map<String, Object>> getAllSparePartsForDropdown() {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = """
         SELECT sp.id, sp.name, sp.part_code, i.quantity
         FROM spare_part sp
         LEFT JOIN inventory i ON sp.id = i.spare_part_id
         WHERE sp.active = TRUE
         ORDER BY sp.name ASC
     """;
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-        while (rs.next()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id",        rs.getInt("id"));
-            map.put("name",      rs.getString("name"));
-            map.put("partCode",  rs.getString("part_code"));
-            map.put("quantity",  rs.getInt("quantity"));
-            list.add(map);
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", rs.getInt("id"));
+                map.put("name", rs.getString("name"));
+                map.put("partCode", rs.getString("part_code"));
+                map.put("quantity", rs.getInt("quantity"));
+                list.add(map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) { e.printStackTrace(); }
-    return list;
-}
+        return list;
+    }
 
 // lay danh sach spare_part_id da lien ket voi device
-public List<Integer> getLinkedSparePartIds(int deviceId) {
-    List<Integer> ids = new ArrayList<>();
-    String sql = "SELECT spare_part_id FROM device_spare_part WHERE device_id = ?";
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, deviceId);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) ids.add(rs.getInt(1));
-    } catch (Exception e) { e.printStackTrace(); }
-    return ids;
-}
+    public List<Integer> getLinkedSparePartIds(int deviceId) {
+        List<Integer> ids = new ArrayList<>();
+        String sql = "SELECT spare_part_id FROM device_spare_part WHERE device_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, deviceId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ids.add(rs.getInt(1));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ids;
+    }
 
 // luu lai spare parts lien ket voi device (xoa cu, insert moi)
-public boolean saveSparePartLinks(int deviceId, List<Integer> sparePartIds) {
-    String deleteSql = "DELETE FROM device_spare_part WHERE device_id = ?";
-    String insertSql = "INSERT INTO device_spare_part (device_id, spare_part_id) VALUES (?, ?)";
-    try (Connection conn = getConnection()) {
-        conn.setAutoCommit(false);
-        try (PreparedStatement psDel = conn.prepareStatement(deleteSql)) {
-            psDel.setInt(1, deviceId);
-            psDel.executeUpdate();
-        }
-        if (sparePartIds != null && !sparePartIds.isEmpty()) {
-            try (PreparedStatement psIns = conn.prepareStatement(insertSql)) {
-                for (Integer spId : sparePartIds) {
-                    psIns.setInt(1, deviceId);
-                    psIns.setInt(2, spId);
-                    psIns.addBatch();
-                }
-                psIns.executeBatch();
+    public boolean saveSparePartLinks(int deviceId, List<Integer> sparePartIds) {
+        String deleteSql = "DELETE FROM device_spare_part WHERE device_id = ?";
+        String insertSql = "INSERT INTO device_spare_part (device_id, spare_part_id) VALUES (?, ?)";
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement psDel = conn.prepareStatement(deleteSql)) {
+                psDel.setInt(1, deviceId);
+                psDel.executeUpdate();
             }
+            if (sparePartIds != null && !sparePartIds.isEmpty()) {
+                try (PreparedStatement psIns = conn.prepareStatement(insertSql)) {
+                    for (Integer spId : sparePartIds) {
+                        psIns.setInt(1, deviceId);
+                        psIns.setInt(2, spId);
+                        psIns.addBatch();
+                    }
+                    psIns.executeBatch();
+                }
+            }
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        conn.commit();
-        return true;
-    } catch (Exception e) {
-        e.printStackTrace();
+        return false;
     }
-    return false;
-}
 
 }

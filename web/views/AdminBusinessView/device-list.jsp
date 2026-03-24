@@ -344,8 +344,11 @@
                                 ? Number(d.price).toLocaleString('vi-VN') + ' VND' : 'N/A';
 
                             var tr = document.createElement('tr');
+                            var imgSrc = (d.image && d.image !== 'null' && d.image !== '') 
+    ? d.image : 'default_device.jpg';
                             tr.innerHTML =
-                                '<td class="ps-3"><img src="' + CTX + '/assets/images/devices/' + esc(d.image) + '" alt="' + esc(d.machine) + '" class="device-img"></td>' +
+                                    
+                                '<td class="ps-3"><img src="' + CTX + '/assets/images/devices/' + imgSrc + '" alt="' + esc(d.machine) + '" class="device-img"></td>' +
                                 '<td><strong>' + esc(d.serial) + '</strong></td>' +
                                 '<td><span style="cursor:pointer;color:#0d6efd;font-weight:600;" ' +
                                     'onclick="showDeviceDetail(' + d.id + ')" ' +

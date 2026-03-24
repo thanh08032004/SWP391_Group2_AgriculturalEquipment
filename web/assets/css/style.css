@@ -1786,16 +1786,17 @@ h2::before {
 
 
 .sidebar {
-    width: 260px; 
-    height: 100vh; 
+    width: 260px;
+    height: 100vh;
     background-color: #8C593B;
     color: #ffffff;
     padding-top: 12px;
     overflow-y: auto;
-    
-
-    position: sticky;
+    top: 60px; 
+    position: sticky;   /* ← đổi từ sticky sang fixed */
     top: 0;
+    left: 0;
+    z-index: 999;      /* ← thêm để không bị che */
     flex-shrink: 0;
 }
 

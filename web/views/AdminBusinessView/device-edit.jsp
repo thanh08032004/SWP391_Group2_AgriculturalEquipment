@@ -251,7 +251,6 @@
 
         </c:if>
 
-        <jsp:include page="/common/footer.jsp"></jsp:include>
         <jsp:include page="/common/scripts.jsp"></jsp:include>
     </body>
 </html>
