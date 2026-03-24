@@ -42,22 +42,25 @@ public class ContractDAO extends DBContext {
                 c.setCustomerName(rs.getString("fullname"));
 
                 c.setPartyA(rs.getString("party_a"));
+                c.setPartyARepresentative(rs.getString("party_a_representative"));
+                c.setPartyAIdentityCard(rs.getString("party_a_identity_card"));
 
                 c.setSignedAt(rs.getDate("signed_at"));
                 c.setEffectiveDate(rs.getDate("effective_date"));
                 c.setExpiryDate(rs.getDate("expiry_date"));
 
                 c.setTotalValue(rs.getBigDecimal("total_value"));
-
                 c.setPaymentTerms(rs.getString("payment_terms"));
                 c.setDescription(rs.getString("description"));
+                c.setStatus(rs.getString("status"));
                 c.setFileUrl(rs.getString("file_url"));
 
                 c.setCreatedBy(rs.getInt("created_by"));
-                c.setStatus(rs.getString("status"));
                 c.setCreatedAt(rs.getTimestamp("created_at"));
+
                 c.setCustomerCompany(rs.getString("customer_company"));
                 c.setCustomerTaxCode(rs.getString("customer_tax_code"));
+                c.setCustomerIdentityCard(rs.getString("customer_identity_card"));
 
                 return c;
             }
@@ -297,14 +300,15 @@ public class ContractDAO extends DBContext {
     public int insert(Contract c) {
 
         String sql = """
-            INSERT INTO contract
-            (contract_code, customer_id, party_a,
-             signed_at, effective_date, expiry_date,
-             total_value, payment_terms, description,
-             status, file_url, created_by,
-             customer_company, customer_tax_code)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+        INSERT INTO contract
+        (contract_code, customer_id, party_a, 
+         party_a_representative, party_a_identity_card,
+         signed_at, effective_date, expiry_date,
+         total_value, payment_terms, description,
+         status, file_url, created_by,
+         customer_company, customer_tax_code, customer_identity_card)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
         try (PreparedStatement ps = getConnection()
                 .prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -312,34 +316,37 @@ public class ContractDAO extends DBContext {
             ps.setString(1, c.getContractCode());
             ps.setInt(2, c.getCustomerId());
             ps.setString(3, c.getPartyA());
+            ps.setString(4, c.getPartyARepresentative());
+            ps.setString(5, c.getPartyAIdentityCard());
 
-            ps.setDate(4, new java.sql.Date(c.getSignedAt().getTime()));
+            ps.setDate(6, new java.sql.Date(c.getSignedAt().getTime()));
 
             if (c.getEffectiveDate() != null) {
-                ps.setDate(5, new java.sql.Date(c.getEffectiveDate().getTime()));
+                ps.setDate(7, new java.sql.Date(c.getEffectiveDate().getTime()));
             } else {
-                ps.setNull(5, java.sql.Types.DATE);
+                ps.setNull(7, java.sql.Types.DATE);
             }
 
             if (c.getExpiryDate() != null) {
-                ps.setDate(6, new java.sql.Date(c.getExpiryDate().getTime()));
+                ps.setDate(8, new java.sql.Date(c.getExpiryDate().getTime()));
             } else {
-                ps.setNull(6, java.sql.Types.DATE);
+                ps.setNull(8, java.sql.Types.DATE);
             }
 
             if (c.getTotalValue() != null) {
-                ps.setBigDecimal(7, c.getTotalValue());
+                ps.setBigDecimal(9, c.getTotalValue());
             } else {
-                ps.setNull(7, java.sql.Types.DECIMAL);
+                ps.setNull(9, java.sql.Types.DECIMAL);
             }
 
-            ps.setString(8, c.getPaymentTerms());
-            ps.setString(9, c.getDescription());
-            ps.setString(10, c.getStatus());
-            ps.setString(11, c.getFileUrl());
-            ps.setInt(12, c.getCreatedBy());
-            ps.setString(13, c.getCustomerCompany());
-            ps.setString(14, c.getCustomerTaxCode());
+            ps.setString(10, c.getPaymentTerms());
+            ps.setString(11, c.getDescription());
+            ps.setString(12, c.getStatus());
+            ps.setString(13, c.getFileUrl());
+            ps.setInt(14, c.getCreatedBy());
+            ps.setString(15, c.getCustomerCompany());
+            ps.setString(16, c.getCustomerTaxCode());
+            ps.setString(17, c.getCustomerIdentityCard());
 
             ps.executeUpdate();
 
@@ -406,55 +413,61 @@ public class ContractDAO extends DBContext {
     public void update(Contract c) {
 
         String sql = """
-            UPDATE contract SET
-                contract_code = ?,
-                customer_id = ?,
-                party_a = ?,
-                signed_at = ?,
-                effective_date = ?,
-                expiry_date = ?,
-                total_value = ?,
-                payment_terms = ?,
-                description = ?,
-                status = ?,
-                file_url = ?,
-                customer_company = ?,
-                customer_tax_code = ?,
-            WHERE id = ?
-        """;
+        UPDATE contract SET
+            contract_code = ?,
+            customer_id = ?,
+            party_a = ?,
+            party_a_representative = ?,
+            party_a_identity_card = ?,
+            signed_at = ?,
+            effective_date = ?,
+            expiry_date = ?,
+            total_value = ?,
+            payment_terms = ?,
+            description = ?,
+            status = ?,
+            file_url = ?,
+            customer_company = ?,
+            customer_tax_code = ?,
+            customer_identity_card = ?
+        WHERE id = ?
+    """;
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
 
             ps.setString(1, c.getContractCode());
             ps.setInt(2, c.getCustomerId());
             ps.setString(3, c.getPartyA());
-            ps.setDate(4, new java.sql.Date(c.getSignedAt().getTime()));
+            ps.setString(4, c.getPartyARepresentative());
+            ps.setString(5, c.getPartyAIdentityCard());
+            ps.setDate(6, new java.sql.Date(c.getSignedAt().getTime()));
 
             if (c.getEffectiveDate() != null) {
-                ps.setDate(5, new java.sql.Date(c.getEffectiveDate().getTime()));
+                ps.setDate(7, new java.sql.Date(c.getEffectiveDate().getTime()));
             } else {
-                ps.setNull(5, Types.DATE);
+                ps.setNull(7, Types.DATE);
             }
 
             if (c.getExpiryDate() != null) {
-                ps.setDate(6, new java.sql.Date(c.getExpiryDate().getTime()));
+                ps.setDate(8, new java.sql.Date(c.getExpiryDate().getTime()));
             } else {
-                ps.setNull(6, Types.DATE);
+                ps.setNull(8, Types.DATE);
             }
 
             if (c.getTotalValue() != null) {
-                ps.setBigDecimal(7, c.getTotalValue());
+                ps.setBigDecimal(9, c.getTotalValue());
             } else {
-                ps.setNull(7, Types.DECIMAL);
+                ps.setNull(9, Types.DECIMAL);
             }
 
-            ps.setString(8, c.getPaymentTerms());
-            ps.setString(9, c.getDescription());
-            ps.setString(10, c.getStatus());
-            ps.setString(11, c.getFileUrl());
-            ps.setString(12, c.getCustomerCompany());
-            ps.setString(13, c.getCustomerTaxCode());
-            ps.setInt(14, c.getId());
+            ps.setString(10, c.getPaymentTerms());
+            ps.setString(11, c.getDescription());
+            ps.setString(12, c.getStatus());
+            ps.setString(13, c.getFileUrl());
+            ps.setString(14, c.getCustomerCompany());
+            ps.setString(15, c.getCustomerTaxCode());
+            ps.setString(16, c.getCustomerIdentityCard());
+            ps.setInt(17, c.getId());
 
             ps.executeUpdate();
 

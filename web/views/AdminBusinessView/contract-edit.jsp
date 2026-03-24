@@ -71,34 +71,50 @@
                                         </div>
 
                                         <div class="row">
-
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label small fw-bold text-muted">
-                                                    Customer Company
-                                                </label>
-                                                <input type="text"
-                                                       name="customerCompany"
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label small fw-bold text-muted">Customer Company</label>
+                                                <input type="text" name="customerCompany"
                                                        class="form-control"
                                                        value="${contract.customerCompany}">
                                             </div>
 
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label small fw-bold text-muted">
-                                                    Tax Code Customer
-                                                </label>
-                                                <input type="text"
-                                                       name="customerTaxCode"
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label small fw-bold text-muted">Tax Code Customer</label>
+                                                <input type="text" name="customerTaxCode"
                                                        class="form-control"
                                                        value="${contract.customerTaxCode}">
                                             </div>
 
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label small fw-bold text-muted">Identity Card Customer</label>
+                                                <input type="text" name="customerIdentityCard"
+                                                       class="form-control"
+                                                       value="${contract.customerIdentityCard}">
+                                            </div>
                                         </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold text-muted">Party A</label>
-                                            <input type="text" name="partyA"
-                                                   class="form-control"
-                                                   value="${contract.partyA}">
+                                        <!-- PARTY A -->
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label small fw-bold text-muted">Party A (Company)</label>
+                                                <input type="text" name="partyA"
+                                                       class="form-control"
+                                                       value="${contract.partyA}" readonly>
+                                            </div>
+
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label small fw-bold text-muted">Representative of Party A</label>
+                                                <input type="text" name="partyARepresentative"
+                                                       class="form-control"
+                                                       value="${contract.partyARepresentative}">
+                                            </div>
+
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label small fw-bold text-muted">Identity Card of Party A</label>
+                                                <input type="text" name="partyAIdentityCard"
+                                                       class="form-control"
+                                                       value="${contract.partyAIdentityCard}">
+                                            </div>
                                         </div>
 
                                         <hr class="my-4">

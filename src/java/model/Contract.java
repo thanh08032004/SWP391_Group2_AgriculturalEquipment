@@ -29,7 +29,9 @@ public class Contract {
 
     // bên A (công ty)
     private String partyA;
-
+    private String partyARepresentative;       // Người đại diện bên bán
+    private String partyAIdentityCard;  
+    
     // ngày ký
     private Date signedAt;
 
@@ -61,4 +63,6 @@ public class Contract {
     
     private String customerCompany;
     private String customerTaxCode;
+    private String customerIdentityCard;
+    
 }

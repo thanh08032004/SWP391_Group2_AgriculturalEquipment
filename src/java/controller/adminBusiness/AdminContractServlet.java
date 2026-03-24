@@ -256,33 +256,35 @@ public class AdminContractServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if ("add".equals(action)) {
-
             try {
                 // ===== BASIC =====
                 String contractCode = request.getParameter("contractCode");
                 int customerId = Integer.parseInt(request.getParameter("customerId"));
-                String partyA = request.getParameter("partyA");
+                String partyA = request.getParameter("partyACompany");
+
+                String partyARepresentative = request.getParameter("partyARepresentative");
+                String partyAIdentityCard = request.getParameter("partyAIdentityCard");
 
                 // ===== DATE =====
                 java.sql.Date signedAt = java.sql.Date.valueOf(request.getParameter("signedAt"));
 
                 java.sql.Date effectiveDate = null;
-                if (request.getParameter("effectiveDate") != null
-                        && !request.getParameter("effectiveDate").isEmpty()) {
-                    effectiveDate = java.sql.Date.valueOf(request.getParameter("effectiveDate"));
+                String eff = request.getParameter("effectiveDate");
+                if (eff != null && !eff.isEmpty()) {
+                    effectiveDate = java.sql.Date.valueOf(eff);
                 }
 
                 java.sql.Date expiryDate = null;
-                if (request.getParameter("expiryDate") != null
-                        && !request.getParameter("expiryDate").isEmpty()) {
-                    expiryDate = java.sql.Date.valueOf(request.getParameter("expiryDate"));
+                String exp = request.getParameter("expiryDate");
+                if (exp != null && !exp.isEmpty()) {
+                    expiryDate = java.sql.Date.valueOf(exp);
                 }
 
                 // ===== VALUE =====
                 BigDecimal totalValue = null;
-                if (request.getParameter("totalValue") != null
-                        && !request.getParameter("totalValue").isEmpty()) {
-                    totalValue = new BigDecimal(request.getParameter("totalValue"));
+                String val = request.getParameter("totalValue");
+                if (val != null && !val.isEmpty()) {
+                    totalValue = new BigDecimal(val);
                 }
 
                 String status = request.getParameter("status");
@@ -290,24 +292,19 @@ public class AdminContractServlet extends HttpServlet {
                 String description = request.getParameter("description");
                 String customerCompany = request.getParameter("customerCompany");
                 String customerTaxCode = request.getParameter("customerTaxCode");
+                String customerIdentityCard = request.getParameter("customerIdentityCard");
 
                 // ===== FILE =====
                 Part filePart = request.getPart("file");
                 String fileUrl = null;
-
                 if (filePart != null && filePart.getSize() > 0) {
-
                     String fileName = filePart.getSubmittedFileName();
-
                     String uploadPath = getServletContext().getRealPath("/assets/contracts");
-
                     File dir = new File(uploadPath);
                     if (!dir.exists()) {
                         dir.mkdirs();
                     }
-
                     filePart.write(uploadPath + File.separator + fileName);
-
                     fileUrl = "assets/contracts/" + fileName;
                 }
 
@@ -317,74 +314,60 @@ public class AdminContractServlet extends HttpServlet {
                 int createdBy = (user != null) ? user.getId() : 1;
 
                 // ===== BUILD OBJECT =====
-                Contract c = new Contract();
-                c.setContractCode(contractCode);
-                c.setCustomerId(customerId);
-                c.setPartyA(partyA);
-                c.setSignedAt(new java.util.Date(signedAt.getTime()));
-
-                c.setEffectiveDate(effectiveDate != null
-                        ? new java.util.Date(effectiveDate.getTime())
-                        : null);
-
-                c.setExpiryDate(expiryDate != null
-                        ? new java.util.Date(expiryDate.getTime())
-                        : null);
-
-                c.setTotalValue(totalValue);
-                c.setPaymentTerms(paymentTerms);
-                c.setDescription(description);
-                c.setStatus(status);
-                c.setFileUrl(fileUrl);
-                c.setCreatedBy(createdBy);
-                c.setCustomerCompany(customerCompany);
-                c.setCustomerTaxCode(customerTaxCode);
+                Contract c = Contract.builder()
+                        .contractCode(contractCode)
+                        .customerId(customerId)
+                        .partyA(partyA)
+                        .partyARepresentative(partyARepresentative)
+                        .partyAIdentityCard(partyAIdentityCard)
+                        .signedAt(new java.util.Date(signedAt.getTime()))
+                        .effectiveDate(effectiveDate != null ? new java.util.Date(effectiveDate.getTime()) : null)
+                        .expiryDate(expiryDate != null ? new java.util.Date(expiryDate.getTime()) : null)
+                        .totalValue(totalValue)
+                        .status(status)
+                        .paymentTerms(paymentTerms)
+                        .description(description)
+                        .fileUrl(fileUrl)
+                        .createdBy(createdBy)
+                        .customerCompany(customerCompany)
+                        .customerTaxCode(customerTaxCode)
+                        .customerIdentityCard(customerIdentityCard)
+                        .build();
 
                 // ===== INSERT CONTRACT =====
                 int contractId = dao.insert(c);
 
                 // ===== INSERT MULTI DEVICE =====
-                DeviceDAO deviceDAO = new DeviceDAO();
                 String[] deviceData = request.getParameterValues("deviceData");
-
                 if (deviceData != null) {
+                    DeviceDAO deviceDAO = new DeviceDAO();
                     for (String item : deviceData) {
                         String[] parts = item.split("-");
                         int deviceId = Integer.parseInt(parts[0]);
                         int subId = Integer.parseInt(parts[1]);
-
                         dao.addDeviceToContract(contractId, deviceId, subId);
                         deviceDAO.updateCustomerForDevice(deviceId, customerId);
                     }
                 }
 
                 // ===== REDIRECT =====
-                response.sendRedirect(request.getContextPath()
-                        + "/admin-business/contracts?action=list");
+                response.sendRedirect(request.getContextPath() + "/admin-business/contracts?action=list");
 
             } catch (Exception e) {
                 e.printStackTrace();
-
                 request.setAttribute("error", "Create contract failed!");
-
                 UserDAO userDAO = new UserDAO();
                 DeviceDAO deviceDAO = new DeviceDAO();
-
                 request.setAttribute("userList", userDAO.getAllCustomers());
                 request.setAttribute("deviceList", deviceDAO.getDevicesWithoutCustomer());
-
-                request.getRequestDispatcher("/views/AdminBusinessView/contract-add.jsp")
-                        .forward(request, response);
+                request.getRequestDispatcher("/views/AdminBusinessView/contract-add.jsp").forward(request, response);
             }
         }
 
         if ("update".equals(action)) {
-
             try {
                 int id = Integer.parseInt(request.getParameter("id"));
-
                 String contractCode = request.getParameter("contractCode");
-
                 int customerId = Integer.parseInt(request.getParameter("customerId"));
                 String partyA = request.getParameter("partyA");
 
@@ -392,20 +375,17 @@ public class AdminContractServlet extends HttpServlet {
                 java.sql.Date signedAt = java.sql.Date.valueOf(request.getParameter("signedAt"));
 
                 java.sql.Date effectiveDate = null;
-                if (request.getParameter("effectiveDate") != null
-                        && !request.getParameter("effectiveDate").isEmpty()) {
+                if (request.getParameter("effectiveDate") != null && !request.getParameter("effectiveDate").isEmpty()) {
                     effectiveDate = java.sql.Date.valueOf(request.getParameter("effectiveDate"));
                 }
 
                 java.sql.Date expiryDate = null;
-                if (request.getParameter("expiryDate") != null
-                        && !request.getParameter("expiryDate").isEmpty()) {
+                if (request.getParameter("expiryDate") != null && !request.getParameter("expiryDate").isEmpty()) {
                     expiryDate = java.sql.Date.valueOf(request.getParameter("expiryDate"));
                 }
 
                 BigDecimal totalValue = null;
-                if (request.getParameter("totalValue") != null
-                        && !request.getParameter("totalValue").isEmpty()) {
+                if (request.getParameter("totalValue") != null && !request.getParameter("totalValue").isEmpty()) {
                     totalValue = new BigDecimal(request.getParameter("totalValue"));
                 }
 
@@ -413,6 +393,7 @@ public class AdminContractServlet extends HttpServlet {
                 String paymentTerms = request.getParameter("paymentTerms");
                 String description = request.getParameter("description");
 
+                // ===== EXISTING CONTRACT =====
                 Contract old = dao.getById(id);
 
                 // ===== FILE =====
@@ -420,15 +401,12 @@ public class AdminContractServlet extends HttpServlet {
                 String fileUrl = old.getFileUrl();
 
                 if (filePart != null && filePart.getSize() > 0) {
-
                     String fileName = filePart.getSubmittedFileName();
                     String uploadPath = getServletContext().getRealPath("/assets/contracts");
-
                     File dir = new File(uploadPath);
                     if (!dir.exists()) {
                         dir.mkdirs();
                     }
-
                     filePart.write(uploadPath + File.separator + fileName);
                     fileUrl = "assets/contracts/" + fileName;
                 }
@@ -439,6 +417,8 @@ public class AdminContractServlet extends HttpServlet {
                 c.setContractCode(contractCode);
                 c.setCustomerId(customerId);
                 c.setPartyA(partyA);
+                c.setPartyARepresentative(request.getParameter("partyARepresentative"));
+                c.setPartyAIdentityCard(request.getParameter("partyAIdentityCard"));
                 c.setSignedAt(new java.util.Date(signedAt.getTime()));
                 c.setEffectiveDate(effectiveDate != null ? new Date(effectiveDate.getTime()) : null);
                 c.setExpiryDate(expiryDate != null ? new Date(expiryDate.getTime()) : null);
@@ -447,32 +427,29 @@ public class AdminContractServlet extends HttpServlet {
                 c.setDescription(description);
                 c.setStatus(status);
                 c.setFileUrl(fileUrl);
+
+                // ===== CUSTOMER INFO =====
                 c.setCustomerCompany(request.getParameter("customerCompany"));
                 c.setCustomerTaxCode(request.getParameter("customerTaxCode"));
+                c.setCustomerIdentityCard(request.getParameter("customerIdentityCard"));
 
                 dao.update(c);
 
-                // ===== CURRENT DEVICES =====
+                // ===== DEVICES =====
                 List<Integer> currentDevices = dao.getDeviceIdsByContract(id);
                 Set<Integer> currentSet = new HashSet<>(currentDevices);
 
-                // ===== NEW DEVICES FROM FORM =====
                 String[] deviceData = request.getParameterValues("deviceData");
-
                 Set<Integer> newDevices = new HashSet<>();
-
                 DeviceDAO deviceDAO = new DeviceDAO();
 
                 if (deviceData != null) {
                     for (String item : deviceData) {
-
                         String[] parts = item.split("-");
                         int deviceId = Integer.parseInt(parts[0]);
                         int subId = Integer.parseInt(parts[1]);
-
                         newDevices.add(deviceId);
 
-                        // ADD nếu chưa có
                         if (!currentSet.contains(deviceId)) {
                             dao.addDeviceToContract(id, deviceId, subId);
                             deviceDAO.updateCustomerForDevice(deviceId, customerId);
@@ -480,15 +457,13 @@ public class AdminContractServlet extends HttpServlet {
                     }
                 }
 
-                // ===== REMOVE =====
                 for (Integer deviceId : currentSet) {
                     if (!newDevices.contains(deviceId)) {
                         dao.removeDeviceFromContract(id, deviceId);
                     }
                 }
 
-                response.sendRedirect(request.getContextPath()
-                        + "/admin-business/contracts?action=list");
+                response.sendRedirect(request.getContextPath() + "/admin-business/contracts?action=list");
 
             } catch (Exception e) {
                 e.printStackTrace();

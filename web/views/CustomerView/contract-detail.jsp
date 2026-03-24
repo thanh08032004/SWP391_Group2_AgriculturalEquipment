@@ -64,8 +64,24 @@
                                     <strong>Customer Company:</strong> ${contract.customerCompany}
                                 </div>
                                 <div class="col-md-6">
+                                    <strong>Party A Representative:</strong> ${contract.partyARepresentative}
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <strong>Customer Identity Card:</strong> ${contract.customerIdentityCard}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Party A Identity Card:</strong> ${contract.partyAIdentityCard}
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-6">
                                     <strong>Tax Code Customer:</strong> ${contract.customerTaxCode}
                                 </div>
+
                             </div>
 
                             <div class="row mb-2">
@@ -83,7 +99,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <strong>Total Value:</strong>
-                                    <fmt:formatNumber value="${contract.totalValue}" type="number" groupingUsed="true"/> VNĐ
+                                    <fmt:formatNumber value="${contract.totalValue}" type="number" groupingUsed="true"/> đ
                                 </div>
                             </div>
 
@@ -184,10 +200,10 @@
                                                     <td class="fw-semibold text-primary">${s.subcategoryName}</td>
                                                     <td>${s.quantity}</td>
                                                     <td>
-                                                        <fmt:formatNumber value="${s.unitPrice}" type="number" groupingUsed="true"/> VNĐ
+                                                        <fmt:formatNumber value="${s.unitPrice}" type="number" groupingUsed="true"/> đ
                                                     </td>
                                                     <td>
-                                                        <fmt:formatNumber value="${s.totalPrice}" type="number" groupingUsed="true"/> VNĐ
+                                                        <fmt:formatNumber value="${s.totalPrice}" type="number" groupingUsed="true"/> đ
                                                     </td>
                                                 </tr>
                                             </c:forEach>
@@ -278,20 +294,20 @@
             fetch(CTX + '/customer/contract/list?action=getDevicesBySub&subId=' + subId + '&contractId=${contract.id}')
                     .then(res => res.json())
                     .then(list => {
-                        let html = '<table class="table table-bordered">';
+                        let html = '<div class="table-responsive"><table class="table table-bordered">';
                         html += '<tr><th>ID</th><th>Name</th><th>Price</th><th>Action</th></tr>';
 
                         list.forEach(d => {
                             html += '<tr>'
-                                    + '<td>' + d.id + '</td>'
-                                    + '<td>' + esc(d.machineName) + '</td>'
-                                    + '<td>' + esc(d.price) + ' VNĐ</td>'
+                                    + '<td style="max-width:80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + d.id + '</td>'
+                                    + '<td style="max-width:200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + esc(d.machineName) + '</td>'
+                                    + '<td style="max-width:120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + esc(d.price) + ' VNĐ</td>'
                                     + '<td><button class="btn btn-primary btn-sm" onclick="showDeviceDetail(' + d.id + ')">'
                                     + '<i class="bi bi-eye"></i> View</button></td>'
                                     + '</tr>';
                         });
 
-                        html += '</table>';
+                        html += '</table></div>';
 
                         document.getElementById('subDeviceContent').innerHTML = html;
                     })
