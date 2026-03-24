@@ -353,7 +353,17 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.setAttribute("subcategoryList", deviceDAO.getAllSubcategories());
                 request.setAttribute("subcategoryId", request.getParameter("subcategoryId"));
                 request.setAttribute("sparePartList", deviceDAO.getAllSparePartsForDropdown());
-//                request.setAttribute("sparePartIds",request.getParameter("sparePartIds"));
+                String[] selectedSpIds = request.getParameterValues("sparePartIds");
+                if (selectedSpIds != null) {
+                    List<Integer> selectedSpIdList = new ArrayList<>();
+                    for (String s : selectedSpIds) {
+                        try {
+                            selectedSpIdList.add(Integer.parseInt(s));
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
+                    request.setAttribute("linkedSparePartIds", selectedSpIdList);
+                }
                 request.setAttribute("brandId", request.getParameter("brandId"));
                 request.setAttribute("purchaseDate", request.getParameter("purchaseDate"));
                 request.setAttribute("warrantyEndDate", request.getParameter("warrantyEndDate"));
@@ -433,7 +443,7 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.setAttribute("errorDate", "Ngày không hợp lệ");
                 hasError = true;
             }
-            
+
             d.setModel(request.getParameter("model"));
             String priceStr = request.getParameter("price");
             BigDecimal price = new BigDecimal("0.00");

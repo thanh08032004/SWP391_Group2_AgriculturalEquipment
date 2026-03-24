@@ -183,7 +183,13 @@
                                     </label>
                                     <select name="sparePartIds" class="form-select" multiple style="height: 160px;">
                                         <c:forEach var="sp" items="${sparePartList}">
-                                            <option value="${sp.id}">
+                                            <c:set var="isSelected" value="false"/>
+                                            <c:forEach var="linkedId" items="${linkedSparePartIds}">
+                                                <c:if test="${linkedId == sp.id}">
+                                                    <c:set var="isSelected" value="true"/>
+                                                </c:if>
+                                            </c:forEach>
+                                            <option value="${sp.id}" ${isSelected ? 'selected' : ''}>
                                                 [${sp.partCode}] ${sp.name} – Stock: ${sp.quantity}
                                             </option>
                                         </c:forEach>
