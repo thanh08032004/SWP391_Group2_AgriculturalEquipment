@@ -337,6 +337,7 @@ public class SparePartDAO extends DBContext {
                 sp.setUnit(rs.getString("unit"));
                 sp.setPrice(rs.getBigDecimal("price"));
                 sp.setStock(rs.getInt("stock"));
+                sp.setImageUrl(rs.getString("image"));
                 list.add(sp);
             }
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package controller.adminBusiness;
 
 import dal.ContractDAO;
 import dal.DeviceDAO;
+import dal.SparePartDAO;
 import dto.CategoryDTO;
 import dto.DeviceDTO;
 import jakarta.servlet.ServletException;
@@ -216,6 +217,57 @@ public class AdminDeviceServlet extends HttpServlet {
                         response.getWriter().write(json);
                     }
                     return;
+                case "getSparePartsByDeviceJson": {
+                    int devId = Integer.parseInt(request.getParameter("id"));
+                    SparePartDAO spDAO = new dal.SparePartDAO();
+                    List<model.SparePart> parts = spDAO.getSparePartByDeviceId(devId);
+
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+
+                    StringBuilder json = new StringBuilder("[");
+                    for (int i = 0; i < parts.size(); i++) {
+                        model.SparePart sp = parts.get(i);
+                        if (i > 0) {
+                            json.append(",");
+                        }
+                        json.append(String.format(
+                                "{\"id\":%d,\"name\":\"%s\",\"image\":\"%s\"}",
+                                sp.getId(),
+                                sp.getName() != null ? sp.getName().replace("\"", "\\\"") : "",
+                                sp.getImageUrl() != null ? sp.getImageUrl().replace("\"", "\\\"") : "default_spare.jpg"
+                        ));
+                    }
+                    json.append("]");
+                    response.getWriter().write(json.toString());
+                    return;
+                }
+
+                case "getSparePartDetailJson": {
+                    int spId = Integer.parseInt(request.getParameter("id"));
+                    dal.SparePartDAO spDAO = new dal.SparePartDAO();
+                    model.SparePart sp = spDAO.findSparePartById(spId);
+
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+
+                    if (sp != null) {
+                        String json = String.format(
+                                "{\"id\":%d,\"partCode\":\"%s\",\"name\":\"%s\",\"description\":\"%s\","
+                                + "\"unit\":\"%s\",\"price\":\"%s\",\"stock\":%d,\"image\":\"%s\"}",
+                                sp.getId(),
+                                sp.getPartCode() != null ? sp.getPartCode().replace("\"", "\\\"") : "",
+                                sp.getName() != null ? sp.getName().replace("\"", "\\\"") : "",
+                                sp.getDescription() != null ? sp.getDescription().replace("\"", "\\\"") : "",
+                                sp.getUnit() != null ? sp.getUnit().replace("\"", "\\\"") : "",
+                                sp.getPrice() != null ? sp.getPrice().toPlainString() : "0",
+                                sp.getStock(),
+                                sp.getImageUrl() != null ? sp.getImageUrl().replace("\"", "\\\"") : "default_spare.jpg"
+                        );
+                        response.getWriter().write(json);
+                    }
+                    return;
+                }
 
                 default: {
                     response.sendRedirect("devices?action=list");
