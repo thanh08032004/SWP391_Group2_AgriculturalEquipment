@@ -176,25 +176,25 @@
                                         <hr class="my-4">
 
                                         <!-- DATE -->
-                                        <h6 class="fw-bold text-primary mb-3">Date</h6>
+                                        <h6 class="fw-bold text-primary mb-3">Date Information</h6>
 
                                         <div class="row">
                                             <div class="col-md-4 mb-3">
-                                                <label>Signed</label>
+                                                <label>Signed Date</label>
                                                 <input type="date" name="signedAt"
                                                        class="form-control"
                                                        value="${contract.signedAt}" required>
                                             </div>
 
                                             <div class="col-md-4 mb-3">
-                                                <label>Effective</label>
+                                                <label>Effective Date</label>
                                                 <input type="date" name="effectiveDate"
                                                        class="form-control"
                                                        value="${contract.effectiveDate}">
                                             </div>
 
                                             <div class="col-md-4 mb-3">
-                                                <label>Expiry</label>
+                                                <label>Expiry Date</label>
                                                 <input type="date" name="expiryDate"
                                                        class="form-control"
                                                        value="${contract.expiryDate}">
@@ -204,10 +204,13 @@
                                         <hr class="my-4">
 
                                         <!-- VALUE -->
-                                        <h6 class="fw-bold text-primary mb-3">Value</h6>
+                                        <h6 class="fw-bold text-primary mb-3">Contract Value</h6>
 
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
+                                                <label class="form-label small fw-bold text-muted">
+                                                    Total Value (VNĐ)
+                                                </label>
                                                 <input type="number" name="totalValue"
                                                        id="totalValue"
                                                        class="form-control"
@@ -216,6 +219,9 @@
                                             </div>
 
                                             <div class="col-md-6 mb-3">
+                                                <label class="form-label small fw-bold text-muted">
+                                                    Status
+                                                </label>
                                                 <select name="status" class="form-select">
                                                     <option value="DRAFT" ${contract.status == 'DRAFT' ? 'selected' : ''}>DRAFT</option>
                                                     <option value="ACTIVE" ${contract.status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
@@ -226,6 +232,9 @@
                                         </div>
 
                                         <div class="mb-3">
+                                            <label class="form-label small fw-bold text-muted">
+                                                Payment Terms
+                                            </label>
                                             <textarea name="paymentTerms"
                                                       class="form-control"
                                                       rows="2">${contract.paymentTerms}</textarea>
@@ -234,7 +243,7 @@
                                         <hr class="my-4">
 
                                         <!-- FILE -->
-                                        <h6 class="fw-bold text-primary mb-3">File</h6>
+                                        <h6 class="fw-bold text-primary mb-3">Contract File</h6>
 
                                         <c:if test="${not empty contract.fileUrl}">
                                             <p>
@@ -249,6 +258,9 @@
                                         <input type="file" name="file" class="form-control">
 
                                         <hr class="my-4">
+                                        
+                                        <!-- DESCRIPTION -->
+                                        <h6 class="fw-bold text-primary mb-3">Description</h6>
 
                                         <!-- DESC -->
                                         <textarea name="description"
