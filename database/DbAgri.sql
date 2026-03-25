@@ -303,25 +303,35 @@ voucher_id INT NULL,
 -- 17. CONTRACT – hợp đồng mua bán thiết bị
 -- =================================================
 CREATE TABLE contract (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  contract_code VARCHAR(50) NOT NULL UNIQUE,
-  customer_id INT NOT NULL,      -- bên B (khách hàng)
-  party_a VARCHAR(255),          -- bên A (công ty)
-  signed_at DATE NOT NULL,       -- ngày ký
-  effective_date DATE,           -- ngày hiệu lực
-  expiry_date DATE,              -- ngày hết hạn
-  total_value DECIMAL(12,2) NOT NULL,
-  payment_terms VARCHAR(255),    -- điều khoản thanh toán
-  description TEXT,              -- mô tả hợp đồng
-  status ENUM('DRAFT','ACTIVE','COMPLETED','CANCELED') DEFAULT 'DRAFT',
-  file_url VARCHAR(255),         -- file PDF hợp đồng
-  created_by INT,                -- nhân viên tạo
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  customer_company VARCHAR(255),
-  customer_tax_code VARCHAR(50),
-  FOREIGN KEY (customer_id)
-    REFERENCES users(id)
-    ON DELETE RESTRICT
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    contract_code VARCHAR(50) NOT NULL UNIQUE,
+    customer_id INT NOT NULL,                -- bên B (khách hàng)
+    
+    party_a VARCHAR(255),                     -- bên A (công ty)
+    party_a_representative VARCHAR(255),     -- người đại diện bên A
+    party_a_identity_card VARCHAR(50),       -- CMND/CCCD người đại diện bên A
+    
+    signed_at DATE NOT NULL,                  -- ngày ký
+    effective_date DATE,                      -- ngày hiệu lực
+    expiry_date DATE,                         -- ngày hết hạn
+    
+    total_value DECIMAL(12,2) NOT NULL,      -- tổng giá trị hợp đồng
+    payment_terms VARCHAR(255),               -- điều khoản thanh toán
+    description TEXT,                         -- mô tả hợp đồng
+    
+    status ENUM('DRAFT','ACTIVE','COMPLETED','CANCELED') DEFAULT 'DRAFT',
+    file_url VARCHAR(255),                    -- file PDF hợp đồng
+    
+    created_by INT,                           -- nhân viên tạo
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    customer_company VARCHAR(255),
+    customer_tax_code VARCHAR(50),
+    customer_identity_card VARCHAR(50),       -- CMND/CCCD khách hàng
+
+    FOREIGN KEY (customer_id)
+        REFERENCES users(id)
+        ON DELETE RESTRICT
 );
 
 -- =================================================
@@ -674,6 +684,7 @@ INSERT INTO customer_voucher
 VALUES
 -- customer 4
 (4, 12, FALSE, NOW()),
+(4, 17, FALSE, NOW()),
 -- customer 7
 (7, 13, FALSE, NOW()),
 -- customer 8
@@ -774,10 +785,13 @@ VALUES
 (5 ,1),(5, 2),(5, 3),(5,4);
 
 -- ========================================================================== --
+-- Insert mẫu hợp đồng 1
 INSERT INTO contract (
   contract_code,
   customer_id,
   party_a,
+  party_a_representative,
+  party_a_identity_card,
   signed_at,
   effective_date,
   expiry_date,
@@ -788,11 +802,14 @@ INSERT INTO contract (
   file_url,
   created_by,
   customer_company,
-  customer_tax_code
+  customer_tax_code,
+  customer_identity_card
 ) VALUES (
   'HD-2026-001',
   4,
   'AgriCMS Company',
+  'Nguyen Van A',
+  '012345678',
   '2026-02-01',
   '2026-02-01',
   '2029-02-01',
@@ -803,13 +820,17 @@ INSERT INTO contract (
   'assets/contracts/300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
   2,
   'HSF Company',
-  '123456789'
+  '123456789',
+  '987654321'
 );
 
+-- Insert mẫu hợp đồng 2
 INSERT INTO contract (
   contract_code,
   customer_id,
   party_a,
+  party_a_representative,
+  party_a_identity_card,
   signed_at,
   effective_date,
   expiry_date,
@@ -820,11 +841,14 @@ INSERT INTO contract (
   file_url,
   created_by,
   customer_company,
-  customer_tax_code
+  customer_tax_code,
+  customer_identity_card
 ) VALUES (
   'HD-2026-002',
   7,
   'AgriCMS Company',
+  'Tran Thi B',
+  '112233445',
   '2026-02-05',
   '2026-02-05',
   '2028-02-05',
@@ -835,13 +859,17 @@ INSERT INTO contract (
   'assets/contracts/300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
   2,
   'CSD Company',
-  '123456333'
+  '123456333',
+  '334455667'
 );
 
+-- Insert mẫu hợp đồng 3
 INSERT INTO contract (
   contract_code,
   customer_id,
   party_a,
+  party_a_representative,
+  party_a_identity_card,
   signed_at,
   effective_date,
   expiry_date,
@@ -852,11 +880,14 @@ INSERT INTO contract (
   file_url,
   created_by,
   customer_company,
-  customer_tax_code
+  customer_tax_code,
+  customer_identity_card
 ) VALUES (
   'HD-2026-003',
   8,
   'AgriCMS Company',
+  'Le Van C',
+  '556677889',
   '2026-02-10',
   '2026-02-10',
   '2029-02-10',
@@ -867,7 +898,8 @@ INSERT INTO contract (
   'assets/contracts/300-mau-hop-dong-cua-nhieu-linh-vuc-thong-dung-nhat-1.pdf',
   2,
   'PRJ Company',
-  '123456444'
+  '123456444',
+  '778899001'
 );
 
 INSERT INTO contract_device (
@@ -959,3 +991,18 @@ UPDATE device SET subcategory_id = 4 WHERE serial_number = 'SN-NOCUS-002';
 UPDATE device SET subcategory_id = 6 WHERE serial_number = 'SN-NOCUS-003';
 UPDATE device SET subcategory_id = 10 WHERE serial_number = 'SN-NOCUS-004';
 UPDATE device SET subcategory_id = 15 WHERE serial_number = 'SN-NOCUS-005';
+
+-- ===================================================================================== --
+INSERT INTO role_permission(role_id, permission_id) values 
+(4, 32);
+INSERT INTO role_permission(role_id, permission_id) values 
+(1, 28);
+INSERT INTO role_permission(role_id, permission_id) values 
+(2, 28);
+INSERT INTO role_permission(role_id, permission_id) values 
+(3, 28);
+INSERT INTO role_permission(role_id, permission_id) values 
+(4, 28);
+INSERT INTO role_permission(role_id, permission_id) values 
+(5, 28);
+-- ===================================================================================== --

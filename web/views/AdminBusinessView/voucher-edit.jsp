@@ -167,8 +167,6 @@
                                             </div>
 
                                             <!-- Customer ID -->
-
-
                                             <div class="col-md-6 mb-3" id="customerIdField" style="display:none;">
                                                 <label class="form-label small fw-bold text-muted">
                                                     Customer

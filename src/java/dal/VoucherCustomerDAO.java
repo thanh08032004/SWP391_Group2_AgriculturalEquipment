@@ -109,17 +109,17 @@ public class VoucherCustomerDAO extends DBContext {
     public Voucher getVoucherByIdAndUser(int id, int customer_id) {
 
         String sql = """
-                     SELECT v.*
-                     FROM voucher v
-                     LEFT JOIN customer_voucher cv
-                     ON v.id = cv.voucher_id AND cv.customer_id = ?
-                     WHERE v.id = ?
-                     AND v.is_active = TRUE
-                     AND (cv.is_used = 0 OR cv.is_used IS NULL)
-                     AND (v.voucher_type = 'GLOBAL'
-                        OR cv.customer_id IS NOT NULL
-                     )
-                     """;
+    SELECT v.*, cv.customer_id
+    FROM voucher v
+    LEFT JOIN customer_voucher cv
+    ON v.id = cv.voucher_id AND cv.customer_id = ?
+    WHERE v.id = ?
+    AND v.is_active = TRUE
+    AND (cv.is_used = 0 OR cv.is_used IS NULL)
+    AND (v.voucher_type = 'GLOBAL'
+        OR cv.customer_id IS NOT NULL
+    )
+""";
 
         try {
             Connection con = getConnection();
@@ -139,6 +139,9 @@ public class VoucherCustomerDAO extends DBContext {
                 v.setActive(rs.getBoolean("is_active"));
                 v.setVoucherType(rs.getString("voucher_type"));
                 v.setDescription(rs.getString("description"));
+                v.setCustomerId(rs.getObject("customer_id") != null
+                        ? rs.getInt("customer_id")
+                        : null);
                 return v;
             }
 
@@ -232,4 +235,3 @@ public class VoucherCustomerDAO extends DBContext {
         }
     }
 }
-    

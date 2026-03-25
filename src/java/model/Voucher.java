@@ -22,4 +22,5 @@ public class Voucher {
     private Integer createdBy;
     private String createdName;
     private boolean active;
+    private Integer customerId;
 }

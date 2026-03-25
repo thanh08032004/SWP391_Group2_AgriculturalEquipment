@@ -121,7 +121,6 @@
                                     </table>  
 
 
-                                    <!-- TARGET SETTINGS -->
                                     <h6 class="fw-bold text-primary mb-3">Target Settings</h6>
 
                                     <div class="row">
@@ -131,30 +130,40 @@
                                             <label class="form-label small fw-bold text-muted">
                                                 Voucher Type
                                             </label>
-
-                                     
+                                            <div class="form-control bg-light">
+                                                <c:choose>
+                                                    <c:when test="${voucher.voucherType == 'CUSTOMER'}">
+                                                        Specific Customer
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        Global (All Customers)
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
                                         </div>
 
                                         <!-- Customer ID -->
-                                        <div class="col-md-6 mb-3" id="customerIdField" style="display:none;">
+                                        <div class="col-md-6 mb-3" id="customerIdField">
                                             <label class="form-label small fw-bold text-muted">
                                                 Customer ID
                                             </label>
 
-                                            <tr>
-                                                <th class="bg-light">Customer ID</th>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${voucher.voucherType == 'CUSTOMER'}">
-                                                            ${voucher.customerId}
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="text-muted">All Customers</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                            </tr>
+                                            <div class="form-control bg-light">
+                                                ${voucher.customerId}
+                                            </div>
                                         </div>
+                                        <script>
+                                            window.addEventListener("DOMContentLoaded", function () {
+                                                const voucherType = "${voucher.voucherType}";
+                                                const customerField = document.getElementById("customerIdField");
+
+                                                if (voucherType === "CUSTOMER") {
+                                                    customerField.style.display = "block";
+                                                } else {
+                                                    customerField.style.display = "none";
+                                                }
+                                            });
+                                        </script>
 
                                     </div>
                                     <hr class="my-4">

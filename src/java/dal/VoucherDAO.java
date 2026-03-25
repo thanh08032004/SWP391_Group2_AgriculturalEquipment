@@ -61,14 +61,15 @@ public class VoucherDAO extends DBContext {
 
     /* Get voucher by ID (Detail) */
     public Voucher getVoucherById(int id) {
-        String sql = """
-                     SELECT v.*,
-                        COALESCE(up.fullname, 'Unknown') AS created_name                        
-                     FROM voucher v
-                     LEFT JOIN users u ON v.created_by = u.id
-                     LEFT JOIN user_profile up ON u.id = up.user_id 
-                     
-                     WHERE v.id = ?
+        String sql = """                   
+                         SELECT v.*,
+                                COALESCE(up.fullname, 'Unknown') AS created_name,
+                                cv.customer_id
+                         FROM voucher v
+                         LEFT JOIN users u ON v.created_by = u.id
+                         LEFT JOIN user_profile up ON u.id = up.user_id
+                         LEFT JOIN customer_voucher cv ON v.id = cv.voucher_id
+                         WHERE v.id = ?
                      """;
 
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -111,11 +112,19 @@ public class VoucherDAO extends DBContext {
 
         v.setVoucherType(rs.getString("voucher_type"));
 
-        v.setCreatedBy(rs.getInt("created_by"));     
+        v.setCreatedBy(rs.getInt("created_by"));
         v.setCreatedName(rs.getString("created_name"));
 
         v.setActive(rs.getBoolean("is_active"));
 
+        try {
+            v.setCustomerId(rs.getObject("customer_id") != null
+                    ? rs.getInt("customer_id")
+                    : null);
+        } catch (Exception e) {
+            // tránh lỗi nếu query không có column này
+            v.setCustomerId(null);
+        }
         return v;
     }
 
@@ -135,7 +144,7 @@ public class VoucherDAO extends DBContext {
             ps.setDouble(4, v.getDiscountValue());
             ps.setDouble(5, v.getMinServicePrice());
             ps.setString(6, v.getVoucherType());
-            ps.setInt(7, v.getCreatedBy());            
+            ps.setInt(7, v.getCreatedBy());
             ps.setBoolean(8, v.isActive());
 
             ps.executeUpdate();
@@ -169,7 +178,7 @@ public class VoucherDAO extends DBContext {
             ps.setDouble(4, v.getDiscountValue());
             ps.setDouble(5, v.getMinServicePrice());
             ps.setString(6, v.getVoucherType());
-            ps.setBoolean(7, v.isActive());          
+            ps.setBoolean(7, v.isActive());
             ps.setInt(8, v.getId());
 
             ps.executeUpdate();

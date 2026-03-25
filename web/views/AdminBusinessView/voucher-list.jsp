@@ -134,6 +134,14 @@
                                             </td>
 
                                             <td class="text-center d-flex align-items-center" >
+                                                <!-- View Detail -->
+                                                <a class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center"
+                                                   title="View Detail"
+                                                   href="${pageContext.request.contextPath}/admin-business/vouchers?action=detail&id=${v.id}&page=${currentPage}&keyword=${keyword}"
+                                                   style="width: 30px; height: 30px; line-height: 30px; padding: 0; margin: 3px">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+
                                                 <!-- Edit -->
                                                 <a class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center"
                                                    title="Edit"
