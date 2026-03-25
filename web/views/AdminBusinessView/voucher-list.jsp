@@ -4,6 +4,7 @@
 <html lang="en">
     <head>
         <jsp:include page="/common/head.jsp"></jsp:include>
+
             <title>Voucher Management - AgriCMS</title>
         </head>
         <body class="bg-light">
@@ -125,16 +126,15 @@
                                                 </c:choose>
                                             </td>
                                             <td class="text-center">
-    <a href="javascript:void(0);"
-   class="view-user"
-   data-id="${v.createdBy}"
-   style="text-decoration: underline; color: #0d6efd; cursor: pointer;">
-    ${v.createdName}
-</a>
-</td>
+                                                <span class="fw-bold text-primary"
+                                                      style="cursor:pointer; text-decoration:underline;"
+                                                      onclick="viewUserDetail(${v.createdBy})">
+                                                    ${v.createdName}
+                                                </span>
+                                            </td>
 
                                             <td class="text-center d-flex align-items-center" >
-                                                 <!-- Edit -->
+                                                <!-- Edit -->
                                                 <a class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center"
                                                    title="Edit"
                                                    href="${pageContext.request.contextPath}/admin-business/vouchers?action=edit&id=${v.id}&page=${currentPage}&keyword=${keyword}" 
@@ -193,68 +193,81 @@
                     </div>
                 </div>
             </main>
+        </div>  
+
+
+        <div class="modal fade" id="userModal" tabindex="-1">
+            <div class="modal-dialog modal-sm modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                    <div id="userContent"></div>
+                </div>
+            </div>
         </div>
 
-             <!-- USER MODAL -->
-<div class="modal fade" id="userModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 shadow">
+        <!--         Pop-up infor of user                              -->
+        <jsp:include page="/common/scripts.jsp"></jsp:include>
+            <script>
+                const contextPath = '${pageContext.request.contextPath}';
+        </script>
 
-            <!-- HEADER -->
-            <div class="text-center p-4 text-white"
-                 style="background:#8B5A3C; border-top-left-radius: 12px; border-top-right-radius: 12px;">
-                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                     class="rounded-circle mb-2"
-                     width="80">
-                <h5 id="userName"></h5>
-                <small>CUSTOMER</small>
-            </div>
+        <script>
+            function viewUserDetail(id) {
+                document.getElementById('userContent').innerHTML =
+                        '<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>';
 
-            <!-- BODY -->
-            <div class="p-3">
-                <p><i class="bi bi-telephone"></i> <b>Phone:</b> <span id="userPhone"></span></p>
-                <p><i class="bi bi-envelope"></i> <b>Email:</b> <span id="userEmail"></span></p>
-                <p><i class="bi bi-geo-alt"></i> <b>Address:</b> <span id="userAddress"></span></p>
-            </div>
+                const modalObj = new bootstrap.Modal(document.getElementById('userModal'));
+                modalObj.show();
 
-            <!-- FOOTER -->
-            <div class="text-center p-3">
-                <button class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
-            </div>
+                fetch(contextPath + '/admin-business/vouchers?action=user-info&id=' + id)
+                        .then(res => res.json())
+                        .then(user => {
 
+                            document.getElementById('userContent').innerHTML = `
+<div class="bg-primary p-4 text-center text-white" style="border-radius: 15px 15px 0 0;">
+    <img src="${contextPath}/assets/images/avatar/\${user.avatar}" 
+         class="rounded-circle mb-2 border border-3 border-white shadow-sm" 
+         style="width:90px; height:90px; object-fit:cover;">
+    <h5 class="mb-0 fw-bold">\${user.name}</h5>
+    <small class="opacity-75">\${user.role}</small>
+</div>
+
+<div class="p-4">
+    <div class="d-flex mb-3">
+        <i class="bi bi-telephone text-primary me-3"></i>
+        <div>
+            <small class="text-muted d-block">Phone</small>
+            <strong>\${user.phone || 'N/A'}</strong>
         </div>
     </div>
-</div>                           
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+    <div class="d-flex mb-3">
+        <i class="bi bi-envelope text-primary me-3"></i>
+        <div>
+            <small class="text-muted d-block">Email</small>
+            <strong>\${user.email}</strong>
+        </div>
+    </div>
+    <div class="d-flex">
+        <i class="bi bi-geo-alt text-primary me-3"></i>
+        <div>
+            <small class="text-muted d-block">Address</small>
+            <strong>\${user.address || 'N/A'}</strong>
+        </div>
+    </div>
+</div>
 
-    document.querySelectorAll(".view-user").forEach(btn => {
-        btn.addEventListener("click", function () {
-
-            let userId = this.getAttribute("data-id");
-
-            fetch(`admin-business/vouchers?action=user-info&id=${userId}`)
-                .then(res => res.json())
-                .then(data => {
-
-                    console.log(data); // 👈 debug
-
-                    document.getElementById("userName").innerText = data.name;
-                    document.getElementById("userPhone").innerText = data.phone;
-                    document.getElementById("userEmail").innerText = data.email;
-                    document.getElementById("userAddress").innerText = data.address;
-
-                    let modal = new bootstrap.Modal(document.getElementById("userModal"));
-                    modal.show();
-                })
-                .catch(err => console.error(err));
-        });
-    });
-
-});
-</script>                                      
+<div class="p-3 pt-0 text-center">
+    <button class="btn btn-light btn-sm w-100 border" data-bs-dismiss="modal">Close</button>
+</div>
+`;
+                        })
+                        .catch(err => {
+                            document.getElementById('userContent').innerHTML =
+                                    '<div class="alert alert-danger m-3">Error loading user</div>';
+                        });
+            }
+        </script>
         <!-- SCRIPT -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>       
+
     </body>
 </html>
 

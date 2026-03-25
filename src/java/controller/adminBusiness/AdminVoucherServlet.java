@@ -38,7 +38,7 @@ public class AdminVoucherServlet extends HttpServlet {
             case "delete":
                 deleteVoucher(req, resp);
                 break;
-            case "user-info":   // 👈 thêm dòng này
+            case "user-info":
                 getUserInfo(req, resp);
                 break;
             default:
@@ -188,13 +188,15 @@ public class AdminVoucherServlet extends HttpServlet {
             resp.getWriter().write("{}");
             return;
         }
-
+        //pop up profile
         String json = String.format(
-                "{\"name\":\"%s\",\"phone\":\"%s\",\"email\":\"%s\",\"address\":\"%s\"}",
+                 "{\"name\":\"%s\",\"phone\":\"%s\",\"email\":\"%s\",\"address\":\"%s\",\"avatar\":\"%s\",\"role\":\"%s\"}",
                 p.getFullname(),
-                p.getPhone(),
+                p.getPhone() != null ? p.getPhone() : "",
                 p.getEmail(),
-                p.getAddress()
+                p.getAddress() != null ? p.getAddress() : "",
+                p.getAvatar() != null ? p.getAvatar() : "admin.png",
+                p.getUser().getRoleName()
         );
 
         resp.getWriter().write(json);
@@ -343,7 +345,6 @@ public class AdminVoucherServlet extends HttpServlet {
 
             // xóa customer cũ
             cvDao.deleteByVoucherId(v.getId());
-
             if ("CUSTOMER".equals(voucherType)
                     && customerId != null
                     && !customerId.isEmpty()) {
