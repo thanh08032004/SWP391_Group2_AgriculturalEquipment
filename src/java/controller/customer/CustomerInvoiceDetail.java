@@ -196,7 +196,6 @@ public class CustomerInvoiceDetail extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/customer/invoice/list");
                 return;
             }
-
             int invoiceId = Integer.parseInt(invoiceRaw);
 
             InvoiceDetailDTO invoice = dao.getInvoiceDetailByIdAndCustomer(invoiceId, customerId);
@@ -204,7 +203,9 @@ public class CustomerInvoiceDetail extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/customer/invoice/detail?id=" + invoiceId);
                 return;
             }
-
+            if (invoice.getVoucherId() > 0) {
+                dao.markVoucherUsed(customerId, invoice.getVoucherId());
+            }
             dao.updatePaymentToPending(invoiceId, paymentMethod);
             response.sendRedirect(
                     request.getContextPath() + "/customer/invoice/detail?id=" + invoiceId
@@ -222,7 +223,7 @@ public class CustomerInvoiceDetail extends HttpServlet {
         int invoiceId = Integer.parseInt(invoiceRaw);
         int voucherId = Integer.parseInt(voucherRaw);
 
-        dao.applyVoucher(invoiceId, voucherId, customerId);
+        dao.applyVoucher(invoiceId, voucherId);
 
         response.sendRedirect(
                 request.getContextPath()

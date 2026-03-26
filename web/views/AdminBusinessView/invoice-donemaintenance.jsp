@@ -92,7 +92,7 @@
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/admin-business/maintenance?action=detail&id=${r.id}" 
+                                        <a href="${pageContext.request.contextPath}/admin-business/maintenance/detail?action=detail&id=${r.id}" 
                                            class="btn btn-sm btn-light border px-3">View</a>
                                     </td>
                                     <td>

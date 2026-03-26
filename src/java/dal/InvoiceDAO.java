@@ -117,7 +117,7 @@ public class InvoiceDAO extends DBContext {
             mi.quantity
         FROM maintenance_item mi
         JOIN spare_part sp ON mi.spare_part_id = sp.id
-        WHERE mi.maintenance_id = ?
+        WHERE mi.maintenance_id = ? and mi.paid = 1
     """;
 
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -243,7 +243,7 @@ public class InvoiceDAO extends DBContext {
             v.code AS voucher_code,
             v.discount_type,
             v.discount_value,
-
+            v.id AS voucher_id,
             i.labor_cost,
             i.discount_amount,
             i.total_amount,
@@ -295,7 +295,7 @@ public class InvoiceDAO extends DBContext {
                     dto.setVoucherCode(rs.getString("voucher_code"));
                     dto.setVoucherDiscountType(rs.getString("discount_type"));
                     dto.setVoucherDiscountValue(rs.getDouble("discount_value"));
-
+                    dto.setVoucherId(rs.getInt("voucher_id"));
                     dto.setLaborCost(rs.getDouble("labor_cost"));
                     dto.setDiscountAmount(rs.getDouble("discount_amount"));
                     dto.setTotalAmount(rs.getDouble("total_amount"));
@@ -745,20 +745,18 @@ public class InvoiceDAO extends DBContext {
     return list;
 }
 
-    public void applyVoucher(int invoiceId, int voucherId, int customerId) {
+    public void applyVoucher(int invoiceId, int voucherId) {
 
-        // Lấy thông tin voucher trước
-        String getVoucher = "SELECT discount_type, discount_value, voucher_type FROM voucher WHERE id = ? AND is_active = TRUE";
+    String getVoucher = "SELECT discount_type, discount_value FROM voucher WHERE id = ? AND is_active = TRUE";
 
-        // Lấy total hiện tại (spare parts + labor, chưa trừ discount)
-        String getTotal = "SELECT labor_cost + COALESCE("
-                + "  (SELECT SUM(sp.price * mi.quantity) "
-                + "   FROM maintenance_item mi "
-                + "   JOIN spare_part sp ON sp.id = mi.spare_part_id "
-                + "   WHERE mi.maintenance_id = i.maintenance_id), 0) AS base_total "
-                + "FROM invoice i WHERE i.id = ?";
+    String getTotal = "SELECT labor_cost + COALESCE("
+            + "  (SELECT SUM(sp.price * mi.quantity) "
+            + "   FROM maintenance_item mi "
+            + "   JOIN spare_part sp ON sp.id = mi.spare_part_id "
+            + "   WHERE mi.maintenance_id = i.maintenance_id), 0) AS base_total "
+            + "FROM invoice i WHERE i.id = ?";
 
-        String updateInvoice = """
+    String updateInvoice = """
         UPDATE invoice
         SET voucher_id      = ?,
             discount_amount = ?,
@@ -767,88 +765,77 @@ public class InvoiceDAO extends DBContext {
           AND payment_status = 'UNPAID'
     """;
 
-        String markUsed = """
+    try (Connection con = getConnection()) {
+        con.setAutoCommit(false);
+
+        try {
+            String discountType;
+            double discountValue;
+
+            try (PreparedStatement ps = con.prepareStatement(getVoucher)) {
+                ps.setInt(1, voucherId);
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    con.rollback();
+                    return;
+                }
+                discountType = rs.getString("discount_type");
+                discountValue = rs.getDouble("discount_value");
+            }
+
+            double baseTotal;
+            try (PreparedStatement ps = con.prepareStatement(getTotal)) {
+                ps.setInt(1, invoiceId);
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    con.rollback();
+                    return;
+                }
+                baseTotal = rs.getDouble("base_total");
+            }
+
+            double discountAmount = "PERCENT".equals(discountType)
+                    ? baseTotal * discountValue / 100
+                    : discountValue;
+
+            double newTotal = Math.max(0, baseTotal - discountAmount);
+
+            try (PreparedStatement ps = con.prepareStatement(updateInvoice)) {
+                ps.setInt(1, voucherId);
+                ps.setDouble(2, discountAmount);
+                ps.setDouble(3, newTotal);
+                ps.setInt(4, invoiceId);
+                ps.executeUpdate();
+            }
+
+            con.commit();
+
+        } catch (Exception e) {
+            con.rollback();
+            throw e;
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+    public void markVoucherUsed(int customerId, int voucherId) {
+    String sql = """
         UPDATE customer_voucher
         SET is_used = TRUE
         WHERE customer_id = ? AND voucher_id = ?
     """;
 
-        String insertUsed = """
-        INSERT INTO customer_voucher (customer_id, voucher_id, is_used)
-        VALUES (?, ?, TRUE)
-        ON DUPLICATE KEY UPDATE is_used = TRUE
-    """;
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
 
-        try (Connection con = getConnection()) {
-            con.setAutoCommit(false);
-            try {
-                // Bước 1: Lấy thông tin voucher
-                String discountType;
-                double discountValue;
-                String voucherType;
-                try (PreparedStatement ps = con.prepareStatement(getVoucher)) {
-                    ps.setInt(1, voucherId);
-                    ResultSet rs = ps.executeQuery();
-                    if (!rs.next()) {
-                        con.rollback();
-                        return;
-                    } // voucher không tồn tại
-                    discountType = rs.getString("discount_type");
-                    discountValue = rs.getDouble("discount_value");
-                    voucherType = rs.getString("voucher_type");
-                }
+        ps.setInt(1, customerId);
+        ps.setInt(2, voucherId);
+        ps.executeUpdate();
 
-                // Bước 2: Lấy base_total (spare parts + labor, không bị ảnh hưởng bởi discount cũ)
-                double baseTotal;
-                try (PreparedStatement ps = con.prepareStatement(getTotal)) {
-                    ps.setInt(1, invoiceId);
-                    ResultSet rs = ps.executeQuery();
-                    if (!rs.next()) {
-                        con.rollback();
-                        return;
-                    }
-                    baseTotal = rs.getDouble("base_total");
-                }
-
-                // Bước 3: Tính discount và total mới
-                double discountAmount = "PERCENT".equals(discountType)
-                        ? baseTotal * discountValue / 100
-                        : discountValue;
-                double newTotal = Math.max(0, baseTotal - discountAmount);
-
-                // Bước 4: Update invoice
-                try (PreparedStatement ps = con.prepareStatement(updateInvoice)) {
-                    ps.setInt(1, voucherId);
-                    ps.setDouble(2, discountAmount);
-                    ps.setDouble(3, newTotal);
-                    ps.setInt(4, invoiceId);
-                    int rows = ps.executeUpdate();
-                    if (rows == 0) {
-                        con.rollback();
-                        return;
-                    }
-                }
-
-                // Bước 5: Đánh dấu voucher đã dùng
-                // GLOBAL chưa có trong customer_voucher → INSERT, CUSTOMER → UPDATE
-                String useSql = "CUSTOMER".equals(voucherType) ? markUsed : insertUsed;
-                try (PreparedStatement ps = con.prepareStatement(useSql)) {
-                    ps.setInt(1, customerId);
-                    ps.setInt(2, voucherId);
-                    ps.executeUpdate();
-                }
-
-                con.commit();
-
-            } catch (Exception e) {
-                con.rollback();
-                throw e;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
-
+}
     public List<Invoice> searchFilterInvoiceByTechnician(
             int technicianId,
             String keyword,

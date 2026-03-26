@@ -116,12 +116,11 @@ public class AdminAddInvoiceServlet extends HttpServlet {
         double spareTotal;
         double totalAmount;
 
-// Nếu còn trong thời hạn bảo hành → miễn phí toàn bộ
         if (dao.isUnderWarranty(maintenanceId)) {
             laborCost = 0;
             spareTotal = 0;
             totalAmount = 0;
-            voucherId = null; // không cần voucher nếu đã free
+            voucherId = null;
         } else {
             laborCost = dao.getLaborCostByMaintenance(maintenanceId);
             spareTotal = dao.getTotalSpareCostByMaintenance(maintenanceId);

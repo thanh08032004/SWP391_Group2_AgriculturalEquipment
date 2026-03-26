@@ -22,10 +22,10 @@ public class AdminMaintenanceServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-if ("feedback-detail".equals(action)) {
-    handleFeedbackDetailPage(request, response);
-    return;
-}
+        if ("feedback-detail".equals(action)) {
+            handleFeedbackDetailPage(request, response);
+            return;
+        }
         MaintenanceDAO dao = new MaintenanceDAO();
         DeviceDAO dDao = new DeviceDAO();
         if ("getDeviceDetail".equals(action)) {
@@ -108,43 +108,45 @@ if ("feedback-detail".equals(action)) {
             request.getRequestDispatcher("/views/AdminBusinessView/maintenance-list.jsp").forward(request, response);
         }
     }
-private void handleFeedbackDetailPage(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
 
-   int id = Integer.parseInt(request.getParameter("id"));
+    private void handleFeedbackDetailPage(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-    FeedbackDAO fDao = new FeedbackDAO();
-String subAction = request.getParameter("subAction");
+        int id = Integer.parseInt(request.getParameter("id"));
 
-if ("getMaintenanceDetail".equals(subAction)) {
-    InvoiceDAO dao = new InvoiceDAO();
-    Maintenance m = dao.getMaintenanceDetail(id);
+        FeedbackDAO fDao = new FeedbackDAO();
+        String subAction = request.getParameter("subAction");
 
-    response.setContentType("application/json");
-    response.setCharacterEncoding("UTF-8");
+        if ("getMaintenanceDetail".equals(subAction)) {
+            InvoiceDAO dao = new InvoiceDAO();
+            Maintenance m = dao.getMaintenanceDetail(id);
 
-    PrintWriter out = response.getWriter();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
 
-    if (m != null) {
-        out.print("{");
-        out.print("\"id\":" + m.getId() + ",");
-        out.print("\"machineName\":\"" + m.getMachineName() + "\",");
-        out.print("\"problem\":\"" + m.getDescription() + "\",");
-        out.print("\"status\":\"" + m.getStatus() + "\",");
-        out.print("\"startDate\":\"" + m.getStartDate() + "\",");
-        out.print("\"finishDate\":\"" + m.getEndDate() + "\"");
-        out.print("}");
+            PrintWriter out = response.getWriter();
+
+            if (m != null) {
+                out.print("{");
+                out.print("\"id\":" + m.getId() + ",");
+                out.print("\"machineName\":\"" + m.getMachineName() + "\",");
+                out.print("\"problem\":\"" + m.getDescription() + "\",");
+                out.print("\"status\":\"" + m.getStatus() + "\",");
+                out.print("\"startDate\":\"" + m.getStartDate() + "\",");
+                out.print("\"finishDate\":\"" + m.getEndDate() + "\"");
+                out.print("}");
+            }
+
+            return;
+        }
+        MaintenanceFeedback f = fDao.getFeedbackByMaintenanceId(id);
+
+        request.setAttribute("feedback", f);
+        request.setAttribute("maintenanceID", id);
+        request.getRequestDispatcher("/views/AdminBusinessView/view-feedback.jsp")
+                .forward(request, response);
     }
 
-    return;
-}
-    MaintenanceFeedback f = fDao.getFeedbackByMaintenanceId(id);
-
-    request.setAttribute("feedback", f);
-request.setAttribute("maintenanceID", id);
-    request.getRequestDispatcher("/views/AdminBusinessView/view-feedback.jsp")
-           .forward(request, response);
-}
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
@@ -159,7 +161,25 @@ request.setAttribute("maintenanceID", id);
         //            dao.updateStatus(id, "IN_PROGRESS");
         //            response.sendRedirect("maintenance?action=detail&id=" + id);
         //        } //reject-diagnosis
-        else if ("reject-diagnosis".equals(action)) {
+        else if ("send-recheck".equals(action)) {
+            String reason = request.getParameter("reason");
+
+            HttpSession session = request.getSession();
+            model.User user = (model.User) session.getAttribute("user");
+            if (user == null) {
+                System.out.println("❌ USER NULL");
+                response.sendRedirect("login");
+                return;
+            }
+            boolean success = dao.insertRecheckRequest(id, user.getId(), reason);
+
+            if (success) {
+                dao.updateStatus(id, "RECHECK_REQUIRED");
+                response.sendRedirect("maintenance?action=feedback-detail&id=" + id + "&msg=recheck_sent");
+            } else {
+                response.sendRedirect("maintenance?action=feedback-detail&id=" + id + "&msg=error");
+            }
+        } else if ("reject-diagnosis".equals(action)) {
             boolean updateStatus = dao.updateStatus(id, "TECHNICIAN_ACCEPTED");
             boolean clearItems = dao.saveMaintenanceItems(id, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
             if (updateStatus && clearItems) {

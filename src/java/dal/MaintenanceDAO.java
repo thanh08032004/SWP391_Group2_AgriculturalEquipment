@@ -49,7 +49,22 @@ public class MaintenanceDAO extends DBContext {
         }
         return false;
     }
+    public boolean insertRecheckRequest(int maintenanceId, int requestedBy, String reason) {
+    String sql = "INSERT INTO maintenance_recheck_request (maintenance_id, requested_by, reason) VALUES (?, ?, ?)";
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
 
+        ps.setInt(1, maintenanceId);
+        ps.setInt(2, requestedBy);
+        ps.setString(3, reason);
+
+        return ps.executeUpdate() > 0;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
     public int countMaintenanceRequests(String name, String status) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM maintenance m "
                 + "JOIN device d ON m.device_id = d.id "

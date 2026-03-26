@@ -211,33 +211,76 @@
                         </div>
                     </div>
                     <!-- Apply Voucher -->
-                    <c:if test="${invoice.paymentStatus eq 'UNPAID' and invoice.totalAmount > 0}">
-                        <form method="post"
-                              action="${pageContext.request.contextPath}/customer/invoice/detail">
-                            <input type="hidden"
-                                   name="invoiceId"
-                                   value="${invoice.invoiceId}" />
-                            <div class="info-row align-items-center">
-                                <div class="info-label">
-                                    Voucher
-                                </div>
-                                <div style="display:flex; gap:8px; align-items:center;">
-                                    <select name="voucherId"
-                                            class="form-select form-select-sm"
-                                            style="width:220px;">
-                                        <option value="">Select voucher</option>
-                                        <c:forEach var="v" items="${customerVouchers}">
-                                            <option value="${v.id}">
-                                                ${v.code} (-${v.discountValue} ${v.discountType})
-                                            </option>
-                                        </c:forEach>
-                                    </select>
-                                    <button class="btn btn-primary btn-sm">
-                                        Apply
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                    <c:if test="${invoice.paymentStatus eq 'UNPAID' 
+                                  and invoice.totalAmount > 0 
+                                  and invoice.discountAmount == 0}">
+                          <form method="post"
+                                action="${pageContext.request.contextPath}/customer/invoice/detail">
+
+                              <input type="hidden" name="invoiceId" value="${invoice.invoiceId}" />
+
+                              <div class="info-row align-items-center">
+                                  <div class="info-label">Voucher</div>
+
+                                  <div style="display:flex; gap:8px;">
+                                      <select name="voucherId" class="form-select form-select-sm" style="width:220px;">
+                                          <option value="">Select voucher</option>
+                                          <c:forEach var="v" items="${customerVouchers}">
+                                              <option value="${v.id}"
+                                                      ${v.id == invoice.voucherId ? "selected" : ""}>
+                                                  ${v.code} (-${v.discountValue} ${v.discountType})
+                                              </option>
+                                          </c:forEach>
+                                      </select>
+
+                                      <button class="btn btn-primary btn-sm">Apply</button>
+                                  </div>
+                              </div>
+                          </form>
+                    </c:if>
+                    <c:if test="${invoice.paymentStatus eq 'UNPAID' 
+                                  and invoice.discountAmount > 0}">
+                          <div class="info-row align-items-center">
+                              <div class="info-label">Voucher</div>
+
+                              <div>
+                                  <span class="text-success fw-bold">
+                                      Applied: ${invoice.voucherCode}
+                                  </span>
+
+                                  <button type="button"
+                                          class="btn btn-outline-warning btn-sm ms-2"
+                                          onclick="toggleVoucherSelect()">
+                                      Change
+                                  </button>
+                              </div>
+                          </div>
+                          <!-- hidden form -->
+                          <form id="changeVoucherForm"
+                                method="post"
+                                action="${pageContext.request.contextPath}/customer/invoice/detail"
+                                style="display:none;">
+
+                              <input type="hidden" name="invoiceId" value="${invoice.invoiceId}" />
+
+                              <div class="info-row align-items-center">
+                                  <div class="info-label"></div>
+
+                                  <div style="display:flex; gap:8px;">
+                                      <select name="voucherId" class="form-select form-select-sm" style="width:220px;">
+                                          <c:forEach var="v" items="${customerVouchers}">
+                                              <option value="${v.id}"
+                                                      ${v.id == invoice.voucherId ? "selected" : ""}>
+                                                  ${v.code} (-${v.discountValue} ${v.discountType})
+                                              </option>
+                                          </c:forEach>
+                                      </select>
+
+                                      <button class="btn btn-warning btn-sm">Update</button>
+                                  </div>
+                              </div>
+                          </form>
+
                     </c:if>
                     <div class="info-row">
                         <div class="info-label">Voucher Discount</div>
@@ -260,7 +303,6 @@
                     <i class="bi bi-arrow-left me-1"></i>
                     Back to Invoice List
                 </a>
-
                 <%-- Nút Pay chỉ hiện khi UNPAID --%>
                 <c:if test="${invoice.paymentStatus eq 'UNPAID'}">
                     <c:choose>
@@ -297,6 +339,12 @@
             </div>
         </div>
         <jsp:include page="/common/scripts.jsp"></jsp:include>
+            <script>
+                function toggleVoucherSelect() {
+                    const form = document.getElementById("changeVoucherForm");
+                    form.style.display = (form.style.display === "none") ? "block" : "none";
+                }
+            </script>
             <script>
 
                 var CTX = '${pageContext.request.contextPath}';

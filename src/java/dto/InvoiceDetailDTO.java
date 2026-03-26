@@ -21,6 +21,7 @@ public class InvoiceDetailDTO {
     private String categoryName;
     private int customerId;
     private int technicianId;
+    private int voucherId;
     private String voucherCode;
     private String voucherDiscountType;
     private double voucherDiscountValue;
