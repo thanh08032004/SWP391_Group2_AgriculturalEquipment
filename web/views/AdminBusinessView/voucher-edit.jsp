@@ -160,8 +160,15 @@
                                                         class="form-select"
                                                         onchange="onVoucherTypeChange(this)">
 
-                                                    <option value="GLOBAL">Global (All Customers)</option>
-                                                    <option value="CUSTOMER">Specific Customer</option>
+                                                    <option value="GLOBAL"
+                                                            ${voucher.voucherType == 'GLOBAL' ? 'selected' : ''}>
+                                                        Global (All Customers)
+                                                    </option>
+
+                                                    <option value="CUSTOMER"
+                                                            ${voucher.voucherType == 'CUSTOMER' ? 'selected' : ''}>
+                                                        Specific Customer
+                                                    </option>
 
                                                 </select>
                                             </div>
@@ -176,7 +183,8 @@
                                                     <option value="">-- Select Customer --</option>
 
                                                     <c:forEach var="c" items="${customers}">
-                                                        <option value="${c.id}">
+                                                        <option value="${c.id}"
+                                                                ${c.id == voucher.customerId ? 'selected' : ''}>
                                                             ${c.id} - ${c.fullname} (${c.email})
                                                         </option>
                                                     </c:forEach>

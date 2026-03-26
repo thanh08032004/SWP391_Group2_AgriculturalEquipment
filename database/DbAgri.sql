@@ -683,14 +683,10 @@ INSERT INTO customer_voucher
 (customer_id, voucher_id, is_used, assigned_at)
 VALUES
 -- customer 4
-(4, 12, FALSE, NOW()),
-(4, 17, FALSE, NOW()),
--- customer 7
-(7, 13, FALSE, NOW()),
--- customer 8
-(8, 14, FALSE, NOW()),
--- customer 9
-(9, 15, FALSE, NOW());
+(4, 14, FALSE, NOW()),
+(4, 15, FALSE, NOW()),
+(4, 16, FALSE, NOW()),
+(4, 17, FALSE, NOW());
 
 	
 INSERT INTO invoice (  maintenance_id,    voucher_id,  labor_cost,  discount_amount,  total_amount,  description,  payment_status,  payment_method,  issued_at,  paid_at) 
@@ -1005,4 +1001,13 @@ INSERT INTO role_permission(role_id, permission_id) values
 (4, 28);
 INSERT INTO role_permission(role_id, permission_id) values 
 (5, 28);
+INSERT INTO role_permission(role_id, permission_id) values 
+(1, 31);
+INSERT INTO permission (code, name, description) VALUES
+('/upload-avatar','Cập nhật ảnh đại diện','Chỉnh sửa ảnh đại diện'),
+('/change-password',  'Đổi mật khẩu',  'Người dùng tự đổi mật khẩu');
+INSERT INTO role_permission(role_id, permission_id) values 
+(1, 34), (2, 34), (3, 34), (4, 34), (5, 34);
+INSERT INTO role_permission(role_id, permission_id) values 
+(1, 35), (2, 35), (3, 35), (4, 35), (5, 35), (2, 33);
 -- ===================================================================================== --
