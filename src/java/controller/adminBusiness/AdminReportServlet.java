@@ -4,15 +4,15 @@
  */
 package controller.adminBusiness;
 
+import dal.ReportDAO;
 import dto.ReportDTO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import service.ReportService;
 
 /**
  *
@@ -20,19 +20,17 @@ import service.ReportService;
  */
 public class AdminReportServlet extends HttpServlet {
 
-    private ReportService service = new ReportService();
+    private ReportDAO dao = new ReportDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
+            int month, year;
 
             String monthParam = request.getParameter("month");
             String yearParam = request.getParameter("year");
-
-            int month;
-            int year;
 
             if (monthParam == null || yearParam == null
                     || monthParam.isEmpty() || yearParam.isEmpty()) {
@@ -42,19 +40,32 @@ public class AdminReportServlet extends HttpServlet {
                 year = now.getYear();
 
             } else {
-
                 month = Integer.parseInt(monthParam);
                 year = Integer.parseInt(yearParam);
 
-                // Validate month
                 if (month < 1 || month > 12) {
                     month = java.time.LocalDate.now().getMonthValue();
                 }
             }
 
-            ReportDTO report = service.generateReport(month, year);
-            Map<Integer, Double> revenueByDay = service.getRevenueByDay(month, year);
-            Map<String, Double> revenueLast6Months = service.getRevenueLast6Months(month, year);
+            // 👉 Gộp logic service vào đây
+            ReportDTO report = new ReportDTO();
+            report.setActiveMachines(dao.countActiveMachines());
+            report.setTotalMaintenance(dao.countMaintenance(month, year));
+            report.setTotalRevenue(dao.calculateRevenue(month, year));
+            report.setTopSpareParts(dao.getTopSpareParts(month, year));
+
+            Map<Integer, Double> revenueByDay = dao.getRevenueByDay(month, year);
+
+            Map<String, Double> revenueLast6Months = new LinkedHashMap<>();
+            java.time.YearMonth current = java.time.YearMonth.of(year, month);
+
+            for (int i = 5; i >= 0; i--) {
+                java.time.YearMonth ym = current.minusMonths(i);
+                double revenue = dao.calculateRevenue(ym.getMonthValue(), ym.getYear());
+                String label = String.format("%02d/%d", ym.getMonthValue(), ym.getYear());
+                revenueLast6Months.put(label, revenue);
+            }
 
             request.setAttribute("report", report);
             request.setAttribute("revenueByDay", revenueByDay);
@@ -65,11 +76,8 @@ public class AdminReportServlet extends HttpServlet {
             request.getRequestDispatcher("/views/AdminBusinessView/dashboard-report.jsp")
                     .forward(request, response);
 
-        } catch (NumberFormatException e) {
-            response.getWriter().println("Invalid month/year format");
         } catch (Exception e) {
             e.printStackTrace();
-            response.getWriter().println("Error generating report");
         }
     }
 }
