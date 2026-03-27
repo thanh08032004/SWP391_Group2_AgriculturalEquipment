@@ -37,20 +37,18 @@ public class CustomerMaintenanceServlet extends HttpServlet {
                 request.getRequestDispatcher("/views/CustomerView/maintenance-status-detail.jsp").forward(request, response);
             }
         } else {
-            //tao form
-            // doGet
-            HttpSession session = request.getSession();
-            User user = (User) session.getAttribute("user");
-            if (user == null) {
-                response.sendRedirect(request.getContextPath() + "/login");
-                return;
-            }
-
             String deviceIdStr = request.getParameter("deviceId");
             if (deviceIdStr != null) {
                 int deviceId = Integer.parseInt(deviceIdStr);
-                DeviceDTO device = new DeviceDAO().getDeviceByIdAndCustomer(deviceId, user.getId());
 
+                // lay user tu session
+                User user = (User) request.getSession().getAttribute("user");
+                if (user == null) {
+                    response.sendRedirect(request.getContextPath() + "/login");
+                    return;
+                }
+
+                DeviceDTO device = new DeviceDAO().getDeviceByIdAndCustomer(deviceId, user.getId());
                 if (device == null) {
                     response.sendRedirect(request.getContextPath() + "/customer/devices?error=unauthorized");
                     return;
@@ -88,12 +86,19 @@ public class CustomerMaintenanceServlet extends HttpServlet {
                 e.printStackTrace();
                 response.sendRedirect(request.getContextPath() + "/customer/devices?error=system_error");
             }
-        } //new req
+        } 
+        //new req
         else {
             try {
                 User user = (User) request.getSession().getAttribute("user");
+                if (user == null) {
+                    response.sendRedirect(request.getContextPath() + "/login");
+                    return;
+                }
+
                 int deviceId = Integer.parseInt(request.getParameter("deviceId"));
-                // Verify ownership truoc khi tao
+
+                // VERIFY OWNERSHIP truoc khi tao
                 DeviceDTO device = deviceDAO.getDeviceByIdAndCustomer(deviceId, user.getId());
                 if (device == null) {
                     response.sendRedirect(request.getContextPath() + "/customer/devices?error=unauthorized");
