@@ -141,7 +141,7 @@
                                                     <c:choose>
                                                         <c:when test="${item.paid}">
                                                             <fmt:formatNumber value="${item.price * item.quantity}"
-                                                                              type="currency" currencySymbol=""/>
+                                                                              type="currency" currencySymbol=""/> đ
                                                         </c:when>
                                                         <c:otherwise>
                                                             <span class="text-success fw-bold">Free</span>
@@ -158,7 +158,7 @@
                                         <c:if test="${task.laborHours > 0}">
                                             <c:set var="laborCost" value="${task.laborHours * task.laborCostPerHour}" />
                                             <tr class="table-info">
-                                                <td class="fw-bold ps-3">Labor Cost (${task.laborHours} hrs)</td>
+                                                <td class="fw-bold ps-3">Labor Cost (${task.laborHours} hrs)</td> đ
                                                 <td colspan="2" class="text-center text-muted small">
                                                     Rate: <fmt:formatNumber value="${task.laborCostPerHour}"
                                                                       type="currency" currencySymbol=""/>/hr
@@ -181,7 +181,7 @@
                                             <td class="text-end text-primary fs-5 pe-3 py-3">
                                                 <fmt:formatNumber
                                                     value="${totalSpareParts + (task.laborHours > 0 ? task.laborHours * task.laborCostPerHour : 0)}"
-                                                    type="currency" currencySymbol=""/>
+                                                    type="currency" currencySymbol=""/> đ
                                             </td>
                                         </tr>
                                     </tfoot>

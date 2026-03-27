@@ -218,7 +218,7 @@
                                                         <c:choose>
                                                             <c:when test="${item.paid}">
                                                                 <fmt:formatNumber value="${item.price * item.quantity}" 
-                                                                                  type="currency" currencySymbol=""/>
+                                                                                  type="currency" currencySymbol=""/> đ
                                                             </c:when>
                                                             <c:otherwise>
                                                                 <span class="text-success fw-bold">Free</span>
@@ -252,7 +252,7 @@
                                                         <span class="badge bg-danger">Charged</span>
                                                     </td>
                                                     <td class="text-end fw-bold">
-                                                        <fmt:formatNumber value="${laborCost}" type="currency" currencySymbol=""/>
+                                                        <fmt:formatNumber value="${laborCost}" type="currency" currencySymbol=""/> đ
                                                     </td>
                                                 </tr>
                                             </c:if>
@@ -263,7 +263,7 @@
                                                 <td class="text-end text-primary fs-6">
                                                     <fmt:formatNumber 
                                                         value="${totalSpareParts + (not empty task.laborHours ? task.laborHours * (not empty laborRate ? laborRate : 0) : 0)}" 
-                                                        type="currency" currencySymbol=""/>
+                                                        type="currency" currencySymbol=""/> đ
                                                 </td>
                                             </tr>
                                         </tfoot>

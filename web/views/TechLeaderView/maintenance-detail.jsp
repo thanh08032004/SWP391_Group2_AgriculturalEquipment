@@ -225,7 +225,7 @@
                                                                 <c:choose>
                                                                     <c:when test="${item.paid}">
                                                                         <fmt:formatNumber value="${item.price * item.quantity}" 
-                                                                                          type="currency" currencySymbol=""/>
+                                                                                          type="currency" currencySymbol=""/> đ
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <span class="text-success fw-bold">Free</span>
@@ -248,7 +248,7 @@
                                                             <td class="text-center">${task.laborHours}</td>
                                                             <td class="text-center">Hours</td>
                                                             <td class="text-center fw-bold">
-                                                                <fmt:formatNumber value="${laborCost}" type="currency" currencySymbol=""/>
+                                                                <fmt:formatNumber value="${laborCost}" type="currency" currencySymbol=""/> đ
                                                             </td>
                                                         </tr>
                                                     </c:if>
@@ -258,7 +258,7 @@
                                                         <td colspan="3" class="text-end text-uppercase">Final Total (Estimated):</td>
                                                         <td class="text-end text-primary fs-5">
                                                             <fmt:formatNumber value="${totalSpareParts + (task.laborHours * (not empty laborRate ? laborRate : 0))}" 
-                                                                              type="currency" currencySymbol=""/>
+                                                                              type="currency" currencySymbol=""/> đ
 
                                                         </td>
                                                     </tr>
