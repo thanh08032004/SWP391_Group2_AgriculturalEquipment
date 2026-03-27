@@ -506,7 +506,42 @@ public class InvoiceDAO extends DBContext {
 
         return null;
     }
+public Maintenance getMaintenanceByIdAndCustomer(int id, int customerId) {
 
+    String sql = "SELECT m.*, d.machine_name, d.customer_id "
+            + "FROM maintenance m "
+            + "JOIN device d ON m.device_id = d.id "
+            + "WHERE m.id = ? AND d.customer_id = ?";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, id);
+        ps.setInt(2, customerId);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+
+            Maintenance m = new Maintenance();
+
+            m.setId(rs.getInt("id"));
+            m.setDeviceId(rs.getInt("device_id"));
+            m.setDescription(rs.getString("description"));
+            m.setStatus(rs.getString("status"));
+            m.setStartDate(rs.getTimestamp("start_date"));
+            m.setEndDate(rs.getTimestamp("end_date"));
+            m.setMachineName(rs.getString("machine_name"));
+
+            return m;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return null;
+}
     public int countInvoice(String keyword, String filter) {
         int total = 0;
 

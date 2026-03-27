@@ -2,6 +2,7 @@ package controller.customer;
 
 import dal.FeedbackDAO;
 import dal.InvoiceDAO;
+import dal.MaintenanceDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,7 +18,7 @@ import java.util.List;
 import model.Maintenance;
 
 @MultipartConfig(
-        maxFileSize = 10 * 1024 * 1024,  
+        maxFileSize = 10 * 1024 * 1024,
         maxRequestSize = 50 * 1024 * 1024
 )
 public class CustomerFeedbackAdd extends HttpServlet {
@@ -28,7 +29,32 @@ public class CustomerFeedbackAdd extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String maintenanceId = request.getParameter("maintenanceId");
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        int customerId = user.getId();
+
+        String maintenanceRaw = request.getParameter("maintenanceId");
+
+        if (maintenanceRaw == null) {
+            response.sendRedirect(request.getContextPath() + "/customer/maintenance/list");
+            return;
+        }
+
+        int maintenanceId = Integer.parseInt(maintenanceRaw);
+
+        MaintenanceDAO mDao = new MaintenanceDAO();
+        Maintenance m = mDao.getMaintenanceByIdAndCustomer(maintenanceId, customerId);
+
+        if (m == null) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
         request.setAttribute("maintenanceId", maintenanceId);
 
         request.getRequestDispatcher("/views/CustomerView/customer-feedbackadd.jsp")
@@ -39,43 +65,41 @@ public class CustomerFeedbackAdd extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-String action = request.getParameter("action");
+        String action = request.getParameter("action");
 
 
         /* ================= MAINTENANCE POPUP ================= */
+        if ("getMaintenanceDetail".equals(action)) {
 
-   if ("getMaintenanceDetail".equals(action)) {
+            int id = Integer.parseInt(request.getParameter("id"));
+            InvoiceDAO dao = new InvoiceDAO();
+            Maintenance m = dao.getMaintenanceDetail(id);
 
-        int id = Integer.parseInt(request.getParameter("id"));
-InvoiceDAO dao = new InvoiceDAO();
-        Maintenance m = dao.getMaintenanceDetail(id);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+            PrintWriter out = response.getWriter();
 
-        PrintWriter out = response.getWriter();
+            if (m != null) {
 
-        if (m != null) {
+                out.print("{");
+                out.print("\"id\":" + m.getId() + ",");
+                out.print("\"machineName\":\"" + m.getMachineName() + "\",");
+                out.print("\"problem\":\"" + m.getDescription() + "\",");
+                out.print("\"status\":\"" + m.getStatus() + "\",");
+                out.print("\"startDate\":\"" + m.getStartDate() + "\",");
+                out.print("\"finishDate\":\"" + m.getEndDate() + "\"");
+                out.print("}");
 
-            out.print("{");
-            out.print("\"id\":"+m.getId()+",");
-            out.print("\"machineName\":\""+m.getMachineName()+"\",");
-            out.print("\"problem\":\""+m.getDescription()+"\",");
-            out.print("\"status\":\""+m.getStatus()+"\",");
-            out.print("\"startDate\":\""+m.getStartDate()+"\",");
-            out.print("\"finishDate\":\""+m.getEndDate()+"\"");
-            out.print("}");
+            }
 
+            return;
         }
-
-        return;
-    }
         User user = (User) session.getAttribute("user");
         int customerId = user.getId();
         int maintenanceId = Integer.parseInt(request.getParameter("maintenanceId"));
@@ -105,6 +129,13 @@ InvoiceDAO dao = new InvoiceDAO();
 
                 imagePaths.add(UPLOAD_DIR + "/" + fileName);
             }
+        }
+        MaintenanceDAO mDao = new MaintenanceDAO();
+        Maintenance m = mDao.getMaintenanceByIdAndCustomer(maintenanceId, customerId);
+
+        if (m == null) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
 
         FeedbackDAO dao = new FeedbackDAO();
