@@ -48,7 +48,7 @@ public class AdminReportServlet extends HttpServlet {
                 }
             }
 
-            // 👉 Gộp logic service vào đây
+  
             ReportDTO report = new ReportDTO();
             report.setActiveMachines(dao.countActiveMachines());
             report.setTotalMaintenance(dao.countMaintenance(month, year));

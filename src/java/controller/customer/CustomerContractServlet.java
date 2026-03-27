@@ -76,7 +76,13 @@ public class CustomerContractServlet extends HttpServlet {
 
             int id = Integer.parseInt(request.getParameter("id"));
 
-            Contract contract = dao.getById(id);
+            Contract contract = dao.getByIdAndCustomer(id, customerId);
+
+            if (contract == null) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN); // 403
+                return;
+            }
+            
             request.setAttribute("contract", contract);
 
             List<SubcategorySummaryDTO> subList = dao.getDeviceSummaryByContract(id);
