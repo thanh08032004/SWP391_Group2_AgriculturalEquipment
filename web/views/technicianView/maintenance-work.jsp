@@ -208,8 +208,8 @@
                                     <input type="number"
                                            name="workHours"
                                            class="form-control"
-                                           min="0.5"
-                                           step="0.5"
+                                           min="1"
+                                           step="1.0"
                                            required
                                            placeholder="Enter number of hours">
                                 </div>

@@ -556,6 +556,19 @@ public class AdminDeviceServlet extends HttpServlet {
                 request.setAttribute("categories", deviceDAO.getAllCategories());
                 request.setAttribute("brands", deviceDAO.getAllBrands());
                 request.setAttribute("customerList", deviceDAO.getAllCustomersForDropdown());
+                request.setAttribute("sparePartList", deviceDAO.getAllSparePartsForDropdown());
+                request.setAttribute("subcategoryList", deviceDAO.getAllSubcategories());
+                String[] selectedSpIds = request.getParameterValues("sparePartIds");
+                if (selectedSpIds != null) {
+                    List<Integer> selectedSpIdList = new ArrayList<>();
+                    for (String s : selectedSpIds) {
+                        try {
+                            selectedSpIdList.add(Integer.parseInt(s));
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
+                    request.setAttribute("linkedSparePartIds", selectedSpIdList);
+                }
                 request.getRequestDispatcher("/views/AdminBusinessView/device-edit.jsp").forward(request, response);
                 return;
             }
