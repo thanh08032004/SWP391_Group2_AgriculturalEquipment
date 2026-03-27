@@ -1,0 +1,20 @@
+<component name="libraryTable">
+  <library name="Libraries jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/smtp-1.6.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/jakarta.servlet.jsp.jstl-api-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/jakarta.activation-2.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/jakarta.mail-2.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/mailapi-1.6.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/jaxb-api-2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/mssql-jdbc-13.2.0.jre11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/mysql-connector-j-8.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/jbcrypt-0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/lombok-1.18.24.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/jakarta.servlet.jsp.jstl-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Libraries jar/jakarta.activation-api-2.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

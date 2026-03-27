@@ -529,9 +529,19 @@
                                     '</span>' +
                                     '</td>' +
                                     '<td class="col-status status-cell">' + statusHtml + '</td>' +
-                                    '<td class="col-actions text-center pe-3">' +
-                                    '<a href="' + CTX + '/admin-business/devices?action=edit&id=' + d.id + '" class="btn btn-sm btn-outline-primary mx-1" title="Edit"><i class="bi bi-pencil"></i></a>' +
-                                    '</td>';
+                                    (function () {
+                                        var hasOwner = (d.customerId && d.customerId !== '0' && d.customerId !== '');
+                                        var disableBtn = (!hasOwner && d.status !== 'BROKEN')
+                                                ? '<button onclick="changeDeviceStatus(' + d.id + ',\'BROKEN\')" class="btn btn-sm btn-outline-danger mx-1" title="Disable"><i class="bi bi-slash-circle"></i></button>'
+                                                : '';
+                                        var activateBtn = (!hasOwner && d.status !== 'ACTIVE')
+                                                ? '<button onclick="changeDeviceStatus(' + d.id + ',\'ACTIVE\')" class="btn btn-sm btn-outline-success mx-1" title="Activate"><i class="bi bi-check-circle"></i></button>'
+                                                : '';
+                                        return '<td class="col-actions text-center pe-3">' +
+                                                '<a href="' + CTX + '/admin-business/devices?action=edit&id=' + d.id + '" class="btn btn-sm btn-outline-primary mx-1" title="Edit"><i class="bi bi-pencil"></i></a>' +
+                                                disableBtn + activateBtn +
+                                                '</td>';
+                                    })()
                             tbody.appendChild(tr);
                         });
                     }
@@ -595,7 +605,7 @@
                                     'onclick="showSparePartsModal(' + dev.id + ',\'' + esc(dev.machineName) + '\')" ' +
                                     'onmouseover="this.style.textDecoration=\'underline\'" ' +
                                     'onmouseout="this.style.textDecoration=\'none\'">' +
-                                     + esc(dev.machineName) +
+                                    +esc(dev.machineName) +
                                     '</span>' +
                                     '</td></tr>' +
                                     '<tr><th>Model</th><td>' + esc(dev.model) + '</td></tr>' +
@@ -735,6 +745,46 @@
                         .catch(function () {
                             document.getElementById('sparePartDetailContent').innerHTML =
                                     '<p class="text-danger text-center p-4">Error loading spare part details.</p>';
+                        });
+            }
+
+            function changeDeviceStatus(deviceId, newStatus) {
+                var label = newStatus === 'BROKEN' ? 'disable (BROKEN)' : 'activate (ACTIVE)';
+                if (!confirm('Are you sure you want to ' + label + ' this device?'))
+                    return;
+
+                fetch(CTX + '/admin-business/devices?action=updateStatus&id=' + deviceId + '&status=' + newStatus)
+                        .then(function (res) {
+                            if (!res.ok)
+                                throw new Error('Server error');
+                            document.querySelectorAll('tr').forEach(function (row) {
+                                var editLink = row.querySelector('a[href*="action=edit&id=' + deviceId + '"]');
+                                if (!editLink)
+                                    return;
+
+                                var statusCell = row.querySelector('.status-cell');
+                                if (statusCell) {
+                                    if (newStatus === 'BROKEN')
+                                        statusCell.innerHTML = '<span class="status-badge s-broken">Broken</span>';
+                                    else
+                                        statusCell.innerHTML = '<span class="status-badge s-active">Active</span>';
+                                }
+
+                                var actionsCell = row.querySelector('.col-actions');
+                                if (actionsCell) {
+                                    var editHtml = '<a href="' + CTX + '/admin-business/devices?action=edit&id=' + deviceId + '" class="btn btn-sm btn-outline-primary mx-1" title="Edit"><i class="bi bi-pencil"></i></a>';
+                                    var disableHtml = '<button onclick="changeDeviceStatus(' + deviceId + ',\'BROKEN\')" class="btn btn-sm btn-outline-danger mx-1" title="Disable"><i class="bi bi-slash-circle"></i></button>';
+                                    var activateHtml = '<button onclick="changeDeviceStatus(' + deviceId + ',\'ACTIVE\')" class="btn btn-sm btn-outline-success mx-1" title="Activate"><i class="bi bi-check-circle"></i></button>';
+
+                                    if (newStatus === 'BROKEN')
+                                        actionsCell.innerHTML = editHtml + activateHtml;
+                                    else
+                                        actionsCell.innerHTML = editHtml + disableHtml;
+                                }
+                            });
+                        })
+                        .catch(function () {
+                            alert('Error updating device status.');
                         });
             }
         </script>

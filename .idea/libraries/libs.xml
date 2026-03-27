@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/jakarta.servlet.jsp.jstl-api-2.0.0 (2).jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jakarta.servlet.jsp.jstl-2.0.0 (2).jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lombok-1.18.24.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
