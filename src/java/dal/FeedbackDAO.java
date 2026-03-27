@@ -211,7 +211,7 @@ public MaintenanceFeedback getFeedbackByMaintenanceId(int maintenanceId) {
     return null;
 }
 
-    public MaintenanceFeedback getFeedbackById(int id) {
+    public MaintenanceFeedback getFeedbackByIdAndUser(int id, int userId) {
 
     String sql = """
         SELECT mr.id,
@@ -223,13 +223,14 @@ public MaintenanceFeedback getFeedbackByMaintenanceId(int maintenanceId) {
         FROM maintenance_rating mr
         JOIN maintenance m ON mr.maintenance_id = m.id
         JOIN device d ON m.device_id = d.id
-        WHERE mr.id = ?
+        WHERE mr.id = ? AND d.customer_id = ?
     """;
 
     try (Connection con = getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
 
         ps.setInt(1, id);
+        ps.setInt(2, userId);
 
         ResultSet rs = ps.executeQuery();
 
@@ -243,8 +244,6 @@ public MaintenanceFeedback getFeedbackByMaintenanceId(int maintenanceId) {
             f.setRating(rs.getInt("rating"));
             f.setComment(rs.getString("comment"));
             f.setCreatedDate(rs.getTimestamp("created_at"));
-
-            // 🔥 LOAD IMAGES
             f.setImages(getImagesByRatingId(f.getId()));
 
             return f;
@@ -256,7 +255,6 @@ public MaintenanceFeedback getFeedbackByMaintenanceId(int maintenanceId) {
 
     return null;
 }
-
     public int countFeedbackByCustomer(int customerId, String keyword, String rating) {
 
         int total = 0;

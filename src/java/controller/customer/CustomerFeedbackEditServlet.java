@@ -28,44 +28,43 @@ public class CustomerFeedbackEditServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-String action = request.getParameter("action");
+        String action = request.getParameter("action");
 
-if ("getMaintenanceDetail".equals(action)) {
-    int id = Integer.parseInt(request.getParameter("id"));
+        if ("getMaintenanceDetail".equals(action)) {
+            int id = Integer.parseInt(request.getParameter("id"));
 
-    InvoiceDAO dao1 = new InvoiceDAO();
-    Maintenance m = dao1.getMaintenanceDetail(id);
+            InvoiceDAO dao1 = new InvoiceDAO();
+            Maintenance m = dao1.getMaintenanceDetail(id);
 
-    response.setContentType("application/json");
-    response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
 
-    PrintWriter out = response.getWriter();
+            PrintWriter out = response.getWriter();
 
-    if (m != null) {
-        out.print("{");
-        out.print("\"id\":" + m.getId() + ",");
-        out.print("\"machineName\":\"" + m.getMachineName() + "\",");
-        out.print("\"problem\":\"" + m.getDescription() + "\",");
-        out.print("\"status\":\"" + m.getStatus() + "\",");
-        out.print("\"startDate\":\"" + m.getStartDate() + "\",");
-        out.print("\"finishDate\":\"" + m.getEndDate() + "\"");
-        out.print("}");
-    }
+            if (m != null) {
+                out.print("{");
+                out.print("\"id\":" + m.getId() + ",");
+                out.print("\"machineName\":\"" + m.getMachineName() + "\",");
+                out.print("\"problem\":\"" + m.getDescription() + "\",");
+                out.print("\"status\":\"" + m.getStatus() + "\",");
+                out.print("\"startDate\":\"" + m.getStartDate() + "\",");
+                out.print("\"finishDate\":\"" + m.getEndDate() + "\"");
+                out.print("}");
+            }
 
-    return;
-}
-        User user = (User) session.getAttribute("user");
-
-        if (user.getRoleId() != 4) {
-            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        User user = (User) session.getAttribute("user");
 
         int id = Integer.parseInt(request.getParameter("id"));
 
         FeedbackDAO dao = new FeedbackDAO();
+        MaintenanceFeedback feedback = dao.getFeedbackByIdAndUser(id, user.getId());
 
-        MaintenanceFeedback feedback = dao.getFeedbackById(id);
+        if (feedback == null) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
 
         request.setAttribute("feedback", feedback);
 

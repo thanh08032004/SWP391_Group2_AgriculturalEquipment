@@ -1,4 +1,5 @@
 package controller.customer;
+
 import dal.DeviceDAO;
 import dal.MaintenanceDAO;
 import dal.UserProfileDAO;
@@ -14,31 +15,31 @@ import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 import model.Maintenance;
+import model.User;
 import model.UserProfile;
 
 public class CustomerMaintenanceDetailServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet CustomerMaintenanceDetailServlet</title>");  
+            out.println("<title>Servlet CustomerMaintenanceDetailServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet CustomerMaintenanceDetailServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet CustomerMaintenanceDetailServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
-    } 
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         String action = request.getParameter("action");
         DeviceDAO dDao = new DeviceDAO();
         if ("getDeviceDetail".equals(action)) {
@@ -79,22 +80,33 @@ public class CustomerMaintenanceDetailServlet extends HttpServlet {
             }
             return;
         }
-        
-        MaintenanceDAO dao = new MaintenanceDAO();
-                    double laborRate = 100000.0;
-            int id = Integer.parseInt(request.getParameter("id"));
-            Maintenance task = dao.getMaintenanceById(id);
-            List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
-            request.setAttribute("task", task);
-            request.setAttribute("items", items);
-            request.setAttribute("laborRate", laborRate);
-            request.getRequestDispatcher("/views/CustomerView/customer-maintenancedetail.jsp").forward(request, response);
-    } 
+        HttpSession session = request.getSession(false);
 
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        User user = (User) session.getAttribute("user");
+        int id = Integer.parseInt(request.getParameter("id"));
+        MaintenanceDAO dao = new MaintenanceDAO();
+        Maintenance task = dao.getMaintenanceByIdAndCustomer(id, user.getId());
+        if (task == null) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        List<Map<String, Object>> items = dao.getMaintenanceItemsWithPrice(id);
+
+        request.setAttribute("task", task);
+        request.setAttribute("items", items);
+        request.setAttribute("laborRate", 100000.0);
+
+        request.getRequestDispatcher("/views/CustomerView/customer-maintenancedetail.jsp")
+                .forward(request, response);
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 

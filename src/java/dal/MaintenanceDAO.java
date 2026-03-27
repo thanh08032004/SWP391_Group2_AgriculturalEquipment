@@ -202,7 +202,51 @@ public class MaintenanceDAO extends DBContext {
         }
         return null;
     }
+ public Maintenance getMaintenanceByIdAndCustomer(int id, int customerId) {
 
+    String sql = "SELECT m.*, "
+            + "d.machine_name, d.model, up.fullname AS customer_name, d.customer_id AS customerId, "
+            + "i.id AS invoice_id, i.total_amount AS invoice_total, i.payment_status AS invoice_status "
+            + "FROM maintenance m "
+            + "JOIN device d ON m.device_id = d.id "
+            + "JOIN user_profile up ON d.customer_id = up.user_id "
+            + "LEFT JOIN invoice i ON i.maintenance_id = m.id "
+            + "WHERE m.id = ? AND d.customer_id = ?";
+
+    try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, id);
+        ps.setInt(2, customerId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                Maintenance m = Maintenance.builder()
+                        .id(rs.getInt("id"))
+                        .deviceId(rs.getInt("device_id"))
+                        .customerId(rs.getInt("customerId"))
+                        .technicianId(rs.getObject("technician_id") != null ? rs.getInt("technician_id") : null)
+                        .description(rs.getString("description"))
+                        .status(rs.getString("status"))
+                        .startDate(rs.getTimestamp("start_date"))
+                        .endDate(rs.getTimestamp("end_date"))
+                        .laborHours(rs.getDouble("labor_hours"))
+                        .laborCostPerHour(rs.getDouble("labor_cost_per_hour"))
+                        .technicianNote(rs.getString("technician_note"))
+                        .machineName(rs.getString("machine_name"))
+                        .modelName(rs.getString("model"))
+                        .customerName(rs.getString("customer_name"))
+                        .invoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null)
+                        .invoiceStatus(rs.getString("invoice_status"))
+                        .build();
+
+                m.setImages(getMaintenanceImages(con, id));
+                return m;
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
     private List<MaintenanceImage> getMaintenanceImages(Connection con, int maintenanceId) throws SQLException {
         List<MaintenanceImage> images = new ArrayList<>();
         String sql = "SELECT * FROM maintenance_image WHERE maintenance_id = ? ORDER BY created_at ASC";
