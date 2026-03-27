@@ -617,6 +617,31 @@ public class DeviceDAO extends DBContext {
         }
         return list;
     }
+    
+    //4
+    public List<dto.SubcategoryDTO> getAllSubcategories() {
+        List<dto.SubcategoryDTO> list = new java.util.ArrayList<>();
+        String sql = """
+        SELECT id, category_id, name, description
+        FROM subcategory
+        WHERE status = 'ACTIVE'
+        ORDER BY category_id, name
+    """;
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                dto.SubcategoryDTO s = new dto.SubcategoryDTO();
+                s.setId(rs.getInt("id"));
+                s.setCategoryId(rs.getInt("category_id"));
+                s.setName(rs.getString("name"));
+                s.setDescription(rs.getString("description"));
+                list.add(s);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 
     public List<Map<String, Object>> getAllCustomersForDropdown() {
         List<Map<String, Object>> list = new ArrayList<>();
@@ -745,29 +770,6 @@ public class DeviceDAO extends DBContext {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public List<dto.SubcategoryDTO> getAllSubcategories() {
-        List<dto.SubcategoryDTO> list = new java.util.ArrayList<>();
-        String sql = """
-        SELECT id, category_id, name, description
-        FROM subcategory
-        WHERE status = 'ACTIVE'
-        ORDER BY category_id, name
-    """;
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                dto.SubcategoryDTO s = new dto.SubcategoryDTO();
-                s.setId(rs.getInt("id"));
-                s.setCategoryId(rs.getInt("category_id"));
-                s.setName(rs.getString("name"));
-                s.setDescription(rs.getString("description"));
-                list.add(s);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
     }
 
     // lay tat ca spare parts (de hien thi multi-select)

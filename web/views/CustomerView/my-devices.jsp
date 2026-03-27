@@ -103,6 +103,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </c:if>
+        
         <c:if test="${param.error == 'system_error'}">
             <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i> System error. Please try again later.

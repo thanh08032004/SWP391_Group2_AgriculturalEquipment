@@ -2,6 +2,7 @@ package controller.customer;
 
 import dal.DeviceDAO;
 import dal.MaintenanceDAO;
+import dto.DeviceDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.*;
@@ -11,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import model.Maintenance;
+import model.User;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024,
@@ -36,11 +38,27 @@ public class CustomerMaintenanceServlet extends HttpServlet {
             }
         } else {
             //tao form
+            // doGet
+            HttpSession session = request.getSession();
+            User user = (User) session.getAttribute("user");
+            if (user == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+
             String deviceIdStr = request.getParameter("deviceId");
             if (deviceIdStr != null) {
                 int deviceId = Integer.parseInt(deviceIdStr);
-                request.setAttribute("device", new DeviceDAO().getDeviceById(deviceId));
-                request.getRequestDispatcher("/views/CustomerView/maintenance-request.jsp").forward(request, response);
+                DeviceDTO device = new DeviceDAO().getDeviceByIdAndCustomer(deviceId, user.getId());
+
+                if (device == null) {
+                    response.sendRedirect(request.getContextPath() + "/customer/devices?error=unauthorized");
+                    return;
+                }
+
+                request.setAttribute("device", device);
+                request.getRequestDispatcher("/views/CustomerView/maintenance-request.jsp")
+                        .forward(request, response);
             }
         }
     }
@@ -62,7 +80,7 @@ public class CustomerMaintenanceServlet extends HttpServlet {
                     maintenanceDAO.updateStatus(id, "IN_PROGRESS");
                     deviceDAO.updateDeviceStatus(m.getDeviceId(), "MAINTENANCE");
                 } else {
-                    maintenanceDAO.updateStatus(id, "READY"); 
+                    maintenanceDAO.updateStatus(id, "READY");
                     deviceDAO.updateDeviceStatus(m.getDeviceId(), "BROKEN");
                 }
                 response.sendRedirect(request.getContextPath() + "/customer/devices?msg=updated");
@@ -70,12 +88,17 @@ public class CustomerMaintenanceServlet extends HttpServlet {
                 e.printStackTrace();
                 response.sendRedirect(request.getContextPath() + "/customer/devices?error=system_error");
             }
-        } 
-        
-        //new req
+        } //new req
         else {
             try {
+                User user = (User) request.getSession().getAttribute("user");
                 int deviceId = Integer.parseInt(request.getParameter("deviceId"));
+                // Verify ownership truoc khi tao
+                DeviceDTO device = deviceDAO.getDeviceByIdAndCustomer(deviceId, user.getId());
+                if (device == null) {
+                    response.sendRedirect(request.getContextPath() + "/customer/devices?error=unauthorized");
+                    return;
+                }
                 String desc = request.getParameter("description");
 
                 Part part = request.getPart("image");
@@ -85,7 +108,9 @@ public class CustomerMaintenanceServlet extends HttpServlet {
                 if (fileName != null && !fileName.isEmpty()) {
                     String uploadPath = getServletContext().getRealPath("/") + "assets/images/maintenance";
                     File uploadDir = new File(uploadPath);
-                    if (!uploadDir.exists()) uploadDir.mkdirs();
+                    if (!uploadDir.exists()) {
+                        uploadDir.mkdirs();
+                    }
 
                     // ten file: deviceId_timestamp_name
                     finalFileName = deviceId + "_" + System.currentTimeMillis() + "_" + fileName;
