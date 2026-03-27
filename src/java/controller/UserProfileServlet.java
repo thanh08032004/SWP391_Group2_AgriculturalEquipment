@@ -97,6 +97,7 @@ public class UserProfileServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
 
+        // lưu trữ các ô khác nếu data bị lỗi
         Map<String, String> errors = new HashMap<>();
      
         String fullname = request.getParameter("fullname");
