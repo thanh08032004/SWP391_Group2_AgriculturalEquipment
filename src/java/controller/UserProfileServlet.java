@@ -2,7 +2,6 @@ package controller;
 
 import dal.UserProfileDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,23 +20,6 @@ import utils.UserProfileUtils;
  */
 public class UserProfileServlet extends HttpServlet {
     
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AccountProfileServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AccountProfileServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -64,8 +46,7 @@ public class UserProfileServlet extends HttpServlet {
         String tab = request.getParameter("tab");
         if (tab == null) {
             tab = "profile";
-        }
-        request.setAttribute("tab", tab);
+        }       
 
         // 6. Hiển thị thông báo
         // 6.1 báo lỗi Wrong Pass
@@ -148,7 +129,7 @@ public class UserProfileServlet extends HttpServlet {
             errors.put("phone", e.getMessage());
         }
 
-//        // validate birth date
+        // validate birth date
         try {
             birthDate = UserProfileUtils.validateBirthDate(birthDateStr);
         } catch (IllegalArgumentException e) {

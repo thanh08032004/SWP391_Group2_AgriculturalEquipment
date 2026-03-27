@@ -65,7 +65,7 @@
                     <i class="fa fa-arrow-left"></i> Back to Home
                 </a>
 
-                <c:if test="${tab == 'profile' || tab == null}">
+                <c:if test="${tab == 'profile'}">
                     <h3>My Profile</h3>
                     <c:if test="${not empty success}">
                         <p style="color:green; margin-bottom: 12px;">
@@ -76,7 +76,12 @@
                     <form action="${pageContext.request.contextPath}/profile" method="post">
                         <div class="info-grid">
                             <div class="info-box">
-                                <label>Full Name</label>
+                                <label>
+                                    Full Name 
+                                    <c:if test="${edit}">
+                                        <span class="required" style="color:red">*</span>
+                                    </c:if>
+                                </label>
 
                                 <c:choose>
                                     <c:when test="${edit}">
@@ -98,7 +103,12 @@
                             </div>     
 
                             <div class="info-box">
-                                <label>Email</label>
+                                <label>
+                                    Email 
+                                    <c:if test="${edit}">
+                                        <span class="required" style="color:red">*</span>
+                                    </c:if>
+                                </label>
 
                                 <c:choose>
                                     <c:when test="${edit}">
@@ -115,9 +125,13 @@
                             </div>
 
                             <div class="info-box">
-                                <label>Phone number</label>
-                                <c:choose>
-                                    <c:when test="${edit}">
+                                <label>
+                                    Phone number 
+                                    <c:if test="${edit}">
+                                        <span class="required" style="color:red">*</span>
+                                    </c:if></label>
+                                    <c:choose>
+                                        <c:when test="${edit}">
                                         <input type="text" name="phone" value="${profile.phone}" required>
                                         <c:if test="${not empty errors.phone}">
                                             <small class="error-text">${errors.phone}</small>
@@ -130,9 +144,13 @@
                             </div>
 
                             <div class="info-box">
-                                <label>Gender</label>
-                                <c:choose>
-                                    <c:when test="${edit}">
+                                <label>
+                                    Gender 
+                                    <c:if test="${edit}">
+                                        <span class="required" style="color:red">*</span>
+                                    </c:if></label>
+                                    <c:choose>
+                                        <c:when test="${edit}">
                                         <select name="gender">
                                             <option value="Male" ${profile.gender=='Male'?'selected':''}>Male</option>
                                             <option value="Female" ${profile.gender=='Female'?'selected':''}>Female</option>
@@ -146,9 +164,13 @@
                             </div>
 
                             <div class="info-box">
-                                <label>Birth Date</label>
-                                <c:choose>
-                                    <c:when test="${edit}">
+                                <label>
+                                    Birth Date 
+                                    <c:if test="${edit}">
+                                        <span class="required" style="color:red">*</span>
+                                    </c:if></label>
+                                    <c:choose>
+                                        <c:when test="${edit}">
                                         <input type="date" name="birthDate"
                                                value="${profile.birthDate}">
                                         <c:if test="${not empty errors.birthDate}">
@@ -161,11 +183,15 @@
                                 </c:choose>
                             </div>
                             <div class="info-box full-width">
-                                <label>Address</label>
-                                <c:choose>
-                                    <c:when test="${edit}">
+                                <label>
+                                    Address 
+                                    <c:if test="${edit}">
+                                        <span class="required" style="color:red">*</span>
+                                    </c:if></label>
+                                    <c:choose>
+                                        <c:when test="${edit}">
                                         <input type="text" name="address"
-                                               value="${profile.address}">
+                                               value="${profile.address}" required>
                                         <c:if test="${not empty errors.address}">
                                             <small class="error-text">${errors.address}</small>
                                         </c:if>
@@ -200,16 +226,26 @@
                         <h4><i class="fa fa-key"></i> Change Password</h4>
                         <form action="${pageContext.request.contextPath}/change-password" method="post">
                             <div class="form-group">
-                                <label>Current Password</label>
+                                <label>
+                                    Current Password
+                                    <span class="required" style="color:red">*</span>
+                                </label>
                                 <input type="password" name="currentPassword" required>
                             </div>
                             <div class="form-group">
-                                <label>New Password</label>
+                                <label>
+                                    New Password
+                                    <span class="required" style="color:red">*</span>
+                                </label>
+                                
                                 <input type="password" name="newPassword" minlength="3"
                                        maxlength="30" required>
                             </div>
                             <div class="form-group">
-                                <label>Confirm New Password</label>
+                                <label>
+                                    Confirm New Password
+                                    <span class="required" style="color:red">*</span>
+                                </label>
                                 <input type="password" name="confirmPassword" minlength="3"
                                        maxlength="30" required>
                             </div>

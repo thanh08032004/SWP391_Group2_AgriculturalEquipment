@@ -316,8 +316,6 @@ body {
 }
 
 
-
-
 @media (max-width: 900px) {
   .profile-wrapper {
     grid-template-columns: 1fr;
